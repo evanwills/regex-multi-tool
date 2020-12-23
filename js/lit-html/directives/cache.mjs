@@ -12,8 +12,8 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import { TemplateInstance } from '../lib/template-instance.js';
-import { directive, NodePart, reparentNodes, TemplateResult } from '../lit-html.js';
+import { TemplateInstance } from '../lib/template-instance.mjs';
+import { directive, NodePart, reparentNodes, TemplateResult } from '../lit-html.mjs';
 
 const templateCaches = new WeakMap();
 

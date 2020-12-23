@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { AttributeCommitter, BooleanAttributePart, EventPart, NodePart, PropertyCommitter } from "./parts.js";
+import { AttributeCommitter, BooleanAttributePart, EventPart, NodePart, PropertyCommitter } from "./parts.mjs";
 /**
  * Creates Parts when a template is instantiated.
  */

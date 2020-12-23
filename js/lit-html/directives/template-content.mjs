@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { directive, NodePart } from '../lit-html.js';
+import { directive, NodePart } from '../lit-html.mjs';
 
 // For each part, remember the value that was last rendered to the part by the
 // templateContent directive, and the DocumentFragment that was last set as a

@@ -11,9 +11,9 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { removeNodes } from "./dom.js";
-import { NodePart } from "./parts.js";
-import { templateFactory } from "./template-factory.js";
+import { removeNodes } from "./dom.mjs";
+import { NodePart } from "./parts.mjs";
+import { templateFactory } from "./template-factory.mjs";
 
 export const parts = new WeakMap();
 

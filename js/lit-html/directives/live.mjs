@@ -12,7 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import { AttributePart, BooleanAttributePart, directive, EventPart, NodePart, PropertyPart } from '../lit-html.js';
+import { AttributePart, BooleanAttributePart, directive, EventPart, NodePart, PropertyPart } from '../lit-html.mjs';
 
 /**
  * Checks binding values against live DOM values, instead of previously bound

@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { marker, Template } from "./template.js";
+import { marker, Template } from "./template.mjs";
 /**
  * The default TemplateFactory which caches Templates keyed on
  * result.type and result.strings.

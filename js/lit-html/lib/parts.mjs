@@ -11,12 +11,12 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { isDirective } from "./directive.js";
-import { removeNodes } from "./dom.js";
-import { noChange, nothing } from "./part.js";
-import { TemplateInstance } from "./template-instance.js";
-import { TemplateResult } from "./template-result.js";
-import { createMarker } from "./template.js";
+import { isDirective } from "./directive.mjs";
+import { removeNodes } from "./dom.mjs";
+import { noChange, nothing } from "./part.mjs";
+import { TemplateInstance } from "./template-instance.mjs";
+import { TemplateResult } from "./template-result.mjs";
+import { createMarker } from "./template.mjs";
 
 export const isPrimitive = value => {
   return value === null ||

@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { AttributePart, directive } from '../lit-html.js';
+import { AttributePart, directive } from '../lit-html.mjs';
 
 const previousValues = new WeakMap();
 

@@ -12,9 +12,9 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import { reparentNodes } from '../lib/dom.js';
-import { isPrimitive } from '../lib/parts.js';
-import { directive, NodePart } from '../lit-html.js';
+import { reparentNodes } from '../lib/dom.mjs';
+import { isPrimitive } from '../lib/parts.mjs';
+import { directive, NodePart } from '../lit-html.mjs';
 
 // For each part, remember the value that was last rendered to the part by the
 // unsafeSVG directive, and the DocumentFragment that was last set as a value.

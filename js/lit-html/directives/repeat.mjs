@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { createMarker, directive, NodePart, removeNodes, reparentNodes } from '../lit-html.js';
+import { createMarker, directive, NodePart, removeNodes, reparentNodes } from '../lit-html.mjs';
 
 // Helper functions for manipulating parts
 // TODO(kschaaf): Refactor into Part API?

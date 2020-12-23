@@ -15,8 +15,8 @@
 /**
 * @module lit-html
 */
-import { reparentNodes } from "./dom.js";
-import { boundAttributeSuffix, lastAttributeNameRegex, marker, nodeMarker } from "./template.js";
+import { reparentNodes } from "./dom.mjs";
+import { boundAttributeSuffix, lastAttributeNameRegex, marker, nodeMarker } from "./template.mjs";
 
 /**
  * Our TrustedTypePolicy for HTML which is declared using the html template

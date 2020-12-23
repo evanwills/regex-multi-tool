@@ -22,7 +22,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
   function settle(resolve, reject, d, v) { Promise.resolve(v).then(function (v) { resolve({ value: v, done: d }); }, reject); }
 };
 
-import { directive, NodePart } from '../lit-html.js';
+import { directive, NodePart } from '../lit-html.mjs';
 
 /**
  * A directive that renders the items of an async iterable[1], replacing

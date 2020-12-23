@@ -12,8 +12,8 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import { isCEPolyfill } from "./dom.js";
-import { isTemplatePartActive } from "./template.js";
+import { isCEPolyfill } from "./dom.mjs";
+import { isTemplatePartActive } from "./template.mjs";
 
 /**
  * An instance of a `Template` that can be attached to the DOM and updated

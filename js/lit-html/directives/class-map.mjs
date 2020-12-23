@@ -11,7 +11,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { AttributePart, directive, PropertyPart } from '../lit-html.js';
+import { AttributePart, directive, PropertyPart } from '../lit-html.mjs';
 
 // IE11 doesn't support classList on SVG elements, so we emulate it with a Set
 class ClassList {

@@ -1,26 +1,25 @@
-const { src, dest, series, parallel, watch } = require('gulp');
+const { src, dest, series, watch } = require('gulp')
 const browserSync = require('browser-sync').create()
 const sass = require('gulp-sass')
 
-const origin = './';
+const origin = './'
 const destination = './'
 
 sass.compiler = require('node-sass')
 
-
 function scss (cb) {
-  src('scss/*.scss').
-  pipe(sass({
-    outputStyle: 'expanded',
-    eyeglass: {
-      enableImportOnce: false
-    },
-    precision: 3,
-    sourceComments: true,
-    sourceMap: true,
-    sourceMapContents: true,
-  })).
-  pipe(dest('.css'))
+  src('scss/*.scss')
+    .pipe(sass({
+      outputStyle: 'expanded',
+      eyeglass: {
+        enableImportOnce: false
+      },
+      precision: 3,
+      sourceComments: true,
+      sourceMap: true,
+      sourceMapContents: true
+    }))
+    .pipe(dest('.css'))
 }
 
 function watcher (cb) {
@@ -28,13 +27,13 @@ function watcher (cb) {
     'change', series(scss)
   )
   watch(origin + '**/*.html').on(
-    'change', series(html, browserSync.reload)
+    'change', series(browserSync.reload)
   )
   watch(origin + '**/*.css').on(
-    'change', series(css, browserSync.reload)
+    'change', series(browserSync.reload)
   )
   watch(origin + '**/*.js').on(
-    'change', series(js, browserSync.reload)
+    'change', series(browserSync.reload)
   )
   cb()
 }
@@ -42,7 +41,7 @@ function watcher (cb) {
 function server (cb) {
   browserSync.init({
     server: {
-      notify: false,
+      notify: true,
       open: true,
       baseDir: destination,
       index: origin + 'index.html',
@@ -51,17 +50,16 @@ function server (cb) {
       }
     },
     callbacks: {
-      ready: function(err, bs) {
+      ready: function (err, bs) {
         bs.utils.serveStatic.mime.define({
           'text/javascript': ['js', 'mjs']
-        });
+        })
 
-        console.log("---> " + bs.utils.serveStatic.mime.lookup('.wasm'));
+        console.log('---> ' + bs.utils.serveStatic.mime.lookup('.mjs'))
       }
     }
   })
   cb()
 }
 
-
-exports.default = series(server);
+exports.default = series(server, watcher)

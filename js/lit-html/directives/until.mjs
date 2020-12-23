@@ -11,8 +11,8 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import { isPrimitive } from '../lib/parts.js';
-import { directive } from '../lit-html.js';
+import { isPrimitive } from '../lib/parts.mjs';
+import { directive } from '../lit-html.mjs';
 
 const _state = new WeakMap();
 // Effectively infinity, but a SMI.

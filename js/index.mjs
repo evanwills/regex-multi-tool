@@ -1,5 +1,5 @@
-import { render } from '../lit-html/lit-html.js'
-import { header } from './view/templates.js'
+import { render } from './lit-html/lit-html.mjs'
+import { header } from './view/templates.mjs'
 
 render(
   mainApp(
