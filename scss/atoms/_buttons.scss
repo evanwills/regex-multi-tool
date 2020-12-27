@@ -1,0 +1,39 @@
+input + .radio-btn-label {
+  display: inline-block;
+  margin-left: -1.25rem;
+  border: 0.05rem solid #ddd;
+  padding: 0.5rem 1rem;
+  z-index: 3;
+  position: relative;
+
+  &::before {
+    background-color: #fff;
+    bottom: 0;
+    content: '';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -2;
+  }
+
+  &::after {
+    background-color: #6d6;
+    bottom: 0;
+    content: '';
+    left: 0;
+    right: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    transition: opacity ease-in-out .2s;
+    z-index: -1;
+  }
+}
+
+input:checked + .radio-btn-label {
+  &::after {
+    opacity: 1;
+    transition: opacity ease-in-out .2s;
+  }
+}

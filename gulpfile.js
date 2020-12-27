@@ -3,7 +3,7 @@ const browserSync = require('browser-sync').create()
 const sass = require('gulp-sass')
 
 const origin = './'
-const destination = './'
+// const destination = './'
 
 sass.compiler = require('node-sass')
 
@@ -19,7 +19,7 @@ function scss (cb) {
       sourceMap: true,
       sourceMapContents: true
     }))
-    .pipe(dest('.css'))
+    .pipe(dest('css'))
 }
 
 function watcher (cb) {
@@ -35,27 +35,39 @@ function watcher (cb) {
   watch(origin + '**/*.js').on(
     'change', series(browserSync.reload)
   )
+  watch(origin + '**/*.mjs').on(
+    'change', series(browserSync.reload)
+  )
   cb()
 }
 
 function server (cb) {
   browserSync.init({
+    // more info on browser-sync options:
+    // https://browsersync.io/docs/options
     server: {
       notify: true,
       open: true,
-      baseDir: destination,
-      index: origin + 'index.html',
-      serveStaticOptions: {
-        extensions: ['html', 'js', 'css']
-      }
+      baseDir: './',
+      index: 'index.html'
     },
+    // ui: {
+    //   port: 56017
+    // },
+    // The following is adapted from
+    // https://github.com/BrowserSync/browser-sync/issues/1503
     callbacks: {
       ready: function (err, bs) {
+        if (err) {
+          console.log(err)
+        }
         bs.utils.serveStatic.mime.define({
-          'text/javascript': ['js', 'mjs']
+          'text/javascript': ['js', 'mjs'],
+          'text/css': ['css'],
+          'text/svg': ['svg'],
+          'image/jpeg': ['jpg', 'jpeg'],
+          'image/png': ['png']
         })
-
-        console.log('---> ' + bs.utils.serveStatic.mime.lookup('.mjs'))
       }
     }
   })

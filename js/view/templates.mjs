@@ -1,7 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
 
-export let doRegex = false
-
 /**
  * Template for header block for Regex multi tool
  *
@@ -12,19 +10,21 @@ export let doRegex = false
  */
 export const header = (isFancy, changeHandler) => {
   const _isFancy = (typeof isFancy === 'boolean' && isFancy === true)
+  console.log('inside header()')
+
   return html`
   <header>
-    <h1>Regex multi tool</h1>
-    <h2>${(_isFancy === true) ? 'Regex tester' : 'Do regex stuff'}</h2>
+    <h1 class="header1">Regex multi tool</h1>
+    <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2>
 
     <ul>
       <li>
         <input type="radio" id="mode-simple" name="mode" value="simple" ?checked=${!_isFancy} @onChange=${changeHandler} />
-        <label for="mode-simple">Regex tester</label>
+        <label for="mode-simple" class="radio-btn-label">Regex tester</label>
       </li>
       <li>
         <input type="radio" id="mode-fancy" name="mode" value="fancy" ?checked=${_isFancy} @onChange=${changeHandler} />
-        <label for="mode-simple">Do regex stuff</label>
+        <label for="mode-fancy" class="radio-btn-label">Do regex stuff</label>
       </li>
     </ul>
   </header>`
@@ -36,7 +36,7 @@ export const footer = (buttons) => {
     <ul class="action-btns">
       ${buttons.map(button => html`
       <li class="btn-wrap btn-wrap--${button.name}">
-        <button name=${$button.name} id=${$button.name} .value="${button.value}" @click=${button.click}>
+        <button name=${button.name} id=${button.name} .value="${button.value}" @click=${button.click}>
           ${button.label}
         </button>
       </li>
@@ -54,11 +54,11 @@ export const doStuffUI = (props) => {
   return html`<h1>Do regex stuff</h1>`
 }
 
-
-export const mainApp = (isFancy, changeHandler, toolProps, buttons) => {
+export const mainApp = (props) => {
+  console.log('mainApp()')
   return html`
-    ${header(isFancy, changeHandler)}
-    ${(isFancy) ? doStuffUI(toolProps) : regexTestUI(toolProps)}
-    ${footer(buttons)}
+    ${header(!props.doRegex, props.change)}
+    ${(props.doRegex) ? regexTestUI(props.tool) : doStuffUI(props.tool)}
+    ${footer(props.buttons)}
   `
 }
