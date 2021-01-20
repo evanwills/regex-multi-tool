@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-
+import { regexPair } from './regex-pair.mjs'
 /**
  * Template for header block for Regex multi tool
  *
@@ -11,21 +11,27 @@ import { html } from '../lit-html/lit-html.mjs'
 export const header = (isFancy, changeHandler) => {
   const _isFancy = (typeof isFancy === 'boolean' && isFancy === true)
   console.log('inside header()')
+  console.log('isFancy:', isFancy)
+  console.log('_isFancy:', _isFancy)
+
+  // NOTE: the empty HTML comments within the unordered list
+  //       are there because the white space they omit causes
+  //       issues with the layout if not removed.
 
   return html`
-  <header>
-    <h1 class="header1">Regex multi tool</h1>
-    <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2>
+  <header class="regex-multi__header">
+    <h1 class="header-1">Regex multi tool</h1>
+    <!-- <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
 
-    <ul>
-      <li>
-        <input type="radio" id="mode-simple" name="mode" value="simple" ?checked=${!_isFancy} @onChange=${changeHandler} />
-        <label for="mode-simple" class="radio-btn-label">Regex tester</label>
-      </li>
-      <li>
-        <input type="radio" id="mode-fancy" name="mode" value="fancy" ?checked=${_isFancy} @onChange=${changeHandler} />
-        <label for="mode-fancy" class="radio-btn-label">Do regex stuff</label>
-      </li>
+    <ul class="btn-list btn-list--small">
+      <li><!--
+        --><input type="radio" id="mode-simple" name="mode" value="simple" ?checked=${!_isFancy} @change=${changeHandler} /><!--
+        --><label for="mode-simple" class="btn-list__btn radio-btn-label"><span class="sr-only">Regex </span>tester</label><!--
+      --></li>
+      <li><!--
+        --><input type="radio" id="mode-fancy" name="mode" value="fancy" ?checked=${_isFancy} @change=${changeHandler} /><!--
+        --><label for="mode-fancy" class="btn-list__btn radio-btn-label"><span class="sr-only">Do regex </span>stuff</label><!--
+        --></li>
     </ul>
   </header>`
 }
@@ -47,7 +53,9 @@ export const footer = (buttons) => {
 }
 
 export const regexTestUI = (props) => {
-  return html`<h1>Regex test</h1>`
+  console.log('props:', props)
+  return html`<h1>Regex test</h1>
+  ${regexPair(props)}`
 }
 
 export const doStuffUI = (props) => {
@@ -56,9 +64,10 @@ export const doStuffUI = (props) => {
 
 export const mainApp = (props) => {
   console.log('mainApp()')
+  console.log('props:', props)
   return html`
-    ${header(!props.doRegex, props.change)}
-    ${(props.doRegex) ? regexTestUI(props.tool) : doStuffUI(props.tool)}
+    ${header(!props.simple, props.change)}
+    ${(props.simple) ? regexTestUI(props.tool) : doStuffUI(props.tool)}
     ${footer(props.buttons)}
   `
 }

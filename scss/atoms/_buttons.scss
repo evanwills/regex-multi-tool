@@ -1,10 +1,11 @@
 input + .radio-btn-label {
+  // border: 0.05rem solid #ddd;
   display: inline-block;
   margin-left: -1.25rem;
-  border: 0.05rem solid #ddd;
-  padding: 0.5rem 1rem;
-  z-index: 3;
+  padding: 0.2rem 0.5rem;
   position: relative;
+  text-transform: capitalize;
+  z-index: 3;
 
   &::before {
     background-color: #fff;
@@ -22,9 +23,9 @@ input + .radio-btn-label {
     bottom: 0;
     content: '';
     left: 0;
-    right: 0;
     opacity: 0;
     position: absolute;
+    right: 0;
     top: 0;
     transition: opacity ease-in-out .2s;
     z-index: -1;
@@ -35,5 +36,17 @@ input:checked + .radio-btn-label {
   &::after {
     opacity: 1;
     transition: opacity ease-in-out .2s;
+  }
+}
+
+.regex-pair__btn {
+  border: .05rem solid #ccc;
+  &:first-child {
+    border-top-left-radius: .75rem;
+    border-bottom-left-radius: .75rem;
+  }
+  &:last-of-type {
+    border-top-right-radius: .75rem;
+    border-bottom-right-radius: .75rem;
   }
 }
