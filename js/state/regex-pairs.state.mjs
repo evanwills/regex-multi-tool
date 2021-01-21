@@ -1,33 +1,78 @@
 
 export const regexPairActions = {
+  UPDATE_REGEX: 'PAIR_UPDATE_REGEX',
+  UPDATE_REPLACE: 'PAIR_UPDATE_REPLACE',
+  UPDATE_FLAGS: 'PAIR_UPDATE_FLAGS',
+  UPDATE_DELIMS: 'PAIR_UPDATE_DELIMS',
+  MULTI_LINE: 'PAIR_SET_MULTI_LINE',
+  TRANSFORM_ESCAPED: 'PAIR_SET_TRANSFORM_ESCAPED',
   MOVE_UP: 'PAIR_MOVE_UP',
   MOVE_DOWN: 'PAIR_MOVE_DOWN',
   MOVE_TO: 'PAIR_MOVE_TO',
   ADD_BEFORE: 'PAIR_ADD_BEFORE',
   ADD_AFTER: 'PAIR_ADD_AFTER',
   DELETE: 'PAIR_DELETE',
-  RESET: 'PAIR_RESET',
-  MULTI_LINE: 'PAIR_MULTI_LINE',
-  TRANSFORM_ESCAPED: 'PAIR_TRANSFORM_ESCAPED',
-  UPDATE_FLAGS: 'PAIR_UPDATE_FLAGS',
-  UPDATE_DELIMS: 'PAIR_UPDATE_DELIMS',
-  UPDATE_REGEX: 'PAIR_UPDATE_REGEX',
-  UPDATE_REPLACE: 'PAIR_UPDATE_REPLACE'
+  RESET: 'PAIR_RESET'
 }
 
 // ==============================================
 // START: Utility functions
 
 /**
+ * Use up a couple of milliseconds worth of CPU time to ensure
+ * UID is unique
+ *
+ * @returns {void}
+ */
+const slowPoke = () => {
+  console.groupCollapsed('slowPoke()')
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.log(Math.sqrt(Date.now() * Math.PI))
+  console.groupEnd()
+}
+
+
+/**
  * Get a unique ID for each regex pair
  *
- * ID is the last nine digits of JS timestamp (just short of
- * 1 billion milliseconds) prefixed with the letter "R"
+ * ID is the last nine digits of JS timestamp prefixed with the
+ * letter "R"
+ *
+ * NOTE: The number just short of 1 billion milliseconds
+ *       or rougly equivalent to 11.5 days
  *
  * @returns {string}
  */
 const getID = () => {
-  let basicID = Date.now()
+  let basicID = 0
+  // slowPoke()
+  basicID = Date.now()
   basicID = basicID.toString()
   return 'R' + basicID.substr(-9)
 }
@@ -118,7 +163,50 @@ const getNewPairAndPos = (pairs, id) => {
   }
 }
 
+/**
+ * Get the index of the regex pair matched by the specified ID
+ *
+ * @param {array}  pairs List of regex pair object
+ * @param {string} id    UID for regex pair to be moved
+ *
+ * @returns {number} The index of the pair matched by the ID
+ */
+const getPos = (pairs, id) => {
+  for (let a = 0; a < pairs.length; a += 1) {
+    if (pairs[a].id === id) {
+      return a
+    }
+  }
+
+  // couldn't find pair return something.
+  return -1
+}
+
 //  END:  Utility functions
+// ==============================================
+// START: Initial state
+
+const defaultPair = {
+  pos: 1,
+  count: 1,
+  id: getID(),
+  regex: {
+    pattern: '',
+    error: ''
+  },
+  replace: '',
+  flags: 'ig',
+  delimiters: {
+    open: '',
+    close: '',
+    error: ''
+  },
+  hasError: '',
+  multiLine: false,
+  transformEscaped: true
+}
+
+//  END:  Initial state
 // ==============================================
 // START: Reducer helpers functions
 
@@ -224,18 +312,18 @@ const updatePairFlags = (pairs, id, value, error) => {
 const updatePairDelim = (pairs, id, value, open, error) => {
   return pairs.map((pair) => {
     if (pair.id === id) {
-      const _flags = {
-        ...pair.flags,
+      const _delims = {
+        ...pair.delimiters,
         error: error
       }
       if (open === true) {
-        _flags.open = value
+        _delims.open = value
       } else {
-        _flags.close = value
+        _delims.close = value
       }
       return setHasError({
         ...pair,
-        flags: _flags
+        delimiters: _delims
       })
     } else {
       return pair
@@ -305,19 +393,12 @@ const updatePairMultiLine = (pairs, id, value) => {
  *                  up one position
  */
 const movePairUp = (pairs, id) => {
-  const sortedPairs = [...pairs]
-  let moved = false
-
-  sortedPairs.sort((a, b) => {
-    if (moved === false && a.id === id) {
-      moved = true
-      return -1
-    } else {
-      return 0
-    }
-  })
-
-  return updatePos(sortedPairs)
+  const _pos = getPos(pairs, id)
+  if (_pos > -1) {
+    return movePairTo(pairs, id, (_pos - 1))
+  } else {
+    throw Error('Could not find regex-pair matching ID: ' + id)
+  }
 }
 
 /**
@@ -330,19 +411,13 @@ const movePairUp = (pairs, id) => {
  *                  down one position
  */
 const movePairDown = (pairs, id) => {
-  const sortedPairs = [...pairs]
-  let moved = false
-
-  sortedPairs.sort((a, b) => {
-    if (moved === false && a.id === id) {
-      moved = true
-      return 1
-    } else {
-      return 0
-    }
-  })
-
-  return updatePos(sortedPairs)
+  const _pos = getPos(pairs, id)
+  console.log('_pos:', _pos)
+  if (_pos > -1) {
+    return movePairTo(pairs, id, _pos + 1)
+  } else {
+    throw Error('Could not find regex-pair matching ID: ' + id)
+  }
 }
 
 /**
@@ -356,18 +431,35 @@ const movePairDown = (pairs, id) => {
  *                  to the specified position position
  */
 const movePairTo = (pairs, id, pos) => {
-  const _pair = pairs.filter(pair => (pair.id === id))
-  const _output = pairs.filter(pair => (pair.id !== id))
-  const _pos = pos - 1
+  const _pair = pairs.filter(pair => (pair.id === id))[0]
+  const _oldPos = getPos(pairs, id)
+  const _pairs = pairs.filter(pair => (pair.id !== id))
 
-  if (_pair.pos === _pos) {
+  const _newPos = (pos * 1)
+
+  let output = []
+  if (_oldPos === _newPos) {
+    console.warn('New position is same as old position (' + _oldPos + ')')
     return pairs
-  } else if (_pair.pos > _pos) {
-    _output.splice(_pos, 0, _pair)
+  } else if (_newPos === 0) {
+    output = [
+      _pair, ..._pairs
+    ]
+  } else if (_newPos === _pairs.length) {
+    output = [
+      ..._pairs, _pair
+    ]
   } else {
-    _output.splice(pos, 0, _pair)
+    const _before = _pairs.slice(0, _newPos)
+    const _after = _pairs.slice(_newPos)
+    output = [
+      ..._before,
+      _pair,
+      ..._after
+    ]
   }
-  return updatePos(_output)
+
+  return updatePos(output)
 }
 
 /**
@@ -465,78 +557,78 @@ const deletePair = (pairs, id) => {
 // ==============================================
 // START: Reducer
 
-export const regexPairsReducer = (state, action) => {
+export const regexPairsReducer = (state = [defaultPair], action = { type: 'default' }) => {
   switch (action.type) {
     case regexPairActions.UPDATE_REGEX:
       return updatePairRegex(
         state,
-        action.body.id,
-        action.body.value,
-        action.body.error
+        action.payload.id,
+        action.payload.value,
+        action.payload.error
       )
 
     case regexPairActions.UPDATE_REPLACE:
       return updatePairReplace(
         state,
-        action.body.id,
-        action.body.value
+        action.payload.id,
+        action.payload.value
       )
 
     case regexPairActions.UPDATE_FLAGS:
       return updatePairFlags(
         state,
-        action.body.id,
-        action.body.value,
-        action.body.error
+        action.payload.id,
+        action.payload.value,
+        action.payload.error
       )
 
     case regexPairActions.UPDATE_DELIMS:
       return updatePairDelim(
         state,
-        action.body.id,
-        action.body.value,
-        action.body.isOpen,
-        action.body.error
+        action.payload.id,
+        action.payload.value,
+        action.payload.isOpen,
+        action.payload.error
       )
 
     case regexPairActions.MULTI_LINE:
       return updatePairMultiLine(
         state,
-        action.body.id,
-        action.body.value
+        action.payload.id,
+        action.payload.value
       )
 
     case regexPairActions.TRANSFORM_ESCAPED:
       return updatePairEscaped(
         state,
-        action.body.id,
-        action.body.value
+        action.payload.id,
+        action.payload.value
       )
 
     case regexPairActions.MOVE_UP:
-      return movePairUp(state, action.body.id)
+      return movePairUp(state, action.payload.id)
 
     case regexPairActions.MOVE_DOWN:
-      return movePairDown(state, action.body.id)
+      return movePairDown(state, action.payload.id)
 
     case regexPairActions.MOVE_TO:
       return movePairTo(
         state,
-        action.body.id,
-        action.body.value
+        action.payload.id,
+        action.payload.value
       )
 
     case regexPairActions.ADD_BEFORE:
-      return addPairBefore(state, action.body.id)
+      return addPairBefore(state, action.payload.id)
 
     case regexPairActions.ADD_AFTER:
-      return addPairAfter(state, action.body.id)
+      return addPairAfter(state, action.payload.id)
 
     case regexPairActions.RESET:
-      return resetPair(state, action.body.id)
+      return resetPair(state, action.payload.id)
 
     case regexPairActions.DELETE:
-      return deletePair(state, action.body.id)
+      return deletePair(state, action.payload.id)
 
     default:
       return state
