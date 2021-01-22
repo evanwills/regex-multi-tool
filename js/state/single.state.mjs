@@ -1,18 +1,35 @@
 
 export const regexPairActions = {
-  UPDATE_REGEX: 'PAIR_UPDATE_REGEX',
-  UPDATE_REPLACE: 'PAIR_UPDATE_REPLACE',
-  UPDATE_FLAGS: 'PAIR_UPDATE_FLAGS',
-  UPDATE_DELIMS: 'PAIR_UPDATE_DELIMS',
-  MULTI_LINE: 'PAIR_SET_MULTI_LINE',
-  TRANSFORM_ESCAPED: 'PAIR_SET_TRANSFORM_ESCAPED',
-  MOVE_UP: 'PAIR_MOVE_UP',
-  MOVE_DOWN: 'PAIR_MOVE_DOWN',
-  MOVE_TO: 'PAIR_MOVE_TO',
-  ADD_BEFORE: 'PAIR_ADD_BEFORE',
-  ADD_AFTER: 'PAIR_ADD_AFTER',
-  DELETE: 'PAIR_DELETE',
-  RESET: 'PAIR_RESET'
+  UPDATE_REGEX: 'REGEX_PAIR_UPDATE_REGEX',
+  UPDATE_REPLACE: 'REGEX_PAIR_UPDATE_REPLACE',
+  UPDATE_FLAGS: 'REGEX_PAIR_UPDATE_FLAGS',
+  UPDATE_DELIMS: 'REGEX_PAIR_UPDATE_DELIMS',
+  MULTI_LINE: 'REGEX_PAIR_SET_MULTI_LINE',
+  TRANSFORM_ESCAPED: 'REGEX_PAIR_SET_TRANSFORM_ESCAPED',
+  MOVE_UP: 'REGEX_PAIR_MOVE_UP',
+  MOVE_DOWN: 'REGEX_PAIR_MOVE_DOWN',
+  MOVE_TO: 'REGEX_PAIR_MOVE_TO',
+  ADD_BEFORE: 'REGEX_PAIR_ADD_BEFORE',
+  ADD_AFTER: 'REGEX_PAIR_ADD_AFTER',
+  DELETE: 'REGEX_PAIR_DELETE',
+  RESET: 'REGEX_PAIR_RESET'
+}
+
+export const regexActions = {
+  UPDATE_CHAIN: 'REGEX_UPDATE_CHAIN',
+  SET_ENGINE: 'REGEX_SET_ENGINE',
+  UPDATE_DEFAULTS: 'REGEX_UPDATE_ENGINE_DEFAULTS',
+  REGISTER_ENGINE: 'REGEX_REGISTER_ENGINE',
+  SET_MATCHES: 'REGEX_SET_MATCHES',
+  SET_OUTPUT: 'REGEX_SET_OUTPUT'
+}
+
+export const regexInputActions = {
+  SET_INPUT: 'REGEX_INPUT_SET_RAW',
+  SET_DO_SPLIT: 'REGEX_INPUT_SET_DO_SPLIT',
+  SET_SPLITTER: 'REGEX_INPUT_SET_SPLITTER',
+  SET_STRIP_BEFORE: 'REGEX_INPUT_SET_STRIP_BEFORE',
+  SET_STRIP_AFTER: 'REGEX_INPUT_SET_STRIP_AFTER'
 }
 
 // ==============================================
@@ -56,7 +73,6 @@ const slowPoke = () => {
   console.log(Math.sqrt(Date.now() * Math.PI))
   console.groupEnd()
 }
-
 
 /**
  * Get a unique ID for each regex pair
@@ -204,6 +220,29 @@ const defaultPair = {
   hasError: '',
   multiLine: false,
   transformEscaped: true
+}
+
+const engineDefaults = {
+  engine: 'vanillaJS',
+  flags: 'ig',
+  delimiters: {
+    open: '',
+    close: ''
+  },
+  multiLine: false,
+  transformEscaped: true
+}
+
+const defaultInput = {
+  raw: '',
+  split: {
+    doSplit: false,
+    splitter: ''
+  },
+  strip: {
+    before: false,
+    after: false
+  }
 }
 
 //  END:  Initial state
@@ -555,7 +594,7 @@ const deletePair = (pairs, id) => {
 
 //  END:  Reducer helpers functions
 // ==============================================
-// START: Reducer
+// START: Reducers
 
 export const regexPairsReducer = (state = [defaultPair], action = { type: 'default' }) => {
   switch (action.type) {
@@ -635,5 +674,146 @@ export const regexPairsReducer = (state = [defaultPair], action = { type: 'defau
   }
 }
 
-//  END:  Reducer
+export const regexUpdateChainReducer = (state = true, action = { type: 'default' }) => {
+  if (action.type === regexActions.UPDATE_CHAIN && typeof action.payload === 'boolean') {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexSetEngineReducer = (state = 'vanillaJS', action = { type: 'default' }) => {
+  if (action.type === regexActions.SET_ENGINE && typeof action.payload === 'string') {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexUpdateDefaultsReducer = (state = engineDefaults, action = { type: 'default' }) => {
+  if (action.type === regexActions.UPDATE_DEFAULTS) {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexRegisterEngineReducer = (state = [], action = { type: 'default' }) => {
+  switch (action.type) {
+    case regexActions.REGISTER_ENGINE:
+      for (let a = 0; a < state.length; a += 1) {
+        if (state[a].id === action.payload.id) {
+          console.error('Cannot re-register "' + action.payload.label + '" (' + action.payload.id + ')')
+        }
+      }
+      return [...state, action.payload]
+
+    case regexActions.UPDATE_DEFAULTS:
+      return state.map(engine => {
+        if (engine.id === action.payload.engine) {
+          return {
+            ...engine,
+            userDefaults: action.payload.defaults
+          }
+        } else {
+          return engine
+        }
+      })
+
+    default:
+      return state
+  }
+}
+
+export const regexSetMatchesReducer = (state = [], action = { type: 'default' }) => {
+  if (action.type === regexActions.SET_MATCHES) {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexSetOutputReducer = (state = '', action = { type: 'default' }) => {
+  if (action.type === regexActions.SET_OUTPUT && typeof action.payload === 'string') {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexInputReducer = (state = defaultInput, action = { type: 'default' }) => {
+  switch (action.type) {
+    case regexInputActions.SET_INPUT:
+      if (typeof action.payload === 'string') {
+        return {
+          ...state,
+          raw: action.payload
+        }
+      } else {
+        console.error('Invalid input value')
+        break
+      }
+
+    case regexInputActions.SET_DO_SPLIT:
+      if (typeof action.payload === 'boolean') {
+        return {
+          ...state,
+          split: {
+            ...state.split,
+            doSplit: action.payload
+          }
+        }
+      } else {
+        console.error('Invalid state for doSplit')
+        break
+      }
+
+    case regexInputActions.SET_SPLITTER:
+      if (typeof action.payload === 'string') {
+        return {
+          ...state,
+          split: {
+            ...state.split,
+            splitter: action.payload
+          }
+        }
+      } else {
+        console.error('Splitter must be a string')
+        break
+      }
+
+    case regexInputActions.SET_STRIP_BEFORE:
+      if (typeof action.payload === 'boolean') {
+        return {
+          ...state,
+          strip: {
+            ...state.strip,
+            before: action.payload
+          }
+        }
+      } else {
+        console.error('Invalid state for split before')
+        break
+      }
+
+    case regexInputActions.SET_STRIP_AFTER:
+      if (typeof action.payload === 'boolean') {
+        return {
+          ...state,
+          strip: {
+            ...state.strip,
+            after: action.payload
+          }
+        }
+      } else {
+        console.error('Invalid state for split before')
+        break
+      }
+
+    default:
+      return state
+  }
+}
+
+//  END:  Reducers
 // ==============================================

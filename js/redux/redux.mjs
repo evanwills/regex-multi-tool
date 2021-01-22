@@ -1,4 +1,4 @@
-import $$observable from "./symbol-observable.mjs";
+import $$observable from './symbol-observable.mjs'
 
 /**
  * These are private action types reserved by Redux.
@@ -7,30 +7,30 @@ import $$observable from "./symbol-observable.mjs";
  * Do not reference these action types directly in your code.
  */
 var randomString = function randomString () {
-  return Math.random().toString(36).substring(7).split('').join('.');
-};
+  return Math.random().toString(36).substring(7).split('').join('.')
+}
 
 var ActionTypes = {
-  INIT: "@@redux/INIT" + randomString(),
-  REPLACE: "@@redux/REPLACE" + randomString(),
-  PROBE_UNKNOWN_ACTION: function PROBE_UNKNOWN_ACTION() {
-    return "@@redux/PROBE_UNKNOWN_ACTION" + randomString();
-  } };
-
+  INIT: '@@redux/INIT' + randomString(),
+  REPLACE: '@@redux/REPLACE' + randomString(),
+  PROBE_UNKNOWN_ACTION: function PROBE_UNKNOWN_ACTION () {
+    return '@@redux/PROBE_UNKNOWN_ACTION' + randomString()
+  }
+}
 
 /**
  * @param {any} obj The object to inspect.
  * @returns {boolean} True if the argument appears to be a plain object.
  */
 function isPlainObject (obj) {
-  if (typeof obj !== 'object' || obj === null) return false;
-  var proto = obj;
+  if (typeof obj !== 'object' || obj === null) return false
+  var proto = obj
 
   while (Object.getPrototypeOf(proto) !== null) {
-    proto = Object.getPrototypeOf(proto);
+    proto = Object.getPrototypeOf(proto)
   }
 
-  return Object.getPrototypeOf(obj) === proto;
+  return Object.getPrototypeOf(obj) === proto
 }
 
 /**
@@ -58,9 +58,8 @@ function isPlainObject (obj) {
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-
 function createStore (reducer, preloadedState, enhancer) {
-  var _ref2;
+  var _ref2
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
     throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function.');
@@ -614,9 +613,9 @@ function compose () {
  * as named arguments.
  *
  * @param {...Function} middlewares The middleware chain to be applied.
+ *
  * @returns {Function} A store enhancer applying the middleware.
  */
-
 function applyMiddleware () {
   for (var _len = arguments.length, middlewares = new Array(_len), _key = 0; _key < _len; _key++) {
     middlewares[_key] = arguments[_key];
@@ -648,10 +647,11 @@ function applyMiddleware () {
 }
 
 /*
-   * This is a dummy function to check if the function name has been altered by minification.
-   * If the function has been minified and NODE_ENV !== 'production', warn the user.
-   */
-
+ * This is a dummy function to check if the function name has been
+ * altered by minification.
+ * If the function has been minified and NODE_ENV !== 'production',
+ * warn the user.
+ */
 function isCrushed () {}
 
 if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
