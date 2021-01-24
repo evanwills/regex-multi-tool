@@ -10,6 +10,7 @@ import {
   regexSetMatchesReducer,
   regexSetOutputReducer
 } from './single.state.mjs'
+import { repeatReducer } from './repeat.state.mjs'
 
 const initialState = {
   mode: 'single',
@@ -55,31 +56,21 @@ const initialState = {
   }
 }
 
-export const appState = createStore(
-  {
-    mode: modeReducer,
+export const appReducer = (state, action) => {
+  return {
+    mode: modeReducer(state.mode, action),
     single: {
-      input: regexInputReducer,
+      input: regexInputReducer(state.single.input, action),
       regex: {
-        pairs: regexPairsReducer,
-        chain: regexUpdateChainReducer,
-        engine: regexSetEngineReducer,
-        defaults: regexUpdateDefaultsReducer,
-        engines: regexRegisterEngineReducer
+        pairs: regexPairsReducer(state.single.regex.pairs, action),
+        chain: regexUpdateChainReducer(state.single.regex.chain, action),
+        engine: regexSetEngineReducer(state.single.regex.engine, action),
+        defaults: regexUpdateDefaultsReducer(state.single.regex.defaults, action),
+        engines: regexRegisterEngineReducer(state.single.regex.engines, action)
       },
-      matches: regexSetMatchesReducer,
-      output: regexSetOutputReducer
+      matches: regexSetMatchesReducer(state.single.matches, action),
+      output: regexSetOutputReducer(state.single.output, action)
     },
-    repeat: {
-      actions: [],
-      action: '',
-      fields: {
-        inputs: [],
-        value: '',
-        outputs: [],
-        groups: []
-      }
-    }
-  },
-  initialState
-)
+    repeat: repeatReducer(state.repeat, action)
+  }
+}

@@ -645,10 +645,10 @@ export const regexPairsReducer = (state = [defaultPair], action = { type: 'defau
       )
 
     case regexPairActions.MOVE_UP:
-      return movePairUp(state, action.payload.id)
+      return movePairUp(state, action.payload)
 
     case regexPairActions.MOVE_DOWN:
-      return movePairDown(state, action.payload.id)
+      return movePairDown(state, action.payload)
 
     case regexPairActions.MOVE_TO:
       return movePairTo(
@@ -658,16 +658,16 @@ export const regexPairsReducer = (state = [defaultPair], action = { type: 'defau
       )
 
     case regexPairActions.ADD_BEFORE:
-      return addPairBefore(state, action.payload.id)
+      return addPairBefore(state, action.payload)
 
     case regexPairActions.ADD_AFTER:
-      return addPairAfter(state, action.payload.id)
+      return addPairAfter(state, action.payload)
 
     case regexPairActions.RESET:
-      return resetPair(state, action.payload.id)
+      return resetPair(state, action.payload)
 
     case regexPairActions.DELETE:
-      return deletePair(state, action.payload.id)
+      return deletePair(state, action.payload)
 
     default:
       return state
@@ -816,4 +816,206 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
 }
 
 //  END:  Reducers
+// ==============================================
+// START: Action creators
+
+// The following set of functions return self-dispatching action
+// creators functions
+//
+// For button click action creators they are pure higher order arrow
+// fuctions because they do not need to know about the state of the
+// button that was clicked.
+//
+// <INPUT> & <SELECT> change action creators need to know the state
+// of the field that was changed so these return normal (non-arrow)
+// function that inherit the `this` context of the field that
+// changed.
+
+/**
+ *
+ * @param _store Redux store object
+ */
+export const dispatchUpdatePairRegex = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.UPDATE_REGEX,
+      payload: {
+        id: _id,
+        value: this.value
+      }
+    })
+  }
+}
+
+export const dispatchUpdatePairReplace = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.UPDATE_REPLACE,
+      payload: {
+        id: _id,
+        value: this.value
+      }
+    })
+  }
+}
+
+export const dispatchUpdatePairFlags = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.UPDATE_FLAGS,
+      payload: {
+        id: _id,
+        value: this.value
+      }
+    })
+  }
+}
+
+export const dispatchUpdatePairDelims = (_store) => (_id, _isOpen) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.UPDATE_DELIMS,
+      payload: {
+        id: _id,
+        value: this.value,
+        isOpen: _isOpen
+      }
+    })
+  }
+}
+
+export const dispatchUpdatePairMultiLine = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.MULTI_LINE,
+      payload: {
+        id: _id,
+        value: this.checked
+      }
+    })
+  }
+}
+
+export const dispatchUpdatePairEscaped = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.TRANSFORM_ESCAPED,
+      payload: {
+        id: _id,
+        value: this.checked
+      }
+    })
+  }
+}
+
+export const dispatchMovePairUpDown = (_store) => (_id, _up) => (e) => {
+  const _actionType = (_up === true) ? regexPairActions.MOVE_UP : regexPairActions.MOVE_DOWN
+
+  return (e) => {
+    _store.dispatch({
+      type: _actionType,
+      payload: _id
+    })
+  }
+}
+
+export const dispatchPairMoveTo = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.MOVE_TO,
+      payload: {
+        id: _id,
+        value: this.value
+      }
+    })
+  }
+}
+
+export const dispatchAddPairBeforeAfter = (_store) => (_id, _before) => {
+  const _actionType = (_before === true) ? regexPairActions.ADD_BEFORE : regexPairActions.ADD_AFTER
+
+  return (e) => {
+    _store.dispatch({
+      type: _actionType,
+      payload: _id
+    })
+  }
+}
+
+export const dispatchResetRegexPair = (_store) => (_id) => (e) => {
+  _store.dispatch({
+    type: regexPairActions.RESET,
+    payload: _id
+  })
+}
+
+export const dispatchDeleteRegexPair = (_store) => (_id) => (e) => {
+  _store.dispatch({
+    type: regexPairActions.DELETE,
+    payload: _id
+  })
+}
+
+export const dispatchSetMatches = (_store) => (e) => {
+  _store.dispatch({
+    type: regexActions.SET_MATCHES,
+    payload: []
+  })
+}
+
+export const dispatchSetOutput = (_store) => (e) => {
+  _store.dispatch({
+    type: regexActions.SET_OUTPUT,
+    payload: ''
+  })
+}
+
+export const dispatchSetEngine = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexActions.SET_ENGINE,
+      payload: this.value
+    })
+  }
+}
+
+export const dispatchSetInput = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexInputActions.SET_INPUT,
+      payload: this.value
+    })
+  }
+}
+
+export const dispatchSetDoSplit = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexInputActions.SET_DO_SPLIT,
+      payload: this.checked
+    })
+  }
+}
+
+export const dispatchSetSplitter = (_store) => (_id) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexInputActions.SET_SPLITTER,
+      payload: this.value
+    })
+  }
+}
+
+export const dispatchSetStripBefore = (_store) => (_id, _before) => {
+  const _actionType = (_before === true) ? regexInputActions.SET_STRIP_BEFORE : regexInputActions.SET_STRIP_AFTER
+
+  return function (e) {
+    _store.dispatch({
+      type: _actionType,
+      payload: this.checked
+    })
+  }
+}
+
+//  END:  Action creators
 // ==============================================
