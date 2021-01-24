@@ -9,76 +9,38 @@ import { regexPairActions, regexActions, regexInputActions } from './single.stat
  *
  * @returns {void}
  */
-const slowPoke = () => {
-  console.groupCollapsed('slowPoke()')
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.log(Math.sqrt(Date.now() * Math.PI))
-  console.groupEnd()
-}
-
-/**
- * Get a unique ID for each regex pair
- *
- * ID is the last nine digits of JS timestamp prefixed with the
- * letter "R"
- *
- * NOTE: The number just short of 1 billion milliseconds
- *       or rougly equivalent to 11.5 days
- *
- * @returns {string}
- */
-const getID = () => {
-  let basicID = 0
-  // slowPoke()
-  basicID = Date.now()
-  basicID = basicID.toString()
-  return 'R' + basicID.substr(-9)
-}
-
-/**
- * Clone regex pair. Give it a new ID and reset the regex and
- * replace patterns
- *
- * @param {object} oldPair Existing regex pair object to be cloned
- *
- * @returns {object} cloned version of supplied regex pair object
- */
-const clonePair = (oldPair) => {
-  return {
-    ...oldPair,
-    id: getID(),
-    pos: 0,
-    count: 0,
-    regex: { pattern: '', error: '' },
-    replace: ''
-  }
-}
+// const slowPoke = () => {
+//   console.groupCollapsed('slowPoke()')
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   console.groupEnd()
+// }
 
 /**
  * Update the pos (position) & count property of each regex pair
@@ -117,33 +79,6 @@ const setHasError = (pair) => {
       ...pair,
       hasError: _hasError
     }
-  }
-}
-
-/**
- * Get clone of specified pair and original pair's position in the
- * list or regex pairs
- *
- * @param {array}  pairs List of regex pair object
- * @param {string} id    UID for regex pair to be moved
- *
- * @returns {object} list of regex pairs with specified pair moved
- *                  up one position
- */
-const getNewPairAndPos = (pairs, id) => {
-  for (let a = 0; a < pairs.length; a += 1) {
-    if (pairs[a].id === id) {
-      return {
-        pair: clonePair(pairs[a]),
-        pos: a
-      }
-    }
-  }
-
-  // couldn't find pair return something.
-  return {
-    pair: {},
-    pos: -1
   }
 }
 
@@ -478,12 +413,11 @@ const movePairTo = (pairs, id, pos) => {
  * @returns {array} list of regex pairs with cloned pair inserted
  *                  before its original pair
  */
-const addPairBefore = (pairs, id) => {
-  const newPair = getNewPairAndPos(pairs, id)
-  if (newPair.pos > -1) {
+const addPairBefore = (pairs, payload) => {
+  if (payload.oldPos > -1) {
     const newPairs = [...pairs]
 
-    newPairs.splice(newPair.pos, 0, newPair.pair)
+    newPairs.splice(payload.oldPos, 0, payload.newPair)
 
     return updatePos(newPairs)
   } else {
@@ -500,12 +434,11 @@ const addPairBefore = (pairs, id) => {
  * @returns {array} list of regex pairs with cloned pair inserted
  *                  after its original pair
  */
-const addPairAfter = (pairs, id) => {
-  const newPair = getNewPairAndPos(pairs, id)
-  if (newPair.pos > -1) {
+const addPairAfter = (pairs, payload) => {
+  if (payload.oldPos > -1) {
     const newPairs = [...pairs]
 
-    newPairs.splice(newPair.pos + 1, 0, newPair.pair)
+    newPairs.splice(payload.oldPos + 1, 0, payload.newPair)
 
     return updatePos(newPairs)
   } else {
