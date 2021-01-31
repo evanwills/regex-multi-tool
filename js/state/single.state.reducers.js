@@ -1,5 +1,6 @@
-import { regexPairActions, regexActions, regexInputActions } from './single.state.actions.mjs'
-import { getID } from './utils.mjs'
+import { combineReducers } from 'redux'
+import { regexPairActions, regexActions, regexInputActions } from './single.state.actions'
+import { getID } from './utils'
 
 // ==============================================
 // START: Utility functions
@@ -717,20 +718,18 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
   }
 }
 
-export const singleReducer = (state, action) => {
-  return {
-    input: regexInputReducer(state.input, action),
-    regex: {
-      pairs: regexPairsReducer(state.regex.pairs, action),
-      chain: regexUpdateChainReducer(state.regex.chain, action),
-      engine: regexSetEngineReducer(state.regex.engine, action),
-      defaults: regexUpdateDefaultsReducer(state.regex.defaults, action),
-      engines: regexRegisterEngineReducer(state.regex.engines, action)
-    },
-    matches: regexSetMatchesReducer(state.matches, action),
-    output: regexSetOutputReducer(state.output, action)
-  }
-}
+export const singleReducer = combineReducers({
+  input: regexInputReducer,
+  regex: combineReducers({
+    pairs: regexPairsReducer,
+    chain: regexUpdateChainReducer,
+    engine: regexSetEngineReducer,
+    defaults: regexUpdateDefaultsReducer,
+    engines: regexRegisterEngineReducer
+  }),
+  matches: regexSetMatchesReducer,
+  output: regexSetOutputReducer
+})
 
 //  END:  Reducers
 // ==============================================

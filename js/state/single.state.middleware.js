@@ -1,5 +1,5 @@
-import { regexPairActions, regexActions, regexInputActions } from './single.state.actions.mjs'
-import { getID, convertEscaped } from './utils.mjs'
+import { regexPairActions, regexActions } from './single.state.actions.js'
+import { getID, convertEscaped } from './utils.js'
 
 // ==============================================
 // START: Utility functions

@@ -4,7 +4,8 @@ export const repeatActions = {
   SET_ACTION: 'REPEAT_SET_ACTON',
   UPDATE_FIELD: 'REPEAT_UPDATE_FIELD',
   MODIFY_INPUT: 'REPEAT_MODIFY_INPUT',
-  RESET_ACTION: 'REPEAT_RESET_ACTION' // Only used by middleware
+  RESET_ACTION: 'REPEAT_RESET_ACTION', // Only used by middleware
+  TOGGLE_NAV: 'REPEAT_TOGGLE_NAV'
 }
 
 const defaultRepeat = {
@@ -15,7 +16,8 @@ const defaultRepeat = {
     value: '',
     outputs: [],
     groups: []
-  }
+  },
+  navOpen: false
 }
 
 /**
@@ -107,7 +109,19 @@ export const repeatReducer = (state = defaultRepeat, action = { type: 'default' 
         ? { ...state, fields: { ...state.fields, groups: action.payload } }
         : state
 
+    case repeatActions.REPEAT_TOGGLE_NAV:
+      return !state.navOpen
+
     default:
       return state
+  }
+}
+
+export const getAutoDispatchSetAction = (_store) => {
+  return function (e) {
+    _store.dispatch({
+      type: repeatActions.SET_ACTION,
+      payload: this.dataset.id
+    })
   }
 }

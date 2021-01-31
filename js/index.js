@@ -1,6 +1,6 @@
-import { render } from './lit-html/lit-html.mjs'
-import { mainApp } from './view/templates.mjs'
-import { getNewPair } from './view/regex-pair.mjs'
+import { render } from 'lit-html'
+import { mainApp } from './view/templates.js'
+import { getNewPair } from './view/regex-pair.js'
 
 const mainAppProps = {
   simple: true,

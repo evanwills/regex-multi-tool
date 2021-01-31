@@ -62,7 +62,7 @@ function server (cb) {
           console.log(err)
         }
         bs.utils.serveStatic.mime.define({
-          'text/javascript': ['js', 'mjs'],
+          'text/javascript': ['mjs', 'js'],
           'text/css': ['css'],
           'text/svg': ['svg'],
           'image/jpeg': ['jpg', 'jpeg'],

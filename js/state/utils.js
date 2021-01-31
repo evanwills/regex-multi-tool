@@ -18,6 +18,11 @@ export const getID = () => {
   return 'R' + basicID.substr(-9)
 }
 
+export const ucFirst = (input) => {
+  const first = input.substr(0, 1)
+  return first.toUpperCase() + input.substr(1)
+}
+
 const escapeChars = [
   { find: /\\n/g, replace: '\n' },
   { find: /\\r/g, replace: '\r' },

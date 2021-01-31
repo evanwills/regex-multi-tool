@@ -1,7 +1,9 @@
-import { createStore, combineReducers } from './redux/redux.mjs'
-import { modeReducer } from './mode.state.mjs'
-import { singleReducer } from './single.state.mjs'
-import { repeatReducer } from './repeat.state.mjs'
+import { combineReducers, createStore } from 'redux'
+import { modeReducer } from './mode.state.js'
+// import { singleReducer } from './single.state.actions.js'
+// import { singleReducer } from './single.state.middleware.js'
+import { singleReducer } from './single.state.reducers.js'
+import { repeatReducer } from './repeat.state.js'
 
 const initialState = {
   mode: 'single',
@@ -47,10 +49,11 @@ const initialState = {
   }
 }
 
-export const appReducer = (state, action) => {
-  return {
-    mode: modeReducer(state.mode, action),
-    single: singleReducer(state.single, action),
-    repeat: repeatReducer(state.repeat, action)
-  }
-}
+export const store = createStore(
+  combineReducers({
+    mode: modeReducer,
+    single: singleReducer,
+    repeat: repeatReducer
+  }),
+  initialState
+)

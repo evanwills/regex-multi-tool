@@ -51,48 +51,48 @@ export const regexInputActions = {
  *
  * @param _store Redux store object
  */
-export const dispatchUpdatePairRegex = (_store) => (_id) => {
+export const getAutoDispatchUpdateRegex = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.UPDATE_REGEX,
       payload: {
-        id: _id,
+        id: this.dataset.id,
         value: this.value
       }
     })
   }
 }
 
-export const dispatchUpdatePairReplace = (_store) => (_id) => {
+export const getAutoDispatchUpdateReplace = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.UPDATE_REPLACE,
       payload: {
-        id: _id,
+        id: this.dataset.id,
         value: this.value
       }
     })
   }
 }
 
-export const dispatchUpdatePairFlags = (_store) => (_id) => {
+export const getAutoDispatchUpdateFlags = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.UPDATE_FLAGS,
       payload: {
-        id: _id,
+        id: this.dataset.id,
         value: this.value
       }
     })
   }
 }
 
-export const dispatchUpdatePairDelims = (_store) => (_id, _isOpen) => {
+export const getAutoDispatchUpdateDelims = (_store) => (_isOpen) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.UPDATE_DELIMS,
       payload: {
-        id: _id,
+        id: this.dataset.id,
         value: this.value,
         isOpen: _isOpen
       }
@@ -100,93 +100,99 @@ export const dispatchUpdatePairDelims = (_store) => (_id, _isOpen) => {
   }
 }
 
-export const dispatchUpdatePairMultiLine = (_store) => (_id) => {
+export const getAutoDispatchUpdateMultiLine = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.MULTI_LINE,
       payload: {
-        id: _id,
+        id: this.value,
         value: this.checked
       }
     })
   }
 }
 
-export const dispatchUpdatePairEscaped = (_store) => (_id) => {
+export const getAutoDispatchUpdateEscaped = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.TRANSFORM_ESCAPED,
       payload: {
-        id: _id,
+        id: this.value,
         value: this.checked
       }
     })
   }
 }
 
-export const dispatchMovePairUpDown = (_store) => (_id, _up) => (e) => {
-  const _actionType = (_up === true) ? regexPairActions.MOVE_UP : regexPairActions.MOVE_DOWN
+export const getAutoDispatchMovePair = (_store) => (_up) => {
+  return function (e) {
+    const _actionType = (_up === true) ? regexPairActions.MOVE_UP : regexPairActions.MOVE_DOWN
 
-  return (e) => {
-    _store.dispatch({
-      type: _actionType,
-      payload: _id
-    })
+    return (e) => {
+      _store.dispatch({
+        type: _actionType,
+        payload: this.value
+      })
+    }
   }
 }
 
-export const dispatchPairMoveTo = (_store) => (_id) => {
+export const getAutoDispatchPairMoveTo = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexPairActions.MOVE_TO,
       payload: {
-        id: _id,
+        id: this.dataset.id,
         value: this.value
       }
     })
   }
 }
 
-export const dispatchAddPairBeforeAfter = (_store) => (_id, _before) => {
+export const getAutoDispatchAddPair = (_store) => (_before) => {
   const _actionType = (_before === true) ? regexPairActions.ADD_BEFORE : regexPairActions.ADD_AFTER
 
   return (e) => {
     _store.dispatch({
       type: _actionType,
-      payload: _id
+      payload: this.value
     })
   }
 }
 
-export const dispatchResetRegexPair = (_store) => (_id) => (e) => {
-  _store.dispatch({
-    type: regexPairActions.RESET,
-    payload: _id
-  })
+export const getAutoDispatchResetRegexPair = (_store) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.RESET,
+      payload: this.value
+    })
+  }
 }
 
-export const dispatchDeleteRegexPair = (_store) => (_id) => (e) => {
-  _store.dispatch({
-    type: regexPairActions.DELETE,
-    payload: _id
-  })
+export const getAutoDispatchDeleteRegexPair = (_store) => {
+  return function (e) {
+    _store.dispatch({
+      type: regexPairActions.DELETE,
+      payload: this.value
+    })
+  }
 }
 
-export const dispatchSetMatches = (_store) => (e) => {
+export const getAutoDispatchSetMatches = (_store) => (e) => {
   _store.dispatch({
     type: regexActions.SET_MATCHES,
     payload: []
   })
 }
 
-export const dispatchSetOutput = (_store) => (e) => {
+export const getAutoDispatchSetOutput = (_store) => (e) => {
   _store.dispatch({
     type: regexActions.SET_OUTPUT,
     payload: ''
   })
 }
 
-export const dispatchSetEngine = (_store) => (_id) => {
+export const getAutoDispatchSetEngine = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexActions.SET_ENGINE,
@@ -195,7 +201,7 @@ export const dispatchSetEngine = (_store) => (_id) => {
   }
 }
 
-export const dispatchSetInput = (_store) => (_id) => {
+export const getAutoDispatchSetInput = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexInputActions.SET_INPUT,
@@ -204,7 +210,7 @@ export const dispatchSetInput = (_store) => (_id) => {
   }
 }
 
-export const dispatchSetDoSplit = (_store) => (_id) => {
+export const getAutoDispatchSetDoSplit = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexInputActions.SET_DO_SPLIT,
@@ -213,7 +219,7 @@ export const dispatchSetDoSplit = (_store) => (_id) => {
   }
 }
 
-export const dispatchSetSplitter = (_store) => (_id) => {
+export const getAutoDispatchSetSplitter = (_store) => {
   return function (e) {
     _store.dispatch({
       type: regexInputActions.SET_SPLITTER,
@@ -222,7 +228,7 @@ export const dispatchSetSplitter = (_store) => (_id) => {
   }
 }
 
-export const dispatchSetStripBefore = (_store) => (_id, _before) => {
+export const getAutoDispatchSetStripBefore = (_store) => (_before) => {
   const _actionType = (_before === true) ? regexInputActions.SET_STRIP_BEFORE : regexInputActions.SET_STRIP_AFTER
 
   return function (e) {
