@@ -1,6 +1,5 @@
 import { html } from 'lit-html'
 import { getID } from '../state/utils.js'
-import { store } from '../state/index.js'
 import {
   getAutoDispatchUpdateRegex,
   getAutoDispatchUpdateReplace,
@@ -8,11 +7,8 @@ import {
   getAutoDispatchUpdateDelims,
   getAutoDispatchUpdateMultiLine,
   getAutoDispatchUpdateEscaped,
-  getAutoDispatchMovePair,
   getAutoDispatchPairMoveTo,
-  getAutoDispatchAddPair,
-  getAutoDispatchResetRegexPair,
-  getAutoDispatchDeleteRegexPair
+  getAutoDispatchPairBtn
 } from '../state/single.state.actions'
 
 // ============================================
@@ -67,70 +63,192 @@ export const getNewPair = (_defaults) => {
 }
 
 //  END:  non-view functions
-// ============================================
-// START: event handlers
-
-// --------------------------------------------
-// START: event handler getters
-
-const getDelimChange = getAutoDispatchUpdateDelims(store)
-const moveToClick = getAutoDispatchPairMoveTo(store)
-
-const getMoveClick = getAutoDispatchMovePair(store)
-const getAddClick = getAutoDispatchAddPair(store)
-
-//  END:  event handler getters
-// --------------------------------------------
-// START: actual event handler functions
-
-const patternChange = getAutoDispatchUpdateRegex(store)
-const replaceChange = getAutoDispatchUpdateReplace(store)
-const flagsChange = getAutoDispatchUpdateFlags(store)
-const delimOpenChange = getDelimChange(true)
-const delimCloseChange = getDelimChange(false)
-const multiLineChange = getAutoDispatchUpdateMultiLine(store)
-const transformEscapedChange = getAutoDispatchUpdateEscaped(store)
-const resetClick = getAutoDispatchResetRegexPair(store)
-const deleteClick = getAutoDispatchDeleteRegexPair(store)
-const moveUpClick = getMoveClick(true)
-const moveDownClick = getMoveClick(false)
-const addBeforeClick = getAddClick(true)
-const addAfterClick = getAddClick(false)
-
-//  END: actual event handler functions
-// --------------------------------------------
-
-//  END:  event handlers
-// ============================================
+// ===================================================================
 // START: sub views
 
 const hiddenPos = (pos) => html`<span class="sr-only">number ${pos}</span>`
 
-const moveTo = (id, count, pos) => {
+
+/**
+ * Get a Select input to trigger moving the specified regex
+ * pair component to a specific position in the list.
+ *
+ * NOTE: If the pair is the only one in the list then an empty
+ *       string will be returned.
+ *
+ * @param {string}   id         ID of the regex pair being rendered
+ * @param {number}   count      Total number of regex pairs in the
+ *                              list
+ * @param {number}   pos        Position of regex pair in list of
+ *                              regex pairs
+ * @param {function} _getClick  A function that returns the
+ *                              appropriate event handler for the
+ *                              button (that automatically dispatches
+ *                              an action to the redux store)
+ *
+ * @returns {lit-html} render function
+ */
+const moveTo = (id, count, pos, _change) => {
   if (count < 2) {
     return ''
   }
   const _id = 'move-to-' + id
   const options = []
   for (let a = 1; a < count; a += 1) {
-    options.push((a !== pos) ? html`<option value="${a}">${a}</option>` : html`<option value="" title="current position"> -- </option>`)
+    options.push((a !== pos)
+      ? html`<option value="${a}">${a}</option>`
+      : html`<option value="" title="current position (${a})" selected="selected"> -- </option>`
+    )
   }
 
   return html`
     <li>
       <label for="#${_id}">Move ${hiddenPos(pos)} to</label>
-      <select id="${_id}" data-id="${id}" @change=${moveToClick(id)}>
+      <select id="${_id}" data-id="${id}" @change=${_change}>
         ${options.map(option => option)}
       </select>
     </li>
   `
 }
 
+/**
+ * Get a button to trigger disabling/enabling the specified regex
+ * pair component
+ *
+ * NOTE: If the pair is the only one in the list then an empty
+ *       string will be returned.
+ *
+ * @param {string}   id         ID of the regex pair being rendered
+ * @param {number}   count      Total number of regex pairs in the
+ *                              list
+ * @param {boolean}  isDisabled Whether or not the pair is already
+ *                              disabled
+ * @param {number}   pos        Position of regex pair in list of
+ *                              regex pairs
+ * @param {function} _getClick  A function that returns the
+ *                              appropriate event handler for the
+ *                              button (that automatically dispatches
+ *                              an action to the redux store)
+ *
+ * @returns {lit-html} render function
+ */
+const disableBtn = (id, count, isDisabled, pos, _getClick) => {
+  const _mode = (isDisabled) ? 'Enable' : 'Disable'
+
+  return (count > 1)
+    ? html`
+      <button value="${id}" class="regex-pair__btn regex-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_getClick('disable')} title="${_mode} this regex pair">
+        ${_mode} ${hiddenPos(pos)}
+      </button>`
+    : ''
+}
+
+/**
+ * Get a button to trigger deleting the specified regex pair
+ * component
+ *
+ * NOTE: If the pair is the only one in the list then an empty string
+ *       will be returned.
+ *
+ * @param {string}   id        ID of the regex pair being rendered
+ * @param {number}   count     Total number of regex pairs in the
+ *                             list
+ * @param {number}   pos       Position of regex pair in list of
+ *                             regex pairs
+ * @param {function} _getClick A function that returns the
+ *                             appropriate event handler for the
+ *                             button (that automatically dispatches
+ *                             an action to the redux store)
+ *
+ * @returns {lit-html} render function
+ */
+const deleteBtn = (id, count, pos, _getClick) => {
+  return (count > 1)
+    ? html`
+      <button value="${id}" class="regex-pair__btn regex-pair__btn--delete" @click=${_getClick('delete')} title="Delete this regex pair">
+        Delete ${hiddenPos(pos)}
+      </button>`
+    : ''
+}
+
+/**
+ * Get a button to trigger moving the specified regex pair component
+ * up or down in the list
+ *
+ * NOTE: If the pair is the only one in the list then an empty string
+ *       will be returned.
+ *       If an "Up" button is requested and the pair is already first
+ *       in the list then an empty string will be returned. Likewise,
+ *       if "Down" is requested and the pair is already last, an empty
+ *       string will also be returned.
+ *
+ * @param {string}   id        ID of the regex pair being rendered
+ * @param {number}   count     Total number of regex pairs in the
+ *                             list
+ * @param {number}   pos       Position of regex pair in list of
+ *                             regex pairs
+ * @param {string}   _dir      Either "up" or "down"
+ * @param {function} _getClick A function that returns the
+ *                             appropriate event handler for the
+ *                             button (that automatically dispatches
+ *                             an action to the redux store)
+ *
+ * @returns {lit-html} render function
+ */
+const movePair = (id, count, pos, _dir, _getClick) => {
+  let _newPos = -1
+
+  if (typeof _dir !== 'string' || (_dir !== 'up' && _dir !== 'down')) {
+    throw Error('movePair() expects fourth param _dir to be either "up" or "down"')
+  }
+
+  if (count === 1) {
+    return ''
+  }
+
+  if (_dir === 'up') {
+    if (pos === count) {
+      return ''
+    }
+    _newPos = pos - 1
+  } else {
+    if (pos === 1) {
+      return ''
+    }
+    _newPos = pos + 1
+  }
+
+  return html`
+    <button value="${id}" class="regex-pair__btn regex-pair__btn--move" @click=${_getClick('move_' + _dir)} title="Move regex pair ${_dir} to position ${_newPos}">
+      Move ${pos} ${_dir}
+    </button>`
+}
+
+/**
+ *
+ * @param {string}  id    ID of the regex pair being rendered
+ * @param {number}  pos   Position of regex pair in list of regex pairs
+ * @param {number}  count Total number of regex pairs in the list
+ * @param {boolean} up    Button is "Move up" or "Move down"
+ *
+ * @returns {lit-html}
+ */
+const addPair = (id, pos, _dir, _getClick) => {
+  if (_dir !== 'before' && _dir !== 'after') {
+    throw Error('addPair() expects third param _dir to be either "before" or "after"')
+  }
+
+  return html`
+  <button value="${id}" class="regex-pair__btn regex-pair__btn--add" @click=${_getClick('add_' + _dir)} title="Add regex pair ${_dir} ${pos}">
+    Add pair ${_dir} ${pos}
+  </button>`
+}
 //  END:  sub views
 // ============================================
 // START: main view
 
 /**
+ * Render a single regex-pair componenet.
  *
  * @param {object} props {
  *   pos: {number}        // position of pair in list of pairs
@@ -159,14 +277,35 @@ const moveTo = (id, count, pos) => {
  *                        // escaped characters in replace pattern
  *                        // when doing find replace
  * }
+ * @param {function} dispatch Redux store despatch function
+ *
+ * @returns {lit-html}
  */
+export const regexPair = (props, dispatch) => {
+  const _pos = hiddenPos(props.pos)
 
-export const regexPair = (props) => {
-  const movePairUp = (props.pos > 1) ? html`<button value="${props.pos}" class="regex-pair__btn regex-pair__btn--move" @click=${moveUpClick} title="Move regex pair up to position ${(props.pos - 1)}">Move ${hiddenPos} up</button>` : ''
+  // ============================================
+  // START: event handlers
 
-  const movePairDown = (props.pos < props.count) ? html`<button value="${props.pos}" class="regex-pair__btn regex-pair__btn--move" @click=${moveDownClick} title="Move regex pair down to position ${(props.pos + 1)}">Move ${hiddenPos} down</button>` : ''
+  // --------------------------------------------
+  // START: event handler getters
 
-  // const moveTo = (props.count > 1) ?
+  const getDelimChange = getAutoDispatchUpdateDelims(dispatch)
+  const moveToClick = getAutoDispatchPairMoveTo(dispatch)
+  const getBtnClick = getAutoDispatchPairBtn(dispatch)
+
+  //  END:  event handler getters
+  // --------------------------------------------
+  // START: actual event handler functions
+
+  const patternChange = getAutoDispatchUpdateRegex(dispatch)
+  const replaceChange = getAutoDispatchUpdateReplace(dispatch)
+
+  //  END: actual event handler functions
+  // --------------------------------------------
+
+  //  END:  event handlers
+  // ============================================
 
   return html`
     <article id="${props.id}" class="regex-pair">
@@ -177,13 +316,13 @@ export const regexPair = (props) => {
             ${(props.regex.error !== '') ? html`<p class="regex-pair__pattern-error" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
             <label for="${props.id}-regex" class="regex-pair__label">Regex</label>
             ${(props.multiLine)
-              ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__txt" @keyup=${patternChange} placeholder="regular expression">${props.regex.pattern}</textarea>`
-              : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__input" value="${props.regex.pattern}" @keyup=${patternChange} placeholder="regular expression" />`}
+              ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__txt" @change=${patternChange} placeholder="regular expression">${props.regex.pattern}</textarea>`
+              : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__input" value="${props.regex.pattern}" @change=${patternChange} placeholder="regular expression" />`}
           </li>
           <li class="regex-pair__flags">
             ${(props.flags.error !== '') ? html`<p class="regex-pair__flags-error" id="${props.id}-flags-error">props.flags.error</p>` : ''}
             <label for="${props.id}-flags" class="regex-pair__label">Flags</label>
-            <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="regex-pair__input" value="${props.flags.flags}" @keyup=${flagsChange} placeholder="i" />
+            <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="regex-pair__input" value="${props.flags.flags}" @keyup=${getAutoDispatchUpdateFlags(dispatch)} placeholder="i" />
           </li>
           <li class="regex-pair__replace">
             <label for="${props.id}-replace" class="regex-pair__label">Replace</label>
@@ -197,10 +336,10 @@ export const regexPair = (props) => {
             ${(props.flags.error !== '') ? html`<p class="regex-pair__delims-error" id="${props.id}-delims-error">props.delims.error</p>` : ''}
 
             <label for="${props.id}-delims--open" class="regex-pair__label">Opening delimiter</label>
-            <input id="${props.id}-delims--open" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.open}" @keyup=${delimOpenChange} />
+            <input id="${props.id}-delims--open" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.open}" @keyup=${getDelimChange(true)} />
 
             <label for="${props.id}-delims--close" class="regex-pair__label">Closing delimiter</label>
-            <input id="${props.id}-delims--close" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.close}" @keyup=${delimCloseChange} />
+            <input id="${props.id}-delims--close" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.close}" @keyup=${getDelimChange(false)} />
           </li>`
             : ''}
         </ul>
@@ -209,38 +348,33 @@ export const regexPair = (props) => {
         <ul class="regex-pair__control">
             <li>
               <label>
-                <input type="checkbox" value="${props.id}" ?checked=${props.multiLine} @change=${multiLineChange} class="regex-pair--cb" />
+                <input type="checkbox" value="${props.id}" ?checked=${props.multiLine} @change=${getAutoDispatchUpdateMultiLine(dispatch)} class="regex-pair--cb" />
                 Multi-line input
               </label>
             </li>
             <li>
               <label>
-                <input type="checkbox" value="${props.id}" ?checked=${props.tranformEscaped} @change=${transformEscapedChange} class="regex-pair--cb" />
+                <input type="checkbox" value="${props.id}" ?checked=${props.tranformEscaped} @change=${getAutoDispatchUpdateEscaped(dispatch)} class="regex-pair--cb" />
                 Transform escaped characters in replacement
               </label>
             </li>
         </ul>
         <ul class="regex-pair__sibling-ctrl">
           <li class="regex-pair__sibling-ctrl__before">
-            ${movePairUp}
-            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--add" @click=${addBeforeClick}>Add pair before</button>
+            ${movePair(props.id, props.count, props.pos, 'up', getBtnClick)}
+            ${addPair(props.id, props.count, 'before', getBtnClick)}
           </li>
-          ${(props.count > 1)
-            ? html`
-            <li class="regex-pair__sibling-ctrl__this">
-              <button value="${props.id}" class="regex-pair__btn regex-pair__btn--delete" @click=${deleteClick} title="Delete this regex pair">
-                Delete ${hiddenPos}
-              </button>
-              <button value="${props.id}" class="regex-pair__btn regex-pair__btn--delete" @click=${resetClick} title="Delete this regex pair">
-                Reset ${hiddenPos}
-              </button>
-            </li>
-            ${moveTo(props.id, props.count, props.pos)}`
-            : ''
-          }
+          <li class="regex-pair__sibling-ctrl__this">
+            ${deleteBtn(props.id, props.count, props.pos, getBtnClick)}
+            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--reset" @click=${getBtnClick('reset')} title="Reset this regex pair">
+              Reset ${_pos}
+            </button>
+            ${disableBtn(props.id, props.count, props.isDisabled, props.pos, getBtnClick)}
+            ${moveTo(props.id, props.count, props.pos, moveToClick)}
+          </li>
           <li class="regex-pair__sibling-ctrl__after">
-            ${movePairDown}
-            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--add" @click=${addAfterClick}>Add pair after</button>
+            ${movePair(props.id, props.count, props.pos, 'down', getBtnClick)}
+            ${addPair(props.id, props.count, 'after', getBtnClick)}
           </li>
         </ul>
       </footer>

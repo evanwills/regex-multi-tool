@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+// import { createSlice } from '@reduxjs/toolkit'
 import { regexPairActions, regexActions, regexInputActions } from './single.state.actions'
 import { getID } from './utils'
 
@@ -124,7 +125,8 @@ const defaultPair = {
   },
   hasError: '',
   multiLine: false,
-  transformEscaped: true
+  transformEscaped: true,
+  disabled: false
 }
 
 const engineDefaults = {
@@ -492,6 +494,31 @@ const deletePair = (pairs, id) => {
   return updatePos(pairs.filter(pair => (pair.id !== id)))
 }
 
+/**
+ * Disable/enable specified pair in the list of regex pairs
+ *
+ * If pair is "Disabled" it will not be used when matching/replacing
+ * the input. It will however, be validated as normal
+ *
+ * @param {array}  pairs List of regex pair object
+ * @param {string} id    UID for regex pair to be deleted
+ *
+ * @returns {array} list of regex pairs with the specified pair
+ *                  disabled/enabled
+ */
+const disablePair = (pairs, id) => {
+  return pairs.map(pair => {
+    if (pair.id === id) {
+      return {
+        ...pair,
+        disabled: !pair.disabled
+      }
+    } else {
+      return pair
+    }
+  })
+}
+
 //  END:  list helpers
 // ----------------------------------------------
 
@@ -499,7 +526,7 @@ const deletePair = (pairs, id) => {
 // ==============================================
 // START: Reducers
 
-export const regexPairsReducer = (state = [defaultPair], action = { type: 'default' }) => {
+export const regexPairReducer = (state = [defaultPair], action = { type: 'default' }) => {
   switch (action.type) {
     case regexPairActions.UPDATE_REGEX:
       return updatePairRegex(
@@ -571,6 +598,9 @@ export const regexPairsReducer = (state = [defaultPair], action = { type: 'defau
 
     case regexPairActions.DELETE:
       return deletePair(state, action.payload)
+
+    case regexPairActions.DISABLE:
+      return disablePair(state, action.payload)
 
     default:
       return state
@@ -721,7 +751,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
 export const singleReducer = combineReducers({
   input: regexInputReducer,
   regex: combineReducers({
-    pairs: regexPairsReducer,
+    pairs: regexPairReducer,
     chain: regexUpdateChainReducer,
     engine: regexSetEngineReducer,
     defaults: regexUpdateDefaultsReducer,

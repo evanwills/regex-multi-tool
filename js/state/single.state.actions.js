@@ -1,4 +1,7 @@
-
+/**
+ * List of actions that can be performed on individual regex pair
+ * componenets in the list of regex pairs
+ */
 export const regexPairActions = {
   UPDATE_REGEX: 'REGEX_PAIR_UPDATE_REGEX',
   UPDATE_REPLACE: 'REGEX_PAIR_UPDATE_REPLACE',
@@ -12,7 +15,8 @@ export const regexPairActions = {
   ADD_BEFORE: 'REGEX_PAIR_ADD_BEFORE',
   ADD_AFTER: 'REGEX_PAIR_ADD_AFTER',
   DELETE: 'REGEX_PAIR_DELETE',
-  RESET: 'REGEX_PAIR_RESET'
+  RESET: 'REGEX_PAIR_RESET',
+  DISABLE: 'REGEX_PAIR_DISABLE'
 }
 
 export const regexActions = {
@@ -38,22 +42,25 @@ export const regexInputActions = {
 // The following set of functions return self-dispatching action
 // creators functions
 //
-// For button click action creators they are pure higher order arrow
-// fuctions because they do not need to know about the state of the
-// button that was clicked.
-//
-// <INPUT> & <SELECT> change action creators need to know the state
-// of the field that was changed so these return normal (non-arrow)
-// function that inherit the `this` context of the field that
-// changed.
+// `<BUTTON>`, `<INPUT>` & `<SELECT>` click/change action creators
+// need to know the state of the field that was changed so these
+// return normal (non-arrow) function that inherit the `this` context
+// of the field that changed.
 
 /**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair regulare expression
+ * text input field
  *
- * @param _store Redux store object
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
  */
-export const getAutoDispatchUpdateRegex = (_store) => {
+export const getAutoDispatchUpdateRegex = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.UPDATE_REGEX,
       payload: {
         id: this.dataset.id,
@@ -63,9 +70,20 @@ export const getAutoDispatchUpdateRegex = (_store) => {
   }
 }
 
-export const getAutoDispatchUpdateReplace = (_store) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair replacement pattern
+ * text input field
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchUpdateReplace = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.UPDATE_REPLACE,
       payload: {
         id: this.dataset.id,
@@ -75,9 +93,20 @@ export const getAutoDispatchUpdateReplace = (_store) => {
   }
 }
 
-export const getAutoDispatchUpdateFlags = (_store) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair flags/modifiers
+ * text input field
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchUpdateFlags = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.UPDATE_FLAGS,
       payload: {
         id: this.dataset.id,
@@ -87,9 +116,20 @@ export const getAutoDispatchUpdateFlags = (_store) => {
   }
 }
 
-export const getAutoDispatchUpdateDelims = (_store) => (_isOpen) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair the opening or closing
+ * delimiter text fields
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchUpdateDelims = (_dispatch) => (_isOpen) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.UPDATE_DELIMS,
       payload: {
         id: this.dataset.id,
@@ -100,9 +140,20 @@ export const getAutoDispatchUpdateDelims = (_store) => (_isOpen) => {
   }
 }
 
-export const getAutoDispatchUpdateMultiLine = (_store) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair the "Multi line"
+ * checkbox field
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchUpdateMultiLine = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.MULTI_LINE,
       payload: {
         id: this.value,
@@ -112,9 +163,20 @@ export const getAutoDispatchUpdateMultiLine = (_store) => {
   }
 }
 
-export const getAutoDispatchUpdateEscaped = (_store) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair the "Transform escapsed"
+ * checkbox field
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchUpdateEscaped = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.TRANSFORM_ESCAPED,
       payload: {
         id: this.value,
@@ -124,22 +186,20 @@ export const getAutoDispatchUpdateEscaped = (_store) => {
   }
 }
 
-export const getAutoDispatchMovePair = (_store) => (_up) => {
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair "Move to" select field
+ * change events
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchPairMoveTo = (_dispatch) => {
   return function (e) {
-    const _actionType = (_up === true) ? regexPairActions.MOVE_UP : regexPairActions.MOVE_DOWN
-
-    return (e) => {
-      _store.dispatch({
-        type: _actionType,
-        payload: this.value
-      })
-    }
-  }
-}
-
-export const getAutoDispatchPairMoveTo = (_store) => {
-  return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexPairActions.MOVE_TO,
       payload: {
         id: this.dataset.id,
@@ -149,90 +209,96 @@ export const getAutoDispatchPairMoveTo = (_store) => {
   }
 }
 
-export const getAutoDispatchAddPair = (_store) => (_before) => {
-  const _actionType = (_before === true) ? regexPairActions.ADD_BEFORE : regexPairActions.ADD_AFTER
-
-  return (e) => {
-    _store.dispatch({
-      type: _actionType,
-      payload: this.value
-    })
+/**
+ * Get a function that returns an action creator function that can
+ * be used as an event handler for Regex Pair button clicks
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ * @param {string} prop      A property name of the regexPairActions
+ *                           object
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchPairBtn = (_dispatch) => (prop) => {
+  if (typeof field !== 'string') {
+    throw Error('getAutoDispatchPairBtn() expects second param field to be a string. "' + typeof field + '" given')
   }
+  const _prop = prop.toUpperCase()
+  const boolProps = [
+    'MOVE_UP', 'MOVE_DOWN',
+    'ADD_BEFORE', 'ADD_AFTER',
+    'DELETE', 'RESET', 'DISABLE'
+  ]
+
+  if (boolProps.indexOf(_prop) > -1) {
+    return function (e) {
+      _dispatch({
+        type: regexPairActions[_prop],
+        payload: this.value
+      })
+    }
+  }
+
+  throw Error('getAutoDispatchPairBtn() expects second param field to be the name of one of the boolean Regex Pair Actions')
 }
 
-export const getAutoDispatchResetRegexPair = (_store) => {
-  return function (e) {
-    _store.dispatch({
-      type: regexPairActions.RESET,
-      payload: this.value
-    })
-  }
-}
-
-export const getAutoDispatchDeleteRegexPair = (_store) => {
-  return function (e) {
-    _store.dispatch({
-      type: regexPairActions.DELETE,
-      payload: this.value
-    })
-  }
-}
-
-export const getAutoDispatchSetMatches = (_store) => (e) => {
-  _store.dispatch({
+export const getAutoDispatchSetMatches = (_dispatch) => (e) => {
+  _dispatch({
     type: regexActions.SET_MATCHES,
     payload: []
   })
 }
 
-export const getAutoDispatchSetOutput = (_store) => (e) => {
-  _store.dispatch({
+export const getAutoDispatchSetOutput = (_dispatch) => (e) => {
+  _dispatch({
     type: regexActions.SET_OUTPUT,
     payload: ''
   })
 }
 
-export const getAutoDispatchSetEngine = (_store) => {
+export const getAutoDispatchSetEngine = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexActions.SET_ENGINE,
       payload: this.value
     })
   }
 }
 
-export const getAutoDispatchSetInput = (_store) => {
+export const getAutoDispatchSetInput = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexInputActions.SET_INPUT,
       payload: this.value
     })
   }
 }
 
-export const getAutoDispatchSetDoSplit = (_store) => {
+export const getAutoDispatchSetDoSplit = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexInputActions.SET_DO_SPLIT,
       payload: this.checked
     })
   }
 }
 
-export const getAutoDispatchSetSplitter = (_store) => {
+export const getAutoDispatchSetSplitter = (_dispatch) => {
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: regexInputActions.SET_SPLITTER,
       payload: this.value
     })
   }
 }
 
-export const getAutoDispatchSetStripBefore = (_store) => (_before) => {
+export const getAutoDispatchSetStripBefore = (_dispatch) => (_before) => {
   const _actionType = (_before === true) ? regexInputActions.SET_STRIP_BEFORE : regexInputActions.SET_STRIP_AFTER
 
   return function (e) {
-    _store.dispatch({
+    _dispatch({
       type: _actionType,
       payload: this.checked
     })
