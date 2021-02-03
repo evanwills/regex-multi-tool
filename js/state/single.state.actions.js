@@ -16,7 +16,8 @@ export const regexPairActions = {
   ADD_AFTER: 'REGEX_PAIR_ADD_AFTER',
   DELETE: 'REGEX_PAIR_DELETE',
   RESET: 'REGEX_PAIR_RESET',
-  DISABLE: 'REGEX_PAIR_DISABLE'
+  DISABLE: 'REGEX_PAIR_DISABLE',
+  SET_AS_DEFAULT: 'REGEX_SET_AS_DEFAULT'
 }
 
 export const regexActions = {
@@ -229,14 +230,18 @@ export const getAutoDispatchPairBtn = (_dispatch) => (prop) => {
   const boolProps = [
     'MOVE_UP', 'MOVE_DOWN',
     'ADD_BEFORE', 'ADD_AFTER',
-    'DELETE', 'RESET', 'DISABLE'
+    'DELETE', 'RESET', 'DISABLE',
+    // 'SET_AS_DEFAULT' gets intercepted by middleware and converted
+    // to REGEX_UPDATE_ENGINE_DEFAULTS and pairs settings are added
+    // as the action's payload
+    'SET_AS_DEFAULT'
   ]
 
   if (boolProps.indexOf(_prop) > -1) {
     return function (e) {
       _dispatch({
         type: regexPairActions[_prop],
-        payload: this.value
+        payload: this.value // ID of regex pair
       })
     }
   }
@@ -301,6 +306,15 @@ export const getAutoDispatchSetStripBefore = (_dispatch) => (_before) => {
     _dispatch({
       type: _actionType,
       payload: this.checked
+    })
+  }
+}
+
+export const getAutoDispatchRegisterEngine = (_dispatch, _engine) => {
+  return function (e) {
+    _dispatch({
+      type: regexActions.REGEX_REGISTER_ENGINE,
+      payload: _engine
     })
   }
 }

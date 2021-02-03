@@ -68,7 +68,6 @@ export const getNewPair = (_defaults) => {
 
 const hiddenPos = (pos) => html`<span class="sr-only">number ${pos}</span>`
 
-
 /**
  * Get a Select input to trigger moving the specified regex
  * pair component to a specific position in the list.
@@ -371,6 +370,9 @@ export const regexPair = (props, dispatch) => {
             </button>
             ${disableBtn(props.id, props.count, props.isDisabled, props.pos, getBtnClick)}
             ${moveTo(props.id, props.count, props.pos, moveToClick)}
+            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--set-default" @click=${getBtnClick('set_as_default')} title="Use this regex pair's confguration as default for new regex pairs">
+              Make default
+            </button>
           </li>
           <li class="regex-pair__sibling-ctrl__after">
             ${movePair(props.id, props.count, props.pos, 'down', getBtnClick)}

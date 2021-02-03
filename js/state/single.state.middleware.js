@@ -11,8 +11,7 @@ import { getID, convertEscaped } from './utils.js'
  * @param {array}  pairs List of regex pair object
  * @param {string} id    UID for regex pair to be moved
  *
- * @returns {object} list of regex pairs with specified pair moved
- *                  up one position
+ * @returns {object} Clone of of pair with regex and replace empty
  */
 const getNewPairAndPos = (pairs, id) => {
   for (let a = 0; a < pairs.length; a += 1) {
@@ -86,26 +85,64 @@ const trimAndImplode = (_input, _doSplit, _splitter, _trim) => {
   return _output
 }
 
+/**
+ * Get new set of default settings based on specified regex-pair
+ * components current configuration
+ *
+ * @param {array}  pairs           List of regex pair object
+ * @param {string} id              UID for regex pair to be moved
+ * @param {object} currentDefaults Regex pair settings used as
+ *                                 default for current regex engine
+ *
+ * @returns {object,false} New regex pair settings defaults or FALSE
+ *                         if matching pair could not be found or
+ *                         matching pair is already the same as the
+ *                         current defaults
+ */
+const getPairDefaults = (pairs, id, currentDefaults) => {
+  const _src = pairs.filter(pair => (pair.id === id))
+  let _output = false
+  if (_src.length === 1) {
+    _output = {
+      flags: _src[0].flags,
+      delims: _src[0].delims,
+      multiLine: _src[0].multiLine,
+      transformEscaped: _src[0].transformEscaped
+    }
+
+    const _defaultKeys = Object.keys(currentDefaults)
+
+    for (let a = 0; a < _defaultKeys.length; a += 1) {
+      const _key = _defaultKeys[a]
+      if (currentDefaults[_key] !== _output[_key]) {
+        // At least one property is different.
+        // That's enough to go on.
+        return _output
+      }
+    }
+  }
+
+  // Nothing has changed
+  // Let the reducer handle it from here.
+  return false
+}
+
 //  END:  Utility functions
 // ==============================================
 // START: Middleware functions
 
-export const cloneRegexPairMW = ({ getState, dispatch }) => next => action => {
+export const singleMW = ({ getState, dispatch }) => next => action => {
   switch (action.type) {
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
       return next({
         type: action.type,
-        payload: getNewPairAndPos(getState.single.pairs, action.payload)
+        payload: getNewPairAndPos(
+          getState.single.regex.pairs,
+          action.payload
+        )
       })
 
-    default:
-      return next(action)
-  }
-}
-
-export const prepareInputMW = ({ getState, dispatch }) => next => action => {
-  switch (action.type) {
     case regexActions.SET_MATCHES:
     case regexActions.SET_OUTPUT:
       return next({
@@ -115,6 +152,16 @@ export const prepareInputMW = ({ getState, dispatch }) => next => action => {
           getState.single.input.split.doSplit,
           getState.single.input.split.splitter,
           getState.single.input.strip.before
+        )
+      })
+
+    case regexPairActions.SET_AS_DEFAULT:
+      return next({
+        type: regexActions.UPDATE_DEFAULTS,
+        payload: getPairDefaults(
+          getState.single.regex.pairs,
+          action.payload, // regex pair ID
+          getState.single.defaults
         )
       })
 
