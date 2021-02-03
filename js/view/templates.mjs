@@ -1,5 +1,5 @@
 import { html } from 'lit-html'
-import { regexPair } from './regex-pair.js'
+import { regexPair } from './regex-pair.mjs'
 /**
  * Template for header block for Regex multi tool
  *

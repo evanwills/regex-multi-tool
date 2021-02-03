@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 // import { createSlice } from '@reduxjs/toolkit'
-import { regexPairActions, regexActions, regexInputActions } from './single.state.actions'
+import { regexPairActions, regexActions, regexInputActions } from './oneOff.state.actions'
 import { getID } from './utils'
 
 // ==============================================
@@ -748,7 +748,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
   }
 }
 
-export const singleReducer = combineReducers({
+export const oneOffReducer = combineReducers({
   input: regexInputReducer,
   regex: combineReducers({
     pairs: regexPairReducer,

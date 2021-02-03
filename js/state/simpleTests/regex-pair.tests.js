@@ -1,7 +1,7 @@
 import {
   regexPairsReducer,
   regexPairActions
-} from '../regex-pairs.state.js'
+} from '../regex-pairs.state.mjs'
 
 let state = regexPairsReducer()
 

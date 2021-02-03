@@ -1,5 +1,5 @@
 import { html } from 'lit-html'
-import { getID } from '../state/utils.js'
+import { getID } from '../state/utils.mjs'
 import {
   getAutoDispatchUpdateRegex,
   getAutoDispatchUpdateReplace,
@@ -9,7 +9,7 @@ import {
   getAutoDispatchUpdateEscaped,
   getAutoDispatchPairMoveTo,
   getAutoDispatchPairBtn
-} from '../state/single.state.actions'
+} from '../state/oneOff.state.actions'
 
 // ============================================
 // START: non-view functions
@@ -247,7 +247,7 @@ const addPair = (id, pos, _dir, _getClick) => {
 // START: main view
 
 /**
- * Render a single regex-pair componenet.
+ * Render a oneOff regex-pair componenet.
  *
  * @param {object} props {
  *   pos: {number}        // position of pair in list of pairs

@@ -1,5 +1,5 @@
-import { regexPairActions, regexActions } from './single.state.actions.js'
-import { getID, convertEscaped } from './utils.js'
+import { regexPairActions, regexActions } from './oneOff.state.actions.mjs'
+import { getID, convertEscaped } from './utils.mjs'
 
 // ==============================================
 // START: Utility functions
@@ -131,14 +131,14 @@ const getPairDefaults = (pairs, id, currentDefaults) => {
 // ==============================================
 // START: Middleware functions
 
-export const singleMW = ({ getState, dispatch }) => next => action => {
+export const oneOffMW = ({ getState, dispatch }) => next => action => {
   switch (action.type) {
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
       return next({
         type: action.type,
         payload: getNewPairAndPos(
-          getState.single.regex.pairs,
+          getState.oneOff.regex.pairs,
           action.payload
         )
       })
@@ -148,10 +148,10 @@ export const singleMW = ({ getState, dispatch }) => next => action => {
       return next({
         type: action.type,
         payload: explodeAndTrim(
-          getState.single.input.raw,
-          getState.single.input.split.doSplit,
-          getState.single.input.split.splitter,
-          getState.single.input.strip.before
+          getState.oneOff.input.raw,
+          getState.oneOff.input.split.doSplit,
+          getState.oneOff.input.split.splitter,
+          getState.oneOff.input.strip.before
         )
       })
 
@@ -159,9 +159,9 @@ export const singleMW = ({ getState, dispatch }) => next => action => {
       return next({
         type: regexActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
-          getState.single.regex.pairs,
+          getState.oneOff.regex.pairs,
           action.payload, // regex pair ID
-          getState.single.defaults
+          getState.oneOff.defaults
         )
       })
 
@@ -177,9 +177,9 @@ export const finaliseOutputMW = ({ getState, dispatch }) => next => action => {
         type: action.type,
         payload: trimAndImplode(
           action.payoload,
-          getState.single.input.split.doSplit,
-          getState.single.input.split.splitter,
-          getState.single.input.strip.after
+          getState.oneOff.input.split.doSplit,
+          getState.oneOff.input.split.splitter,
+          getState.oneOff.input.strip.after
         )
       })
 

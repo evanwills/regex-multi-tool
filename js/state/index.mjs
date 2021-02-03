@@ -1,6 +1,13 @@
-const appState = {
-  mode: 'single',
-  single: {
+import { combineReducers, createStore } from 'redux'
+import { modeReducer } from './mode.state.mjs'
+// import { oneOffReducer } from './oneOff.state.actions.mjs'
+// import { oneOffReducer } from './oneOff.state.middleware.mjs'
+import { oneOffReducer } from './oneOff.state.reducers.mjs'
+import { repeatReducer } from './repeat.state.mjs'
+
+const initialState = {
+  mode: 'oneOff',
+  oneOff: {
     input: {
       raw: '',
       split: {
@@ -41,3 +48,12 @@ const appState = {
     }
   }
 }
+
+export const store = createStore(
+  combineReducers({
+    mode: modeReducer,
+    oneOff: oneOffReducer,
+    repeat: repeatReducer
+  }),
+  initialState
+)
