@@ -3,7 +3,7 @@ import { modeReducer } from './mode.state.mjs'
 // import { oneOffReducer } from './oneOff.state.actions.mjs'
 // import { oneOffReducer } from './oneOff.state.middleware.mjs'
 import { oneOffReducer } from './oneOff.state.reducers.mjs'
-import { repeatReducer } from './repeat.state.mjs'
+import { repeatReducer } from './repeat.state.reducers.mjs'
 
 const initialState = {
   mode: 'oneOff',
