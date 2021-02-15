@@ -1,4 +1,4 @@
-import { html } from 'lit-html'
+import { html } from '../lit-html/lit-html.mjs'
 import { getID } from '../state/utils.mjs'
 import {
   getAutoDispatchUpdateRegex,
