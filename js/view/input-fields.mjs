@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { ucFirst } from '../state/utils.mjs'
+import { ucFirst, idSafe } from '../state/utils.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field
@@ -292,7 +292,7 @@ export const select = (props) => {
 const checkableInput = (props, fieldType, descBy) => {
   const _name = (fieldType === 'radio') ? ' name="' + props.id + '"' : ''
   const _id = (fieldType === 'checkbox')
-    ? props.id + '-' + props.value.replace(/[^a-z0-9_-]+/ig, '')
+    ? props.id + '-' + idSafe(props.value)
     : props.id
 
   return html`
@@ -341,4 +341,37 @@ export const wholeSingleCheckable = (props, outside) => {
       ${_desription}
     `
   }
+}
+
+
+
+export const checkableInputGroup = (props, outside) => {
+  const _fieldType = (typeof props.type === 'string' && props.type === 'checkbox') ? 'checkbox' : 'radio'
+
+  const _role = (_fieldType === 'radio') ? 'radiogroup' : 'group'
+  const _outside = (typeof props.wrapped === 'boolean' && props.wrapped === true)
+
+  return html`
+    <div role="${_role}" aria-labelledby="${props.id}-grp-lbl" class=${getClassName(props, 'grp')}>
+      <p class=${getClassName(props, 'grp-lbl')} id="${props.id}-grp-lbl">
+        ${props.label}
+      </p>
+      <ul class=${getClassName(props, 'grp-list')}>
+        ${props.options.map((option) => wholeSingleCheckable(
+          {
+            ...option,
+            type: _fieldType,
+            id: option.id + '-input',
+            class: props.class,
+            change: (typeof option.change === 'function')
+              ? option.change
+              : (typeof props.change === 'function')
+                ? props.change
+                : null
+          },
+          _outside
+        ))}
+      </ul>
+    </div>
+  `
 }

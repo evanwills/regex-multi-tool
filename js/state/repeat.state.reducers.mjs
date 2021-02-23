@@ -1,12 +1,13 @@
 import { repeatActions } from './repeat.state.actions.mjs'
 
 const defaultRepeat = {
-  actions: [],
-  actionID: '',
+  allActions: [],
+  activeAction: {},
   fields: {
-    inputs: [],
-    value: '',
-    outputs: [],
+    inputPrimary: '',
+    inputExtra: [],
+    outputPrimary: '',
+    outputExtra: [],
     groups: []
   },
   navOpen: false,
@@ -62,6 +63,11 @@ export const repeatReducer = (state = defaultRepeat, action = { type: 'default' 
         ? { ...state, actions: [...state.actions, action.payload] }
         : state
 
+    case repeatActions.REGISTER_ALL_ACTION:
+      return (objectExistsInList(state.actions, action.payload) === false)
+        ? { ...state, actions: [...state.actions, action.payload] }
+        : state
+
     case repeatActions.UPDATE_FIELD:
       return {
         ...state,
@@ -101,13 +107,13 @@ export const repeatReducer = (state = defaultRepeat, action = { type: 'default' 
         ? { ...state, fields: { ...state.fields, groups: action.payload } }
         : state
 
-    case repeatActions.REPEAT_TOGGLE_NAV:
+    case repeatActions.REPEATABLE_TOGGLE_NAV:
       return {
         ...state,
         navOpen: !state.navOpen
       }
 
-    case repeatActions.REPEAT_TOGGLE_DEBUG:
+    case repeatActions.REPEATABLE_TOGGLE_DEBUG:
       return {
         ...state,
         debug: !state.debug

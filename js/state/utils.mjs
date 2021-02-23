@@ -23,6 +23,10 @@ export const ucFirst = (input) => {
   return first.toUpperCase() + input.substr(1)
 }
 
+export const idSafe = (input) => {
+  return input.replace(/[^a-z0-9_-]/ig, '')
+}
+
 const escapeChars = [
   { find: /\\n/g, replace: '\n' },
   { find: /\\r/g, replace: '\r' },
