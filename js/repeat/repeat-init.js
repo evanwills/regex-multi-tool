@@ -53,9 +53,11 @@ const validGroupName = (groupName) => {
  */
 const addToGroup = (actionGroupList, groupName) => {
   const tmpGroup = groupName.trim().toLowerCase()
+
   if (validGroupName(tmpGroup) && actionGroupList.indexOf(tmpGroup) === -1) {
     actionGroupList.push(tmpGroup)
   }
+
   return actionGroupList
 }
 
@@ -66,8 +68,8 @@ const addToGroup = (actionGroupList, groupName) => {
 /**
  * Constructor for Regex-Multi-Tool repeatable actions
  *
- * @param {object}  url    document.location string for the URL of
- *                         the page
+ * @param {object}  url    Object containing all the parts of a URL
+ *                         in easy to used
  * @param {boolean} remote Whether or not to allow remote actions
  *                         from this source
  * @param {string}  docs   URL for documentation for regex-multi-tool
@@ -143,9 +145,11 @@ export const Repeatable = (url, _remote, docs, api) => {
   // START: private method declaration
 
   /**
-   * updateRegistry adds a new action to the registry of action (if appropriate).
+   * updateRegistry adds a new action to the registry of action
+   * (if appropriate).
    *
-   * It also ensures that each action object has all the properties, including defaults
+   * It also ensures that each action object has all the properties,
+   * including optional properties
    *
    * @param {object} config config object used containing the
    *             action's function and all the metadata needed to
@@ -153,6 +157,10 @@ export const Repeatable = (url, _remote, docs, api) => {
    */
   const updateRegistry = function (config) {
     let tmp = false
+    const errorMsg = 'Repeatable.register() expects '
+
+    // ====================================================
+    // START: Validating fields
 
     if (typeof config.ignore === 'boolean' && config.ignore === true) {
       // This action has been set to IGNORE
@@ -162,18 +170,30 @@ export const Repeatable = (url, _remote, docs, api) => {
       }
     }
 
+    tmp = invalidString('action', config)
+    if (tmp !== false) {
+      throw Error(errorMsg + 'an "action" property that is a non-empty string. ' + tmp + ' given.')
+    }
+
+    tmp = invalidString('name', config)
+    if (tmp !== false) {
+      throw Error(errorMsg + 'a "name" property that is a non-empty string. ' + tmp + ' given.')
+    }
+
     config.remote = (typeof config.remote === 'boolean' && config.remote === true)
 
     if (config.remote === true) {
+      // This is a remote action so it doesn't need to have an action funciton
       if (allowRemote === false) {
-        console.warn('All remote actions are blocked from this host')
+        console.warn('All remote actions are blocked from this host. Action: "' + config.name + '" will not be available')
         return false
       } else if (isHTTPS === true) {
-        console.warn('"Regex Multi-tool" is not being served via HTTPS so is likely to be blocked by the browser.')
+        console.warn('"Regex Multi-tool" is not being served via HTTPS so action: "' + config.name + '" is likely to be blocked by the browser.')
       }
     } else {
+      // This is a local action so it MUST have an action function
       if (typeof config.func === 'undefined' || !isFunction(config.func)) {
-        throw new Error('a "func" property that is a plain javascript function. ' + tmp + ' given.')
+        throw Error(errorMsg + 'a "func" property that is a plain javascript function. ' + tmp + ' given.')
       }
     }
 
@@ -182,7 +202,7 @@ export const Repeatable = (url, _remote, docs, api) => {
     if (tmp === false) {
       tmp = config.group.trim().toLowerCase()
       if (tmp !== '' && !validGroupName(tmp)) {
-        throw new Error('Action group name must be a string between 2 and 50 characters long, must start with at least two alphabetical characters and can contain only alpha numeric characters and hyphens. "' + tmp + '" does not meet these requirements')
+        throw Error(errorMsg + 'Action group name must be a string between 2 and 50 characters long, must start with at least two alphabetical characters and can contain only alpha numeric characters and hyphens. "' + tmp + '" does not meet these requirements')
       }
 
       if (actionGroups.indexOf(tmp) === -1) {
@@ -190,37 +210,42 @@ export const Repeatable = (url, _remote, docs, api) => {
         // to. Ignore it
         return false
       }
+    } else {
+      config.group = 'public'
     }
 
-    tmp = invalidString('action', config)
-    if (tmp !== false) {
-      throw new Error('an "action" property that is a non-empty string. ' + tmp + ' given.')
-    }
+    //  END:  Validating fields
+    // ====================================================
+    // START: setting defaults for optional fields
 
-    tmp = invalidString('name', config)
-    if (tmp !== false) {
-      throw new Error('a "name" property that is a non-empty string. ' + tmp + ' given.')
-    }
+    config.inputLabel = (typeof config.inputLabel !== 'string' || config.inputLabel.trim() === '')
+      ? 'Input'
+      : config.inputLabel
 
-    tmp = invalidString('inputLabel', config)
-    if (tmp !== false) {
-      throw new Error('a "inputLabel" property that is a non-empty string. ' + tmp + ' given.')
-    }
-
-    config.inputLabel = (typeof config.inputLabel !== 'string' || config.inputLabel.trim() === '') ? 'Input' : config.inputLabel
+    config.outputLabel = (typeof config.outputLabel !== 'string' || config.outputLabel.trim() === '')
+      ? 'Output'
+      : config.outputLabel
 
     config.docsURL = (typeof config.docsURL === 'string')
       ? config.docsURL
       : ''
 
     config.action = config.action.toLowerCase()
+    config.id = config.action
 
-    config.rawGET = (typeof config.rawGET === 'boolean') ? config.rawGET : false
+    config.rawGET = (typeof config.rawGET === 'boolean' && config.rawGET === true)
 
-    config.extraInputs = (typeof config.extraInputs !== 'undefined' && Array.isArray(config.extraInputs)) ? config.extraInputs : []
+    config.extraInputs = (typeof config.extraInputs !== 'undefined' && Array.isArray(config.extraInputs))
+      ? config.extraInputs
+      : []
 
-    // TODO: work out how to sort the registry so it's always in
-    // alphabetical order (by name, not action)
+    config.description = (typeof config.extraInputs !== 'string')
+      ? config.description
+      : ''
+
+    //  END:  setting defaults for optional fields
+    // ====================================================
+
     registry = [...registry, config]
 
     // console.log('registry:', registry)

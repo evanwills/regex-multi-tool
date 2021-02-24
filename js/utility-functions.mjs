@@ -413,3 +413,27 @@ export const makeHumanReadableAttr = (_attr) => {
   }
   return _output
 }
+
+/**
+ * Make user group name more human readable
+ *
+ * @param {string} input Name of user group action belongs to
+ *
+ * @returns {string} Human readable version of group name
+ */
+export const groupNameToLabel = (input) => {
+  const groupLabel = (whole, num1, letter1, word1, word2) => {
+    if (letter1 !== '') {
+      return num1 + ' ' + letter1.toUpperCase() + word1
+    } else {
+      return ' ' + word2
+    }
+  }
+
+  let output = input.replace(/^([0-9-_]*)([a-z])([a-z]+)|([A-Z][a-z]+)/g, groupLabel)
+
+  output = output.replace(/\s*_+\s*/g, ' ')
+  output = output.replace(/\s*-+\s*/g, ' - ')
+
+  return output.trim()
+}

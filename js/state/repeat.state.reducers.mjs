@@ -1,17 +1,88 @@
 import { repeatActions } from './repeat.state.actions.mjs'
 
+/**
+ * Initial State for repeatable actions in Regex Multi-Tool
+ *
+ * @constant {object} defaultRepeat
+ */
 const defaultRepeat = {
-  allActions: [],
+  // Complete list of all actions grouped by user group
+  allActions: {},
+  // Action currently being used
   activeAction: {},
   fields: {
+    // The primary input field for repeatable actions
+    // (Always plain text)
     inputPrimary: '',
+    // Additional input fields (may be numbers or texts)
+    // NOTE: Extra inputs contain everything about the extra input,
+    //       not just it's current value
     inputExtra: [],
+    // The primary output field
+    // (the modified version of inputPrimary)
     outputPrimary: '',
+    // It's sometimes useful to output the results of a repeatable
+    // action into distinct blocks
+    // (e.g. when creating both a HTML for display to the user
+    //       and HTML for an email)
     outputExtra: [],
+    //
     groups: []
   },
   navOpen: false,
   debug: false
+}
+
+/**
+ * Group and sort action list
+ *
+ * @param {array} actionsList List of all actions available to user
+ *
+ * @returns {object}
+ */
+const sortActionsList = (actionsList) => {
+  // const _newList = []
+  const groupedActions = {}
+  const publicActions = []
+
+  const sortByActionLabel = (a, b) => {
+    if (a.label < b.label) {
+      return -1
+    } else if (a.label > b.label) {
+      return 1
+    }
+    return 0
+  }
+
+  // Get group names
+  const groupList = actionsList.map(action => action.group)
+  groupList.sort()
+  for (let a = 0; a < groupList; a += 1) {
+    if (groupList[a] !== 'public') {
+      groupedActions[groupList[a]] = []
+    }
+  }
+
+  // Add actions to groups
+  for (let a = 0; a < actionsList; a += 1) {
+    const prop = actionsList[a].group
+    if (prop === 'public') {
+      publicActions.push(actionsList[a])
+    } else {
+      groupedActions[prop].push(actionsList[a])
+    }
+  }
+
+  // Sort actions within a group
+  for (const prop in groupedActions) {
+    groupedActions[prop].sort(sortByActionLabel)
+  }
+
+  // Put public actions at the bottom of the list
+  publicActions.sort(sortByActionLabel)
+  groupedActions.public = publicActions
+
+  return groupedActions
 }
 
 /**
@@ -54,19 +125,27 @@ const fieldShouldUpdate = (fields, id, value) => {
 export const repeatReducer = (state = defaultRepeat, action = { type: 'default' }) => {
   switch (action.type) {
     case repeatActions.SET_ACTION:
-      return (objectExistsInList(state.actions, action.payload) === true)
-        ? { ...state, actionID: action.payload.id }
-        : state
-
-    case repeatActions.REGISTER_ACTION:
-      return (objectExistsInList(state.actions, action.payload) === false)
-        ? { ...state, actions: [...state.actions, action.payload] }
+      return (action.payload !== false)
+        ? {
+            ...state,
+            currentAction: action.payload,
+            fields: {
+              inputLabel: action.payload.inputLabel,
+              inputPrimary: '',
+              inputExtra: action.payload.extraInputs,
+              outputLabel: action.payload.outputLabel,
+              outputPrimary: '',
+              outputExtra: [],
+              groups: []
+            }
+          }
         : state
 
     case repeatActions.REGISTER_ALL_ACTION:
-      return (objectExistsInList(state.actions, action.payload) === false)
-        ? { ...state, actions: [...state.actions, action.payload] }
-        : state
+      return {
+        ...state,
+        allActions: sortActionsList(action.payload)
+      }
 
     case repeatActions.UPDATE_FIELD:
       return {
