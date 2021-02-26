@@ -94,16 +94,17 @@ const moveTo = (id, count, pos, _change) => {
   const _id = 'move-to-' + id
   const options = []
   for (let a = 1; a < count; a += 1) {
+    const _dir = (a < pos) ? 'up' : 'down'
     options.push((a !== pos)
-      ? html`<option value="${a}">${a}</option>`
-      : html`<option value="" title="current position (${a})" selected="selected"> -- </option>`
+      ? html`<option value="${a}" title="Move ${_dir} to position ${a}">${a}</option>`
+      : html`<option value="" title="current position (${a})" selected="selected"></option>`
     )
   }
 
   return html`
     <li>
-      <label for="#${_id}">Move ${hiddenPos(pos)} to</label>
-      <select id="${_id}" data-id="${id}" @change=${_change}>
+      <label for="${_id}-move-to">Move ${hiddenPos(pos)} to</label>
+      <select id="${_id}-move-to" data-id="${id}" @change=${_change}>
         ${options.map(option => option)}
       </select>
     </li>
@@ -136,7 +137,7 @@ const disableBtn = (id, count, isDisabled, pos, _getClick) => {
 
   return (count > 1)
     ? html`
-      <button value="${id}" class="regex-pair__btn regex-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_getClick('disable')} title="${_mode} this regex pair">
+      <button value="${id}-disable" class="regex-pair__btn regex-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_getClick('disable')} title="${_mode} this regex pair">
         ${_mode} ${hiddenPos(pos)}
       </button>`
     : ''
@@ -164,7 +165,7 @@ const disableBtn = (id, count, isDisabled, pos, _getClick) => {
 const deleteBtn = (id, count, pos, _getClick) => {
   return (count > 1)
     ? html`
-      <button value="${id}" class="regex-pair__btn regex-pair__btn--delete" @click=${_getClick('delete')} title="Delete this regex pair">
+      <button value="${id}-delete" class="regex-pair__btn regex-pair__btn--delete" @click=${_getClick('delete')} title="Delete this regex pair">
         Delete ${hiddenPos(pos)}
       </button>`
     : ''
@@ -218,7 +219,7 @@ const movePair = (id, count, pos, _dir, _getClick) => {
   }
 
   return html`
-    <button value="${id}" class="regex-pair__btn regex-pair__btn--move" @click=${_getClick('move_' + _dir)} title="Move regex pair ${_dir} to position ${_newPos}">
+    <button value="${id}-move-${_dir}" class="regex-pair__btn regex-pair__btn--move" @click=${_getClick('move_' + _dir)} title="Move regex pair ${_dir} to position ${_newPos}">
       Move ${pos} ${_dir}
     </button>`
 }
@@ -238,7 +239,7 @@ const addPair = (id, pos, _dir, _getClick) => {
   }
 
   return html`
-  <button value="${id}" class="regex-pair__btn regex-pair__btn--add" @click=${_getClick('add_' + _dir)} title="Add regex pair ${_dir} ${pos}">
+  <button value="${id}-add-${_dir}" class="regex-pair__btn regex-pair__btn--add" @click=${_getClick('add_' + _dir)} title="Add regex pair ${_dir} ${pos}">
     Add pair ${_dir} ${pos}
   </button>`
 }
@@ -347,36 +348,36 @@ export const regexPair = (props, dispatch) => {
         <ul class="regex-pair__control">
             <li>
               <label>
-                <input type="checkbox" value="${props.id}" ?checked=${props.multiLine} @change=${getAutoDispatchUpdateMultiLine(dispatch)} class="regex-pair--cb" />
+                <input type="checkbox" value="${props.id}-multiLine" ?checked=${props.multiLine} @change=${getAutoDispatchUpdateMultiLine(dispatch)} class="regex-pair--cb" />
                 Multi-line input
               </label>
             </li>
             <li>
               <label>
-                <input type="checkbox" value="${props.id}" ?checked=${props.tranformEscaped} @change=${getAutoDispatchUpdateEscaped(dispatch)} class="regex-pair--cb" />
+                <input type="checkbox" value="${props.id}-whiteSpace" ?checked=${props.tranformEscaped} @change=${getAutoDispatchUpdateEscaped(dispatch)} class="regex-pair--cb" />
                 Transform escaped characters in replacement
               </label>
             </li>
         </ul>
         <ul class="regex-pair__sibling-ctrl">
           <li class="regex-pair__sibling-ctrl__before">
-            ${movePair(props.id, props.count, props.pos, 'up', getBtnClick)}
-            ${addPair(props.id, props.count, 'before', getBtnClick)}
+            ${movePair(props.id, props.count, props.pos, 'up', getBtnClick)}<!--
+            -->${addPair(props.id, props.count, 'before', getBtnClick)}
           </li>
           <li class="regex-pair__sibling-ctrl__this">
-            ${deleteBtn(props.id, props.count, props.pos, getBtnClick)}
-            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--reset" @click=${getBtnClick('reset')} title="Reset this regex pair">
+            ${deleteBtn(props.id, props.count, props.pos, getBtnClick)}<!--
+            --><button value="${props.id}-reset" class="regex-pair__btn regex-pair__btn--reset" @click=${getBtnClick('reset')} title="Reset this regex pair">
               Reset ${_pos}
-            </button>
-            ${disableBtn(props.id, props.count, props.isDisabled, props.pos, getBtnClick)}
-            ${moveTo(props.id, props.count, props.pos, moveToClick)}
-            <button value="${props.id}" class="regex-pair__btn regex-pair__btn--set-default" @click=${getBtnClick('set_as_default')} title="Use this regex pair's confguration as default for new regex pairs">
+            </button><!--
+            -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, getBtnClick)}<!--
+            --><button value="${props.id}-makeDefalt" class="regex-pair__btn regex-pair__btn--set-default" @click=${getBtnClick('set_as_default')} title="Use this regex pair's confguration as default for new regex pairs">
               Make default
-            </button>
+            </button><!--
+            -->${moveTo(props.id, props.count, props.pos, moveToClick)}
           </li>
           <li class="regex-pair__sibling-ctrl__after">
-            ${movePair(props.id, props.count, props.pos, 'down', getBtnClick)}
-            ${addPair(props.id, props.count, 'after', getBtnClick)}
+            ${movePair(props.id, props.count, props.pos, 'down', getBtnClick)}<!--
+            -->${addPair(props.id, props.count, 'after', getBtnClick)}
           </li>
         </ul>
       </footer>

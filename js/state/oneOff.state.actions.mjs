@@ -50,6 +50,73 @@ export const regexInputActions = {
 // of the field that changed.
 
 /**
+ * Get a function that can be shared across all simple events
+ * (checkbox changes and button clicks) across all regex pairs.
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchOneOffSimpleEvent = (_dispatch) => {
+  return function (e) {
+    const val = this.value.split('-')
+    const extraType = (typeof val[2] === 'string') ? val[2].trim() : ''
+    let _type = ''
+
+    switch (val[1]) {
+      case 'multiLine':
+        _type = regexPairActions.MULTI_LINE
+        break
+
+      case 'whiteSpace':
+        _type = regexPairActions.TRANSFORM_ESCAPED
+        break
+
+      case 'add':
+        if (extraType === '') {
+          throw Error('"Add" button clicks require a third parameter')
+        }
+        _type = (extraType === 'before')
+          ? regexPairActions.ADD_BEFORE
+          : regexPairActions.ADD_AFTER
+        break
+
+      case 'move':
+        if (extraType === '') {
+          throw Error('"Move" button clicks require a third parameter')
+        }
+        _type = (extraType === 'up')
+          ? regexPairActions.MOVE_UP
+          : regexPairActions.MOVE_DOWN
+        break
+
+      case 'delete':
+        _type = regexPairActions.DELETE
+        break
+
+      case 'reset':
+        _type = regexPairActions.RESET
+        break
+
+      case 'disable':
+        _type = regexPairActions.DISABLE
+        break
+
+      case 'setDefault':
+        _type = regexPairActions.SET_AS_DEFAULT
+        break
+    }
+
+    _dispatch({
+      type: _type,
+      payload: val[0].trim()
+    })
+  }
+}
+
+/**
  * Get a function that returns an action creator function that can
  * be used as an event handler for Regex Pair regulare expression
  * text input field
