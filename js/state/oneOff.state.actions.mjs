@@ -41,6 +41,18 @@ export const regexInputActions = {
 // ==============================================
 // START: Action creators
 
+const getActionMeta = (input) => {
+  const _val = input.split('-')
+  if (_val.length < 2) {
+    throw Error('Value of field (when split on hypen) must have at least two parts. ' + _val.length + ' given')
+  }
+  return {
+    id: _val[0].trim(),
+    type: _val[1].trim(),
+    extra: (typeof _val[2] === 'string') ? _val[2].trim() : ''
+  }
+}
+
 // The following set of functions return self-dispatching action
 // creators functions
 //
@@ -61,11 +73,10 @@ export const regexInputActions = {
  */
 export const getAutoDispatchOneOffSimpleEvent = (_dispatch) => {
   return function (e) {
-    const val = this.value.split('-')
-    const extraType = (typeof val[2] === 'string') ? val[2].trim() : ''
+    const _meta = getActionMeta(this.value)
     let _type = ''
 
-    switch (val[1]) {
+    switch (_meta.type) {
       case 'multiLine':
         _type = regexPairActions.MULTI_LINE
         break
@@ -75,19 +86,19 @@ export const getAutoDispatchOneOffSimpleEvent = (_dispatch) => {
         break
 
       case 'add':
-        if (extraType === '') {
+        if (_meta.extra === '') {
           throw Error('"Add" button clicks require a third parameter')
         }
-        _type = (extraType === 'before')
+        _type = (_meta.extra === 'before')
           ? regexPairActions.ADD_BEFORE
           : regexPairActions.ADD_AFTER
         break
 
       case 'move':
-        if (extraType === '') {
+        if (_meta.extra === '') {
           throw Error('"Move" button clicks require a third parameter')
         }
-        _type = (extraType === 'up')
+        _type = (_meta.extra === 'up')
           ? regexPairActions.MOVE_UP
           : regexPairActions.MOVE_DOWN
         break
@@ -111,7 +122,47 @@ export const getAutoDispatchOneOffSimpleEvent = (_dispatch) => {
 
     _dispatch({
       type: _type,
-      payload: val[0].trim()
+      payload: _meta.id
+    })
+  }
+}
+
+/**
+ * Get a function that can be shared across all value events
+ * (text and select changes) across all regex pairs.
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchOneOffValueEvent = (_dispatch) => {
+  return function (e) {
+    const _meta = getActionMeta(this.id)
+    let _type = ''
+
+    switch (_meta.type) {
+      case 'regex':
+        _type = regexPairActions.UPDATE_REGEX
+        break
+
+      case 'flags':
+        _type = regexPairActions.UPDATE_FLAGS
+        break
+
+      case 'replace':
+        _type = regexPairActions.UPDATE_REPLACE
+        break
+
+      case 'delims':
+        _type = regexPairActions.UPDATE_DELIMS
+        break
+    }
+
+    _dispatch({
+      type: _type,
+      payload: _meta.id
     })
   }
 }

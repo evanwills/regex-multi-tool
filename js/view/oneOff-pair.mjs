@@ -91,7 +91,7 @@ const moveTo = (id, count, pos, _change) => {
   if (count < 2) {
     return ''
   }
-  const _id = 'move-to-' + id
+  const _id = id + '-moveTo'
   const options = []
   for (let a = 1; a < count; a += 1) {
     const _dir = (a < pos) ? 'up' : 'down'
@@ -103,8 +103,8 @@ const moveTo = (id, count, pos, _change) => {
 
   return html`
     <li>
-      <label for="${_id}-move-to">Move ${hiddenPos(pos)} to</label>
-      <select id="${_id}-move-to" data-id="${id}" @change=${_change}>
+      <label for="${_id}">Move ${hiddenPos(pos)} to</label>
+      <select id="${_id}" data-id="${id}" @change=${_change}>
         ${options.map(option => option)}
       </select>
     </li>
@@ -335,11 +335,11 @@ export const regexPair = (props, dispatch) => {
           <li class="regex-pair__delims">
             ${(props.flags.error !== '') ? html`<p class="regex-pair__delims-error" id="${props.id}-delims-error">props.delims.error</p>` : ''}
 
-            <label for="${props.id}-delims--open" class="regex-pair__label">Opening delimiter</label>
-            <input id="${props.id}-delims--open" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.open}" @keyup=${getDelimChange(true)} />
+            <label for="${props.id}-delims-open" class="regex-pair__label">Opening delimiter</label>
+            <input id="${props.id}-delims-open" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.open}" @keyup=${getDelimChange(true)} />
 
-            <label for="${props.id}-delims--close" class="regex-pair__label">Closing delimiter</label>
-            <input id="${props.id}-delims--close" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.close}" @keyup=${getDelimChange(false)} />
+            <label for="${props.id}-delims-close" class="regex-pair__label">Closing delimiter</label>
+            <input id="${props.id}-delims-close" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.close}" @keyup=${getDelimChange(false)} />
           </li>`
             : ''}
         </ul>
