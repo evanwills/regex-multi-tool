@@ -15,7 +15,7 @@ export const getID = () => {
   // slowPoke()
   basicID = Date.now()
   basicID = basicID.toString()
-  return 'R' + basicID.substr(-9)
+  return 'R' + basicID.substr(-9) // equivalent to 11.6 days
 }
 
 export const ucFirst = (input) => {

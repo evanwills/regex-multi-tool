@@ -14,6 +14,7 @@ export const appState = {
     },
     regex: {
       pairs: [],
+      focusedID: '',
       chain: true,
       engine: 'vanillaJS',
       defaults: {

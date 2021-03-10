@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 // import { createSlice } from '@reduxjs/toolkit'
-import { regexPairActions, regexActions, regexInputActions } from './oneOff.state.actions'
+import { regexPairActions, oneOffActions } from './oneOff.state.actions'
 import { getID } from './utils'
 
 // ==============================================
@@ -126,7 +126,8 @@ const defaultPair = {
   hasError: '',
   multiLine: false,
   transformEscaped: true,
-  disabled: false
+  disabled: false,
+  settingsOpen: false
 }
 
 const engineDefaults = {
@@ -519,6 +520,35 @@ const disablePair = (pairs, id) => {
   })
 }
 
+/**
+ * Disable/enable specified pair in the list of regex pairs
+ *
+ * If pair is "Disabled" it will not be used when matching/replacing
+ * the input. It will however, be validated as normal
+ *
+ * @param {array}  pairs List of regex pair object
+ * @param {string} id    UID for regex pair to be deleted
+ *
+ * @returns {array} list of regex pairs with the specified pair
+ *                  disabled/enabled
+ */
+const togglePairSettings = (pairs, id) => {
+  return pairs.map(pair => {
+    if (pair.id === id) {
+      return {
+        ...pair,
+        settingsOpen: !pair.settingsOpen
+      }
+    } else {
+      if (pair.settingsOpen !== false) {
+        return { ...pair, settingsOpen: false }
+      } else {
+        return pair
+      }
+    }
+  })
+}
+
 //  END:  list helpers
 // ----------------------------------------------
 
@@ -602,13 +632,19 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
     case regexPairActions.DISABLE:
       return disablePair(state, action.payload)
 
+    case regexPairActions.SETTINGS_TOGGLE:
+      return togglePairSettings(state, action.payload)
+
+    case regexPairActions.SET_FOCUSED_ID:
+      return togglePairSettings(state, '')
+
     default:
       return state
   }
 }
 
 export const regexUpdateChainReducer = (state = true, action = { type: 'default' }) => {
-  if (action.type === regexActions.UPDATE_CHAIN && typeof action.payload === 'boolean') {
+  if (action.type === oneOffActions.UPDATE_CHAIN && typeof action.payload === 'boolean') {
     return action.payload
   } else {
     return state
@@ -616,7 +652,7 @@ export const regexUpdateChainReducer = (state = true, action = { type: 'default'
 }
 
 export const regexSetEngineReducer = (state = 'vanillaJS', action = { type: 'default' }) => {
-  if (action.type === regexActions.SET_ENGINE && typeof action.payload === 'string') {
+  if (action.type === oneOffActions.SET_ENGINE && typeof action.payload === 'string') {
     return action.payload
   } else {
     return state
@@ -624,7 +660,15 @@ export const regexSetEngineReducer = (state = 'vanillaJS', action = { type: 'def
 }
 
 export const regexUpdateDefaultsReducer = (state = engineDefaults, action = { type: 'default' }) => {
-  if (action.type === regexActions.UPDATE_DEFAULTS) {
+  if (action.type === oneOffActions.UPDATE_DEFAULTS) {
+    return action.payload
+  } else {
+    return state
+  }
+}
+
+export const regexUpdateFocusedID = (state = '', action = { type: 'default' }) => {
+  if (action.type === regexPairActions.SET_FOCUSED_ID) {
     return action.payload
   } else {
     return state
@@ -633,7 +677,7 @@ export const regexUpdateDefaultsReducer = (state = engineDefaults, action = { ty
 
 export const regexRegisterEngineReducer = (state = [], action = { type: 'default' }) => {
   switch (action.type) {
-    case regexActions.REGISTER_ENGINE:
+    case oneOffActions.REGISTER_ENGINE:
       for (let a = 0; a < state.length; a += 1) {
         if (state[a].id === action.payload.id) {
           console.error('Cannot re-register "' + action.payload.label + '" (' + action.payload.id + ')')
@@ -641,7 +685,7 @@ export const regexRegisterEngineReducer = (state = [], action = { type: 'default
       }
       return [...state, action.payload]
 
-    case regexActions.UPDATE_DEFAULTS:
+    case oneOffActions.UPDATE_DEFAULTS:
       return state.map(engine => {
         if (engine.id === action.payload.engine) {
           return {
@@ -659,7 +703,7 @@ export const regexRegisterEngineReducer = (state = [], action = { type: 'default
 }
 
 export const regexSetMatchesReducer = (state = [], action = { type: 'default' }) => {
-  if (action.type === regexActions.SET_MATCHES) {
+  if (action.type === oneOffActions.SET_MATCHES) {
     return action.payload
   } else {
     return state
@@ -667,7 +711,7 @@ export const regexSetMatchesReducer = (state = [], action = { type: 'default' })
 }
 
 export const regexSetOutputReducer = (state = '', action = { type: 'default' }) => {
-  if (action.type === regexActions.SET_OUTPUT && typeof action.payload === 'string') {
+  if (action.type === oneOffActions.SET_OUTPUT && typeof action.payload === 'string') {
     return action.payload
   } else {
     return state
@@ -676,7 +720,7 @@ export const regexSetOutputReducer = (state = '', action = { type: 'default' }) 
 
 export const regexInputReducer = (state = defaultInput, action = { type: 'default' }) => {
   switch (action.type) {
-    case regexInputActions.SET_INPUT:
+    case oneOffActions.SET_INPUT:
       if (typeof action.payload === 'string') {
         return {
           ...state,
@@ -687,7 +731,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
         break
       }
 
-    case regexInputActions.SET_DO_SPLIT:
+    case oneOffActions.SET_DO_SPLIT:
       if (typeof action.payload === 'boolean') {
         return {
           ...state,
@@ -701,7 +745,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
         break
       }
 
-    case regexInputActions.SET_SPLITTER:
+    case oneOffActions.SET_SPLITTER:
       if (typeof action.payload === 'string') {
         return {
           ...state,
@@ -715,7 +759,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
         break
       }
 
-    case regexInputActions.SET_STRIP_BEFORE:
+    case oneOffActions.SET_STRIP_BEFORE:
       if (typeof action.payload === 'boolean') {
         return {
           ...state,
@@ -729,7 +773,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
         break
       }
 
-    case regexInputActions.SET_STRIP_AFTER:
+    case oneOffActions.SET_STRIP_AFTER:
       if (typeof action.payload === 'boolean') {
         return {
           ...state,

@@ -1,34 +1,6 @@
 /* jslint browser: true */
 
 /**
- * Regular expression for matching all the parts of a URL
- *
- * NOTE: RegExp object is necessary because we need access
- *       to the RegExp.exec() method
- *
- * It is defined here so it doesn't need to be recompiled
- * every time the getURLobject() function is called
- *
- * @var {RegExp} URLregex
- */
-const URLregex = new RegExp('((https?:|file:/)?//([^/#?]+))(:[0-9]+)?(/[^?#]+)(?:(?:(\\?)([^#]+)|(#)([^?]+))(?:(#)([^?]+)|(\\?)([^#]+))?)?', 'i') // eslint-disable-line
-
-/**
- * Case insensitive match if a string starts with alpha, hyphen
- * or underscore
- *
- * NOTE: RegExp object is necessary because we need access
- *       to the RegExp.test() method
- *
- * It is defined here so it doesn't need to be recompiled
- * every time the makeAttributeSafe() and makeHumanReadableAttr()
- * functions are called
- *
- * @var {RegExp} alphaStart
- */
-const alphaStart = new RegExp('^[a-z_-]', 'i') // eslint-disable-line
-
-/**
  * polyfil for new URL() call (but with better GET and hash parsing)
  * (see: https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
  *
@@ -80,7 +52,7 @@ export const getURLobject = (url) => {
   }
 
   if (typeof _url === 'string' && _url[0] !== '#') {
-    urlParts = URLregex.exec(_url)
+    urlParts = _url.match(/((https?:|file:\/)?\/\/([^/#?]+))(:[0-9]+)?(\/[^?#]+)(?:(?:(\?)([^#]+)|(#)([^?]+))(?:(#)([^?]+)|(\?)([^#]+))?)?/i)
 
     if (urlParts.length >= 3) {
       output.origin = urlParts[1]
@@ -377,7 +349,7 @@ export const makeAttributeSafe = (_attr) => {
     throw new Error('makeAttributeSafe() expects only parameter "_attr" to be string that can be used as an HTML class name or ID. "' + _attr + '" cannot be used. After cleaning, it became an empty string.')
   }
 
-  if (!alphaStart.test(_output)) {
+  if (!_output.match(/^[a-z_-]/i)) {
     _output = '_' + _output
   }
 
@@ -408,7 +380,7 @@ export const makeHumanReadableAttr = (_attr) => {
     throw new Error('makeHumanReadableAttr() expects only parameter "_attr" to be string that can be used as an HTML class name or ID. "' + _attr + '" cannot be used. After cleaning, it became an empty string.')
   }
 
-  if (!alphaStart.test(_output)) {
+  if (!_output.match(/^[a-z_-]/i)) {
     _output = '_' + _output
   }
   return _output

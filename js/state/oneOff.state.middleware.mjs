@@ -1,4 +1,4 @@
-import { regexPairActions, regexActions } from './oneOff.state.actions.mjs'
+import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID, convertEscaped } from './utils.mjs'
 
 // ==============================================
@@ -24,7 +24,8 @@ const getNewPairAndPos = (pairs, id) => {
           pos: 0,
           count: 0,
           regex: { pattern: '', error: '' },
-          replace: ''
+          replace: '',
+          settingsOpen: false
         },
         oldPos: a
       }
@@ -127,11 +128,36 @@ const getPairDefaults = (pairs, id, currentDefaults) => {
   return false
 }
 
+const regexPairFocusMightChange = (actionType) => {
+  for (const key in regexPairActions) {
+    if (actionType === regexPairActions[key] &&
+        actionType !== regexPairActions.SETTINGS_TOGGLE &&
+        actionType !== regexPairActions.SET_FOCUSED_ID
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 //  END:  Utility functions
 // ==============================================
 // START: Middleware functions
 
 export const oneOffMW = ({ getState, dispatch }) => next => action => {
+  if (regexPairFocusMightChange(action.type)) {
+    const tmpID = (typeof action.payload.id === 'string')
+      ? action.payload.id
+      : action.payload
+
+    if (getState.oneOff.regex.focusedID !== tmpID) {
+      dispatch({
+        type: regexPairActions.SET_FOCUSED_ID,
+        payload: tmpID
+      })
+    }
+  }
+
   switch (action.type) {
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
@@ -143,8 +169,8 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
         )
       })
 
-    case regexActions.SET_MATCHES:
-    case regexActions.SET_OUTPUT:
+    case oneOffActions.SET_MATCHES:
+    case oneOffActions.SET_OUTPUT:
       return next({
         type: action.type,
         payload: explodeAndTrim(
@@ -157,7 +183,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
     case regexPairActions.SET_AS_DEFAULT:
       return next({
-        type: regexActions.UPDATE_DEFAULTS,
+        type: oneOffActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
           getState.oneOff.regex.pairs,
           action.payload, // regex pair ID
@@ -172,7 +198,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
 export const finaliseOutputMW = ({ getState, dispatch }) => next => action => {
   switch (action.type) {
-    case regexActions.SET_OUTPUT:
+    case oneOffActions.SET_OUTPUT:
       return next({
         type: action.type,
         payload: trimAndImplode(

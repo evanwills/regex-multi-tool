@@ -17,19 +17,6 @@ import {
 // START: pure helper function
 
 /**
- * Regular expression testing whether a group name is valid
- *
- * NOTE: RegExp object is necessary because we need access
- *       to the RegExp.exec() method
- *
- * It is defined here so it doesn't need to be recompiled
- * every time the validGroupName() function is called
- *
- * @var {RegExp} groupNameRegex
- */
-const groupNameRegex = new RegExp('^[a-z]{2}[0-9a-z-]{0,48}$') // eslint-disable-line
-
-/**
  * Test whether a group name is valid or not.
  *
  * @param {string} groupName Name of action group
@@ -37,7 +24,7 @@ const groupNameRegex = new RegExp('^[a-z]{2}[0-9a-z-]{0,48}$') // eslint-disable
  * @returns {boolean} True if group name is valid
  */
 const validGroupName = (groupName) => {
-  return groupNameRegex.test(groupName.trim().toLowerCase())
+  return (groupName.match(/^[a-z]{2}[0-9a-z-]{0,48}$/i) !== null)
 }
 
 /**
@@ -54,8 +41,12 @@ const validGroupName = (groupName) => {
 const addToGroup = (actionGroupList, groupName) => {
   const tmpGroup = groupName.trim().toLowerCase()
 
-  if (validGroupName(tmpGroup) && actionGroupList.indexOf(tmpGroup) === -1) {
-    actionGroupList.push(tmpGroup)
+  if (validGroupName(tmpGroup)) {
+    if (actionGroupList.indexOf(tmpGroup) === -1) {
+      actionGroupList.push(tmpGroup)
+    }
+  } else {
+    console.error('groupName: "' + groupName + '" is invalid')
   }
 
   return actionGroupList
@@ -194,6 +185,34 @@ export const Repeatable = (url, _remote, docs, api) => {
       // This is a local action so it MUST have an action function
       if (typeof config.func === 'undefined' || !isFunction(config.func)) {
         throw Error(errorMsg + 'a "func" property that is a plain javascript function. ' + tmp + ' given.')
+      }
+    }
+
+    // Validate chained actions
+    if (typeof config.chainedActions !== 'undefined') {
+      if (Array.isArray(config.chainedActions)) {
+        for (let a = 0; a < config.chainedActions.length; a += 1) {
+          tmp = invalidString('actionID', config.chainedActions[a])
+          if (tmp !== false) {
+            throw Error(errorMsg + 'that chained action ' + a + ' contains an "actionID" property that is a non-empty string. ' + tmp + ' given.')
+          }
+          tmp = invalidBool('required', config.chainedActions[a])
+          if (tmp !== false && tmp !== 'undefined') {
+            throw Error(errorMsg + 'that if chained action ' + a + ' contains a "required" property, that "required" is boolean. ' + tmp + ' given.')
+          }
+          if (typeof config.chainedActions[a].order !== 'undefined') {
+            tmp = invalidNum('position', config.chainedActions[a].order)
+            if (tmp !== false && tmp !== 'undefined') {
+              throw Error(errorMsg + 'that if chained action ' + a + ' contains an "order" property, that "order" object must contain a "position" property that is a number. ' + tmp + ' given.')
+            }
+            tmp = invalidBool('force', config.chainedActions[a].order)
+            if (tmp !== false && tmp !== 'undefined') {
+              throw Error(errorMsg + 'that if chained action ' + a + ' contains an "order" property, that "order" object must contain a "force" property that is boolean. ' + tmp + ' given.')
+            }
+          }
+        }
+      } else {
+        throw Error(errorMsg + 'an action with a "chainedActions" property that the "chainedActions" property must be an array. ' + typeof config.chainedActions + ' given.')
       }
     }
 
@@ -355,7 +374,7 @@ export const Repeatable = (url, _remote, docs, api) => {
   this.getActionsList = function () {
     return registry.map(action => {
       // Remove the action function from the action object
-      const { func, ignore, ..._action } = action
+      const { func, ..._action } = action
       return _action
     })
   }
@@ -384,6 +403,38 @@ export const Repeatable = (url, _remote, docs, api) => {
 
   this.getApiURL = function () {
     return apiURL
+  }
+
+  /**
+   * Varify that any actions that want to chain other actions only
+   * list other actions that are available to the current user
+   *
+   * NOTE: This should be called before any actions set or run
+   *
+   * @returns {boolean} TRUE if all actions with chains, only chain
+   *                    available actions. FALSE otherwise
+   */
+  this.verifyChained = function () {
+    const IDs = registry.map(action => action.id)
+    let output = true
+
+    for (let a = 0; a < registry.length; a += 1) {
+      if (Array.isArray(registry[a].chainedActions) && registry[a].chainedActions.length > 0) {
+        const chain = registry[a].chainedActions
+
+        for (let b = 0; b < chain.length; b += 1) {
+          let ok = true;
+          if (IDs.indexOf(chain[b].actionID) === -1) {
+            console.error('"' + registry[a].name + '" Wants to chain action "' + chain[b].actionID + '". But either that action does not exist or is not available to the current user')
+            output = false
+            ok = false
+          }
+          registry[a].chainedActions[b].ok = ok
+        }
+      }
+    }
+
+    return output
   }
 
   //  END:  public method declaration
