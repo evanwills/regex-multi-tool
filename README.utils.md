@@ -39,7 +39,7 @@ var findReplace = [
     replace: '<$1strong$2>'
   },
   { // convert first row of table to table header
-    find: '(<table[^>]*>)(\s+<tr[^>]*>)(.*?)(</tr>)(.*?)(?=<table>)',
+    find: '(<table[^>]*>)(\s+<tr[^>]*>)(.*?)(</tr>)(.*?)(?=</table>)',
     replace: headerCells
   },
   { // Faculty acronym to full faculty name
@@ -64,7 +64,7 @@ var findReplace = {
     replace: '<$1strong$2>'
   },
   cell: { // table cell to table header cell
-    find: '(<table[^>]*>)(\s+<tr[^>]*>)(.*?)(</tr>)(.*?)(?=<table>)',
+    find: '(<table[^>]*>)(\s+<tr[^>]*>)(.*?)(</tr>)(.*?)(?=</table>)',
     replace: headerCells
   },
   acro: { // Faculty acronym to full faculty name
