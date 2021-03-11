@@ -122,7 +122,7 @@ const fieldShouldUpdate = (fields, id, value) => {
   return false
 }
 
-export const repeatReducer = (state = defaultRepeat, action = { type: 'default' }) => {
+export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
   switch (action.type) {
     case repeatActions.SET_ACTION:
       return (action.payload !== false)

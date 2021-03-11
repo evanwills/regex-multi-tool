@@ -65,3 +65,19 @@ export const getAutoDispatchUpdateField = (_dispatch) => {
     })
   }
 }
+
+/**
+ *
+ * @param _dispatch
+ * @returns
+ */
+export const dispatchRegisterAction = (_dispatch) => (repeatablen) => {
+  const aType = (Array.isArray(repeatablen))
+    ? repeatActions.REGISTER_ALL_ACTIONS
+    : repeatActions.REGISTER_SINGLE_ACTION
+
+  _dispatch({
+    type: aType,
+    payload: repeatablen
+  })
+}

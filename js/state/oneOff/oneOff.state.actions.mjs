@@ -291,13 +291,11 @@ export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
   }
 }
 
-export const getAutoDispatchRegisterEngine = (_dispatch, _engine) => {
-  return function (e) {
-    _dispatch({
-      type: oneOffActions.REGEX_REGISTER_ENGINE,
-      payload: _engine
-    })
-  }
+export const registerOneOffEngine = (_dispatch) => (_engine) => {
+  _dispatch({
+    type: oneOffActions.REGEX_REGISTER_ENGINE,
+    payload: _engine
+  })
 }
 
 //  END:  Action creators
