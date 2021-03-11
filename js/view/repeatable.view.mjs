@@ -1,12 +1,7 @@
 import { html } from '../lit-html/lit-html.mjs'
 import { ucFirst } from '../state/utils.mjs'
-import {
-  // getAutoDispatchModifyInput,
-  // getAutoDispatchUpdateField,
-  getAutoDispatchSetAction,
-  getAutoDispatchToggleDebug,
-  getAutoDispatchToggleNav
-} from '../state/repeat.state.mjs'
+import { getEventHandlers } from '../state/repeatable.state.mjs'
+import { store } from '../state/regexMulti-state.mjs'
 
 const getDebugGET = (debug) => (debug === true) ? '&debug=debug' : ''
 
@@ -17,6 +12,8 @@ const navLink = (_baseURL, _debug, _click) => (_action) => {
     </li>
   `
 }
+
+const eventHandlers = getEventHandlers(store.dispatch)
 
 export const actionNav = (_open, _baseURL, _actions, _debug, _dispatch) => {
   const navClass = (_open === true) ? 'open' : 'close'

@@ -1,16 +1,21 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { regexPair } from './oneOff-pair.mjs'
+import { regexPair } from './oneOff-pair.view.mjs'
+// import { regexPair } from './oneOff-pair.view.mjs'
+// import { regexPair } from './repeatable.view.mjs'
+import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneOff.state.mjs'
+import { getEventHandlers as getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.mjs'
+import { store } from '../state/regexMulti-state.mjs'
 
 /**
  * Template for header block for Regex multi tool
  *
- * @param {boolean}  isFancy
+ * @param {boolean}  isSimple
  * @param {function} changeHandler
  *
  * @returns {html} lit-html template function
  */
-export const header = (isFancy, changeHandler) => {
-  const _isFancy = (typeof isFancy === 'boolean' && isFancy === true)
+export const header = (isSimple, changeHandler) => {
+  const _isFancy = (typeof isSimple === 'boolean' && isSimple === false)
   console.log('inside header()')
   console.log('isFancy:', isFancy)
   console.log('_isFancy:', _isFancy)
@@ -53,22 +58,37 @@ export const footer = (buttons) => {
   `
 }
 
-export const regexTestUI = (props) => {
+export const oneOffUI = (props) => {
   console.log('props:', props)
   return html`<h1>Regex test</h1>
   ${regexPair(props)}`
 }
 
-export const doStuffUI = (props) => {
+export const repeatableUI = (props) => {
   return html`<h1>Do regex stuff</h1>`
 }
 
-export const mainApp = (props) => {
+
+export const mainApp = (domNode) => ( props, dispatch) => {
+  const isSimple =  (props.mode === 'oneOff')
+
+  const eventHandlers = (isSimple)
+    ? getOneOffEventHandlers(dispatch)
+    : getRepeatableEventHandlers(dispatch)
+
+  const state = (isSimple)
+    ? props.oneOff
+    : props.repeatable
+
+  const newProps = { ...state, events: { ...eventHandlers } }
+
   console.log('mainApp()')
-  console.log('props:', props)
-  return html`
-    ${header(!props.simple, props.change)}
-    ${(props.simple) ? regexTestUI(props.tool) : doStuffUI(props.tool)}
+  console.log('newProps:', newProps)
+
+  const UI = html`
+    ${header(isSimple, props.change)}
+    ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
     ${footer(props.buttons)}
   `
+  render(UI, domNode)
 }

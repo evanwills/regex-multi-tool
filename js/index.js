@@ -2,7 +2,8 @@
 // import { mainApp } from './view/templates.mjs'
 // import { getNewPair } from './view/oneOff-pair.mjs'
 // import { redux } from './redux/redux.mjs'
-import { store } from './state/index.mjs'
+import { store } from './state/regexMulti-state.mjs'
+import { mainApp } from './view/templates.mjs'
 
 // const mainAppProps = {
 //   simple: true,

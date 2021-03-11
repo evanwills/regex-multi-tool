@@ -52,7 +52,7 @@ export const getURLobject = (url) => {
   }
 
   if (typeof _url === 'string' && _url[0] !== '#') {
-    urlParts = _url.match(/((https?:|file:\/)?\/\/([^/#?]+))(:[0-9]+)?(\/[^?#]+)(?:(?:(\?)([^#]+)|(#)([^?]+))(?:(#)([^?]+)|(\?)([^#]+))?)?/i)
+    urlParts = _url.match(/^((https?:|file:\/)?\/\/([^:/#?]+))(:[0-9]+)?((?:\/[^?#/]+)+)?(?:(\?)([^#]*)(?:(#)(.*))?|(#)([^?]*)(?:(\?)(.*))?)?/i)
 
     if (urlParts.length >= 3) {
       output.origin = urlParts[1]

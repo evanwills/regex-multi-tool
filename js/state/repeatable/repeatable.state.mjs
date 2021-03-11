@@ -43,15 +43,17 @@ const repeatableState = {
 export const repeatable = {
   state: repeatableState,
   actions: repeatActions,
-  event: {
-    setAction: getAutoDispatchSetAction,
-    toggleDebug: getAutoDispatchToggleDebug,
-    toggleNav: getAutoDispatchToggleNav,
-    modifyInput: getAutoDispatchModifyInput,
-    updateField: getAutoDispatchUpdateField,
-    register: dispatchRegisterAction
-  },
   reducers: repeatableReducer,
-  middleware: repeatableMW
+  middleware: repeatableMW,
+  register: dispatchRegisterAction
 }
 
+export const getEventHandlers = (dispatch) => {
+  return {
+    setAction: getAutoDispatchSetAction(dispatch),
+    toggleDebug: getAutoDispatchToggleDebug(dispatch),
+    toggleNav: getAutoDispatchToggleNav(dispatch),
+    modifyInput: getAutoDispatchModifyInput(dispatch),
+    updateField: getAutoDispatchUpdateField(dispatch),
+  }
+}

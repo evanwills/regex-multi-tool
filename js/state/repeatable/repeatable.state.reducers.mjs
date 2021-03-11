@@ -1,4 +1,4 @@
-import { repeatActions } from './repeat.state.actions.mjs'
+import { repeatActions } from './repeatable.state.actions.mjs'
 
 /**
  * Initial State for repeatable actions in Regex Multi-Tool

@@ -50,14 +50,16 @@ export const oneOff = {
     pairs: regexPairActions,
     general: oneOffActions
   },
-  event: {
-    simplePair: getAutoDispatchOneOffPairSimpleEvent,
-    pairValue: getAutoDispatchOneOffPairValueEvent,
-    simpleGeneral: getAutoDipatchOneOffSimpleEvent,
-    generalValue: getAutoDispatchOneOffValueEvent,
-    register: registerOneOffEngine
-  },
+  register: registerOneOffEngine,
   reducers: oneOffReducer,
   middleware: oneOffMW
 }
 
+export const getEventHandlers = (dispatch) => {
+  return {
+    simplePair: getAutoDispatchOneOffPairSimpleEvent(dispatch),
+    pairValue: getAutoDispatchOneOffPairValueEvent(dispatch),
+    simpleGeneral: getAutoDipatchOneOffSimpleEvent(dispatch),
+    generalValue: getAutoDispatchOneOffValueEvent(dispatch),
+  }
+}
