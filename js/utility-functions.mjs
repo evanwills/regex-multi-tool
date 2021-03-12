@@ -98,7 +98,6 @@ export const getURLobject = (url) => {
     }
   }
 
-  console.log('output:', output)
   return output
 }
 

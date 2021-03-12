@@ -1,6 +1,10 @@
+@import 'particles/variables';
+@import 'atoms/base';
+
 @import 'pages/main-page';
 
 @import 'organisms/header';
+@import 'organisms/regex-pair';
 
 @import 'molecules/button-list';
 

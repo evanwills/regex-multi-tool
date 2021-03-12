@@ -6,27 +6,27 @@ const ts = require("gulp-typescript");
 const origin = './'
 // const destination = './'
 
-// sass.compiler = require('node-sass')
+sass = require('gulp-dart-sass')
 
-// function scss (cb) {
-//   src('scss/*.scss')
-//     .pipe(sass({
-//       outputStyle: 'expanded',
-//       eyeglass: {
-//         enableImportOnce: false
-//       },
-//       precision: 3,
-//       sourceComments: true,
-//       sourceMap: true,
-//       sourceMapContents: true
-//     }))
-//     .pipe(dest('css'))
-// }
+function scss (cb) {
+  src('scss/*.scss')
+    .pipe(sass({
+      outputStyle: 'expanded',
+      eyeglass: {
+        enableImportOnce: false
+      },
+      precision: 3,
+      sourceComments: true,
+      sourceMap: true,
+      sourceMapContents: true
+    }))
+    .pipe(dest('css'))
+}
 
 function watcher (cb) {
-  // watch(origin + 'scss/**/*.scss').on(
-  //   'change', series(scss)
-  // )
+  watch(origin + 'scss/**/*.scss').on(
+    'change', series(scss)
+  )
   watch(origin + '**/*.html').on(
     'change', series(browserSync.reload)
   )

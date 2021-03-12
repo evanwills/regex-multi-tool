@@ -108,32 +108,36 @@ const getPos = (pairs, id) => {
 // ==============================================
 // START: Initial state
 
-export const defaultPair = {
-  pos: 1,
-  count: 1,
-  id: getID(),
-  regex: {
-    pattern: '',
-    error: ''
-  },
-  replace: '',
-  flags: {
-    flags: 'ig',
-    error: ''
-  },
-  delims: {
-    allow: false,
-    open: '',
-    close: '',
-    error: ''
-  },
-  hasError: '',
-  multiLine: false,
-  fullWidth: false,
-  transformEscaped: true,
-  disabled: false,
-  settingsOpen: false
+export const getDefaultPair = () => {
+  return {
+    pos: 1,
+    count: 1,
+    id: getID(),
+    regex: {
+      pattern: '',
+      error: ''
+    },
+    replace: '',
+    flags: {
+      flags: 'ig',
+      error: ''
+    },
+    delims: {
+      allow: false,
+      open: '',
+      close: '',
+      error: ''
+    },
+    hasError: '',
+    multiLine: false,
+    fullWidth: false,
+    transformEscaped: true,
+    disabled: false,
+    settingsOpen: false
+  }
 }
+
+const defaultPair = getDefaultPair()
 
 export const engineDefaults = {
   engine: 'vanillaJS',
@@ -563,19 +567,37 @@ const disablePair = (pairs, id) => {
  * @returns {array} list of regex pairs with the specified pair
  *                  disabled/enabled
  */
-const togglePairSettings = (pairs, id) => {
+const closePairSettings = (pairs) => {
+  return pairs.map(pair => (pair.settingsOpen !== false) ? { ...pair, settingsOpen: false } : pair)
+}
+
+/**
+ * Disable/enable specified pair in the list of regex pairs
+ *
+ * If pair is "Disabled" it will not be used when matching/replacing
+ * the input. It will however, be validated as normal
+ *
+ * @param {array}  pairs List of regex pair object
+ * @param {string} id    UID for regex pair to be deleted
+ *
+ * @returns {array} list of regex pairs with the specified pair
+ *                  disabled/enabled
+ */
+const togglePairSettings = (pairs, id, open) => {
+  console.log('id:', id)
+  console.log('open:', open)
   return pairs.map(pair => {
-    console.log('pair:', pair)
-    console.log('pair.id:', pair.id)
-    console.log('id:', id)
     if (pair.id === id) {
-      return {
-        ...pair,
-        settingsOpen: !pair.settingsOpen
+      if (pair.settingsOpen !== open) {
+        return { ...pair, settingsOpen: open }
       }
     } else {
-      return (pair.settingsOpen !== false) ? { ...pair, settingsOpen: false } : pair
+      if (pair.settingsOpen === true) {
+        return { ...pair, settingsOpen: false }
+      }
     }
+
+    return pair
   })
 }
 
@@ -666,13 +688,16 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
     case regexPairActions.DISABLE:
       return disablePair(state, action.payload)
 
-    case regexPairActions.SETTINGS_TOGGLE:
-      return togglePairSettings(state, action.payload)
+    case regexPairActions.OPEN_SETTINGS:
+      return togglePairSettings(state, action.payload, true)
+
+    case regexPairActions.CLOSE_SETTINGS:
+      return togglePairSettings(state, action.payload, false)
 
     case regexPairActions.SET_FOCUSED_ID:
       console.log('SET_FOCUSED_ID')
       console.log('action.payload:', action.payload)
-      return togglePairSettings(state, action.payload)
+      return closePairSettings(state, action.payload)
 
     default:
       return state
@@ -836,7 +861,7 @@ export const oneOffReducer = combineReducers({
     engine: regexSetEngineReducer,
     defaults: regexUpdateDefaultsReducer,
     engines: regexRegisterEngineReducer,
-    focusID: regexUpdateFocusedID
+    focusedID: regexUpdateFocusedID
   }),
   matches: regexSetMatchesReducer,
   output: regexSetOutputReducer

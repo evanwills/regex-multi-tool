@@ -39,14 +39,145 @@ input:checked + .radio-btn-label {
   }
 }
 
-.regex-pair__btn {
-  border: .05rem solid #ccc;
-  &:first-child {
-    border-top-left-radius: .75rem;
-    border-bottom-left-radius: .75rem;
+.r-pair {
+  &-pair__btn {
+    border: .05rem solid #ccc;
+
+    &:first-child {
+      border-top-left-radius: .75rem;
+      border-bottom-left-radius: .75rem;
+    }
+
+    &:last-of-type {
+      border-top-right-radius: .75rem;
+      border-bottom-right-radius: .75rem;
+    }
   }
-  &:last-of-type {
-    border-top-right-radius: .75rem;
-    border-bottom-right-radius: .75rem;
+
+  &__btn {
+    border: none;
+    border-radius: 50%;
+    display: inline-block;
+    /* font-weight: bold; */
+    height: 1.75rem;
+    margin: 0 0.25rem;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    text-indent: -100rem;
+    transition: transform ease-in-out 0.3s;
+    width: 1.75rem;
+
+    &::after {
+      display: inline-block;
+      font-size: 1.3rem;
+      font-weight: bold;
+      position: absolute;
+      left: 51.5%;
+      text-indent: 0;
+      top: 45%;
+      transform: translate(-50%, -50%);
+    }
+
+    &--danger {
+      background-color: #900;
+      color:#fff;
+    }
+
+    /* .r-pair__btn--danger:focus {
+      border-color: #fff;
+    } */
+
+    &--disable {
+      background-color: rgb(231, 227, 10);
+      /* color: #000; */
+
+      &::after {
+        content: '!';
+      }
+    }
+
+    &--delete::after {
+      content: '\000D7';
+    }
+
+    &--reset::after {
+      content: '\021BA';
+      transform: translate(-53%, -50%);
+    }
+
+    &--set-default {
+      background-color: rgb(164, 235, 191);
+      /* color: rgb(255, 251, 0); */
+
+      &::after {
+        content: '\02299';
+        top: 42%;
+      }
+    }
+
+    &--move {
+      background-color: rgb(198, 188, 233);
+
+      &::after {
+        content: '\025BF';
+        font-size: 2.5rem;
+        top: 47%;
+      }
+
+      &--up::after {
+        content: '\025B5';
+        top: 41%;
+      }
+    }
+
+    &--add {
+      background-color: rgb(77, 201, 128);
+
+      &::after {
+        content: '+'
+      }
+    }
+
+    &--settings {
+      border: 0.1rem solid #fff;
+      background-color: #000;
+      height: 1.1rem;
+      width: 1.1rem;
+      opacity: 1;
+      transition: transform, opacity ease-in-out 0.3s;
+
+      &::after {
+        color: #fff;
+        content: '\02026';
+        font-size: 0.7rem;
+        top: 25%
+      }
+
+      &--close {
+        align-self: flex-end;
+        order: -1;
+        margin-bottom: 0.2rem;
+
+        &::before {
+          bottom: -100rem;
+          content: '';
+          left: -10rem;
+          position: fixed;
+          right: -10rem;
+          top: -100rem;
+          z-index: -1;
+        }
+      }
+
+      &--open {
+        margin: 0 0 0 -0.3rem;
+
+        &-is {
+          opacity: 0;
+        }
+      }
+    }
   }
 }
+

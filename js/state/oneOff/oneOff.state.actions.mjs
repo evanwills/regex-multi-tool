@@ -21,7 +21,8 @@ export const regexPairActions = {
   RESET: 'REGEX_PAIR_RESET',
   DISABLE: 'REGEX_PAIR_DISABLE',
   SET_AS_DEFAULT: 'REGEX_SET_AS_DEFAULT',
-  SETTINGS_TOGGLE: 'REGEX_SETTINGS_TOGGLE',
+  OPEN_SETTINGS: 'REGEX_OPEN_SETTINGS',
+  CLOSE_SETTINGS: 'REGEX_CLOSE_SETTINGS',
   SET_FOCUSED_ID: 'REGEX_SET_FOCUSED_ID'
 }
 
@@ -116,7 +117,13 @@ export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
         break
 
       case 'toggleSettings':
-        _type = regexPairActions.SETTINGS_TOGGLE
+        if (_meta.extra === 'open' || _meta.extra === 'close') {
+          _type = (_meta.extra === 'open')
+            ? regexPairActions.OPEN_SETTINGS
+            : regexPairActions.CLOSE_SETTINGS
+        } else {
+          throw Error('Could not determin whether "Toggle settings" button click applies to "Open" or "Close" from "' + this.value + '"')
+        }
         break
 
       case 'add':

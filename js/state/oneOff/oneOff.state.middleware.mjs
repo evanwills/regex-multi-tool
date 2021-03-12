@@ -131,7 +131,8 @@ const getPairDefaults = (pairs, id, currentDefaults) => {
 const regexPairFocusMightChange = (actionType) => {
   for (const key in regexPairActions) {
     if (actionType === regexPairActions[key] &&
-        actionType !== regexPairActions.SETTINGS_TOGGLE &&
+        actionType !== regexPairActions.OPEN_SETTINGS &&
+        actionType !== regexPairActions.CLOSE_SETTINGS &&
         actionType !== regexPairActions.SET_FOCUSED_ID
     ) {
       return true
@@ -153,6 +154,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       ? action.payload.id
       : action.payload
 
+    console.log('Focus pair might change')
     console.log('tmpID:', tmpID)
     console.log('_state.oneOff.regex.focusedID:', _state.oneOff.regex.focusedID)
 

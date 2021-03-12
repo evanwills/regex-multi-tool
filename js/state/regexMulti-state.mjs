@@ -1,4 +1,18 @@
-import { combineReducers, createStore, applyMiddleware, compose } from '../redux/redux.mjs'
+import {
+  combineReducers,
+  createStore,
+  applyMiddleware,
+  compose
+} from '../redux/redux.mjs'
+import {
+  logger,
+  crashReporter,
+  // readyStatePromise,
+  // thunk
+  // timeoutScheduler,
+  // readyStatePromise,
+  // vanillaPromise,
+} from '../redux/standard-middleware.mjs'
 import { modeReducer } from './mode.state.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
@@ -17,7 +31,11 @@ export const store = createStore(
   }),
   initialState,
   compose(
-    applyMiddleware(oneOff.middleware),
-    applyMiddleware(repeatable.middleware)
+    applyMiddleware(
+      logger,
+      crashReporter,
+      oneOff.middleware,
+      repeatable.middleware
+    )
   )
 )

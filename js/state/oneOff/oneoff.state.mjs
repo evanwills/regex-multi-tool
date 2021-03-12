@@ -8,9 +8,10 @@ import {
   getAutoDispatchOneOffValueEvent,
   registerOneOffEngine
 } from './oneOff.state.actions.mjs'
-import { oneOffReducer, defaultPair } from './oneOff.state.reducers.mjs'
+import { oneOffReducer, getDefaultPair } from './oneOff.state.reducers.mjs'
 import { oneOffMW } from './oneOff.state.middleware.mjs'
 
+const defaultPair = getDefaultPair()
 
 const oneOffState = {
   input: {
@@ -26,7 +27,7 @@ const oneOffState = {
   },
   regex: {
     pairs: [defaultPair],
-    focusedID: '',
+    focusedID: defaultPair.id,
     chain: true,
     engine: 'vanillaJS',
     defaults: {

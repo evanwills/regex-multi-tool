@@ -82,8 +82,8 @@ export const getMainAppView = (domNode, store) => {
 
     const newProps = { ...state, events: { ...eventHandlers } }
 
-    console.log('mainApp()')
-    console.log('newProps:', newProps)
+    // console.log('mainApp()')
+    // console.log('newProps:', newProps)
 
     const UI = html`
       ${header(isSimple, props.change)}

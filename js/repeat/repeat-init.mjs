@@ -483,8 +483,6 @@ const tmpApiURL = (typeof apiURL === 'string' && apiURL !== '') ? apiURL : 'docs
 // ======================================================
 // START: instantiate repeatable
 
-console.log('Repeatable:', Repeatable)
-
 export const repeatable = new Repeatable(
   getURLobject(window.location),
   tmpRemote,

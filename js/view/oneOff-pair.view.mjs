@@ -96,8 +96,8 @@ const moveTo = (id, count, pos, _change) => {
 
   return html`
     <span class="r-pair__move-to__wrap"><!--
-      --><label for="${_id}">Move ${hiddenPos(pos)} to</label><!--
-      --><select id="${_id}" data-id="${id}" @change=${_change}>
+      --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
+      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change}>
         ${options.map(option => (option.current)
           ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
           : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
@@ -133,7 +133,7 @@ const disableBtn = (id, count, isDisabled, pos, _click) => {
 
   return (count > 1)
     ? html`
-      <button value="${id}-disable" class="regex-pair__btn regex-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair">
+      <button value="${id}-disable" class="r-pair__btn r-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair">
         ${_mode} ${hiddenPos(pos)}
       </button>`
     : ''
@@ -161,7 +161,7 @@ const disableBtn = (id, count, isDisabled, pos, _click) => {
 const deleteBtn = (id, count, pos, _click) => {
   return (count > 1)
     ? html`
-      <button value="${id}-delete" class="regex-pair__btn regex-pair__btn--delete" @click=${_click} title="Delete this regex pair">
+      <button value="${id}-delete" class="r-pair__btn r-pair__btn--danger r-pair__btn--delete" @click=${_click} title="Delete this regex pair">
         Delete ${hiddenPos(pos)}
       </button>`
     : ''
@@ -216,12 +216,48 @@ const movePair = (id, count, pos, _dir, clickHandler) => {
   }
 
   return html`
-    <button value="${id}-move-${_dir}" class="regex-pair__btn regex-pair__btn--move" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}">
+    <button value="${id}-move-${_dir}" class="r-pair__btn r-pair__btn--move r-pair__btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}">
       Move ${pos} ${_dir}
     </button>`
 }
 
 /**
+ * Get a checkbox & label pair
+ *
+ * @param {string}   id           ID of the regex pair
+ * @param {string}   label        Label for the checkbox
+ * @param {string}   suffix       Suffix for the ID & class
+ * @param {boolean}  isChecked    Whether or not the checkbox is checked
+ * @param {function} eventHandler Event handler function
+ * @returns
+ */
+const checkboxField = (id, label, classSuffix, isChecked, eventHandler) => {
+  return html`
+  <input type="checkbox" id="${id}-${classSuffix}" class="r-pair__cb" value="${id}-${classSuffix}" ?checked=${isChecked} @change=${eventHandler} /><!--
+  --><label for="${id}-${classSuffix}" class="r-pair__cb-label">${label}</label>
+  `
+}
+
+/**
+ * Get an Open/Close button
+ *
+ * @param {string}   id           ID of the regex pair
+ * @param {string}   label        Label for the checkbox
+ * @param {boolean}  isOpen       Whether or not settings block is open
+ * @param {function} eventHandler Event handler function
+ * @returns
+ */
+const openCloseButton = (id, label, isOpen, eventHandler) => {
+  const _which = label.toLocaleLowerCase()
+  const _is = (isOpen) ? 'is' : 'not'
+  return html`
+    <button value="${id}-toggleSettings-${_which}" class="r-pair__btn r-pair__btn--settings r-pair__btn--settings--${_which} r-pair__btn--settings--${_which}-${_is}" @click=${eventHandler} title="${label} settings for this Regex Pair">
+      ${label}
+    </button>`
+}
+
+/**
+ * Get an "Add pair button"
  *
  * @param {string}   id           ID of the regex pair being rendered
  * @param {number}   pos          Position of regex pair in list of regex pairs
@@ -235,8 +271,7 @@ const addPair = (id, pos, _dir, clickHandler) => {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
-  return html`
-  <button value="${id}-add-${_dir}" class="regex-pair__btn regex-pair__btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
+  return html`<button value="${id}-add-${_dir}" class="r-pair__btn r-pair__btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
     Add pair ${_dir} ${pos}
   </button>`
 }
@@ -291,93 +326,91 @@ const addPair = (id, pos, _dir, clickHandler) => {
 export const regexPair = (props) => {
   const _pos = hiddenPos(props.pos)
 
-  console.log('props.events.simplePair:', props.events.simplePair)
   console.log('props:', props)
+
+  // console.log('props.events.simplePair:', props.events.simplePair)
+  // console.log('props:', props)
   return html`
-    <article id="${props.id}" class="regex-pair">
-      <header class="regex-pair__header"><h3>Regex pair ${props.pos} (#${props.id})</h3></header>
-      <main class="regex-pair__main${(props.fullWidth) ? ' regex-pair__main--full-width' : ''}">
-        <ul>
-          <li class="regex-pair__pattern">
-            ${(props.regex.error !== '') ? html`<p class="regex-pair__pattern-error" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
-            <label for="${props.id}-regex" class="regex-pair__label">Regex</label>
-            ${(props.multiLine)
-              ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__txt" @change=${props.events.pairValue} placeholder="regular expression">${props.regex.pattern}</textarea>`
-              : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="regex-pair__input" value="${props.regex.pattern}" @change=${props.events.pairValue} placeholder="regular expression" />`}
-          </li>
-          <li class="regex-pair__flags">
-            ${(props.flags.error !== '') ? html`<p class="regex-pair__flags-error" id="${props.id}-flags-error">props.flags.error</p>` : ''}
-            <label for="${props.id}-flags" class="regex-pair__label">Flags</label>
-            <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="regex-pair__input" value="${props.flags.flags}" @keyup=${props.events.pairValue} placeholder="i" />
-          </li>
-          <li class="regex-pair__replace">
-            <label for="${props.id}-replace" class="regex-pair__label">Replace</label>
-            ${(props.multiLine)
-              ? html`<textarea id="${props.id}-replace" aria-describedby="${props.id}-replace" class="regex-pair__txt" placeholder="replace" @change=${props.events.pairValue}>${props.replace}</textarea>`
-              : html`<input id="${props.id}-replace" class="regex-pair__input" value="${props.replace}" placeholder="replace" @change=${props.events.pairValue}} />`}
-          </li>
-          ${(props.delims.allow === true)
-            ? html`
-          <li class="regex-pair__delims">
-            ${(props.delims.error !== '') ? html`<p class="regex-pair__delims-error" id="${props.id}-delims-error">props.delims.error</p>` : ''}
+    <article id="${props.id}" class="r-pair">
+      <header class="r-pair__header"><h3 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h3></header>
+      <main class="r-pair__main${(props.fullWidth) ? ' r-pair__main--full-width' : ''}">
+        ${(props.regex.error !== '') ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
+        <label for="${props.id}-regex" class="r-pair__label r-pair__label--regex">Regex</label>
+        ${(props.multiLine)
+          ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__txt r-pair__field r-pair__field--regex" @change=${props.events.pairValue} placeholder="regular expression">${props.regex.pattern}</textarea>`
+          : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__input r-pair__field r-pair__field--regex" value="${props.regex.pattern}" @change=${props.events.pairValue} placeholder="regular expression" />`}
+        ${(props.flags.error !== '') ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">props.flags.error</p>` : ''}
+        <label for="${props.id}-flags" class="r-pair__label r-pair__label--flags">Flags</label>
+        <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="r-pair__input r-pair__field--flags" value="${props.flags.flags}" @keyup=${props.events.pairValue} placeholder="i" />
+        <label for="${props.id}-replace" class="r-pair__label r-pair__label--replace">Replace</label>
+        ${(props.multiLine)
+          ? html`<textarea id="${props.id}-replace" aria-describedby="${props.id}-replace" class="r-pair__txt r-pair__field r-pair__field--replace" placeholder="replace" @change=${props.events.pairValue}>${props.replace}</textarea>`
+          : html`<input id="${props.id}-replace" class="r-pair__input r-pair__field r-pair__field--replace" value="${props.replace}" placeholder="replace" @change=${props.events.pairValue}} />`}
+        ${(props.delims.allow === true)
+          ? html`
+          ${(props.delims.error !== '') ? html`<p class="r-pair__error r-pair__delims-error" id="${props.id}-delims-error">props.delims.error</p>` : ''}
 
-            <label for="${props.id}-delims-open" class="regex-pair__label">Opening delimiter</label>
-            <input id="${props.id}-delims-open" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.open}" @keyup=${props.events.pairValue} />
+          <label for="${props.id}-delims-open" class="r-pair__label">Opening delimiter</label>
+          <input id="${props.id}-delims-open" aria-describedby="${props.id}-delims-error" maxchars="1" class="r-pair__input r-pair__field--delims-open" value="${props.delims.open}" @keyup=${props.events.pairValue} />
 
-            <label for="${props.id}-delims-close" class="regex-pair__label">Closing delimiter</label>
-            <input id="${props.id}-delims-close" aria-describedby="${props.id}-delims-error" maxchars="1" class="regex-pair__input" value="${props.delims.close}" @keyup=${props.events.pairValue} />
-          </li>`
-            : ''}
-        </ul>
+          <label for="${props.id}-delims-close" class="r-pair__label">Closing delimiter</label>
+          <input id="${props.id}-delims-close" aria-describedby="${props.id}-delims-error" maxchars="1" class="r-pair__input r-pair__field--delims-close" value="${props.delims.close}" @keyup=${props.events.pairValue} />
+          `
+          : ''}
       </main>
 
-      <button value="${props.id}-toggleSettings-open" class="regex-pair__btn regex-pair__btn--toggle-settings regex-pair__btn--toggle-settings--open" @click=${props.events.simplePair} title="Open settings for this Regex Pair (#${props.pos})">
-        Open
-      </button>
+      ${openCloseButton(props.id, 'Open', props.settingsOpen, props.events.simplePair)}
 
-      <footer class="regex-pair__footer regex-pair__footer--${(props.settingsOpen) ? 'opened' : 'closed'}">
-        <ul class="regex-pair__control">
+      <footer class="r-pair__footer r-pair__footer--${(props.settingsOpen) ? 'opened' : 'closed'}">
+        <ul class="r-pair__control">
             <li>
-              <label>
-                <input type="checkbox" value="${props.id}-multiLine" ?checked=${props.multiLine} @change=${props.events.simplePair} class="regex-pair--cb" />
-                Multi-line input
-              </label>
+              ${checkboxField(
+                props.id,
+                'Multi-line input',
+                'multiLine',
+                props.multiLine,
+                props.events.simplePair
+              )}
             </li>
             <li>
-              <label>
-                <input type="checkbox" value="${props.id}-fullWidth" ?checked=${props.fullWidth} @change=${props.events.simplePair} class="regex-pair--cb" />
-                Full width inputs
-              </label>
+              ${checkboxField(
+                props.id,
+                'Full width input',
+                'fullWidth',
+                props.fullWidth,
+                props.events.simplePair
+              )}
             </li>
             <li>
-              <label>
-                <input type="checkbox" value="${props.id}-whiteSpace" ?checked=${props.transformEscaped} @change=${props.events.simplePair} class="regex-pair--cb" />
-                Transform escaped characters in replacement
-              </label>
+              ${checkboxField(
+                props.id,
+                'Transform escaped characters in replacement',
+                'whiteSpace',
+                props.transformEscaped,
+                props.events.simplePair
+              )}
             </li>
         </ul>
 
-        <ul class="regex-pair__sibling-ctrl">
-          <li class="regex-pair__sibling-ctrl__before">
+        <ul class="r-pair__sibling-ctrl">
+          <li class="r-pair__sibling-ctrl__before">
             ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair)}<!--
             -->${addPair(props.id, props.count, 'before', props.events.simplePair)}
           </li>
-          <li class="regex-pair__sibling-ctrl__this">
+          <li class="r-pair__sibling-ctrl__this">
             ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-reset" class="regex-pair__btn regex-pair__btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">Reset ${_pos}</button><!--
+            --><button value="${props.id}-reset" class="r-pair__btn r-pair__btn--danger r-pair__btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">Reset ${_pos}</button><!--
             -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-makeDefalt" class="regex-pair__btn regex-pair__btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">Make default</button><!--
+            --><button value="${props.id}-setDefault" class="r-pair__btn r-pair__btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">Make default</button><!--
             -->${moveTo(props.id, props.count, props.pos, props.events.pairValue)}
           </li>
-          <li class="regex-pair__sibling-ctrl__after">
+          <li class="r-pair__sibling-ctrl__after">
             ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair)}<!--
             -->${addPair(props.id, props.count, 'after', props.events.simplePair)}
           </li>
         </ul>
 
-        <button value="${props.id}-toggleSettings-close" class="regex-pair__btn regex-pair__btn--toggle-settings regex-pair__btn--toggle-settings--close" @click=${props.events.simplePair} title="Close settings for this Regex Pair (#${props.pos})">
-          Close
-        </button>
+        ${openCloseButton(props.id, 'Close', props.settingsOpen, props.events.simplePair)}
       </footer>
     </article>
   `
