@@ -69,26 +69,29 @@ export const repeatableUI = (props) => {
 }
 
 
-export const mainApp = (domNode) => ( props, dispatch) => {
-  const isSimple =  (props.mode === 'oneOff')
+export const getMainAppView = (domNode, store) => {
+  return function () {
+    const props = store.getState()
+    const isSimple =  (props.mode === 'oneOff')
 
-  const eventHandlers = (isSimple)
-    ? getOneOffEventHandlers(dispatch)
-    : getRepeatableEventHandlers(dispatch)
+    const eventHandlers = (isSimple)
+      ? getOneOffEventHandlers(store.dispatch)
+      : getRepeatableEventHandlers(store.dispatch)
 
-  const state = (isSimple)
-    ? props.oneOff
-    : props.repeatable
+    const state = (isSimple)
+      ? props.oneOff
+      : props.repeatable
 
-  const newProps = { ...state, events: { ...eventHandlers } }
+    const newProps = { ...state, events: { ...eventHandlers } }
 
-  console.log('mainApp()')
-  console.log('newProps:', newProps)
+    console.log('mainApp()')
+    console.log('newProps:', newProps)
 
-  const UI = html`
-    ${header(isSimple, props.change)}
-    ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
-    ${footer(props.buttons)}
-  `
-  render(UI, domNode)
+    const UI = html`
+      ${header(isSimple, props.change)}
+      ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
+      ${footer(props.buttons)}
+    `
+    render(UI, domNode)
+  }
 }

@@ -3,7 +3,7 @@
 // import { getNewPair } from './view/oneOff-pair.mjs'
 // import { redux } from './redux/redux.mjs'
 import { store } from './state/regexMulti-state.mjs'
-import { mainApp } from './view/templates.mjs'
+import { getMainAppView } from './view/templates.mjs'
 
 // const mainAppProps = {
 //   simple: true,
@@ -32,3 +32,9 @@ import { mainApp } from './view/templates.mjs'
 // console.log('index.mjs')
 
 console.log('store:', store)
+
+const mainView = getMainAppView(document.body, store)
+
+mainView()
+
+const unsubscribe = store.subscribe(mainView)
