@@ -36,6 +36,7 @@ const oneOffState = {
         close: ''
       },
       multiLine: false,
+      fullWidth: true,
       transformEscaped: true
     },
     engines: []

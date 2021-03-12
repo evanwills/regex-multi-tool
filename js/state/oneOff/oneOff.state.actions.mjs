@@ -9,6 +9,7 @@ export const regexPairActions = {
   UPDATE_REPLACE: 'REGEX_PAIR_UPDATE_REPLACE',
   UPDATE_FLAGS: 'REGEX_PAIR_UPDATE_FLAGS',
   UPDATE_DELIMS: 'REGEX_PAIR_UPDATE_DELIMS',
+  FULL_WIDTH: 'REGEX_PAIR_SET_FULL_WIDTH',
   MULTI_LINE: 'REGEX_PAIR_SET_MULTI_LINE',
   TRANSFORM_ESCAPED: 'REGEX_PAIR_SET_TRANSFORM_ESCAPED',
   MOVE_UP: 'REGEX_PAIR_MOVE_UP',
@@ -53,6 +54,7 @@ const getActionMeta = (input) => {
       extra: (typeof _val[2] === 'string') ? _val[2].trim() : ''
     }
   } else {
+    console.log('input:', input)
     throw Error('The input must match a regex pair ID plus the primary action type and optionally an action type modifier')
   }
 }
@@ -79,6 +81,9 @@ const getActionMeta = (input) => {
 export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
   return function (e) {
     const _meta = getActionMeta(this.value)
+    console.log('this.id:', this.id)
+    console.log('this.value:', this.value)
+    console.log('_meta:', _meta)
     let _type = ''
 
     switch (_meta.type) {
@@ -88,6 +93,10 @@ export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
 
       case 'whiteSpace':
         _type = regexPairActions.TRANSFORM_ESCAPED
+        break
+
+      case 'fullWidth':
+        _type = regexPairActions.FULL_WIDTH
         break
 
       case 'delete':

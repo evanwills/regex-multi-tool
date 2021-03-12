@@ -78,24 +78,30 @@ const hiddenPos = (pos) => html`<span class="sr-only">number ${pos}</span>`
  * @returns {lit-html} render function
  */
 const moveTo = (id, count, pos, _change) => {
+  const _id = id + '-moveTo'
+  const options = []
+
   if (count < 2) {
     return ''
   }
-  const _id = id + '-moveTo'
-  const options = []
-  for (let a = 1; a < count; a += 1) {
-    const _dir = (a < pos) ? 'up' : 'down'
-    options.push((a !== pos)
-      ? html`<option value="${a}" title="Move ${_dir} to position ${a}">${a}</option>`
-      : html`<option value="" title="current position (${a})" selected="selected"></option>`
-    )
+
+  for (let a = 0; a < count; a += 1) {
+    options.push({
+      current: (a === (pos - 1)),
+      value: a,
+      pos: a + 1,
+      dir: (a < pos) ? 'up' : 'down'
+    })
   }
 
   return html`
     <span class="r-pair__move-to__wrap"><!--
       --><label for="${_id}">Move ${hiddenPos(pos)} to</label><!--
       --><select id="${_id}" data-id="${id}" @change=${_change}>
-        ${options.map(option => option)}
+        ${options.map(option => (option.current)
+          ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
+          : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
+        )}
       </select><!--
     --></span>
   `
@@ -178,14 +184,14 @@ const deleteBtn = (id, count, pos, _click) => {
  * @param {number}   pos       Position of regex pair in list of
  *                             regex pairs
  * @param {string}   _dir      Either "up" or "down"
- * @param {function} _getClick A function that returns the
+ * @param {function} clickHandler A function that returns the
  *                             appropriate event handler for the
  *                             button (that automatically dispatches
  *                             an action to the redux store)
  *
  * @returns {lit-html} render function
  */
-const movePair = (id, count, pos, _dir, _getClick) => {
+const movePair = (id, count, pos, _dir, clickHandler) => {
   let _newPos = -1
 
   if (typeof _dir !== 'string' || (_dir !== 'up' && _dir !== 'down')) {
@@ -197,39 +203,40 @@ const movePair = (id, count, pos, _dir, _getClick) => {
   }
 
   if (_dir === 'up') {
-    if (pos === count) {
+    if (pos === 1) {
+      console.log('pos:', pos)
       return ''
     }
     _newPos = pos - 1
   } else {
-    if (pos === 1) {
+    if (pos === count) {
       return ''
     }
     _newPos = pos + 1
   }
 
   return html`
-    <button value="${id}-move-${_dir}" class="regex-pair__btn regex-pair__btn--move" @click=${_getClick} title="Move regex pair ${_dir} to position ${_newPos}">
+    <button value="${id}-move-${_dir}" class="regex-pair__btn regex-pair__btn--move" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}">
       Move ${pos} ${_dir}
     </button>`
 }
 
 /**
  *
- * @param {string}  id    ID of the regex pair being rendered
- * @param {number}  pos   Position of regex pair in list of regex pairs
- * @param {number}  count Total number of regex pairs in the list
- * @param {boolean} up    Button is "Move up" or "Move down"
+ * @param {string}   id           ID of the regex pair being rendered
+ * @param {number}   pos          Position of regex pair in list of regex pairs
+ * @param {number}   _dir         Total number of regex pairs in the list
+ * @param {function} clickHandler Button is "Move up" or "Move down"
  *
  * @returns {lit-html}
  */
-const addPair = (id, pos, _dir, _getClick) => {
+const addPair = (id, pos, _dir, clickHandler) => {
   if (_dir !== 'before' && _dir !== 'after') {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
   return html`
-  <button value="${id}-add-${_dir}" class="regex-pair__btn regex-pair__btn--add" @click=${_getClick} title="Add regex pair ${_dir} ${pos}">
+  <button value="${id}-add-${_dir}" class="regex-pair__btn regex-pair__btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
     Add pair ${_dir} ${pos}
   </button>`
 }
@@ -284,12 +291,12 @@ const addPair = (id, pos, _dir, _getClick) => {
 export const regexPair = (props) => {
   const _pos = hiddenPos(props.pos)
 
+  console.log('props.events.simplePair:', props.events.simplePair)
   console.log('props:', props)
-  console.log('props.flags:', props.flags)
   return html`
     <article id="${props.id}" class="regex-pair">
       <header class="regex-pair__header"><h3>Regex pair ${props.pos} (#${props.id})</h3></header>
-      <main class="regex-pair__header">
+      <main class="regex-pair__main${(props.fullWidth) ? ' regex-pair__main--full-width' : ''}">
         <ul>
           <li class="regex-pair__pattern">
             ${(props.regex.error !== '') ? html`<p class="regex-pair__pattern-error" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
@@ -324,7 +331,9 @@ export const regexPair = (props) => {
         </ul>
       </main>
 
-      <button value="${props.id}-toggleSettings" class="r-pair__toggle-settings r-pair__toggle-settings--open--${(props.settingsOpen) ? 'is' : 'not'}" title="Open settings for this Regex Pair (#${props.pos})" @onclick=${props.events.simplePair}>Open</button>
+      <button value="${props.id}-toggleSettings-open" class="regex-pair__btn regex-pair__btn--toggle-settings regex-pair__btn--toggle-settings--open" @click=${props.events.simplePair} title="Open settings for this Regex Pair (#${props.pos})">
+        Open
+      </button>
 
       <footer class="regex-pair__footer regex-pair__footer--${(props.settingsOpen) ? 'opened' : 'closed'}">
         <ul class="regex-pair__control">
@@ -336,7 +345,13 @@ export const regexPair = (props) => {
             </li>
             <li>
               <label>
-                <input type="checkbox" value="${props.id}-whiteSpace" ?checked=${props.tranformEscaped} @change=${props.events.simplePair} class="regex-pair--cb" />
+                <input type="checkbox" value="${props.id}-fullWidth" ?checked=${props.fullWidth} @change=${props.events.simplePair} class="regex-pair--cb" />
+                Full width inputs
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" value="${props.id}-whiteSpace" ?checked=${props.transformEscaped} @change=${props.events.simplePair} class="regex-pair--cb" />
                 Transform escaped characters in replacement
               </label>
             </li>
@@ -349,14 +364,10 @@ export const regexPair = (props) => {
           </li>
           <li class="regex-pair__sibling-ctrl__this">
             ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-reset" class="regex-pair__btn regex-pair__btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">
-              Reset ${_pos}
-            </button><!--
+            --><button value="${props.id}-reset" class="regex-pair__btn regex-pair__btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">Reset ${_pos}</button><!--
             -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-makeDefalt" class="regex-pair__btn regex-pair__btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">
-              Make default
-            </button><!--
-            -->${moveTo(props.id, props.count, props.pos, props.events.simplePair)}
+            --><button value="${props.id}-makeDefalt" class="regex-pair__btn regex-pair__btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">Make default</button><!--
+            -->${moveTo(props.id, props.count, props.pos, props.events.pairValue)}
           </li>
           <li class="regex-pair__sibling-ctrl__after">
             ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair)}<!--
@@ -364,7 +375,9 @@ export const regexPair = (props) => {
           </li>
         </ul>
 
-        <button value="${props.id}-toggleSettings" class="r-pair__toggle-settings r-pair__toggle-settings--close" title="Close settings for this Regex Pair (#${props.pos})" @onclick=${props.events.simplePair}>Close</button>
+        <button value="${props.id}-toggleSettings-close" class="regex-pair__btn regex-pair__btn--toggle-settings regex-pair__btn--toggle-settings--close" @click=${props.events.simplePair} title="Close settings for this Regex Pair (#${props.pos})">
+          Close
+        </button>
       </footer>
     </article>
   `

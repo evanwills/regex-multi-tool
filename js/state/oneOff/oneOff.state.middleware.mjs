@@ -145,18 +145,25 @@ const regexPairFocusMightChange = (actionType) => {
 // START: Middleware functions
 
 export const oneOffMW = ({ getState, dispatch }) => next => action => {
+  const _state = getState()
+  console.group('oneOffMW()')
+  console.log(action)
   if (regexPairFocusMightChange(action.type)) {
     const tmpID = (typeof action.payload.id === 'string')
       ? action.payload.id
       : action.payload
 
-    if (getState.oneOff.regex.focusedID !== tmpID) {
+    console.log('tmpID:', tmpID)
+    console.log('_state.oneOff.regex.focusedID:', _state.oneOff.regex.focusedID)
+
+    if (_state.oneOff.regex.focusedID !== tmpID) {
       dispatch({
         type: regexPairActions.SET_FOCUSED_ID,
         payload: tmpID
       })
     }
   }
+  console.groupEnd()
 
   switch (action.type) {
     case regexPairActions.ADD_BEFORE:
@@ -164,7 +171,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       return next({
         type: action.type,
         payload: getNewPairAndPos(
-          getState.oneOff.regex.pairs,
+          _state.oneOff.regex.pairs,
           action.payload
         )
       })
@@ -174,10 +181,10 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       return next({
         type: action.type,
         payload: explodeAndTrim(
-          getState.oneOff.input.raw,
-          getState.oneOff.input.split.doSplit,
-          getState.oneOff.input.split.splitter,
-          getState.oneOff.input.strip.before
+          _state.oneOff.input.raw,
+          _state.oneOff.input.split.doSplit,
+          _state.oneOff.input.split.splitter,
+          _state.oneOff.input.strip.before
         )
       })
 
@@ -185,9 +192,9 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       return next({
         type: oneOffActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
-          getState.oneOff.regex.pairs,
+          _state.oneOff.regex.pairs,
           action.payload, // regex pair ID
-          getState.oneOff.defaults
+          _state.oneOff.defaults
         )
       })
 
@@ -197,15 +204,17 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 }
 
 export const finaliseOutputMW = ({ getState, dispatch }) => next => action => {
+  const _state = getState()
+
   switch (action.type) {
     case oneOffActions.SET_OUTPUT:
       return next({
         type: action.type,
         payload: trimAndImplode(
           action.payoload,
-          getState.oneOff.input.split.doSplit,
-          getState.oneOff.input.split.splitter,
-          getState.oneOff.input.strip.after
+          _state.oneOff.input.split.doSplit,
+          _state.oneOff.input.split.splitter,
+          _state.oneOff.input.strip.after
         )
       })
 

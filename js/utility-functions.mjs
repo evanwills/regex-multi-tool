@@ -52,7 +52,7 @@ export const getURLobject = (url) => {
   }
 
   if (typeof _url === 'string' && _url[0] !== '#') {
-    urlParts = _url.match(/^((https?:|file:\/)?\/\/([^:/#?]+))(:[0-9]+)?((?:\/[^?#/]+)+)?(?:(\?)([^#]*)(?:(#)(.*))?|(#)([^?]*)(?:(\?)(.*))?)?/i)
+    urlParts = _url.match(/^((https?:|file:\/)?\/\/([^:/#?]+))(:[0-9]+)?((?:\/[^?#/]*)+)?(?:(\?)([^#]*)(?:(#)(.*))?|(#)([^?]*)(?:(\?)(.*))?)?$/i)
 
     if (urlParts.length >= 3) {
       output.origin = urlParts[1]
@@ -63,7 +63,10 @@ export const getURLobject = (url) => {
       if (typeof urlParts[4] !== 'undefined') {
         output.port = urlParts[4]
       }
-      output.pathname = urlParts[5]
+      if (typeof urlParts[5] !== 'undefined') {
+        output.pathname = urlParts[5]
+      }
+
       if (typeof urlParts[6] !== 'undefined') {
         output.search = urlParts[7]
       } else if (typeof urlParts[12] !== 'undefined') {
@@ -95,6 +98,7 @@ export const getURLobject = (url) => {
     }
   }
 
+  console.log('output:', output)
   return output
 }
 
@@ -131,7 +135,7 @@ export const isBool = (input) => {
  * @returns {boolean} TRUE if the input is a number
  */
 export const isNumber = (input) => {
-  return (typeof input === 'number' && !isNaN(parseFloat(input)) && !isFinite(input))
+  return (typeof input === 'number' && !isNaN(parseFloat(input)) && isFinite(input))
 }
 
 /**

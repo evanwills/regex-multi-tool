@@ -129,6 +129,7 @@ export const defaultPair = {
   },
   hasError: '',
   multiLine: false,
+  fullWidth: false,
   transformEscaped: true,
   disabled: false,
   settingsOpen: false
@@ -293,12 +294,12 @@ const updatePairDelim = (pairs, id, value, open, error) => {
  * @returns {array} list of regex pairs with the specified pair
  *                  updated
  */
-const updatePairEscaped = (pairs, id, value) => {
+const updatePairEscaped = (pairs, id) => {
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
         ...pair,
-        transformEscaped: value
+        transformEscaped: !pair.transformEscaped
       }
     } else {
       return pair
@@ -317,12 +318,38 @@ const updatePairEscaped = (pairs, id, value) => {
  * @returns {array} list of regex pairs with the specified pair
  *                  updated
  */
-const updatePairMultiLine = (pairs, id, value) => {
+const updatePairMultiLine = (pairs, id) => {
+  console.log('id:', id)
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
         ...pair,
-        multiLine: value
+        multiLine: !pair.multiLine
+      }
+    } else {
+      return pair
+    }
+  })
+}
+
+/**
+ * Update the value of multiLine for specified pair from the list
+ * of regex pairs
+ *
+ * @param {array}   pairs List of regex pair object
+ * @param {string}  id    UID for regex pair to be deleted
+ * @param {boolean} value New value for multiLine
+ *
+ * @returns {array} list of regex pairs with the specified pair
+ *                  updated
+ */
+const updatePairFullWidth = (pairs, id) => {
+  console.log('id:', id)
+  return pairs.map((pair) => {
+    if (pair.id === id) {
+      return {
+        ...pair,
+        fullWidth: !pair.fullWidth
       }
     } else {
       return pair
@@ -538,17 +565,16 @@ const disablePair = (pairs, id) => {
  */
 const togglePairSettings = (pairs, id) => {
   return pairs.map(pair => {
+    console.log('pair:', pair)
+    console.log('pair.id:', pair.id)
+    console.log('id:', id)
     if (pair.id === id) {
       return {
         ...pair,
         settingsOpen: !pair.settingsOpen
       }
     } else {
-      if (pair.settingsOpen !== false) {
-        return { ...pair, settingsOpen: false }
-      } else {
-        return pair
-      }
+      return (pair.settingsOpen !== false) ? { ...pair, settingsOpen: false } : pair
     }
   })
 }
@@ -561,7 +587,6 @@ const togglePairSettings = (pairs, id) => {
 // START: Reducers
 
 export const regexPairReducer = (state = [defaultPair], action = { type: 'default' }) => {
-  console.log('state:', state)
   switch (action.type) {
     case regexPairActions.UPDATE_REGEX:
       return updatePairRegex(
@@ -598,15 +623,19 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
     case regexPairActions.MULTI_LINE:
       return updatePairMultiLine(
         state,
-        action.payload.id,
-        action.payload.value
+        action.payload
+      )
+
+    case regexPairActions.FULL_WIDTH:
+      return updatePairFullWidth(
+        state,
+        action.payload
       )
 
     case regexPairActions.TRANSFORM_ESCAPED:
       return updatePairEscaped(
         state,
-        action.payload.id,
-        action.payload.value
+        action.payload
       )
 
     case regexPairActions.MOVE_UP:
@@ -641,10 +670,11 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
       return togglePairSettings(state, action.payload)
 
     case regexPairActions.SET_FOCUSED_ID:
-      return togglePairSettings(state, '')
+      console.log('SET_FOCUSED_ID')
+      console.log('action.payload:', action.payload)
+      return togglePairSettings(state, action.payload)
 
     default:
-      console.log('returning unchaged state:', state)
       return state
   }
 }
@@ -805,7 +835,8 @@ export const oneOffReducer = combineReducers({
     chain: regexUpdateChainReducer,
     engine: regexSetEngineReducer,
     defaults: regexUpdateDefaultsReducer,
-    engines: regexRegisterEngineReducer
+    engines: regexRegisterEngineReducer,
+    focusID: regexUpdateFocusedID
   }),
   matches: regexSetMatchesReducer,
   output: regexSetOutputReducer
