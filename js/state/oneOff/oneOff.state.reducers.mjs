@@ -108,7 +108,7 @@ const getPos = (pairs, id) => {
 // ==============================================
 // START: Initial state
 
-const defaultPair = {
+export const defaultPair = {
   pos: 1,
   count: 1,
   id: getID(),
@@ -117,8 +117,12 @@ const defaultPair = {
     error: ''
   },
   replace: '',
-  flags: 'ig',
-  delimiters: {
+  flags: {
+    flags: 'ig',
+    error: ''
+  },
+  delims: {
+    allow: false,
     open: '',
     close: '',
     error: ''
@@ -130,7 +134,7 @@ const defaultPair = {
   settingsOpen: false
 }
 
-const engineDefaults = {
+export const engineDefaults = {
   engine: 'vanillaJS',
   flags: 'ig',
   delimiters: {
@@ -141,7 +145,7 @@ const engineDefaults = {
   transformEscaped: true
 }
 
-const defaultInput = {
+export const defaultInput = {
   raw: '',
   split: {
     doSplit: false,
@@ -557,6 +561,7 @@ const togglePairSettings = (pairs, id) => {
 // START: Reducers
 
 export const regexPairReducer = (state = [defaultPair], action = { type: 'default' }) => {
+  console.log('state:', state)
   switch (action.type) {
     case regexPairActions.UPDATE_REGEX:
       return updatePairRegex(
@@ -639,6 +644,7 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
       return togglePairSettings(state, '')
 
     default:
+      console.log('returning unchaged state:', state)
       return state
   }
 }

@@ -30,8 +30,10 @@ import { getMainAppView } from './view/templates.mjs'
 // render(mainApp(mainAppProps), document.body)
 
 // console.log('index.mjs')
+// store.dispatch()
 
 console.log('store:', store)
+console.log('store.getState():', store.getState())
 
 const mainView = getMainAppView(document.body, store)
 

@@ -67,7 +67,7 @@ const addToGroup = (actionGroupList, groupName) => {
  *                         repeatable
  * @param {string}  api    URL for regex-multi-tool repeatable API
  */
-export const Repeatable = (url, _remote, docs, api) => {
+function Repeatable (url, _remote, docs, api) {
   // ============================================
   // START: private property declarations
 
@@ -482,6 +482,8 @@ const tmpApiURL = (typeof apiURL === 'string' && apiURL !== '') ? apiURL : 'docs
 //  END:  seting defaults
 // ======================================================
 // START: instantiate repeatable
+
+console.log('Repeatable:', Repeatable)
 
 export const repeatable = new Repeatable(
   getURLobject(window.location),

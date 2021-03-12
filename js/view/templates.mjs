@@ -1,4 +1,4 @@
-import { html } from '../lit-html/lit-html.mjs'
+import { html, render } from '../lit-html/lit-html.mjs'
 import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
@@ -17,7 +17,7 @@ import { store } from '../state/regexMulti-state.mjs'
 export const header = (isSimple, changeHandler) => {
   const _isFancy = (typeof isSimple === 'boolean' && isSimple === false)
   console.log('inside header()')
-  console.log('isFancy:', isFancy)
+  console.log('isSimple:', isSimple)
   console.log('_isFancy:', _isFancy)
 
   // NOTE: the empty HTML comments within the unordered list
@@ -59,9 +59,15 @@ export const footer = (buttons) => {
 }
 
 export const oneOffUI = (props) => {
+  const newProps = { ...props.regex.pairs[0], events: props.events }
+
   console.log('props:', props)
+  console.log('props.regex.pairs[0]:', props.regex.pairs[0])
+  console.log('props.events:', props.events)
+  console.log('newProps:', newProps)
+
   return html`<h1>Regex test</h1>
-  ${regexPair(props)}`
+  ${regexPair(newProps)}`
 }
 
 export const repeatableUI = (props) => {
@@ -90,7 +96,7 @@ export const getMainAppView = (domNode, store) => {
     const UI = html`
       ${header(isSimple, props.change)}
       ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
-      ${footer(props.buttons)}
+      ${footer([])}
     `
     render(UI, domNode)
   }

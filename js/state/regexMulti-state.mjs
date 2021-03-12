@@ -17,7 +17,7 @@ export const store = createStore(
   }),
   initialState,
   compose(
-    applyMiddleware(oneoff.middleware),
+    applyMiddleware(oneOff.middleware),
     applyMiddleware(repeatable.middleware)
   )
 )

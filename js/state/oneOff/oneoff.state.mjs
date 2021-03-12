@@ -8,7 +8,7 @@ import {
   getAutoDispatchOneOffValueEvent,
   registerOneOffEngine
 } from './oneOff.state.actions.mjs'
-import { oneOffReducer } from './oneOff.state.reducers.mjs'
+import { oneOffReducer, defaultPair } from './oneOff.state.reducers.mjs'
 import { oneOffMW } from './oneOff.state.middleware.mjs'
 
 
@@ -25,7 +25,7 @@ const oneOffState = {
     }
   },
   regex: {
-    pairs: [],
+    pairs: [defaultPair],
     focusedID: '',
     chain: true,
     engine: 'vanillaJS',
