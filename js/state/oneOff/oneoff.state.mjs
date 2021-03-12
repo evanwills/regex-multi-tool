@@ -43,7 +43,8 @@ const oneOffState = {
     engines: []
   },
   matches: [],
-  output: ''
+  output: '',
+  screen: 'input'
 }
 
 export const oneOff = {

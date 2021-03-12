@@ -13,7 +13,7 @@ import {
   // readyStatePromise,
   // vanillaPromise,
 } from '../redux/standard-middleware.mjs'
-import { modeReducer } from './mode.state.mjs'
+import { modeReducer } from './main-app/main-app.state.reducers.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
 

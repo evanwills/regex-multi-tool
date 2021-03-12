@@ -779,6 +779,27 @@ export const regexSetOutputReducer = (state = '', action = { type: 'default' }) 
   }
 }
 
+export const regexSetScreenReducer = (state = '', action = { type: 'default' }) => {
+  if (action.type === oneOffActions.SET_SCREEN && state !== action.payload) {
+    switch (action.payload) {
+      case 'output':
+      case 'matches':
+      case 'input':
+      case 'regex':
+        return action.payload
+
+      default:
+        if (typeof action.payload !== 'string') {
+          throw Error('Cannot use ' + typeof action.payload + ' as a value for oneOff screen')
+        } else {
+          throw Error('Cannot set "' + action.payload + ' "as oneOff screen')
+        }
+    }
+  } else {
+    return state
+  }
+}
+
 export const regexInputReducer = (state = defaultInput, action = { type: 'default' }) => {
   switch (action.type) {
     case oneOffActions.SET_INPUT:
@@ -864,7 +885,8 @@ export const oneOffReducer = combineReducers({
     focusedID: regexUpdateFocusedID
   }),
   matches: regexSetMatchesReducer,
-  output: regexSetOutputReducer
+  output: regexSetOutputReducer,
+  screen: regexSetScreenReducer
 })
 
 //  END:  Reducers

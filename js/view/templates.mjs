@@ -4,6 +4,7 @@ import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
 import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneOff.state.mjs'
 import { getEventHandlers as getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.mjs'
+import { mainAppActions, getAutoDispatchMainAppEvent } from '../state/main-app/main-app.state.actions.mjs'
 import { store } from '../state/regexMulti-state.mjs'
 
 /**
@@ -28,28 +29,31 @@ export const header = (isSimple, changeHandler) => {
 
     <ul class="btn-list btn-list--small">
       <li><!--
-        --><input type="radio" id="mode-simple" name="mode" value="simple" ?checked=${!_isFancy} @change=${changeHandler} /><!--
+        --><input type="radio" id="mode-simple" name="mode" value="oneOff" ?checked=${!_isFancy} @change=${changeHandler} /><!--
         --><label for="mode-simple" class="btn-list__btn radio-btn-label"><span class="sr-only">Regex </span>tester</label><!--
       --></li>
       <li><!--
-        --><input type="radio" id="mode-fancy" name="mode" value="fancy" ?checked=${_isFancy} @change=${changeHandler} /><!--
+        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" ?checked=${_isFancy} @change=${changeHandler} /><!--
         --><label for="mode-fancy" class="btn-list__btn radio-btn-label"><span class="sr-only">Do regex </span>stuff</label><!--
         --></li>
     </ul>
   </header>`
 }
 
-export const footer = (buttons) => {
+export const footer = (buttons, eventHandler) => {
   return html`
-  <footer>
+  <footer class="regex-multi__footer">
     <ul class="action-btns">
-      ${buttons.map(button => html`
-      <li class="btn-wrap btn-wrap--${button.name}">
-        <button name=${button.name} id=${button.name} .value="${button.value}" @click=${button.click}>
-          ${button.label}
-        </button>
-      </li>
-      `)}
+      ${buttons.map(button => {
+        const _name = button.toLowerCase()
+        return html`
+          <li class="btn-wrap btn-wrap--${button.name}">
+            <button name=${_name} id=${_name} .value="${_name}" @click=${eventHandler}>
+              ${button}
+            </button>
+          </li>
+        `
+      })}
     </ul>
   </footer>
   `
@@ -58,8 +62,12 @@ export const footer = (buttons) => {
 export const oneOffUI = (props) => {
   console.log('props:', props)
 
-  return html`<h1>Regex test</h1>
-  ${props.regex.pairs.map(pair => regexPair({...pair, events: props.events }))}`
+  return html`
+  <h1>Regex test</h1>
+  <div class="regex-pairs">
+    ${props.regex.pairs.map(pair => regexPair({...pair, events: props.events }))}
+  </div>
+  `
 }
 
 export const repeatableUI = (props) => {
@@ -70,6 +78,7 @@ export const repeatableUI = (props) => {
 export const getMainAppView = (domNode, store) => {
   return function () {
     const props = store.getState()
+    const mainEvent = getAutoDispatchMainAppEvent(store.dispatch)
     const isSimple =  (props.mode === 'oneOff')
 
     const eventHandlers = (isSimple)
@@ -82,13 +91,15 @@ export const getMainAppView = (domNode, store) => {
 
     const newProps = { ...state, events: { ...eventHandlers } }
 
+    const buttons = (isSimple) ? [ 'Test', 'Replace', 'Reset' ] : [ 'Modify', 'Reset' ]
+
     // console.log('mainApp()')
     // console.log('newProps:', newProps)
 
     const UI = html`
-      ${header(isSimple, props.change)}
+      ${header(isSimple, mainEvent)}
       ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
-      ${footer([])}
+      ${footer(buttons, mainEvent)}
     `
     render(UI, domNode)
   }

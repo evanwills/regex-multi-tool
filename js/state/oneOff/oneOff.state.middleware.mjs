@@ -1,5 +1,6 @@
 import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID, convertEscaped } from '../utils.mjs'
+import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 // ==============================================
 // START: Utility functions
@@ -167,7 +168,30 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
   }
   console.groupEnd()
 
+  if (_state.mode !== 'oneOff') {
+    return next(action)
+  }
+
   switch (action.type) {
+    case mainAppActions.MODIFY:
+      dispatch({
+        type: oneOffActions.SET_OUTPUT
+      })
+      break;
+
+    case mainAppActions.TEST:
+      dispatch({
+        type: oneOffActions.SET_MATCHES
+      })
+      break;
+
+    case mainAppActions.RESET:
+      dispatch({
+        type: oneOffActions.RESET
+      })
+      break;
+
+
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
       return next({
@@ -199,6 +223,15 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           _state.oneOff.defaults
         )
       })
+
+    case oneOffActions.SET_SCREEN:
+      const allowedScreens = ['input', 'regex', 'matches', 'output']
+
+      if (_state.oneOff.screen !== action.payload) {
+
+      } else {
+        throw Error('Cannot set "' + action.payload + '" as OneOff screen')
+      }
 
     default:
       return next(action)

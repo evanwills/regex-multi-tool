@@ -1,44 +1,43 @@
-export const appState = {
-  mode: 'oneOff',
-  oneOff: {
-    input: {
-      raw: '',
-      split: {
-        doSplit: false,
-        splitter: ''
-      },
-      strip: {
-        before: false,
-        after: false
-      }
-    },
-    regex: {
-      pairs: [],
-      focusedID: '',
-      chain: true,
-      engine: 'vanillaJS',
-      defaults: {
-        flags: 'ig',
-        delims: {
-          open: '',
-          close: ''
-        },
-        multiLine: false,
-        transformEscaped: true
-      },
-      engines: []
-    },
-    matches: [],
-    output: ''
-  },
-  repeat: {
-    actions: [],
-    action: '',
-    fields: {
-      inputs: [],
-      value: '',
-      outputs: [],
-      groups: []
+export const mainAppActions = {
+  SET_MODE: 'MAIN-APP_SET_MODE',
+  MODIFY: 'MAIN-APP_MODIFY',
+  TEST: 'MAIN-APP_TEST',
+  RESET: 'MAIN-APP_RESET',
+  HELP: 'MAIN-APP_HELP'
+}
+
+
+export const getAutoDispatchMainAppEvent = (_dispatch) => {
+  return function (e) {
+    let _type = 'default'
+    switch (this.value.toLowerCase()) {
+      case 'oneoff':
+      case 'repeatable':
+        _dispatch({
+          type: mainAppActions.SET_MODE,
+          payload: this.value
+        })
+        return
+
+      case 'modify':
+      case 'replace':
+        _type = mainAppActions.MODIFY
+        break
+
+      case 'test':
+        _type = mainAppActions.TEST
+        break
+
+      case 'reset':
+        _type = mainAppActions.RESET
+        break
+
+      case 'help':
+        _type = mainAppActions.HELP
+        break
     }
+    console.log('dispatching event: ', _type)
+    console.log('button value: ', this.value)
+    _dispatch({type: _type})
   }
 }
