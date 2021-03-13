@@ -1,7 +1,7 @@
-.regex-pairs {
-  // overflow-y: auto;
-  overflow-x: hidden
-}
+// .regex-pairs {
+//   // overflow-y: auto;
+//   overflow-x: hidden
+// }
 
 .r-pair {
   // overflow: hidden;
@@ -17,20 +17,38 @@
   &__main {
     display: grid;
     gap: 0.5rem;
-    grid-template-columns: 1fr 4rem 1fr;
+    grid-template-columns: 3rem 1fr;
     grid-template-areas:
-      "regex-error regex-error regex-error"
-      "regex-label flags-label replace-label"
-      "regex-field flags-field replace-field"
-      ". flags-error flags-error";
+      "regex-error regex-error"
+      "flags-error flags-error"
+      "regex-field regex-field"
+      "flags-field replace-field";
 
-    &--full-width {
-      grid-template-columns: 4rem 1fr 4rem;
+    @media screen and (min-width: 20rem) {
+      grid-template-columns: 3.5rem 1fr 3rem;
       grid-template-areas:
         "regex-error regex-error regex-error"
         "flags-error flags-error flags-error"
         "regex-label regex-field flags-label"
-        "replace-label replace-field flags-field"
+        "replace-label replace-field flags-field";
+    }
+
+    @media screen and (min-width: 26rem) {
+      grid-template-columns: 1fr 3rem 1fr;
+      grid-template-areas:
+        "regex-error regex-error regex-error"
+        "regex-label flags-label replace-label"
+        "regex-field flags-field replace-field"
+        ". flags-error flags-error";
+
+      &--full-width {
+        grid-template-columns: 3.5rem 1fr 3rem;
+        grid-template-areas:
+          "regex-error regex-error regex-error"
+          "flags-error flags-error flags-error"
+          "regex-label regex-field flags-label"
+          "replace-label replace-field flags-field";
+      }
     }
   }
 
@@ -44,15 +62,20 @@
   }
 
   &__label {
-    &--regex {
-      grid-area: regex-label;
-    }
-    &--flags {
-      align-self: end;
-      grid-area: flags-label;
-    }
-    &--replace {
-      grid-area: replace-label;
+    display: none;
+
+    @media screen and (min-width: 20rem) {
+      display: inline-block;
+      &--regex {
+        grid-area: regex-label;
+      }
+      &--flags {
+        align-self: end;
+        grid-area: flags-label;
+      }
+      &--replace {
+        grid-area: replace-label;
+      }
     }
   }
 

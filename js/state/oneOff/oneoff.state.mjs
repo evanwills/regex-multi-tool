@@ -18,12 +18,13 @@ const oneOffState = {
     raw: '',
     split: {
       doSplit: false,
-      splitter: ''
+      splitter: '\\n'
     },
     strip: {
       before: false,
       after: false
-    }
+    },
+    settingsOpen: false
   },
   regex: {
     pairs: [defaultPair],

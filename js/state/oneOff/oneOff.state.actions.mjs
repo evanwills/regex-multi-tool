@@ -40,7 +40,9 @@ export const oneOffActions = {
   SET_DO_SPLIT: 'ONEOFF_INPUT_SET_DO_SPLIT',
   SET_SPLITTER: 'ONEOFF_INPUT_SET_SPLITTER',
   SET_STRIP_BEFORE: 'ONEOFF_INPUT_SET_STRIP_BEFORE',
-  SET_STRIP_AFTER: 'ONEOFF_INPUT_SET_STRIP_AFTER'
+  SET_STRIP_AFTER: 'ONEOFF_INPUT_SET_STRIP_AFTER',
+  TOGGLE_SETTINGS: 'ONEOFF_INPUT_TOGGLE_SETTINGS'
+
 }
 
 // ==============================================
@@ -68,6 +70,101 @@ const getActionMeta = (input) => {
 // need to know the state of the field that was changed so these
 // return normal (non-arrow) function that inherit the `this` context
 // of the field that changed.
+
+/**
+ * Get a function to be used as an event handler, that can be shared
+ * across all simple events (checkbox changes and button clicks)
+ * across all general oneOff interface fields (but not regex pair
+ * events).
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator that can be used as an event handler
+ */
+export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
+  console.log('binding in dispatch')
+  return function (e) {
+    let _type = ''
+    console.log('oneOffSimpleEvent()')
+
+    switch (this.value) {
+      case 'updateChain':
+        _type = oneOffActions.UPDATE_CHAIN
+        break
+
+      case 'setOutput':
+        _type = oneOffActions.SET_OUTPUT
+        break
+
+      case 'setMatches':
+        _type = oneOffActions.SET_MATCHES
+        break
+
+      case 'reset':
+        _type = oneOffActions.RESET
+        break
+
+      case 'split-input':
+        _type = oneOffActions.SET_DO_SPLIT
+        break
+
+      case 'trim-before':
+        _type = oneOffActions.SET_STRIP_BEFORE
+        break
+
+      case 'trim-after':
+        _type = oneOffActions.SET_STRIP_AFTER
+        break
+
+      case 'input-toggleSettings-open':
+      case 'input-toggleSettings-close':
+        _type = oneOffActions.TOGGLE_SETTINGS
+        break
+    }
+
+    _dispatch({
+      type: _type
+    })
+  }
+}
+
+/**
+ * Get a function to be used as an event handler, that can be shared
+ * across all value events (text, radio and select changes) across
+ * all general oneOff interface fields (but not regex pair events).
+ *
+ * @param {object} _dispatch Redux store dispatch function for
+ *                           dispatching redux store actions
+ *
+ * @returns {function} A function that returns a Redux store
+ *                     (self dispatching) action creator
+ */
+export const getAutoDispatchOneOffValueEvent = (_dispatch) => {
+  return function (e) {
+    let _type = ''
+
+    switch (this.id) {
+      case 'setEngine':
+        _type = oneOffActions.SET_ENGINE
+        break
+
+      case 'setInput':
+        _type = oneOffActions.SET_INPUT
+        break
+
+      case 'setSplitter':
+        _type = oneOffActions.SET_SPLITTER
+        break
+    }
+
+    _dispatch({
+      type: _type,
+      payload: this.value
+    })
+  }
+}
 
 /**
  * Get a function to be used as an event handler, that can be shared
@@ -216,95 +313,6 @@ export const getAutoDispatchOneOffPairValueEvent = (_dispatch) => {
     } else {
       throw Error('Could not determine a valid action type from "' + this.id + '"')
     }
-  }
-}
-
-
-/**
- * Get a function to be used as an event handler, that can be shared
- * across all value events (text, radio and select changes) across
- * all general oneOff interface fields (but not regex pair events).
- *
- * @param {object} _dispatch Redux store dispatch function for
- *                           dispatching redux store actions
- *
- * @returns {function} A function that returns a Redux store
- *                     (self dispatching) action creator
- */
-export const getAutoDispatchOneOffValueEvent = (_dispatch) => {
-  return function (e) {
-    let _type = ''
-
-    switch (this.id) {
-      case 'setEngine':
-        _type = oneOffActions.SET_ENGINE
-        break
-
-      case 'setInput':
-        _type = oneOffActions.SET_INPUT
-        break
-
-      case 'setSplitter':
-        _type = oneOffActions.SET_SPLITTER
-        break
-    }
-
-    _dispatch({
-      type: _type,
-      payload: this.value
-    })
-  }
-}
-
-/**
- * Get a function to be used as an event handler, that can be shared
- * across all simple events (checkbox changes and button clicks)
- * across all general oneOff interface fields (but not regex pair
- * events).
- *
- * @param {object} _dispatch Redux store dispatch function for
- *                           dispatching redux store actions
- *
- * @returns {function} A function that returns a Redux store
- *                     (self dispatching) action creator that can be used as an event handler
- */
-export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
-  return function (e) {
-    let _type = ''
-
-    switch (this.value) {
-      case 'updateChain':
-        _type = oneOffActions.UPDATE_CHAIN
-        break
-
-      case 'setOutput':
-        _type = oneOffActions.SET_OUTPUT
-        break
-
-      case 'setMatches':
-        _type = oneOffActions.SET_MATCHES
-        break
-
-      case 'reset':
-        _type = oneOffActions.RESET
-        break
-
-      case 'setDoSplit':
-        _type = oneOffActions.SET_DO_SPLIT
-        break
-
-      case 'setStrip-before':
-        _type = oneOffActions.SET_STRIP_BEFORE
-        break
-
-      case 'setStrip-after':
-        _type = oneOffActions.SET_STRIP_AFTER
-        break
-    }
-
-    _dispatch({
-      type: _type
-    })
   }
 }
 

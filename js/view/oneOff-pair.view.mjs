@@ -1,5 +1,7 @@
 import { html } from '../lit-html/lit-html.mjs'
 import { getID } from '../state/utils.mjs'
+import { isNumeric } from '../utility-functions.mjs'
+import { openCloseButton } from './shared-components.mjs'
 
 // ============================================
 // START: non-view functions
@@ -77,7 +79,7 @@ const hiddenPos = (pos) => html`<span class="sr-only">number ${pos}</span>`
  *
  * @returns {lit-html} render function
  */
-const moveTo = (id, count, pos, _change) => {
+const moveTo = (id, count, pos, _change, tabIndex) => {
   const _id = id + '-moveTo'
   const options = []
 
@@ -97,7 +99,7 @@ const moveTo = (id, count, pos, _change) => {
   return html`
     <span class="r-pair__move-to__wrap"><!--
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
-      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change}>
+      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
         ${options.map(option => (option.current)
           ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
           : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
@@ -128,12 +130,12 @@ const moveTo = (id, count, pos, _change) => {
  *
  * @returns {lit-html} render function
  */
-const disableBtn = (id, count, isDisabled, pos, _click) => {
+const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
   const _mode = (isDisabled) ? 'Enable' : 'Disable'
 
   return (count > 1)
     ? html`
-      <button value="${id}-disable" class="r-pair__btn r-pair__btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair">
+      <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
         ${_mode} ${hiddenPos(pos)}
       </button>`
     : ''
@@ -158,10 +160,10 @@ const disableBtn = (id, count, isDisabled, pos, _click) => {
  *
  * @returns {lit-html} render function
  */
-const deleteBtn = (id, count, pos, _click) => {
+const deleteBtn = (id, count, pos, _click, tabIndex) => {
   return (count > 1)
     ? html`
-      <button value="${id}-delete" class="r-pair__btn r-pair__btn--danger r-pair__btn--delete" @click=${_click} title="Delete this regex pair">
+      <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
         Delete ${hiddenPos(pos)}
       </button>`
     : ''
@@ -191,7 +193,7 @@ const deleteBtn = (id, count, pos, _click) => {
  *
  * @returns {lit-html} render function
  */
-const movePair = (id, count, pos, _dir, clickHandler) => {
+const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
   let _newPos = -1
 
   if (typeof _dir !== 'string' || (_dir !== 'up' && _dir !== 'down')) {
@@ -216,7 +218,7 @@ const movePair = (id, count, pos, _dir, clickHandler) => {
   }
 
   return html`
-    <button value="${id}-move-${_dir}" class="r-pair__btn r-pair__btn--move r-pair__btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}">
+    <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
       Move ${pos} ${_dir}
     </button>`
 }
@@ -231,29 +233,11 @@ const movePair = (id, count, pos, _dir, clickHandler) => {
  * @param {function} eventHandler Event handler function
  * @returns
  */
-const checkboxField = (id, label, classSuffix, isChecked, eventHandler) => {
+const checkboxField = (id, label, classSuffix, isChecked, eventHandler, tabIndex) => {
   return html`
-  <input type="checkbox" id="${id}-${classSuffix}" class="r-pair__cb" value="${id}-${classSuffix}" ?checked=${isChecked} @change=${eventHandler} /><!--
-  --><label for="${id}-${classSuffix}" class="r-pair__cb-label">${label}</label>
+  <input type="checkbox" id="${id}-${classSuffix}" class="cb-btn__input" value="${id}-${classSuffix}" ?checked=${isChecked} @change=${eventHandler} tabindex="${isNumeric(tabIndex) ? tabIndex : 0}" /><!--
+  --><label for="${id}-${classSuffix}" class="cb-btn__label">${label}</label>
   `
-}
-
-/**
- * Get an Open/Close button
- *
- * @param {string}   id           ID of the regex pair
- * @param {string}   label        Label for the checkbox
- * @param {boolean}  isOpen       Whether or not settings block is open
- * @param {function} eventHandler Event handler function
- * @returns
- */
-const openCloseButton = (id, label, isOpen, eventHandler) => {
-  const _which = label.toLocaleLowerCase()
-  const _is = (isOpen) ? 'is' : 'not'
-  return html`
-    <button value="${id}-toggleSettings-${_which}" class="r-pair__btn r-pair__btn--settings r-pair__btn--settings--${_which} r-pair__btn--settings--${_which}-${_is}" @click=${eventHandler} title="${label} settings for this Regex Pair">
-      ${label}
-    </button>`
 }
 
 /**
@@ -266,12 +250,12 @@ const openCloseButton = (id, label, isOpen, eventHandler) => {
  *
  * @returns {lit-html}
  */
-const addPair = (id, pos, _dir, clickHandler) => {
+const addPair = (id, pos, _dir, clickHandler, tabIndex) => {
   if (_dir !== 'before' && _dir !== 'after') {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
-  return html`<button value="${id}-add-${_dir}" class="r-pair__btn r-pair__btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
+  return html`<button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
     Add pair ${_dir} ${pos}
   </button>`
 }
@@ -327,6 +311,8 @@ export const regexPair = (props) => {
   const _pos = hiddenPos(props.pos)
 
   console.log('props:', props)
+  const tabIndex = (props.settingsOpen) ? 0 : -1
+  console.log('tabIndex:', tabIndex)
 
   // console.log('props.events.simplePair:', props.events.simplePair)
   // console.log('props:', props)
@@ -359,17 +345,18 @@ export const regexPair = (props) => {
           : ''}
       </main>
 
-      ${openCloseButton(props.id, 'Open', props.settingsOpen, props.events.simplePair)}
+      ${openCloseButton(props.id, 'this Regex Pair', 'Open', props.settingsOpen, props.events.simplePair)}
 
       <footer class="r-pair__footer r-pair__footer--${(props.settingsOpen) ? 'opened' : 'closed'}">
-        <ul class="r-pair__control">
+        <ul class="r-pair__control clean-list">
             <li>
               ${checkboxField(
                 props.id,
                 'Multi-line input',
                 'multiLine',
                 props.multiLine,
-                props.events.simplePair
+                props.events.simplePair,
+                tabIndex
               )}
             </li>
             <li>
@@ -378,7 +365,8 @@ export const regexPair = (props) => {
                 'Full width input',
                 'fullWidth',
                 props.fullWidth,
-                props.events.simplePair
+                props.events.simplePair,
+                tabIndex
               )}
             </li>
             <li>
@@ -387,30 +375,33 @@ export const regexPair = (props) => {
                 'Transform escaped characters in replacement',
                 'whiteSpace',
                 props.transformEscaped,
-                props.events.simplePair
+                props.events.simplePair,
+                tabIndex
               )}
             </li>
         </ul>
 
-        <ul class="r-pair__sibling-ctrl">
+        <ul class="r-pair__sibling-ctrl clean-list">
           <li class="r-pair__sibling-ctrl__before">
-            ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair)}<!--
-            -->${addPair(props.id, props.count, 'before', props.events.simplePair)}
+            ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair,
+                tabIndex)}<!--
+            -->${addPair(props.id, props.count, 'before', props.events.simplePair,
+                tabIndex)}
           </li>
           <li class="r-pair__sibling-ctrl__this">
-            ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-reset" class="r-pair__btn r-pair__btn--danger r-pair__btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">Reset ${_pos}</button><!--
-            -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair)}<!--
-            --><button value="${props.id}-setDefault" class="r-pair__btn r-pair__btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">Make default</button><!--
-            -->${moveTo(props.id, props.count, props.pos, props.events.pairValue)}
+            ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair, tabIndex)}<!--
+            --><button value="${props.id}-reset" class="rnd-btn rnd-btn--danger rnd-btn--reset" @click=${props.events.simplePair} title="Reset this regex pair" tabindex="${tabIndex}">Reset ${_pos}</button><!--
+            -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair, tabIndex)}<!--
+            --><button value="${props.id}-setDefault" class="rnd-btn rnd-btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs" tabindex="${tabIndex}">Make default</button><!--
+            -->${moveTo(props.id, props.count, props.pos, props.events.pairValue, tabIndex)}
           </li>
           <li class="r-pair__sibling-ctrl__after">
-            ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair)}<!--
-            -->${addPair(props.id, props.count, 'after', props.events.simplePair)}
+            ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair, tabIndex)}<!--
+            -->${addPair(props.id, props.count, 'after', props.events.simplePair, tabIndex)}
           </li>
         </ul>
 
-        ${openCloseButton(props.id, 'Close', props.settingsOpen, props.events.simplePair)}
+        ${openCloseButton(props.id, 'this Regex Pair', 'Close', props.settingsOpen, props.events.simplePair, tabIndex)}
       </footer>
     </article>
   `

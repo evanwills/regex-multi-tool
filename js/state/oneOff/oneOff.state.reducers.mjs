@@ -814,17 +814,13 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.SET_DO_SPLIT:
-      if (typeof action.payload === 'boolean') {
-        return {
-          ...state,
-          split: {
-            ...state.split,
-            doSplit: action.payload
-          }
+      console.log('state.split.doSplit:', state.split.doSplit)
+      return {
+        ...state,
+        split: {
+          ...state.split,
+          doSplit: !state.split.doSplit
         }
-      } else {
-        console.error('Invalid state for doSplit')
-        break
       }
 
     case oneOffActions.SET_SPLITTER:
@@ -842,31 +838,29 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.SET_STRIP_BEFORE:
-      if (typeof action.payload === 'boolean') {
-        return {
-          ...state,
-          strip: {
-            ...state.strip,
-            before: action.payload
-          }
+      return {
+        ...state,
+        strip: {
+          ...state.strip,
+          before: !state.strip.before
         }
-      } else {
-        console.error('Invalid state for split before')
-        break
       }
 
     case oneOffActions.SET_STRIP_AFTER:
-      if (typeof action.payload === 'boolean') {
-        return {
-          ...state,
-          strip: {
-            ...state.strip,
-            after: action.payload
-          }
+      console.log(state,)
+      return {
+        ...state,
+        strip: {
+          ...state.strip,
+          after: !state.strip.after
         }
-      } else {
-        console.error('Invalid state for split before')
-        break
+      }
+
+    case oneOffActions.TOGGLE_SETTINGS:
+      console.log(state,)
+      return {
+        ...state,
+        settingsOpen: !state.settingsOpen
       }
 
     default:
