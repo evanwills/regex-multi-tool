@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { ucFirst, idSafe } from '../state/utils.mjs'
+import { ucFirst, idSafe } from '../utility-functions.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field

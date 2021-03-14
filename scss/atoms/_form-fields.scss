@@ -1,0 +1,16 @@
+
+
+input, textarea {
+  padding: 0.2rem 0.3rem;
+}
+
+textarea {
+  &.lg {
+    height: 20rem;
+  }
+
+  &.xl {
+    height: 35rem;
+  }
+}
+

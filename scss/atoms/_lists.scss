@@ -2,8 +2,15 @@
   margin: 0;
   padding: 0;
 
-  li {
+  > li {
     margin: 0;
     padding: 0.3rem 0;
+    list-style-type: none;
+  }
+
+  &--tight {
+    > li {
+      padding: 0;
+    }
   }
 }

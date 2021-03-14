@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { ucFirst } from '../state/utils.mjs'
+import { ucFirst } from '../utility-functions.mjs'
 import { getEventHandlers } from '../state/repeatable.state.mjs'
 import { store } from '../state/regexMulti-state.mjs'
 

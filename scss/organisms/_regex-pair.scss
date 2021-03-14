@@ -6,7 +6,12 @@
 .r-pair {
   // overflow: hidden;
   position: relative;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
+  border-top: 0.05rem solid var(--txt-colour);
+
+  &:last-child {
+    border-bottom: 0.05rem solid var(--txt-colour);
+  }
 
   li {
     margin: 0;
@@ -24,7 +29,7 @@
       "regex-field regex-field"
       "flags-field replace-field";
 
-    @media screen and (min-width: 20rem) {
+    @media screen and (min-width: 30rem) {
       grid-template-columns: 3.5rem 1fr 3rem;
       grid-template-areas:
         "regex-error regex-error regex-error"
@@ -33,7 +38,7 @@
         "replace-label replace-field flags-field";
     }
 
-    @media screen and (min-width: 26rem) {
+    @media screen and (min-width: 36rem) {
       grid-template-columns: 1fr 3rem 1fr;
       grid-template-areas:
         "regex-error regex-error regex-error"
@@ -64,7 +69,7 @@
   &__label {
     display: none;
 
-    @media screen and (min-width: 20rem) {
+    @media screen and (min-width: 30rem) {
       display: inline-block;
       &--regex {
         grid-area: regex-label;
@@ -99,77 +104,17 @@
 
   &__footer {
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.9);
     bottom: 0;
-    box-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.9);
     display: flex;
     flex-direction: row;
     justify-content: stretch;
-    left: 0;
-    padding: 0.5rem;
-    position: absolute;
     // right: 0;
     // top: 0;
-    transform: scale(1);
-    transition: transform var(--ease) var(--timing);
-    transform-origin: 2% 90%;
-    width: 100%;
-    z-index: 100;
-
-    ul {
-      opacity: 1;
-      transition-delay: calc(var(--timing) * 0.25);
-      transition-timing-function: var(--ease);
-      transition-duration: calc(var(--timing) * 0.75);
-      transition-property: opacity;
-    }
-
-    &--closed {
-      transform: scale(0);
-
-      ul {
-        opacity: 0;
-        transition-delay: 0;
-      }
-    }
   }
 
   &__flags {
     display: inline-block;
     // width: 4rem;
-  }
-
-  &__input, &__text {
-    font-family: 'Courier New', Courier, monospace;
-  }
-
-  &__cb {
-    display: inline-block;
-    position: absolute;
-    opacity: 0;
-    margin-right: -1rem;
-    margin-bottom: -1rem;
-
-    &-label {
-      display: block;
-      border: 0.1rem solid #aaa;
-      max-width: 24rem;
-      margin: 0.1rem auto;
-      padding: 0.2rem 0.5rem;
-      text-align: center;
-      // margin
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
-    &:checked {
-      + label {
-        background-color: rgba(255, 255, 255, 0.85);
-        color: #000;
-      }
-    }
   }
 
   &__control {

@@ -1,3 +1,5 @@
+import { getMeta } from '../../utility-functions.mjs'
+
 /**
  * List of actions that can be performed on individual regex pair
  * componenets in the list of regex pairs
@@ -49,14 +51,10 @@ export const oneOffActions = {
 // START: Action creators
 
 const getActionMeta = (input) => {
-  if (input.match(/^R[0-9]{9}-[a-zA-Z]+(?:-[a-zA-Z]+)?$/)) {
-    const _val = input.split('-')
+  const meta = getMeta(input)
 
-    return {
-      id: _val[0].trim(),
-      type: _val[1].trim(),
-      extra: (typeof _val[2] === 'string') ? _val[2].trim() : ''
-    }
+  if (meta.id.match(/^R[0-9]{9}$/) && meta.type !== '') {
+    return meta
   } else {
     console.log('input:', input)
     throw Error('The input must match a regex pair ID plus the primary action type and optionally an action type modifier')
@@ -84,10 +82,8 @@ const getActionMeta = (input) => {
  *                     (self dispatching) action creator that can be used as an event handler
  */
 export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
-  console.log('binding in dispatch')
   return function (e) {
     let _type = ''
-    console.log('oneOffSimpleEvent()')
 
     switch (this.value) {
       case 'updateChain':
@@ -162,6 +158,17 @@ export const getAutoDispatchOneOffValueEvent = (_dispatch) => {
     _dispatch({
       type: _type,
       payload: this.value
+    })
+  }
+}
+
+export const getAutoDipatchOneOffTabClick = (_dispatch) => {
+  return function (e) {
+    const meta = getMeta(this.href.replace(/^.*?#([^?]+)(?:\?.*)?$/i, '$1'))
+    console.log('meta:', meta)
+    _dispatch({
+      type: oneOffActions.SET_SCREEN,
+      payload: meta.id
     })
   }
 }

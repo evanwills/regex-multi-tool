@@ -6,7 +6,8 @@ import {
   getAutoDispatchOneOffPairValueEvent,
   getAutoDipatchOneOffSimpleEvent,
   getAutoDispatchOneOffValueEvent,
-  registerOneOffEngine
+  registerOneOffEngine,
+  getAutoDipatchOneOffTabClick
 } from './oneOff.state.actions.mjs'
 import { oneOffReducer, getDefaultPair } from './oneOff.state.reducers.mjs'
 import { oneOffMW } from './oneOff.state.middleware.mjs'
@@ -65,5 +66,6 @@ export const getEventHandlers = (dispatch) => {
     pairValue: getAutoDispatchOneOffPairValueEvent(dispatch),
     simpleGeneral: getAutoDipatchOneOffSimpleEvent(dispatch),
     generalValue: getAutoDispatchOneOffValueEvent(dispatch),
+    navClick: getAutoDipatchOneOffTabClick(dispatch)
   }
 }

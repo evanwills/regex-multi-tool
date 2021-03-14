@@ -1,0 +1,32 @@
+
+
+.tab-nav {
+  --line-weight: 0.05rem;
+
+  &__list {
+    border-bottom: var(--line-weight) solid var(--txt-colour);
+
+    > li {
+      display: inline-block;
+      padding: 0 !important;
+      // margin-bottom: -0.1rem;
+    }
+  }
+
+  &__btn{
+    display: inline-block;
+    border:var(--line-weight) solid  var(--txt-colour);
+    color: var(--txt-colour);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem calc(var(--line-weight) * -1);
+    background-color: var(--bg-colour);
+    font-weight: bold;
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+
+    &--active {
+      border-bottom-color: var(--bg-colour);
+    }
+  }
+}

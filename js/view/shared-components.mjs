@@ -30,7 +30,7 @@ export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex,
   <!-- START: checkboxBtn() -->
   <li>
     <input type="checkbox" id="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
-    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNotEmptyStr(badge) ? ' cb-btn__label--${badge}': ''}">${label}</label>
+    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNotEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
   </li>
   <!--  END:  checkboxBtn() -->
   `
