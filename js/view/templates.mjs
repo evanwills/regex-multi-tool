@@ -46,9 +46,12 @@ export const footer = (buttons, eventHandler) => {
     <ul class="action-btns">
       ${buttons.map(button => {
         const _name = button.toLowerCase()
+        const _akey = (_name === 'reset')
+          ?  'x'
+          : (_name === 'replace') ? 's' : _name.substr(0,1)
         return html`
           <li class="btn-wrap btn-wrap--${button.name}">
-            <button name=${_name} class="main-btn main-btn--${_name}" id=${_name} .value="${_name}" @click=${eventHandler} >
+            <button name=${_name} class="main-btn main-btn--${_name}" id=${_name} .value="${_name}" @click=${eventHandler} accesskey="${_akey}">
               ${button}
             </button>
           </li>

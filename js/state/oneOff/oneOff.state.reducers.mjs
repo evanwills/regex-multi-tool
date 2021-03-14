@@ -781,6 +781,9 @@ export const regexSetOutputReducer = (state = '', action = { type: 'default' }) 
 
 export const regexSetScreenReducer = (state = '', action = { type: 'default' }) => {
   if (action.type === oneOffActions.SET_SCREEN && state !== action.payload) {
+    console.log('state', state)
+    console.log('action.payload', action.payload)
+    console.log('state !== action.payload', state !== action.payload)
     switch (action.payload) {
       case 'output':
       case 'matches':

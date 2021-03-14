@@ -6,7 +6,7 @@ const tabNavItem = (groupID, activeID, props, eventHandler) => {
   return html`
     <!-- START: tabNavItem() -->
     <li>
-      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}" @click=${eventHandler}>${label}</a>
+      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}" @click=${eventHandler} accesskey="${props.id.substr(0,1)}">${label}</a>
     </li>
     <!--  END:  tabNavItem() -->
   `
@@ -30,7 +30,7 @@ export const tabBlock = (groupID, activeID, blocks, tabEvent) => {
       </nav>
       ${blocks.filter(block => block.id === activeID).map(block => html`
         <section id="${block.id}">
-          <h2>${block.label}</h2>
+          <h3>${block.label}</h3>
           ${block.view(block.data, block.events)}
         </section>
       `)}

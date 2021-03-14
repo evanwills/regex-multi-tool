@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { isNumeric, isNotEmptyStr, getTabI } from '../utility-functions.mjs'
+import { isNotEmptyStr, getTabI } from '../utility-functions.mjs'
 
 /**
  * Get an Open/Close button

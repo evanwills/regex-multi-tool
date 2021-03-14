@@ -144,7 +144,8 @@ export const isBool = (input) => {
  * @returns {boolean} TRUE if the input is a number
  */
 export const isNumber = (input) => {
-  return (typeof input === 'number' && !isNaN(parseFloat(input)) && !isFinite(input))
+  return (typeof input === 'number' && !isNaN(parseFloat(input)))
+  // return (typeof input === 'number' && !isNaN(parseFloat(input)) && !isFinite(input))
 }
 
 /**
@@ -400,7 +401,7 @@ export const makeHumanReadableAttr = (_attr) => {
 }
 
 export const getTabI = (input) => {
-  return (!isNumeric(input) || input !== 0) ? -1 : 0
+  return (!isNumeric(input) || input !== -1) ? 0 : -1
 }
 
 /**

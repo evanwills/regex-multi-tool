@@ -226,8 +226,13 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
     case oneOffActions.SET_SCREEN:
       const allowedScreens = ['input', 'regex', 'matches', 'output']
+      if (allowedScreens.indexOf(action.payload) >= 0) {
+        if (_state.oneOff.screen !== action.payload) {
+          next(action)
+        } else {
+          return false
+        }
 
-      if (_state.oneOff.screen !== action.payload) {
 
       } else {
         throw Error('Cannot set "' + action.payload + '" as OneOff screen')

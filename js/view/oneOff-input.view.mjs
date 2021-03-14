@@ -21,7 +21,7 @@ export const oneOffInputView = (props, eventHandlers) => {
     <section class="oneOff-input__settings settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
       <h2 id="sample-settings">Sample settings</h2>
       <ul class="clean-list">
-        ${checkboxBtn('input-trim-before', 'Trim input before processing', 'trim-before', props.strip.before, eventHandlers.simpleGeneral, _index, 'search')}
+        ${checkboxBtn('input-trim-before', 'Trim input before processing', 'trim-before', props.strip.before, eventHandlers.simpleGeneral, _index)}
         ${checkboxBtn('input-trim-after', 'Trim input after processing', 'trim-after', props.strip.after, eventHandlers.simpleGeneral, _index)}
         ${checkboxBtn('split-input', 'Split input when processing', 'split-input', props.split.doSplit, eventHandlers.simpleGeneral, _index)}
         ${(props.split.doSplit)

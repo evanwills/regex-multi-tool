@@ -1,6 +1,4 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { oneOffReducer } from '../state/oneOff/oneOff.state.reducers.mjs'
-// import { oneOffInputView } from './oneOff-input.view.mjs'
 import { oneOffInputView } from './oneOff-input.view.mjs'
 import { oneOffRegexView } from './oneOff-regex.view.mjs'
 import { oneOffMatchesView } from './oneOff-matches.view.mjs'
@@ -36,7 +34,6 @@ export const oneOffUI = (props) => {
 
   switch (props.screen) {
     case 'regex':
-      console.log('why are we here')
       blocks[1].data = props[props.screen]
       blocks[1].view = oneOffRegexView
       blocks[1].events = props.events
@@ -68,16 +65,11 @@ export const oneOffUI = (props) => {
         simpleGeneral: props.events.simpleGeneral,
         generalValue: props.events.generalValue
       }
-      break
   }
-
-  console.log('blocks:', blocks)
-
-  console.log('props.screen:', props.screen)
 
   return html`
   <!-- START: oneOffUI() -->
-  <h1>Regex test</h1>
+  <h2>One-Off regex test</h2>
 
   <div class="oneOff">
     ${tabBlock(
