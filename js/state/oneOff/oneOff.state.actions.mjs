@@ -165,7 +165,7 @@ export const getAutoDispatchOneOffValueEvent = (_dispatch) => {
 export const getAutoDipatchOneOffTabClick = (_dispatch) => {
   return function (e) {
     const meta = getMeta(this.href.replace(/^.*?#([^?]+)(?:\?.*)?$/i, '$1'))
-    console.log('meta:', meta)
+
     _dispatch({
       type: oneOffActions.SET_SCREEN,
       payload: meta.id

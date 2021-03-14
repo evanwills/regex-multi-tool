@@ -5,11 +5,8 @@ import { openCloseBtn, checkboxBtn } from './shared-components.mjs'
 
 
 export const oneOffInputView = (props, eventHandlers) => {
-  console.group('oneOffInputView')
-  console.log('props:', props)
-  console.log('eventHandlers:', eventHandlers)
-  console.groupEnd()
   const _index = (props.settingsOpen) ? 0 : -1
+
   return html`
   <!-- START: oneOffInputView() -->
   <section class="oneOff-input settings__wrap">

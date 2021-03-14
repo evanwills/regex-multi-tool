@@ -36,8 +36,7 @@ export const getAutoDispatchMainAppEvent = (_dispatch) => {
         _type = mainAppActions.HELP
         break
     }
-    console.log('dispatching event: ', _type)
-    console.log('button value: ', this.value)
+
     _dispatch({type: _type})
   }
 }

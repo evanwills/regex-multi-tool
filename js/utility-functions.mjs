@@ -461,8 +461,6 @@ export const ucFirst = (input) => {
 
 export const getMeta = (input) => {
   const _tmp = input.split('-', 3)
-  console.log('input:', input)
-  console.log('_tmp:', _tmp)
 
   return {
     id: _tmp[0].trim(),

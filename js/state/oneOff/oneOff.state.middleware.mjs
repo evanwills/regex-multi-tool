@@ -148,16 +148,10 @@ const regexPairFocusMightChange = (actionType) => {
 
 export const oneOffMW = ({ getState, dispatch }) => next => action => {
   const _state = getState()
-  console.group('oneOffMW()')
-  console.log(action)
   if (regexPairFocusMightChange(action.type)) {
     const tmpID = (typeof action.payload.id === 'string')
       ? action.payload.id
       : action.payload
-
-    console.log('Focus pair might change')
-    console.log('tmpID:', tmpID)
-    console.log('_state.oneOff.regex.focusedID:', _state.oneOff.regex.focusedID)
 
     if (_state.oneOff.regex.focusedID !== tmpID) {
       dispatch({
@@ -166,7 +160,6 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
     }
   }
-  console.groupEnd()
 
   if (_state.mode !== 'oneOff') {
     return next(action)
