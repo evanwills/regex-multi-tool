@@ -1,6 +1,6 @@
-import { html } from '../lit-html/lit-html.mjs'
-import { makeHTMLsafe } from '../utility-functions.mjs'
-import { openCloseBtn, checkboxBtn } from './shared-components.mjs'
+import { html } from '../../lit-html/lit-html.mjs'
+import { makeHTMLsafe } from '../../utility-functions.mjs'
+import { openCloseBtn, checkboxBtn } from '../shared-components.mjs'
 // import { getID } from '../state/utils.mjs'
 
 

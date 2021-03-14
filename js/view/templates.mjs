@@ -1,5 +1,5 @@
 import { html, render } from '../lit-html/lit-html.mjs'
-import { oneOffUI } from './oneOff-whole.view.mjs'
+import { oneOffUI } from './oneOff/oneOff-whole.view.mjs'
 // import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
 import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneOff.state.mjs'

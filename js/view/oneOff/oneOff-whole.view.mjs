@@ -1,9 +1,9 @@
-import { html } from '../lit-html/lit-html.mjs'
+import { html } from '../../lit-html/lit-html.mjs'
 import { oneOffInputView } from './oneOff-input.view.mjs'
 import { oneOffRegexView } from './oneOff-regex.view.mjs'
 import { oneOffMatchesView } from './oneOff-matches.view.mjs'
 import { oneOffOutputView } from './oneOff-output.view.mjs'
-import { tabBlock } from './whole-tab-block.view.mjs'
+import { tabBlock } from '../whole-tab-block.view.mjs'
 
 export const oneOffUI = (props) => {
   const blocks = [
