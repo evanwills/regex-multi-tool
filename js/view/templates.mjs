@@ -29,12 +29,12 @@ export const header = (isSimple, changeHandler) => {
 
     <ul class="btn-list btn-list--small">
       <li><!--
-        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-btn__input" ?checked=${!_isFancy} @change=${changeHandler} /><!--
-        --><label for="mode-simple" class="btn-list__btn radio-btn__label"><span class="sr-only">Regex </span>tester</label><!--
+        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-btn__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
+        --><label for="mode-simple" class="btn-list__btn radio-btn__label">One-off</label><!--
       --></li>
       <li><!--
-        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-btn__input" ?checked=${_isFancy} @change=${changeHandler} /><!--
-        --><label for="mode-fancy" class="btn-list__btn radio-btn__label"><span class="sr-only">Do regex </span>stuff</label><!--
+        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-btn__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
+        --><label for="mode-fancy" class="btn-list__btn radio-btn__label">Repeatable</label><!--
         --></li>
     </ul>
   </header>`
