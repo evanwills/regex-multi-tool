@@ -6,7 +6,6 @@ export const mainAppActions = {
   HELP: 'MAIN-APP_HELP'
 }
 
-
 export const getAutoDispatchMainAppEvent = (_dispatch) => {
   return function (e) {
     let _type = 'default'
@@ -37,6 +36,6 @@ export const getAutoDispatchMainAppEvent = (_dispatch) => {
         break
     }
 
-    _dispatch({type: _type})
+    _dispatch({ type: _type })
   }
 }

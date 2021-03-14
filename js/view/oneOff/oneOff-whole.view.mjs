@@ -31,7 +31,6 @@ export const oneOffUI = (props) => {
     })
   }
 
-
   switch (props.screen) {
     case 'regex':
       blocks[1].data = props[props.screen]
@@ -48,7 +47,7 @@ export const oneOffUI = (props) => {
         props.screen = 'input'
       }
 
-    case 'output':
+    case 'output': // eslint-disable-line
       if (typeof blocks[3] !== 'undefined') {
         blocks[3].view = oneOffOutputView
         blocks[3].data = props[props.screen]
@@ -57,7 +56,7 @@ export const oneOffUI = (props) => {
         props.screen = 'input'
       }
 
-    default:
+    default: // eslint-disable-line
       props.screen = 'input'
       blocks[0].view = oneOffInputView
       blocks[0].data = props[props.screen]

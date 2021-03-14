@@ -1,6 +1,5 @@
 import { mainAppActions } from './main-app.state.actions.mjs'
 
-
 export const modeReducer = (state = 'oneOff', action = { type: 'default' }) => {
   if (action.type === mainAppActions.SET_MODE) {
     if (typeof action.payload === 'string' && state !== action.payload && (action.payload === 'oneOff' || action.payload === 'repeatable')) {

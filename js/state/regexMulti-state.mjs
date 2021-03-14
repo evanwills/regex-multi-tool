@@ -6,7 +6,7 @@ import {
 } from '../redux/redux.mjs'
 import {
   logger,
-  crashReporter,
+  crashReporter
   // readyStatePromise,
   // thunk
   // timeoutScheduler,
@@ -18,13 +18,14 @@ import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
 import { isStr, getURLobject } from '../utility-functions.mjs'
 
+const url = getURLobject(window.location)
+
 const initialState = {
   mode: 'oneOff',
   oneOff: oneOff.state,
-  repeat: repeatable.state
+  repeat: repeatable.state,
+  url: url
 }
-
-const url = getURLobject(window.location)
 
 if (isStr(url.searchParams.mode)) {
   const mode = url.searchParams.mode.trim()

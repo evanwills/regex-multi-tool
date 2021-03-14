@@ -1,11 +1,13 @@
+/* global requestAnimationFrame */
+
 /**
  * Logs all actions and states after they are dispatched.
  */
- export const logger = store => next => action => {
+export const logger = store => next => action => {
   console.group(action.type)
   console.info('dispatching', action)
 
-  let result = next(action)
+  const result = next(action)
 
   console.log('next state', store.getState())
   console.groupEnd()
@@ -28,8 +30,9 @@ export const crashReporter = store => next => action => {
 }
 
 /**
- * Schedules actions with { meta: { delay: N } } to be delayed by N milliseconds.
- * Makes `dispatch` return a function to cancel the timeout in this case.
+ * Schedules actions with { meta: { delay: N } } to be delayed by N
+ * milliseconds. Makes `dispatch` return a function to cancel the
+ * timeout in this case.
  */
 export const timeoutScheduler = store => next => action => {
   if (!action.meta || !action.meta.delay) {
@@ -38,21 +41,22 @@ export const timeoutScheduler = store => next => action => {
 
   const timeoutId = setTimeout(() => next(action), action.meta.delay)
 
-  return function cancel() {
+  return function cancel () {
     clearTimeout(timeoutId)
   }
 }
 
 /**
- * Schedules actions with { meta: { raf: true } } to be dispatched inside a rAF loop
- * frame.  Makes `dispatch` return a function to remove the action from the queue in
- * this case.
+ * Schedules actions with { meta: { raf: true } } to be dispatched
+ * inside a rAF (requestAnimationFrame) loop frame.  Makes
+ * `dispatch` return a function to remove the action from the queue
+ * in this case.
  */
 export const rafScheduler = store => next => {
-  const queuedActions = []
+  let queuedActions = []
   let frame = null
 
-  function loop() {
+  function loop () {
     frame = null
     try {
       if (queuedActions.length) {
@@ -63,7 +67,7 @@ export const rafScheduler = store => next => {
     }
   }
 
-  function maybeRaf() {
+  function maybeRaf () {
     if (queuedActions.length && !frame) {
       frame = requestAnimationFrame(loop)
     }
@@ -77,7 +81,7 @@ export const rafScheduler = store => next => {
     queuedActions.push(action)
     maybeRaf()
 
-    return function cancel() {
+    return function cancel () {
       queuedActions = queuedActions.filter(a => a !== action)
     }
   }
@@ -85,8 +89,11 @@ export const rafScheduler = store => next => {
 
 /**
  * Lets you dispatch promises in addition to actions.
- * If the promise is resolved, its result will be dispatched as an action.
- * The promise is returned from `dispatch` so the caller may handle rejection.
+ *
+ * If the promise is resolved, its result will be dispatched as an
+ * action.
+ * The promise is returned from `dispatch` so the caller may handle
+ * rejection.
  */
 export const vanillaPromise = store => next => action => {
   if (typeof action.then !== 'function') {
@@ -99,17 +106,19 @@ export const vanillaPromise = store => next => action => {
 /**
  * Lets you dispatch special actions with a { promise } field.
  *
- * This middleware will turn them into a single action at the beginning,
- * and a single success (or failure) action when the `promise` resolves.
+ * This middleware will turn them into a single action at the
+ * beginning,  and a single success (or failure) action when the
+ * `promise` resolves.
  *
- * For convenience, `dispatch` will return the promise so the caller can wait.
+ * For convenience, `dispatch` will return the promise so the
+ * caller can wait.
  */
 export const readyStatePromise = store => next => action => {
   if (!action.promise) {
     return next(action)
   }
 
-  function makeAction(ready, data) {
+  function makeAction (ready, data) {
     const newAction = Object.assign({}, action, { ready }, data)
     delete newAction.promise
     return newAction

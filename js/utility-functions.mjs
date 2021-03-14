@@ -1,6 +1,65 @@
 /* jslint browser: true */
 
 /**
+ * Convert a string into an array (if possible) and clean up array
+ * items
+ *
+ * @param {string} input String that might contain an array
+ *
+ * @returns {Array, false}
+ */
+const parseStrArray = (input) => {
+  const tmp = input.match(/^\[([^\]]*)\]$/)
+  const regex = /(?:^|\s*),\s*(?:('|")\s*([^\1]*?)\s*\1|([^,]*?))\s*(?=,|$)/g
+  let item
+  const output = []
+
+  while ((item = regex.exec(tmp)) !== null) {
+    item = cleanGET(item)
+    if (item === '') {
+      continue
+    } else {
+      output.push(item)
+    }
+  }
+
+  if (output.length > 0) {
+    // Array is not empty
+    return output
+  }
+
+  // Input could not be converted to an array or was empty after
+  // cleaning
+  return false
+}
+
+/**
+ * Convert string values to appropriate javascript data types
+ *
+ * @param {string} input Value to be converted
+ *
+ * @returns {string, boolean, number, array}
+ */
+const cleanGET = (input) => {
+  const _output = decodeURI(input.trim())
+
+  if (_output.toLowerCase() === 'true') {
+    return true
+  } else if (_output.toLowerCase() === 'false') {
+    return false
+  } else if (isNumeric(_output)) {
+    return (_output * 1)
+  } else {
+    const tmp = parseStrArray(_output)
+    if (tmp !== false) {
+      return tmp
+    }
+  }
+
+  return _output
+}
+
+/**
  * polyfil for new URL() call (but with better GET and hash parsing)
  * (see: https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
  *
@@ -36,19 +95,6 @@ export const getURLobject = (url) => {
     _url = url
   } else if (typeof url.href === 'string') {
     _url = url.href
-  }
-
-  const cleanGET = (input) => {
-    const _output = decodeURI(input)
-
-    if (_output.toLowerCase() === 'true') {
-      return true
-    } else if (_output.toLowerCase() === 'false') {
-      return false
-    } else if (isNumeric(_output)) {
-      return (_output * 1)
-    }
-    return _output
   }
 
   if (typeof _url === 'string' && _url[0] !== '#') {
@@ -428,7 +474,6 @@ export const groupNameToLabel = (input) => {
   return output.trim()
 }
 
-
 /**
  * Convert String to HTML input safe string
  *
@@ -439,15 +484,15 @@ export const groupNameToLabel = (input) => {
  */
 export const makeHTMLsafe = (input, doubleEncode) => {
   const htmlChars = [
-    [ /'/g, '&apos;' ],
-    [ /"/g, '&quot;' ],
-    [ /</g, '&lt;' ],
-    [ />/g, '&gt;' ]
+    [/'/g, '&apos;'],
+    [/"/g, '&quot;'],
+    [/</g, '&lt;'],
+    [/>/g, '&gt;']
   ]
-  const amp = [ /\&/g, '&amp;' ]
+  const amp = [/\&/g, '&amp;']
   const findReplace = (typeof doubleEncode === 'boolean' && doubleEncode === true)
-    ? [ ...htmlChars, amp ]
-    : [ amp, ...htmlChars ]
+    ? [...htmlChars, amp]
+    : [amp, ...htmlChars]
 
   return findReplace.reduce(
     (accumulator, pair) => accumulator.replace(pair[0], pair[1]),
@@ -456,7 +501,7 @@ export const makeHTMLsafe = (input, doubleEncode) => {
 }
 
 export const ucFirst = (input) => {
-  return input.substr(0,1).toUpperCase() + input.substr(1)
+  return input.substr(0, 1).toUpperCase() + input.substr(1)
 }
 
 export const getMeta = (input) => {
@@ -465,7 +510,7 @@ export const getMeta = (input) => {
   return {
     id: _tmp[0].trim(),
     type: isStr(_tmp[1]) ? _tmp[1].trim() : '',
-    extra: isStr(_tmp[2]) ? _tmp[2].trim() : '',
+    extra: isStr(_tmp[2]) ? _tmp[2].trim() : ''
   }
 }
 
@@ -480,7 +525,7 @@ export const getMeta = (input) => {
  *
  * @returns {string}
  */
- export const getID = () => {
+export const getID = () => {
   let basicID = 0
   // slowPoke()
   basicID = Date.now()

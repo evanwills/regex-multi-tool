@@ -170,20 +170,19 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       dispatch({
         type: oneOffActions.SET_OUTPUT
       })
-      break;
+      break
 
     case mainAppActions.TEST:
       dispatch({
         type: oneOffActions.SET_MATCHES
       })
-      break;
+      break
 
     case mainAppActions.RESET:
       dispatch({
         type: oneOffActions.RESET
       })
-      break;
-
+      break
 
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
@@ -218,15 +217,14 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case oneOffActions.SET_SCREEN:
-      const allowedScreens = ['input', 'regex', 'matches', 'output']
+      const allowedScreens = ['input', 'regex', 'matches', 'output'] // eslint-disable-line
+
       if (allowedScreens.indexOf(action.payload) >= 0) {
         if (_state.oneOff.screen !== action.payload) {
-          next(action)
+          return next(action)
         } else {
           return false
         }
-
-
       } else {
         throw Error('Cannot set "' + action.payload + '" as OneOff screen')
       }

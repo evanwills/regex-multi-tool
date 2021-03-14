@@ -11,7 +11,6 @@ import {
 import { repeatableReducer } from './repeatable.state.reducers.mjs'
 import { repeatableMW } from './repeatable.state.middleware.mjs'
 
-
 const repeatableState = {
   // Complete list of all actions grouped by user group
   allActions: {},
@@ -54,6 +53,6 @@ export const getEventHandlers = (dispatch) => {
     toggleDebug: getAutoDispatchToggleDebug(dispatch),
     toggleNav: getAutoDispatchToggleNav(dispatch),
     modifyInput: getAutoDispatchModifyInput(dispatch),
-    updateField: getAutoDispatchUpdateField(dispatch),
+    updateField: getAutoDispatchUpdateField(dispatch)
   }
 }

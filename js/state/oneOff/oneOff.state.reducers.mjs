@@ -847,7 +847,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.SET_STRIP_AFTER:
-      console.log(state,)
+      console.log('state:', state)
       return {
         ...state,
         strip: {
@@ -857,7 +857,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.TOGGLE_SETTINGS:
-      console.log(state,)
+      console.log('state:', state)
       return {
         ...state,
         settingsOpen: !state.settingsOpen

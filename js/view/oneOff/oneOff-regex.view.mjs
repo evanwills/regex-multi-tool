@@ -1,6 +1,6 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { getID, getTabI } from '../../utility-functions.mjs'
-import { openCloseBtn, checkboxBtn } from '../shared-components.mjs'
+import { getID, getTabI, isStr } from '../../utility-functions.mjs'
+import { openCloseBtn, checkboxBtn, isBool } from '../shared-components.mjs'
 
 // ============================================
 // START: non-view functions
@@ -400,7 +400,7 @@ export const regexPair = (props) => {
 export const oneOffRegexView = (props, eventHandlers) => {
   return html`<section>
     <ul class="clean-list">
-      ${props.pairs.map(pair => regexPair({...pair, events: eventHandlers}))}
+      ${props.pairs.map(pair => regexPair({ ...pair, events: eventHandlers }))}
     </ul>
   </section>`
 }

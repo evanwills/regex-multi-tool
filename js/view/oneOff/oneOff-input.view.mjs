@@ -3,7 +3,6 @@ import { makeHTMLsafe } from '../../utility-functions.mjs'
 import { openCloseBtn, checkboxBtn } from '../shared-components.mjs'
 // import { getID } from '../state/utils.mjs'
 
-
 export const oneOffInputView = (props, eventHandlers) => {
   const _index = (props.settingsOpen) ? 0 : -1
 
