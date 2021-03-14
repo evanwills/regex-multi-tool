@@ -27,10 +27,12 @@ export const oneOffUI = (props) => {
   }
 
   return html`
+  <!-- START: oneOffUI() -->
   <h1>Regex test</h1>
-  ${(props.screen )}
-  <div class="regex-pairs">
+
+  <div class="oneOff">
     ${screen(props[props.screen], props.events)}
   </div>
+  <!--  END:  oneOffUI() -->
   `
 }

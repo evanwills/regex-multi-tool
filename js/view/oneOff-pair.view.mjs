@@ -1,7 +1,7 @@
 import { html } from '../lit-html/lit-html.mjs'
 import { getID } from '../state/utils.mjs'
-import { isNumeric } from '../utility-functions.mjs'
-import { openCloseButton } from './shared-components.mjs'
+import { isNumeric, getTabI } from '../utility-functions.mjs'
+import { openCloseBtn, checkboxBtn } from './shared-components.mjs'
 
 // ============================================
 // START: non-view functions
@@ -13,7 +13,7 @@ export const getNewPair = (_defaults) => {
   let _escape = true
 
   if (typeof _defaults !== 'undefined') {
-    if (typeof _defaults.delims !== 'undefined' && typeof _defaults.delims.open === 'string' && typeof _defaults.delims.close === 'string') {
+    if (typeof _defaults.delims !== 'undefined' && isStr(_defaults.delims.open) && isStr(_defaults.delims.close)) {
       _delims = {
         open: _defaults.delims.open,
         close: _defaults.delims.close,
@@ -21,15 +21,15 @@ export const getNewPair = (_defaults) => {
       }
     }
 
-    if (typeof _defaults.flags === 'string') {
+    if (isStr(_defaults.flags)) {
       _flags = _defaults.flags
     }
 
-    if (typeof _defaults.multiLine === 'boolean') {
+    if (isBool(_defaults.multiLine)) {
       _multi = _defaults.multiLine
     }
 
-    if (typeof _defaults.transformEscaped === 'boolean') {
+    if (isBool(_defaults.transformEscaped)) {
       _escape = _defaults.transformEscaped
     }
   }
@@ -99,7 +99,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
   return html`
     <span class="r-pair__move-to__wrap"><!--
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
-      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
+      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${getTabI(tabIndex)}">
         ${options.map(option => (option.current)
           ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
           : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
@@ -135,7 +135,7 @@ const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
 
   return (count > 1)
     ? html`
-      <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
+      <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair" tabindex="${getTabI(tabIndex)}">
         ${_mode} ${hiddenPos(pos)}
       </button>`
     : ''
@@ -163,7 +163,7 @@ const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
 const deleteBtn = (id, count, pos, _click, tabIndex) => {
   return (count > 1)
     ? html`
-      <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
+      <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair" tabindex="${getTabI(tabIndex)}">
         Delete ${hiddenPos(pos)}
       </button>`
     : ''
@@ -218,7 +218,7 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
   }
 
   return html`
-    <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
+    <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}" tabindex="${getTabI(tabIndex)}">
       Move ${pos} ${_dir}
     </button>`
 }
@@ -234,10 +234,9 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
  * @returns
  */
 const checkboxField = (id, label, classSuffix, isChecked, eventHandler, tabIndex) => {
-  return html`
-  <input type="checkbox" id="${id}-${classSuffix}" class="cb-btn__input" value="${id}-${classSuffix}" ?checked=${isChecked} @change=${eventHandler} tabindex="${isNumeric(tabIndex) ? tabIndex : 0}" /><!--
-  --><label for="${id}-${classSuffix}" class="cb-btn__label">${label}</label>
-  `
+  const _id = id + '-' + classSuffix
+
+  return checkboxBtn(_id, label, _id, isChecked, eventHandler, tabIndex)
 }
 
 /**
@@ -255,7 +254,7 @@ const addPair = (id, pos, _dir, clickHandler, tabIndex) => {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
-  return html`<button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${isNumeric(tabIndex) ? tabIndex : 0}">
+  return html`<button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${getTabI(tabIndex)}">
     Add pair ${_dir} ${pos}
   </button>`
 }
@@ -345,40 +344,34 @@ export const regexPair = (props) => {
           : ''}
       </main>
 
-      ${openCloseButton(props.id, 'this Regex Pair', 'Open', props.settingsOpen, props.events.simplePair)}
+      ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair)}
 
       <footer class="r-pair__footer r-pair__footer--${(props.settingsOpen) ? 'opened' : 'closed'}">
         <ul class="r-pair__control clean-list">
-            <li>
-              ${checkboxField(
-                props.id,
-                'Multi-line input',
-                'multiLine',
-                props.multiLine,
-                props.events.simplePair,
-                tabIndex
-              )}
-            </li>
-            <li>
-              ${checkboxField(
-                props.id,
-                'Full width input',
-                'fullWidth',
-                props.fullWidth,
-                props.events.simplePair,
-                tabIndex
-              )}
-            </li>
-            <li>
-              ${checkboxField(
-                props.id,
-                'Transform escaped characters in replacement',
-                'whiteSpace',
-                props.transformEscaped,
-                props.events.simplePair,
-                tabIndex
-              )}
-            </li>
+            ${checkboxField(
+              props.id,
+              'Multi-line input',
+              'multiLine',
+              props.multiLine,
+              props.events.simplePair,
+              tabIndex
+            )}
+            ${checkboxField(
+              props.id,
+              'Full width input',
+              'fullWidth',
+              props.fullWidth,
+              props.events.simplePair,
+              tabIndex
+            )}
+            ${checkboxField(
+              props.id,
+              'Transform escaped characters in replacement',
+              'whiteSpace',
+              props.transformEscaped,
+              props.events.simplePair,
+              tabIndex
+            )}
         </ul>
 
         <ul class="r-pair__sibling-ctrl clean-list">
@@ -401,7 +394,7 @@ export const regexPair = (props) => {
           </li>
         </ul>
 
-        ${openCloseButton(props.id, 'this Regex Pair', 'Close', props.settingsOpen, props.events.simplePair, tabIndex)}
+        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex)}
       </footer>
     </article>
   `

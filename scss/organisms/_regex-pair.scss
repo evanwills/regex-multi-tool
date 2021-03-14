@@ -205,7 +205,7 @@
 
   &__move-to {
     &__wrap {
-      background-color: #fff;
+      background-color: var(--txt-colour);
       border-radius: 0.825rem;
       color: #000;
       display: inline-block;

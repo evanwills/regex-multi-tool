@@ -1,5 +1,5 @@
 import { html } from '../lit-html/lit-html.mjs'
-import { isNumeric } from '../utility-functions.mjs'
+import { isNumeric, isNotEmptyStr, getTabI } from '../utility-functions.mjs'
 
 /**
  * Get an Open/Close button
@@ -12,12 +12,26 @@ import { isNumeric } from '../utility-functions.mjs'
  * @param {number}   tabIndex     Position of this field relative to all other focusable elements
  * @returns
  */
-export const openCloseButton = (id, target, label, isOpen, eventHandler, tabIndex) => {
-  const _index = isNumeric(tabIndex) ? tabIndex : 0
+export const openCloseBtn = (id, label, target, isOpen, eventHandler, tabIndex) => {
   const _which = label.toLocaleLowerCase()
   const _is = (isOpen) ? 'is' : 'not'
   return html`
-    <button value="${id}-toggleSettings-${_which}" class="rnd-btn rnd-btn--settings rnd-btn--settings--${_which} rnd-btn--settings--${_which}-${_is}" @click=${eventHandler} title="${label} settings for ${target}" tabindex="${_index}">
+  <!-- START: openCloseBtn() -->
+    <button value="${id}-toggleSettings-${_which}" class="rnd-btn rnd-btn--settings rnd-btn--settings--${_which} rnd-btn--settings--${_which}-${_is}" @click=${eventHandler} title="${label} settings for ${target}" tabindex="${getTabI(tabIndex)}">
       ${label}
-    </button>`
+    </button>
+  <!--  END:  openCloseBtn() -->
+  `
+}
+
+
+export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge) => {
+  return html`
+  <!-- START: checkboxBtn() -->
+  <li>
+    <input type="checkbox" id="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
+    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNotEmptyStr(badge) ? ' cb-btn__label--${badge}': ''}">${label}</label>
+  </li>
+  <!--  END:  checkboxBtn() -->
+  `
 }

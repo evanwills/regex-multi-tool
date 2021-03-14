@@ -107,12 +107,22 @@ export const getURLobject = (url) => {
 /**
  * Check whether something is a string
  *
- * @param {mixed} input value that shoudl be a string
+ * @param {mixed} input Value that should be a string
  *
  * @returns {boolean} TRUE if the input is a string
  */
-export const isString = (input) => {
+export const isStr = (input, notEmpty) => {
   return (typeof input === 'string')
+}
+
+/**
+ * Tests whether a value is a string and not empty (after being trimmed)
+ *
+ * @param {mixed} input Value that should be a string
+ * @returns {boolean}
+ */
+export const isNotEmptyStr = (input) => {
+  return (isStr(input) && input.trim() !== '')
 }
 
 /**
@@ -134,7 +144,7 @@ export const isBool = (input) => {
  * @returns {boolean} TRUE if the input is a number
  */
 export const isNumber = (input) => {
-  return (typeof input === 'number' && !isNaN(parseFloat(input)) && isFinite(input))
+  return (typeof input === 'number' && !isNaN(parseFloat(input)) && !isFinite(input))
 }
 
 /**
@@ -147,7 +157,7 @@ export const isNumber = (input) => {
 export const isNumeric = (input) => {
   if (isNumber(input)) {
     return true
-  } else if (typeof input === 'string') {
+  } else if (isStr(input)) {
     return isNumber(input * 1)
   } else {
     return false
@@ -180,7 +190,7 @@ export const isFunction = (functionToCheck) => {
 export const invalidString = (prop, input, notEmpty) => {
   let tmp = ''
 
-  if (!isString(prop)) {
+  if (!isStr(prop)) {
     throw new Error('invalidString() expects first parameter "prop" to be a string matching the name of a property in the object. ' + typeof prop + ' given.')
   }
   if (typeof input !== 'object') {
@@ -387,6 +397,10 @@ export const makeHumanReadableAttr = (_attr) => {
     _output = '_' + _output
   }
   return _output
+}
+
+export const getTabI = (input) => {
+  return (!isNumeric(input) || input !== 0) ? -1 : 0
 }
 
 /**

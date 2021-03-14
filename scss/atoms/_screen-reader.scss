@@ -22,6 +22,6 @@
 
 input, button, textarea, select {
   &:focus {
-    outline: 0.15rem dotted #fff;
+    outline: 0.15rem dotted var(--txt-colour);
   }
 }

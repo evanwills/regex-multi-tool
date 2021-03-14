@@ -10,7 +10,7 @@
   z-index: 3;
 
   &::before {
-    background-color: #fff;
+    background-color: var(--txt-colour);
     bottom: 0;
     content: '';
     left: 0;
