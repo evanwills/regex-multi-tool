@@ -1,6 +1,6 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { getID, getTabI, isStr } from '../../utility-functions.mjs'
-import { openCloseBtn, checkboxBtn, isBool } from '../shared-components.mjs'
+import { getID, getTabI, isStr, isBool } from '../../utility-functions.mjs'
+import { openCloseBtn, checkboxBtn } from '../shared-components.mjs'
 
 // ============================================
 // START: non-view functions
