@@ -75,7 +75,8 @@ export const oneOffUI = (props) => {
       'oneOff',
       props.screen,
       blocks,
-      props.events.navClick
+      props.events.navClick,
+      true
     )}
   </div>
   <!--  END:  oneOffUI() -->

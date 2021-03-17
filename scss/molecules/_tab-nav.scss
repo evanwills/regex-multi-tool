@@ -2,6 +2,7 @@
 
 .tab-nav {
   --line-weight: 0.05rem;
+  display: none;
 
   &__list {
     border-bottom: var(--line-weight) solid var(--txt-colour);
@@ -27,6 +28,39 @@
 
     &--active {
       border-bottom-color: var(--bg-colour);
+    }
+  }
+}
+
+
+.tab-wrapper {
+  &--mobile {
+    .tab-nav {
+      display: none;
+    }
+
+    .tab-block {
+      .tab-block__h {
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 30rem) {
+      .tab-nav {
+        display: block;
+      }
+
+      .tab-block {
+        .tab-block__h {
+          display: none;
+        }
+
+        &--active {
+          .tab-block__h {
+            display: block;
+          }
+        }
+      }
     }
   }
 }
