@@ -37,6 +37,14 @@
   &--mobile {
     .tab-nav {
       display: none;
+
+      &__btn {
+        &.tab-nav--accordion {
+        border: .05rem solid var(--txt-colour);
+        padding: 0.3rem 0.5rem;
+        display: block;
+        border-radius: 0;
+      }}
     }
 
     .tab-block {
@@ -48,6 +56,13 @@
     @media screen and (min-width: 30rem) {
       .tab-nav {
         display: block;
+
+        &__btn {
+          &.tab-nav--accordion {
+            border: 0;
+            padding: 0 0.5rem;
+          }
+        }
       }
 
       .tab-block {

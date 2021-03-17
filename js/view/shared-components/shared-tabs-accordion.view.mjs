@@ -21,7 +21,7 @@ const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
 const tabBlockInner = (groupID, activeID, block, tabEvent) => {
   const isActive = (block.id === activeID)
   return html`
-  <section id="${block.id}" class="tab-block tab-block--${(isActive) ? '' : 'in'}active'">
+  <section id="${block.id}" class="tab-block tab-block--${(isActive) ? '' : 'in'}active">
     <h3 class="tab-block__h">${tabNavItem(groupID, activeID, block, tabEvent, true)}</h3>
     ${(isActive) ? html`${block.view(block.data, block.events)}` : ''}
   </section>
