@@ -153,7 +153,7 @@ export const getURLobject = (url) => {
 /**
  * Check whether something is a string
  *
- * @param {mixed} input Value that should be a string
+ * @param {any} input Value that should be a string
  *
  * @returns {boolean} TRUE if the input is a string
  */
@@ -164,7 +164,7 @@ export const isStr = (input, notEmpty) => {
 /**
  * Tests whether a value is a string and not empty (after being trimmed)
  *
- * @param {mixed} input Value that should be a string
+ * @param {any} input Value that should be a string
  * @returns {boolean}
  */
 export const isNotEmptyStr = (input) => {
@@ -174,7 +174,7 @@ export const isNotEmptyStr = (input) => {
 /**
  * Check whether something is a boolean
  *
- * @param {mixed} input value that shoudl be a boolean
+ * @param {any} input value that shoudl be a boolean
  *
  * @returns {boolean} TRUE if the input is a boolean
  */
@@ -183,9 +183,33 @@ export const isBool = (input) => {
 }
 
 /**
+ * Return TRUE if the input is boolean and is true otherwise
+ * return FALSE
+ *
+ * @param {any} input value that shoudl be a boolean
+ *
+ * @returns {boolean}
+ */
+export const boolTrue = (input) => {
+  return (typeof input === 'boolean' && input === true)
+}
+
+/**
+ * Return TRUE if the input is boolean and is FALSE otherwise
+ * return FALSE
+ *
+ * @param {any} input value that shoudl be a boolean
+ *
+ * @returns {boolean}
+ */
+export const boolFalse = (input) => {
+  return (typeof input === 'boolean' && input === false)
+}
+
+/**
  * Check whether something is a number
  *
- * @param {mixed} input Value that should be a number
+ * @param {any} input Value that should be a number
  *
  * @returns {boolean} TRUE if the input is a number
  */
@@ -197,7 +221,7 @@ export const isNumber = (input) => {
 /**
  * Check whether something is a Function
  *
- * @param {mixed} input Value that should be numeric
+ * @param {any} input Value that should be numeric
  *
  * @returns {boolean} TRUE if the input is a Function
  */
@@ -214,7 +238,7 @@ export const isNumeric = (input) => {
 /**
  * Check whether something is a Function
  *
- * @param {mixed} functionToCheck function
+ * @param {any} functionToCheck function
  *
  * @returns {boolean} TRUE if the input is a Function
  */
@@ -372,7 +396,7 @@ export const invalidBool = (prop, input) => {
 /**
  * Test whether a variable is iterable
  *
- * @param {mixed} value to be tested
+ * @param {any} value to be tested
  *
  * @return {boolean} True if input is an array or iterable object
  */

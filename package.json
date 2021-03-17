@@ -3,6 +3,21 @@
   "version": "0.0.1",
   "description": "A tool for testing regular expressions and creating mini tools for modifying text with regular expressions",
   "main": "index.html",
+  "author": "Evan Wills",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evanwills/regex-multi-tool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/evanwills/regex-multi-tool/issues"
+  },
+  "homepage": "https://github.com/evanwills/regex-multi-tool#readme",
+  "keywords": [
+    "regex",
+    "lit-html",
+    "react"
+  ],
   "directories": {
     "test": "tests"
   },
@@ -28,21 +43,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "es-dev-server --app-index index.html --node-resolve --watch --open"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/evanwills/regex-multi-tool.git"
-  },
-  "author": "Evan Wills",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/evanwills/regex-multi-tool/issues"
-  },
-  "homepage": "https://github.com/evanwills/regex-multi-tool#readme",
-  "keywords": [
-    "regex",
-    "lit-html",
-    "react"
-  ]
+    "start": "es-dev-server --app-index index.html --node-resolve --watch --open",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  }
 }

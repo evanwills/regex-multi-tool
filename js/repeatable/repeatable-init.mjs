@@ -10,6 +10,8 @@ import {
   isNumeric,
   invalidString,
   isFunction,
+  invalidBool,
+  invalidNum,
   getURLobject
 } from '../utility-functions.mjs'
 
@@ -423,7 +425,7 @@ function Repeatable (url, _remote, docs, api) {
         const chain = registry[a].chainedActions
 
         for (let b = 0; b < chain.length; b += 1) {
-          let ok = true;
+          let ok = true
           if (IDs.indexOf(chain[b].actionID) === -1) {
             console.error('"' + registry[a].name + '" Wants to chain action "' + chain[b].actionID + '". But either that action does not exist or is not available to the current user')
             output = false

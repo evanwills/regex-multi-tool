@@ -1,6 +1,5 @@
 import { repeatActions } from './repeatable.state.actions.mjs'
-// import { repeatable } from '../../repeat/repeat-init.mjs'
-import { repeatable } from '../../repeat/repeat-init.mjs'
+import { repeatable } from '../../repeatable/repeatable-init.mjs'
 import {
   isNumeric
   // invalidString,
