@@ -3,7 +3,7 @@ import { oneOffInputView } from './oneOff-input.view.mjs'
 import { oneOffRegexView } from './oneOff-regex.view.mjs'
 import { oneOffMatchesView } from './oneOff-matches.view.mjs'
 import { oneOffOutputView } from './oneOff-output.view.mjs'
-import { tabBlock } from '../shared-components/shared-tab-accordion.view.mjs'
+import { tabBlock } from '../shared-components/shared-tabs-accordion.view.mjs'
 
 export const oneOffUI = (props) => {
   const blocks = [

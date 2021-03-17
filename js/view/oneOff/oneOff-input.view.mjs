@@ -1,6 +1,7 @@
 import { html } from '../../lit-html/lit-html.mjs'
 import { makeHTMLsafe } from '../../utility-functions.mjs'
-import { openCloseBtn, checkboxBtn } from '../shared-components.mjs'
+import { openCloseBtn } from '../shared-components/shared-openClose-btn.view.mjs'
+import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
 // import { getID } from '../state/utils.mjs'
 
 export const oneOffInputView = (props, eventHandlers) => {
