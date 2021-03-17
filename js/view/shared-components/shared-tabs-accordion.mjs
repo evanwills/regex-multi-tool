@@ -1,12 +1,12 @@
-import { html } from '../lit-html/lit-html.mjs'
-import { isStr, ucFirst } from '../utility-functions.mjs'
+import { html } from '../../lit-html/lit-html.mjs'
+import { isStr, ucFirst } from '../../utility-functions.mjs'
 
 const tabNavItem = (groupID, activeID, props, eventHandler) => {
   const label = (isStr(props.label)) ? props.label : ucFirst(props.id)
   return html`
     <!-- START: tabNavItem() -->
     <li>
-      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}" @click=${eventHandler} accesskey="${props.id.substr(0,1)}">${label}</a>
+      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}" @click=${eventHandler} accesskey="${props.id.substr(0, 1)}">${label}</a>
     </li>
     <!--  END:  tabNavItem() -->
   `
