@@ -90,6 +90,53 @@ export const multiRegexReplace = (input, findReplace, flags) => {
 }
 
 /**
+ * Run multiple (literal) regular expressions sequentially on a
+ * single string
+ *
+ * @param {string} input       The string which all the regexs are to
+ *                             be applied
+ * @param {array}  findReplace List of Find/Replace pairs where the
+ *                             find property will be converted into
+ *                             a RegExp object
+ *                             findReplace object:
+ *                             ```javascript
+ *                             {
+ *                               find:    (required)
+ *                                        [literal regular expression]
+ *                               replace: (required)
+ *                                        [replacement string]
+ *                             }
+ *                             ```
+ *
+ * @returns {string} Updated string
+ */
+export const multiLitRegexReplace = (input, findReplace) => {
+  if (typeof input !== 'string') {
+    console.error('multiRegexReplace() expects first parameter "input" to be a string. ' + typeof input + ' given.')
+  }
+  if (!Array.isArray(findReplace) && !isIterable(findReplace)) {
+    console.error('multiRegexReplace() expects parameter second "findReplace" to be an array. ' + typeof findReplace + ' given.')
+  }
+  let _output = input
+
+  for (const a in findReplace) {
+    try {
+      _output = _output.replace(
+        findReplace[a].find,
+        findReplace[a].replace
+      )
+    } catch (e) {
+      console.group('findreplace[' + a + ']')
+      console.log('findreplace[' + a + '].find:', findReplace[a].find)
+      console.log('findreplace[' + a + '].replace:', findReplace[a].replace)
+      console.error('multiLitRegexReplace() expects findReplace[' + a + '].find to contain a valid regular expression. It had the following error: "' + e.message + '"')
+      console.groupEnd()
+    }
+  }
+  return _output
+}
+
+/**
  * Convert object into string to be used as the POST values to be
  * passed with the request
  *

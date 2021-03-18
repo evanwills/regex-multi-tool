@@ -28,11 +28,12 @@ const initialState = {
 }
 
 if (isStr(url.searchParams.mode)) {
-  const mode = url.searchParams.mode.trim()
-  if (mode === 'oneOff' || mode === 'repeatable') {
+  const mode = url.searchParams.mode.trim().substr(0, 6)
+  if (mode === 'oneOff' || mode === 'repeat') {
     initialState.mode = mode
   }
 }
+console.log('initialState:', initialState)
 
 if (initialState.mode === 'oneOff' && url.hash !== '') {
   const hash = url.hash.substr(1).toLowerCase()

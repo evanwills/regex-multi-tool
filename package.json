@@ -32,6 +32,7 @@
     "browser-sync": "^2.26.13",
     "browserify": "^17.0.0",
     "es-dev-server": "^2.1.0",
+    "esbundle": "^0.0.2",
     "gulp": "^4.0.0",
     "gulp-cli": "^2.3.0",
     "gulp-dart-sass": "^1.0.2",

@@ -17,7 +17,7 @@ const defaultRepeat = {
     // Additional input fields (may be numbers or texts)
     // NOTE: Extra inputs contain everything about the extra input,
     //       not just it's current value
-    inputExtra: [],
+    inputExtra: {},
     // The primary output field
     // (the modified version of inputPrimary)
     outputPrimary: '',

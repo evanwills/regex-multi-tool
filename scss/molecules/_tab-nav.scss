@@ -2,7 +2,6 @@
 
 .tab-nav {
   --line-weight: 0.05rem;
-  display: none;
 
   &__list {
     border-bottom: var(--line-weight) solid var(--txt-colour);
@@ -14,7 +13,7 @@
     }
   }
 
-  &__btn{
+  &__btn {
     display: inline-block;
     border:var(--line-weight) solid  var(--txt-colour);
     color: var(--txt-colour);
@@ -34,6 +33,13 @@
 
 
 .tab-wrapper {
+  .tab-block {
+    display: none;
+
+    &--active {
+      display: block;
+    }
+  }
   &--mobile {
     .tab-nav {
       display: none;
@@ -48,6 +54,8 @@
     }
 
     .tab-block {
+      display: block;
+
       .tab-block__h {
         display: block;
       }

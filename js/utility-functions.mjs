@@ -250,8 +250,9 @@ export const isFunction = (functionToCheck) => {
  * Test whether an object contains a given property and the value
  * of that property is a string
  *
- * @param {string} prop
- * @param {object} input
+ * @param {string}  prop
+ * @param {object}  input
+ * @param {boolean} notEmpty
  *
  * @returns {false,string} If the value is a string then it is NOT
  *                         invalid. Otherwise the value's data type

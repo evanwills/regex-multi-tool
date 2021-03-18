@@ -1,5 +1,5 @@
-import { html } from '../lit-html/lit-html.mjs'
-import { ucFirst, idSafe } from '../utility-functions.mjs'
+import { html } from '../../lit-html/lit-html.mjs'
+import { ucFirst, idSafe } from '../../utility-functions.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field
@@ -342,8 +342,6 @@ export const wholeSingleCheckable = (props, outside) => {
     `
   }
 }
-
-
 
 export const checkableInputGroup = (props, outside) => {
   const _fieldType = (typeof props.type === 'string' && props.type === 'checkbox') ? 'checkbox' : 'radio'

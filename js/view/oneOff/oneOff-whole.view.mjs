@@ -76,7 +76,7 @@ export const oneOffUI = (props) => {
       props.screen,
       blocks,
       props.events.navClick,
-      true
+      false // use mobile accordion
     )}
   </div>
   <!--  END:  oneOffUI() -->
