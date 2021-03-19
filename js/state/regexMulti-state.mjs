@@ -16,7 +16,9 @@ import {
 import { modeReducer } from './main-app/main-app.state.reducers.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
+import { userSettings } from './user-settings/user-settings.state.mjs'
 import { isStr, getURLobject } from '../utility-functions.mjs'
+import { urlReducer } from './url/url.state.all.mjs'
 
 const url = getURLobject(window.location)
 
@@ -25,7 +27,7 @@ const initialState = {
   oneOff: oneOff.state,
   repeat: repeatable.state,
   url: url,
-  userSettings: {}
+  userSettings: userSettings.state
 }
 
 if (isStr(url.searchParams.mode)) {
@@ -34,7 +36,6 @@ if (isStr(url.searchParams.mode)) {
     initialState.mode = mode
   }
 }
-console.log('initialState:', initialState)
 
 if (initialState.mode === 'oneOff' && url.hash !== '') {
   const hash = url.hash.substr(1).toLowerCase()
@@ -49,8 +50,9 @@ export const store = createStore(
     mode: modeReducer,
     oneOff: oneOff.reducers,
     repeat: repeatable.reducers,
-    url: (state = url, action) => state,
-    userSettings: (state = {}, action) => state
+    url: urlReducer,
+    userSettings: userSettings.reducer
+    // userSettings: (state = userSettings.state, action) => state
   }),
   initialState,
   compose(
@@ -58,7 +60,10 @@ export const store = createStore(
       logger,
       crashReporter,
       oneOff.middleware,
-      repeatable.middleware
+      repeatable.middleware,
+      userSettings.middleware
     )
   )
 )
+
+console.log('store:', store.getState())

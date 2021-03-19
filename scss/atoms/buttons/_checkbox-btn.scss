@@ -55,7 +55,7 @@
     margin-bottom: -1rem;
 
     &:checked + .cb-btn__label {
-      background-color: rgba(255, 255, 255, 0.85);
+      background-color: var(--over-color-rev);
       color: #000;
 
       &--badge::before {

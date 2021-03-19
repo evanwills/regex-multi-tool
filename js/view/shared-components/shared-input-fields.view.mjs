@@ -373,3 +373,7 @@ export const checkableInputGroup = (props, outside) => {
     </div>
   `
 }
+
+export const numberInput = (id, label, value, min, max, eventHandler) => {
+
+}

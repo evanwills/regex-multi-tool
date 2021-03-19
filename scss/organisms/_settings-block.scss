@@ -1,7 +1,7 @@
 .settings {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: var(--over-color);
   bottom: 0;
-  box-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 1.5rem var(--over-color);
   left: 0;
   padding: 0.5rem;
   position: absolute;

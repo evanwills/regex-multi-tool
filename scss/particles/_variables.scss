@@ -1,6 +1,15 @@
 :root {
-  --bg-colour: #2d2b2b;
-  --txt-colour: #fff;
+  --dark-bg: #2d2b2b;
+  --dark-txt: #fff;
+  --dark-over-colour: rgba(0,0,0, 0.85);
+  --light-bg: #fff;
+  --light-txt: #2d2b2b;
+  --light-over-colour: rgba(255, 255, 255, 0.85);
+  --bg-colour: var(--dark-bg, #2d2b2b);
+  --txt-colour: var(--dark-txt ,#fff);
+  --over-color: var(--dark-over-colour, rgba(0,0,0, 0.85));
+  --over-color-rev: var(--light-over-colour, rgba(0,0,0, 0.85));
   --timing: 0.4s;
   --ease: ease-in-out;
+  --font-size: 16px;
 }

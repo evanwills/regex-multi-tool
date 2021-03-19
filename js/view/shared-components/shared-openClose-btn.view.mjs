@@ -5,8 +5,8 @@ import { getTabI } from '../../utility-functions.mjs'
  * Get an Open/Close button
  *
  * @param {string}   id           ID of the regex pair
- * @param {string}   target       Which settings block does this button control
  * @param {string}   label        Label for the checkbox
+ * @param {string}   target       Which settings block does this button control
  * @param {boolean}  isOpen       Whether or not settings block is open
  * @param {function} eventHandler Event handler function
  * @param {number}   tabIndex     Position of this field relative to all other focusable elements

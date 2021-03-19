@@ -1,14 +1,22 @@
 
 .regex-multi__footer {
-  background-color: rgba(0, 0, 0, .5  );
+  background-color: var(--over-color);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+
+  > .rnd-btn--settings {
+    position: absolute;
+    right: .4rem;
+    bottom: .3rem;
+    font-size: 1.5rem;
+    background-color:  var(--bg-colour);
+  }
 }
 
 .action-btns {
-  margin: 0;
+  margin: 0 2rem 0 0;
   padding: 0;
   display: flex;
 }
@@ -21,5 +29,42 @@
   &:last-child {
     flex-grow: 1;
     text-align: right;
+  }
+}
+
+.ui-settings {
+  &.settings {
+    justify-content: space-between;
+    padding: 1rem 1.5rem 2.5rem;
+    transform-origin: 97.5% 97.5%;
+  }
+
+  &__h--1 {
+    margin-top: 0;
+  }
+
+  .rnd-btn--settings--close {
+    bottom: 0.2rem;
+    font-size: 1.3rem;
+    position: absolute;
+    right: 0.2rem;
+  }
+
+  @media screen and (min-width: 35rem) {
+    display: flex;
+
+    &__h {
+      margin-top: 0;
+    }
+
+    &__general {
+      max-width: calc(45% - 1rem);
+      width: calc(45% - 1rem);
+      padding-right: 1rem;
+    }
+    &__ui {
+      max-width: 22rem;
+      width: 55%;
+    }
   }
 }

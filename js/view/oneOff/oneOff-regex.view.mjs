@@ -313,8 +313,8 @@ export const regexPair = (props) => {
 
   return html`
   <li>
-    <article id="${props.id}" class="r-pair settings_wrap">
-      <header class="r-pair__header"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
+    <article id="${props.id}" class="r-pair r-pair--${props.pos} settings_wrap">
+      <header class="r-pair__header sr-only"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
       <main class="r-pair__main${(props.fullWidth) ? ' r-pair__main--full-width' : ''}">
         ${(props.regex.error !== '') ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
         <label for="${props.id}-regex" class="r-pair__label r-pair__label--regex">Regex</label>

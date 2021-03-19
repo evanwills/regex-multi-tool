@@ -14,3 +14,26 @@ textarea {
   }
 }
 
+.input-pair {
+  display: flex;
+  justify-content: space-between;
+
+  &__label {
+    flex-grow: 1;
+    padding-right: 1rem;
+    text-align: right;
+  }
+
+  &__suffix {
+    min-width: 1.5rem;
+  }
+
+  &__input {
+    align-items: center;
+
+    &[type="range"] {
+      position: relative;
+      bottom: 0.4rem;
+    }
+  }
+}

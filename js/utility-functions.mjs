@@ -235,6 +235,8 @@ export const isNumeric = (input) => {
   }
 }
 
+export const isInt = (input) => (isNumeric(input) && !isNaN(parseInt(input)))
+
 /**
  * Check whether something is a Function
  *

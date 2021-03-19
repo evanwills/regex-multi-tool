@@ -13,7 +13,7 @@ export const urlActions = {
   UPDATE_HASH: 'URL_UPDATE_GET'
 }
 
-const initialState = {
+export const initialState = {
   hash: '',
   host: '',
   hostname: '',
