@@ -1,4 +1,4 @@
-import { isNotEmptyStr } from "../../utility-functions.mjs"
+import { isNonEmptyStr } from '../../utility-functions.mjs'
 
 export const repeatActions = {
   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',
@@ -83,11 +83,10 @@ export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
     payload: repeatable
   })
 
-  if (isNotEmptyStr(actionID)) {
+  if (isNonEmptyStr(actionID)) {
     _dispatch({
       type: repeatActions.SET_ACTION,
       payload: actionID
     })
   }
-
 }

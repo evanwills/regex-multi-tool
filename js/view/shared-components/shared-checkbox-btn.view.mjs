@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isNotEmptyStr, getTabI, boolTrue } from '../../utility-functions.mjs'
+import { isNonEmptyStr, getTabI, boolTrue } from '../../utility-functions.mjs'
 
 /**
  * Get a whole checkbox input with label and wrapping li tag with
@@ -22,7 +22,7 @@ export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex,
   <!-- START: checkboxBtn() -->
   <li>
     <input type="${(boolTrue(isRadio)) ? 'radio' : 'checkbox'}" id="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
-    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNotEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
+    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
   </li>
   <!--  END:  checkboxBtn() -->
   `

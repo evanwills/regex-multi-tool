@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { ucFirst, isNotEmptyStr } from '../../utility-functions.mjs'
+import { ucFirst, isNonEmptyStr } from '../../utility-functions.mjs'
 import {
   getEventHandlers
   // getAutoDispatchToggleNav,
@@ -95,7 +95,7 @@ export const repeatableUI = (props) => {
 
       <h3>${props.name}</h3>
 
-      ${(isNotEmptyStr(props.description)) ? html`<p>${props.description}</p>` : ''}
+      ${(isNonEmptyStr(props.description)) ? html`<p>${props.description}</p>` : ''}
     </section>
   `
 }
