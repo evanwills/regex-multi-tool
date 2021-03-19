@@ -46,9 +46,9 @@ const sortActionsList = (actionsList) => {
   const publicActions = []
 
   const sortByActionLabel = (a, b) => {
-    if (a.label < b.label) {
+    if (a.name < b.name) {
       return -1
-    } else if (a.label > b.label) {
+    } else if (a.name > b.name) {
       return 1
     }
     return 0
@@ -124,7 +124,6 @@ const fieldShouldUpdate = (fields, id, value) => {
 export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
   switch (action.type) {
     case repeatActions.SET_ACTION:
-      console.log('action:', action)
       return (action.payload !== false)
         ? {
             ...state,
