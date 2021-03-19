@@ -57,8 +57,9 @@ const convertInputsToFunctions = (inputs) => {
 const getActionMeta = (allActions, actionID) => {
   for (const prop in allActions) {
     const action = allActions[prop].filter(_action => _action.id === actionID)
+
     if (action.length === 1) {
-      return action
+      return action[0]
     }
   }
   return false

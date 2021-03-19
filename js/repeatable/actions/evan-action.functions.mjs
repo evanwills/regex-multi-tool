@@ -5,7 +5,7 @@
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
-import { repeatable as doStuff } from '../repeatable.init.mjs'
+import { repeatable as doStuff } from '../repeatable-init.mjs'
 
 /**
  * getVarsToFileName() makes a GET variable string usable as a

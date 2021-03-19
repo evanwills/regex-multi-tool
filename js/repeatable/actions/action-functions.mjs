@@ -5,8 +5,7 @@
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
-import { repeatable as doStuff } from '../repeatable.init.mjs'
-
+import { repeatable as doStuff } from '../repeatable-init.mjs'
 /**
  * action-functions.js contains all the possible actions available to
  * "Do JS regex stuff"

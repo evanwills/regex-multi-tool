@@ -514,7 +514,7 @@ export const makeHTMLsafe = (input, doubleEncode) => {
     [/</g, '&lt;'],
     [/>/g, '&gt;']
   ]
-  const amp = [/\&/g, '&amp;']
+  const amp = [/&/g, '&amp;']
   const findReplace = (typeof doubleEncode === 'boolean' && doubleEncode === true)
     ? [...htmlChars, amp]
     : [amp, ...htmlChars]

@@ -57,14 +57,14 @@ const sortActionsList = (actionsList) => {
   // Get group names
   const groupList = actionsList.map(action => action.group)
   groupList.sort()
-  for (let a = 0; a < groupList; a += 1) {
-    if (groupList[a] !== 'public') {
+  for (let a = 0; a < groupList.length; a += 1) {
+    if (typeof groupedActions[groupList[a]] === 'undefined' && groupList[a] !== 'public') {
       groupedActions[groupList[a]] = []
     }
   }
 
   // Add actions to groups
-  for (let a = 0; a < actionsList; a += 1) {
+  for (let a = 0; a < actionsList.length; a += 1) {
     const prop = actionsList[a].group
     if (prop === 'public') {
       publicActions.push(actionsList[a])
@@ -81,7 +81,6 @@ const sortActionsList = (actionsList) => {
   // Put public actions at the bottom of the list
   publicActions.sort(sortByActionLabel)
   groupedActions.public = publicActions
-
   return groupedActions
 }
 
@@ -125,10 +124,11 @@ const fieldShouldUpdate = (fields, id, value) => {
 export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
   switch (action.type) {
     case repeatActions.SET_ACTION:
+      console.log('action:', action)
       return (action.payload !== false)
         ? {
             ...state,
-            currentAction: action.payload,
+            activeAction: action.payload,
             fields: {
               inputLabel: action.payload.inputLabel,
               inputPrimary: '',
@@ -141,7 +141,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
           }
         : state
 
-    case repeatActions.REGISTER_ALL_ACTION:
+    case repeatActions.REGISTER_ALL_ACTIONS:
       return {
         ...state,
         allActions: sortActionsList(action.payload)

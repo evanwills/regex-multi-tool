@@ -5,7 +5,7 @@
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction, makeHumanReadableAttr
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
-import { repeatable as doStuff } from '../repeatable.init.mjs'
+import { repeatable as doStuff } from '../repeatable-init.mjs'
 
 const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '

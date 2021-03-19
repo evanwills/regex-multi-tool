@@ -24,7 +24,8 @@ const initialState = {
   mode: 'oneOff',
   oneOff: oneOff.state,
   repeat: repeatable.state,
-  url: url
+  url: url,
+  userSettings: {}
 }
 
 if (isStr(url.searchParams.mode)) {
@@ -47,7 +48,9 @@ export const store = createStore(
   combineReducers({
     mode: modeReducer,
     oneOff: oneOff.reducers,
-    repeat: repeatable.reducers
+    repeat: repeatable.reducers,
+    url: (state = url, action) => state,
+    userSettings: (state = {}, action) => state
   }),
   initialState,
   compose(
