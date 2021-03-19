@@ -6,7 +6,7 @@
 .r-pair {
   // overflow: hidden;
   position: relative;
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   border-top: 0.05rem solid var(--txt-colour);
 
   &--1 {
@@ -28,6 +28,14 @@
       "flags-error flags-error"
       "regex-field regex-field"
       "flags-field replace-field";
+    // padding: 0.3rem 0;
+
+    &--full-width {
+      .r-pair__field {
+        display: block;
+        width: 100%;
+      }
+    }
 
     @media screen and (min-width: 30rem) {
       grid-template-columns: 3.5rem 1fr 3rem;
@@ -142,17 +150,6 @@
 
   &__h {
     margin: 0;
-  }
-
-  &__main {
-    padding: 0.3rem 0;
-
-    &--full-width {
-      .r-pair__field {
-        display: block;
-        width: 100%;
-      }
-    }
   }
 
   &__move-to {

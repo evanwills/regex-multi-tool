@@ -39,7 +39,23 @@
     &--active {
       display: block;
     }
+
+    &__h {
+      padding: 0 .5rem;
+      margin: 1rem 0 0;
+    }
   }
+
+  &--tab {
+    .tab-nav {
+      &__btn {
+        &.tab-nav--accordion {
+          padding: 0;
+        }
+      }
+    }
+  }
+
   &--mobile {
     .tab-nav {
       display: none;
@@ -68,7 +84,7 @@
         &__btn {
           &.tab-nav--accordion {
             border: 0;
-            padding: 0 0.5rem;
+            padding: .5rem 0 0;
           }
         }
       }

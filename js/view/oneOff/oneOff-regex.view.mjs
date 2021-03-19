@@ -341,7 +341,7 @@ export const regexPair = (props) => {
           : ''}
       </main>
 
-      ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0)}
+      ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0, 'xs')}
 
       <footer class="r-pair__footer settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
         <ul class="r-pair__control clean-list">
@@ -391,7 +391,7 @@ export const regexPair = (props) => {
           </li>
         </ul>
 
-        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex)}
+        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex, 'xs')}
       </footer>
     </article>
   </li>

@@ -65,5 +65,3 @@ export const store = createStore(
     )
   )
 )
-
-console.log('store:', store.getState())

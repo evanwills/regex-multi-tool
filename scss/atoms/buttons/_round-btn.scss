@@ -4,18 +4,18 @@
   border-radius: 50%;
   display: inline-block;
   /* font-weight: bold; */
-  height: 1.75rem;
-  margin: 0 0.25rem;
+  height: 2em;
+  margin: 0 0.25em;
   overflow: hidden;
   padding: 0;
   position: relative;
   text-indent: -100rem;
   transition: transform ease-in-out 0.3s;
-  width: 1.75rem;
+  width: 2em;
 
   &::after {
     display: inline-block;
-    font-size: 1.3rem;
+    font-size: 1.75em;
     font-weight: bold;
     position: absolute;
     left: 51.5%;
@@ -23,6 +23,11 @@
     top: 45%;
     transform: translate(-50%, -50%);
   }
+
+  &--xs { font-size: 0.5rem; }
+  &--sm { font-size: 0.7rem; }
+  &--lg { font-size: 1.3rem; }
+  &--xl { font-size: 1.5rem; }
 
   &--danger {
     background-color: #900;
@@ -35,6 +40,7 @@
 
     &::after {
       content: '!';
+      left: 50%;
     }
   }
 
@@ -44,7 +50,7 @@
 
   &--reset::after {
     content: '\021BA';
-    transform: translate(-53%, -50%);
+    transform: translate(-53%, -52%);
   }
 
   &--set-default {
@@ -54,6 +60,7 @@
     &::after {
       content: '\02299';
       top: 42%;
+      left: 49%;
     }
   }
 
@@ -76,22 +83,20 @@
     background-color: rgb(77, 201, 128);
 
     &::after {
-      content: '+'
+      content: '+';
+      left: 50%;
     }
   }
 
   &--settings {
     border: 0.1rem solid var(--txt-colour);
     background-color: #000;
-    height: 1.1em;
-    width: 1.1em;
     opacity: 1;
     transition: transform, opacity ease-in-out 0.3s;
 
     &::after {
       color: var(--txt-colour);
       content: '\02237';
-      font-size: 0.8em;
       top: 38%;
       left: 50%;
     }
@@ -99,7 +104,7 @@
     &--close {
       align-self: flex-end;
       order: -1;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.2em;
 
       // &::before {
       //   bottom: -40rem;
@@ -113,27 +118,11 @@
     }
 
     &--open {
-      margin: 0 0 0 -0.3rem;
+      margin: 0 0 0 -0.3em;
 
       &-is {
         opacity: 0;
       }
-    }
-  }
-}
-
-.r-pair {
-  &-pair__btn {
-    border: .05rem solid #ccc;
-
-    &:first-child {
-      border-top-left-radius: .75rem;
-      border-bottom-left-radius: .75rem;
-    }
-
-    &:last-of-type {
-      border-top-right-radius: .75rem;
-      border-bottom-right-radius: .75rem;
     }
   }
 }
@@ -157,75 +146,3 @@
   }
 }
 
-.cb-btn {
-  &__label {
-    display: block;
-    border: 0.1rem solid #aaa;
-    max-width: 24rem;
-    padding: 0.2rem 0.5rem;
-    position: relative;
-    text-align: center;
-
-    &--centre {
-      margin: 0.1rem auto;
-    }
-
-    &--badge::before {
-      border: 0.1rem solid  var(--txt-colour);
-      border-radius: 50%;
-      color: var(--txt-colour);
-      content: '\02717';
-      display: inline-block;
-      font-size: 0.86rem;
-      height: 1em;
-      left: 0.35rem;
-      line-height: 1;
-      // opacity: 0;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 1em;
-    }
-
-    &--star::before {
-      content: '\02605' !important;
-    }
-    &--heart::before {
-      content: '\02665' !important;
-    }
-    &--focus::before {
-      content: '\02315' !important;
-    }
-    &--target::before {
-      content: '\02316' !important;
-    }
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  &__input {
-    display: inline-block;
-    position: absolute;
-    opacity: 0;
-    margin-right: -1rem;
-    margin-bottom: -1rem;
-
-    &:checked + .cb-btn__label {
-      background-color: var(--over-color-rev);
-      color: #000;
-
-      &--badge::before {
-        background-color: var(--bg-colour);
-        border-color: var(--bg-colour);
-        color: var(--txt-colour);
-        content: '\02713';
-      }
-    }
-
-    &:focus + .cb-btn__label {
-      outline: 0.15rem dotted var(--txt-colour);
-    }
-  }
-}

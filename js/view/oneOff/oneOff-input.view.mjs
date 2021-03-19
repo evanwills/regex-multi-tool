@@ -5,8 +5,8 @@ import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
 // import { getID } from '../state/utils.mjs'
 
 export const oneOffInputView = (props, eventHandlers) => {
-  const _index = (props.settingsOpen) ? 0 : -1
-
+  const _isOpen = props.settingsOpen
+  const _index = (_isOpen) ? 0 : -1
   return html`
   <!-- START: oneOffInputView() -->
   <section class="oneOff-input settings__wrap">
@@ -14,8 +14,8 @@ export const oneOffInputView = (props, eventHandlers) => {
       <label for="oneOff-input__text" class="sr-only">Input</label>
       <textarea id="input" name="input" class="oneOff-input__input block xl" placeholder="input/sample(s)">${makeHTMLsafe(props.raw)}</textarea>
     </p>
-    ${openCloseBtn('input', 'Open', 'input', props.settingsOpen, eventHandlers.simpleGeneral)}
-    <section class="oneOff-input__settings settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
+    ${openCloseBtn('input', 'Open', 'input', _isOpen, eventHandlers.simpleGeneral, 0, 'sm')}
+    <section class="oneOff-input__settings settings settings--${(_isOpen) ? 'opened' : 'closed'}">
       <h2 id="sample-settings">Sample settings</h2>
       <ul class="clean-list">
         ${checkboxBtn('input-trim-before', 'Trim input before processing', 'trim-before', props.strip.before, eventHandlers.simpleGeneral, _index)}
@@ -29,7 +29,7 @@ export const oneOffInputView = (props, eventHandlers) => {
             : ''
           }
       </ul>
-      ${openCloseBtn('input', 'Close', 'input', props.settingsOpen, eventHandlers.simpleGeneral)}
+      ${openCloseBtn('input', 'Close', 'input', _isOpen, eventHandlers.simpleGeneral, _index, 'sm')}
     </section>
   </section>
   <!--  END:  oneOffInputView() -->

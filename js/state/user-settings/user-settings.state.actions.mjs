@@ -43,7 +43,6 @@ export const getAutoDipatchSettingsSimpleEvent = (_dispatch) => {
 }
 
 export const getAutoDipatchSettingsValueEvent = (_dispatch) => {
-  console.log('getAutoDipatchSettingsValueEvent()')
   return function (e) {
     let _type = ''
 
