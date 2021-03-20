@@ -1,6 +1,11 @@
 
 
 input, textarea {
+  background-color: var(--bg-colour);
+  border-color: var(--txt-colour);
+  border-width: var(--line-weight-hvy);
+  color: var(--txt-colour);
+  font-size: 1rem;
   padding: 0.2rem 0.3rem;
 }
 
@@ -36,4 +41,8 @@ textarea {
       bottom: 0.4rem;
     }
   }
+}
+
+.oneOff-input__split__input {
+  width: 4rem;
 }

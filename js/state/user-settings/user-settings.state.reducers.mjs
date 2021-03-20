@@ -1,23 +1,23 @@
 import { userSettingsActions } from './user-settings.state.actions.mjs'
 
 export const initialUserSettingsState = {
-  darkMode: true,
+  uiMode: 'darkMode',
   debug: false,
-  darkModeBg: '#2d2b2b',
-  darkModeTxt: '#fff',
+  customBg: '#2d2b2b',
+  customTxt: '#fff',
+  customOver: '#000',
+  customRev: '#fff',
   fontSize: 1,
-  lightModeBg: '#fff',
-  lightModeTxt: '#2d2b2b',
   localStorage: false,
   settingsOpen: false
 }
 
 export const userSettingsReducer = (state = initialUserSettingsState, action) => {
   switch (action.type) {
-    case userSettingsActions.TOGGLE_DARK_MODE:
+    case userSettingsActions.SET_UI_MODE:
       return {
         ...state,
-        darkMode: !state.darkMode
+        uiMode: action.payload
       }
 
     case userSettingsActions.TOGGLE_DEBUG:
@@ -44,28 +44,28 @@ export const userSettingsReducer = (state = initialUserSettingsState, action) =>
         fontSize: action.payload
       }
 
-    case userSettingsActions.SET_DARK_MODE_BG:
+    case userSettingsActions.SET_CUSTOM_MODE_BG:
       return {
         ...state,
-        darkModeBg: action.payload
+        customBg: action.payload
       }
 
-    case userSettingsActions.SET_DARK_MODE_TXT:
+    case userSettingsActions.SET_CUSTOM_MODE_TXT:
       return {
         ...state,
-        darkModeTxt: action.payload
+        customTxt: action.payload
       }
 
-    case userSettingsActions.SET_LIGHT_MODE_BG:
+    case userSettingsActions.SET_CUSTOM_MODE_OVER_COLOUR:
       return {
         ...state,
-        lightModeBg: action.payload
+        customOver: action.payload
       }
 
-    case userSettingsActions.SET_LIGHT_MODE_TXT:
+    case userSettingsActions.SET_CUSTOM_MODE_OVER_COLOUR_REVERSE:
       return {
         ...state,
-        lightModeTxt: action.payload
+        customRev: action.payload
       }
   }
 

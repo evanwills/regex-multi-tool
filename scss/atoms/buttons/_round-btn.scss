@@ -31,7 +31,7 @@
 
   &--danger {
     background-color: #900;
-    color:var(--txt-colour);
+    color: #fff;
   }
 
   &--disable {
@@ -89,8 +89,8 @@
   }
 
   &--settings {
-    border: 0.1rem solid var(--txt-colour);
-    background-color: #000;
+    border: var(--line-weight-hvy) solid var(--txt-colour);
+    background-color: var(--bg-colour);
     opacity: 1;
     transition: transform, opacity ease-in-out 0.3s;
 

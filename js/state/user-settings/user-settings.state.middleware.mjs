@@ -1,7 +1,7 @@
 import { userSettingsActions } from './user-settings.state.actions.mjs'
 import { isInt, isStr } from '../../utility-functions.mjs'
 
-const validColour = (colour) => (isStr(colour) && colour.match(/^#[0-9a-f]{6}$/i))
+const validColour = (colour) => (isStr(colour) && colour.match(/^#[0-9a-f]{3,6}$/i))
 
 export const userSettingsMW = store => next => action => {
   switch (action.type) {
@@ -16,10 +16,10 @@ export const userSettingsMW = store => next => action => {
       }
       break
 
-    case userSettingsActions.SET_DARK_MODE_BG:
-    case userSettingsActions.SET_DARK_MODE_TXT:
-    case userSettingsActions.SET_LIGHT_MODE_BG:
-    case userSettingsActions.SET_LIGHT_MODE_TXT:
+    case userSettingsActions.SET_CUSTOM_MODE_BG:
+    case userSettingsActions.SET_CUSTOM_MODE_TXT:
+    case userSettingsActions.SET_CUSTOM_MODE_OVER_COLOUR:
+    case userSettingsActions.SET_CUSTOM_MODE_OVER_COLOUR_REV:
       if (validColour(action.payload)) {
         return next(action)
       } else {

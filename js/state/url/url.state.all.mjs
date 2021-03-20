@@ -10,7 +10,8 @@ import { isNonEmptyStr, isNumeric, isBool } from '../../utility-functions.mjs'
 
 export const urlActions = {
   UPDATE_GET: 'URL_UPDATE_GET',
-  UPDATE_HASH: 'URL_UPDATE_GET'
+  UPDATE_HASH: 'URL_UPDATE_HASH',
+  UPDATE_HREF: 'URL_UPDATE_HREF'
 }
 
 export const initialState = {
@@ -29,14 +30,21 @@ export const initialState = {
   username: ''
 }
 
+const updateHref = (url) => {
+  const newUrl = {
+    ...url
+  }
+  return newUrl
+}
+
 export const urlReducer = (state = initialState, action) => {
   switch (action.type) {
     case urlActions.UPDATE_HASH:
       if (state.hash.substr(1) !== action.payload) {
-        return {
+        return updateHref({
           ...state,
           hash: '#' + action.payload
-        }
+        })
       }
       break
 
@@ -48,7 +56,7 @@ export const urlReducer = (state = initialState, action) => {
               ...state.searchParams
             }
             state.searchParams[action.payload.key] = action.payload.value
-            return state
+            return updateHref(state)
           }
         }
       }

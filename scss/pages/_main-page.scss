@@ -1,4 +1,22 @@
 body {
-  margin-top: 2.1rem;
-  margin-bottom: 2.5rem;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.regex-multi {
+  background-color: var(--bg-colour);
+  padding: 2.1rem 0.5rem 2.5rem;
+
+  &::before {
+    background-color: var(--bg-colour);
+    bottom: 0;
+    content: '';
+    height: 100%;
+    left: 0;
+    right: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
 }

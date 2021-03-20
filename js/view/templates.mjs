@@ -9,6 +9,7 @@ import { getAutoDispatchMainAppEvent } from '../state/main-app/main-app.state.ac
 import { checkboxBtn } from './shared-components/shared-checkbox-btn.view.mjs'
 import { getUIEventHandlers } from '../state/user-settings/user-settings.state.mjs'
 import { openCloseBtn } from './shared-components/shared-openClose-btn.view.mjs'
+import { colourInput } from './shared-components/shared-input-fields.view.mjs'
 
 /**
  * Template for header block for Regex multi tool
@@ -66,6 +67,23 @@ export const footer = (buttons, eventHandler, userSettings) => {
   `
 }
 
+const uiModeButtons = (uiMode, eventHandler, tabIndex) => {
+  const modes = ['Dark', 'Light', 'Custom']
+
+  return html`
+  <ul class="list-clean list-inline">
+    ${modes.map(mode => checkboxBtn(
+              'ui-mode',
+              mode + ' mode',
+              mode.toLowerCase() + 'Mode',
+              (uiMode === mode.toLowerCase()),
+              eventHandler,
+              tabIndex, '', true)
+    )}
+  </ul>
+  `
+}
+
 const userSettingsUI = (props, eventHandlers) => {
   const isOpen = props.settingsOpen
   const tabIndex = (isOpen) ? 0 : -1
@@ -76,40 +94,29 @@ const userSettingsUI = (props, eventHandlers) => {
   <div class="ui-settings settings settings--${(isOpen) ? 'opened' : 'closed'}" aria-hidden="${isOpen ? 'false' : 'true'}">
     <div role="group" aria-labelledby="user-general-settings" class="ui-settings__general">
       <h2 id="user-general-settings" class="ui-settings__h ui-settings__h--1">General settings</h2>
-      <ul class="clean-list">
+      <ul class="list-clean">
         ${checkboxBtn('user-debug', 'Debug mode', 'debugMode', props.debug, eventHandlers.simpleEvent, tabIndex)}
         ${checkboxBtn('user-localStorage', 'Save state locally', 'localStorage', props.localStorage, eventHandlers.simpleEvent, tabIndex)}
-        ${checkboxBtn('user-darkMode', (props.darkMode) ? 'Dark mode' : 'Light mode', 'darkMode', props.darkMode, eventHandlers.simpleEvent, tabIndex)}
+        <li>
+          ${uiModeButtons(props.uiMode, eventHandlers.valueEvent, tabIndex)}
+        </li>
       </ul>
     </div>
     <div role="group" aria-labelledby="user-UI-settings" class="ui-settings__ui">
       <h2 id="user-UI-settings" class="ui-settings__h ui-settings__h--2">User interface settings</h2>
-      <ul class="clean-list">
+      <ul class="list-clean">
         <li class="input-pair">
           <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
           --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
           --><span class="input-pair__suffix">${px}px</span>
         </li>
-        <li class="input-pair">
-          <label for="set-darkMode-bg" class="input-pair__label">Dark mode background colour:</label><!--
-          --><input type="color" id="set-darkMode-bg" class="input-pair__input" value="${props.darkModeBg}" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix" style="background-color: ${props.darkModeBg};">&nbsp;</span>
-        </li>
-        <li class="input-pair">
-          <label for="set-darkMode-txt" class="input-pair__label">Dark mode text colour:</label><!--
-          --><input type="color" id="set-darkMode-txt" class="input-pair__input" value="${props.darkModeTxt}" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix" style="background-color: ${props.darkModeTxt};">&nbsp;</span>
-        </li>
-        <li class="input-pair">
-          <label for="set-lightMode-bg" class="input-pair__label">Light mode background colour:</label><!--
-          --><input type="color" id="set-lightMode-bg" class="input-pair__input" value="${props.lightModeBg}" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix" style="background-color: ${props.lightModeBg};">&nbsp;</span>
-        </li>
-        <li class="input-pair">
-          <label for="set-lightMode-txt" class="input-pair__label">Light mode text colour:</label><!--
-          --><input type="color" id="set-lightMode-txt" class="input-pair__input" value="${props.lightModeTxt}" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix" style="background-color: ${props.lightModeTxt};">&nbsp;</span>
-        </li>
+        ${(props.uiMode === 'customMode')
+          ? html`
+            ${colourInput('bg', 'background', props.customBG, eventHandlers.valueEvent, tabIndex)}
+            ${colourInput('txt', 'text', props.customTxt, eventHandlers.valueEvent, tabIndex)}
+            ${colourInput('over', 'overlay', props.customOver, eventHandlers.valueEvent, tabIndex)}
+            ${colourInput('rev', 'reverse overlay', props.customRev, eventHandlers.valueEvent, tabIndex)}`
+          : ''}
       </ul>
     </div>
 
@@ -147,13 +154,15 @@ export const getMainAppView = (domNode, store) => {
     // console.log('newProps:', newProps)
 
     const UI = html`
-      ${header(isSimple, mainEvent)}
-      ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
-      ${footer(
-        buttons,
-        mainEvent,
-        userSettingsUI(props.userSettings, userSettingsEvent)
-      )}
+      <div class="regex-multi ui-${props.userSettings.uiMode}">
+        ${header(isSimple, mainEvent)}
+        ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
+        ${footer(
+          buttons,
+          mainEvent,
+          userSettingsUI(props.userSettings, userSettingsEvent)
+          )}
+      </div>
     `
     render(UI, domNode)
   }

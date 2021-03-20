@@ -2,7 +2,7 @@
 .cb-btn {
   &__label {
     display: block;
-    border: 0.1rem solid #aaa;
+    border: var(--line-weight-hvy) solid var(--txt-colour);
     max-width: 24rem;
     padding: 0.2rem 1.75rem;
     position: relative;
@@ -13,7 +13,7 @@
     }
 
     &--badge::before {
-      border: 0.1rem solid  var(--txt-colour);
+      border: var(--line-weight-hvy) solid  var(--txt-colour);
       border-radius: 50%;
       color: var(--txt-colour);
       content: '\02717';
@@ -56,7 +56,7 @@
 
     &:checked + .cb-btn__label {
       background-color: var(--over-color-rev);
-      color: #000;
+      color: var(--bg-colour);
 
       &--badge::before {
         background-color: var(--bg-colour);

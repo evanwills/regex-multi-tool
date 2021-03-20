@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isNonEmptyStr, getTabI, boolTrue } from '../../utility-functions.mjs'
+import { isNonEmptyStr, getTabI, boolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 
 /**
  * Get a whole checkbox input with label and wrapping li tag with
@@ -18,11 +18,16 @@ import { isNonEmptyStr, getTabI, boolTrue } from '../../utility-functions.mjs'
  * @returns {html}
  */
 export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge, isRadio) => {
+  const _isRadio = boolTrue(isRadio)
+  const _id = (_isRadio)
+    ? id + '-' + makeAttributeSafe(value.toString())
+    : id
+
   return html`
   <!-- START: checkboxBtn() -->
   <li>
-    <input type="${(boolTrue(isRadio)) ? 'radio' : 'checkbox'}" id="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
-    <label for="${id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
+    <input type="${(_isRadio) ? 'radio' : 'checkbox'}" id="${_id}" name="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
+    <label for="${_id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
   </li>
   <!--  END:  checkboxBtn() -->
   `

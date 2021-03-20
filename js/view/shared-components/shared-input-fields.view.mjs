@@ -377,3 +377,13 @@ export const checkableInputGroup = (props, outside) => {
 export const numberInput = (id, label, value, min, max, eventHandler) => {
 
 }
+
+export const colourInput = (id, label, value, eventHandler, tabIndex) => {
+  return html`
+    <li class="input-pair">
+      <label for="set-customMode-${id}" class="input-pair__label">Custom mode ${label} colour:</label>
+      <input type="color" id="set-customMode-${id}" class="input-pair__input" value="${value}" tabindex="${tabIndex}" @change=${eventHandler} /><!--
+      --><span class="input-pair__suffix" style="background-color: ${value};">&nbsp;</span>
+    </li>
+  `
+}

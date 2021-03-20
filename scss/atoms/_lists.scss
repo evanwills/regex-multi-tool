@@ -1,4 +1,4 @@
-.clean-list {
+.list-clean {
   margin: 0;
   padding: 0;
 
@@ -13,4 +13,9 @@
       padding: 0;
     }
   }
+}
+
+.list-inline {
+  display: flex;
+
 }

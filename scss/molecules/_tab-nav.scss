@@ -15,7 +15,7 @@
 
   &__btn {
     display: inline-block;
-    border:var(--line-weight) solid  var(--txt-colour);
+    border: var(--line-weight) solid  var(--txt-colour);
     color: var(--txt-colour);
     text-decoration: none;
     padding: 0.5rem 1rem;
@@ -51,6 +51,7 @@
       &__btn {
         &.tab-nav--accordion {
           padding: 0;
+          border: 0;
         }
       }
     }
@@ -62,7 +63,7 @@
 
       &__btn {
         &.tab-nav--accordion {
-        border: .05rem solid var(--txt-colour);
+        border: var(--line-weight) solid var(--txt-colour);
         padding: 0.3rem 0.5rem;
         display: block;
         border-radius: 0;

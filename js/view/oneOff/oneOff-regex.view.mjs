@@ -344,7 +344,7 @@ export const regexPair = (props) => {
       ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0, 'xs')}
 
       <footer class="r-pair__footer settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
-        <ul class="r-pair__control clean-list">
+        <ul class="r-pair__control list-clean">
             ${checkboxField(
               props.id,
               'Multi-line input',
@@ -371,7 +371,7 @@ export const regexPair = (props) => {
             )}
         </ul>
 
-        <ul class="r-pair__sibling-ctrl clean-list">
+        <ul class="r-pair__sibling-ctrl list-clean">
           <li class="r-pair__sibling-ctrl__before">
             ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair,
                 tabIndex)}<!--
@@ -400,7 +400,7 @@ export const regexPair = (props) => {
 
 export const oneOffRegexView = (props, eventHandlers) => {
   return html`<section>
-    <ul class="clean-list">
+    <ul class="list-clean">
       ${props.pairs.map(pair => regexPair({ ...pair, events: eventHandlers }))}
     </ul>
   </section>`

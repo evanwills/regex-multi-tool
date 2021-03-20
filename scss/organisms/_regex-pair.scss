@@ -7,7 +7,7 @@
   // overflow: hidden;
   position: relative;
   padding: 0 0.5rem;
-  border-top: 0.05rem solid var(--txt-colour);
+  border-top: var(--line-weight) solid var(--txt-colour);
 
   &--1 {
     border-top: none;
