@@ -316,6 +316,26 @@ function Repeatable (url, _remote, docs, api) {
     }
     return false
   }
+  
+  /**
+   * Get basic information about an action
+   *
+   * (Used for building a menu of available actions)
+   * 
+   * @param {object} action object
+   * 
+   * @returns {object} basic metadata for an action
+   */
+  const getActionMetaBasic = (action) => {
+    if (typeof action !== 'undefined' && action !== null) {
+      return {
+        id action.id,
+        name: action.id,
+        group: action.group
+      }
+    }
+    return false
+  }
 
   //  END:  private method declaration
   // ============================================
@@ -419,7 +439,7 @@ function Repeatable (url, _remote, docs, api) {
    * @returns {Array}
    */
   this.getActionsList = function () {
-    return registry.map(action => getActionMeta(action))
+    return registry.map(action => ggetActionMetaBasic(action))
   }
 
   /**
