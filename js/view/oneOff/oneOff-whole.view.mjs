@@ -68,7 +68,7 @@ export const oneOffUI = (props) => {
 
   return html`
   <!-- START: oneOffUI() -->
-  <h2>One-Off regex test</h2>
+  <h2 class="tool-heading">One-Off regex test</h2>
 
   <div class="oneOff">
     ${tabBlock(

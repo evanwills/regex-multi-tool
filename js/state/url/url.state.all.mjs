@@ -1,4 +1,4 @@
-import { isNonEmptyStr, isNumeric, isBool } from '../../utility-functions.mjs'
+import { isNonEmptyStr, isNumeric, isBool, makeURLstr } from '../../utility-functions.mjs'
 
 /**
  * This file handles updating URL parts middleware has intercepted
@@ -31,10 +31,14 @@ export const initialState = {
 }
 
 const updateHref = (url) => {
-  const newUrl = {
-    ...url
+  const href = makeURLstr(url)
+  if (href !== url.href) {
+    return {
+      ...url,
+      href: href
+    }
   }
-  return newUrl
+  return url
 }
 
 export const urlReducer = (state = initialState, action) => {
@@ -49,8 +53,9 @@ export const urlReducer = (state = initialState, action) => {
       break
 
     case urlActions.UPDATE_GET:
+      console.log('action:', action)
       if (isNonEmptyStr(action.payload.key)) {
-        if (isNumeric(action.payload.value) || isBool(action.payload.value)) {
+        if (isNonEmptyStr(action.payload.value) || isNumeric(action.payload.value) || isBool(action.payload.value)) {
           if (state.searchParams[action.payload.key] !== action.payload.value) {
             state.searchParams = {
               ...state.searchParams

@@ -627,9 +627,12 @@ export const makeSearchStr = (url) => {
  * @returns {string}
  */
 export const makeURLstr = (url) => {
-  return url.origin +
-         url.port +
-         url.pathname +
+  return url.pathname +
          makeSearchStr(url) +
          url.hash
+  // return url.origin +
+  //       url.port +
+  //       url.pathname +
+  //       makeSearchStr(url) +
+  //       url.hash
 }

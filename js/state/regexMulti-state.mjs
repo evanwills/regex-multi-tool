@@ -14,6 +14,7 @@ import {
   // vanillaPromise,
 } from '../redux/standard-middleware.mjs'
 import { modeReducer } from './main-app/main-app.state.reducers.mjs'
+import { mainAppMW } from './main-app/main-app.state.middleware.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
 import { userSettings } from './user-settings/user-settings.state.mjs'
@@ -61,7 +62,8 @@ export const store = createStore(
       crashReporter,
       oneOff.middleware,
       repeatable.middleware,
-      userSettings.middleware
+      userSettings.middleware,
+      mainAppMW
     )
   )
 )
