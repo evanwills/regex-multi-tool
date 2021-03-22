@@ -19,6 +19,7 @@ export const initialState = {
   host: '',
   hostname: '',
   href: '',
+  actionHref: '',
   origin: '',
   password: '',
   pathname: '',
@@ -35,7 +36,8 @@ const updateHref = (url) => {
   if (href !== url.href) {
     return {
       ...url,
-      href: href
+      href: href,
+      actionHref: href.replace(/^(.*?[?&])action=.*?(?=[&#].*)$/i, '$1')
     }
   }
   return url

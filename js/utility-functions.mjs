@@ -77,6 +77,7 @@ export const getURLobject = (url) => {
     host: '',
     hostname: '',
     href: '',
+    actionHref: '',
     origin: '',
     password: '',
     pathname: '',
@@ -143,6 +144,8 @@ export const getURLobject = (url) => {
       }
     }
   }
+
+  output.actionHref = stripGETaction(output.href)
 
   return output
 }
@@ -636,3 +639,5 @@ export const makeURLstr = (url) => {
   //       makeSearchStr(url) +
   //       url.hash
 }
+
+export const stripGETaction = (href) => href.replace(/^(.*?[?&])?action=[^&#]+(?=[&#].*)?$/i, '')

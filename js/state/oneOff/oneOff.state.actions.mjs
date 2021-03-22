@@ -330,5 +330,15 @@ export const registerOneOffEngine = (_dispatch) => (_engine) => {
   })
 }
 
+
+export const getOneOffEventHandlers = (dispatch) => {
+  return {
+    simplePair: getAutoDispatchOneOffPairSimpleEvent(dispatch),
+    pairValue: getAutoDispatchOneOffPairValueEvent(dispatch),
+    simpleGeneral: getAutoDipatchOneOffSimpleEvent(dispatch),
+    generalValue: getAutoDispatchOneOffValueEvent(dispatch),
+    navClick: getAutoDipatchOneOffTabClick(dispatch)
+  }
+}
 //  END:  Action creators
 // ==============================================

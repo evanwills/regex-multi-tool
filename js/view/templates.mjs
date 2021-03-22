@@ -2,14 +2,15 @@ import { html, render } from '../lit-html/lit-html.mjs'
 import { oneOffUI } from './oneOff/oneOff-whole.view.mjs'
 // import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
-import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneOff.state.mjs'
-import { getEventHandlers as getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.mjs'
+import { getOneOffEventHandlers } from '../state/oneOff/oneOff.state.actions.mjs'
+import { getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.actions.mjs'
 import { getAutoDispatchMainAppEvent } from '../state/main-app/main-app.state.actions.mjs'
 // import { eventHandlers } from './repeatable/repeatable-whole.view.mjs'
 import { checkboxBtn, radioBtnGroup } from './shared-components/shared-checkbox-btn.view.mjs'
 import { getUIEventHandlers } from '../state/user-settings/user-settings.state.mjs'
 import { openCloseBtn } from './shared-components/shared-openClose-btn.view.mjs'
 import { colourInput } from './shared-components/shared-input-fields.view.mjs'
+import { repeatableUI } from './repeatable/repeatable-whole.view.mjs'
 
 /**
  * Template for header block for Regex multi tool
@@ -129,10 +130,6 @@ const userSettingsUI = (props, eventHandlers) => {
   `
 }
 
-export const repeatableUI = (props) => {
-  return html`<h1>Do regex stuff</h1>`
-}
-
 export const getMainAppView = (domNode, store) => {
   return function () {
     const props = store.getState()
@@ -149,6 +146,10 @@ export const getMainAppView = (domNode, store) => {
       : props.repeatable
 
     const newProps = { ...state, events: { ...eventHandlers } }
+
+    if (!isSimple) {
+      newProps.href = props.url.actionHref
+    }
 
     const buttons = (isSimple)
       ? ['Test', 'Replace', 'Reset']

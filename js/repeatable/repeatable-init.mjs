@@ -330,7 +330,7 @@ function Repeatable (url, _remote, docs, api) {
     if (typeof action !== 'undefined' && action !== null) {
       return {
         id: action.id,
-        name: action.id,
+        name: action.name,
         group: action.group
       }
     }

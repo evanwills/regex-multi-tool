@@ -81,7 +81,17 @@ const sortActionsList = (actionsList) => {
   // Put public actions at the bottom of the list
   publicActions.sort(sortByActionLabel)
   groupedActions.public = publicActions
-  return groupedActions
+
+  const output = []
+
+  for (const prop in groupedActions) {
+    output.push({
+      name: prop,
+      actions: groupedActions[prop]
+    })
+  }
+
+  return output
 }
 
 /**
