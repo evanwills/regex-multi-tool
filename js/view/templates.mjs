@@ -6,7 +6,7 @@ import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneO
 import { getEventHandlers as getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.mjs'
 import { getAutoDispatchMainAppEvent } from '../state/main-app/main-app.state.actions.mjs'
 // import { eventHandlers } from './repeatable/repeatable-whole.view.mjs'
-import { checkboxBtn } from './shared-components/shared-checkbox-btn.view.mjs'
+import { checkboxBtn, radioBtnGroup } from './shared-components/shared-checkbox-btn.view.mjs'
 import { getUIEventHandlers } from '../state/user-settings/user-settings.state.mjs'
 import { openCloseBtn } from './shared-components/shared-openClose-btn.view.mjs'
 import { colourInput } from './shared-components/shared-input-fields.view.mjs'
@@ -70,18 +70,22 @@ export const footer = (buttons, eventHandler, userSettings) => {
 const uiModeButtons = (uiMode, eventHandler, tabIndex) => {
   const modes = ['Dark', 'Light', 'Custom']
 
-  return html`
-  <ul class="list-clean list-inline">
-    ${modes.map(mode => checkboxBtn(
-              'ui-mode',
-              mode + ' mode',
-              mode.toLowerCase() + 'Mode',
-              (uiMode === mode.toLowerCase()),
-              eventHandler,
-              tabIndex, '', true)
-    )}
-  </ul>
-  `
+  const btns = modes.map(mode => {
+    const _id = mode.toLowerCase()
+    return {
+      value: _id + 'Mode',
+      label: mode
+    }
+  })
+
+  return radioBtnGroup(
+    'ui-mode',
+    'Theme',
+    uiMode,
+    btns,
+    eventHandler,
+    tabIndex
+  )
 }
 
 const userSettingsUI = (props, eventHandlers) => {
@@ -97,18 +101,18 @@ const userSettingsUI = (props, eventHandlers) => {
       <ul class="list-clean">
         ${checkboxBtn('user-debug', 'Debug mode', 'debugMode', props.debug, eventHandlers.simpleEvent, tabIndex)}
         ${checkboxBtn('user-localStorage', 'Save state locally', 'localStorage', props.localStorage, eventHandlers.simpleEvent, tabIndex)}
-        <li>
-          ${uiModeButtons(props.uiMode, eventHandlers.valueEvent, tabIndex)}
+        <li class="input-pair input-pair--top-2">
+          <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
+          --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
+          --><span class="input-pair__suffix">${px}px</span>
         </li>
       </ul>
     </div>
     <div role="group" aria-labelledby="user-UI-settings" class="ui-settings__ui">
-      <h2 id="user-UI-settings" class="ui-settings__h ui-settings__h--2">User interface settings</h2>
+      <h2 id="user-UI-settings" class="ui-settings__h ui-settings__h--2">Theme settings</h2>
       <ul class="list-clean">
-        <li class="input-pair">
-          <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
-          --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix">${px}px</span>
+        <li>
+          ${uiModeButtons(props.uiMode, eventHandlers.valueEvent, tabIndex)}
         </li>
         ${(props.uiMode === 'customMode')
           ? html`
