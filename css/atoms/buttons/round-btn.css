@@ -1,0 +1,107 @@
+
+.rnd-btn {
+  border: none;
+  border-radius: 50%;
+  display: inline-block;
+  /* font-weight: bold; */
+  height: 2em;
+  margin: 0 0.25em;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  text-indent: -100rem;
+  transition: transform ease-in-out 0.3s;
+  width: 2em;
+}
+.rnd-btn::after {
+  display: inline-block;
+  font-size: 1.75em;
+  font-weight: bold;
+  position: absolute;
+  left: 51.5%;
+  text-indent: 0;
+  top: 45%;
+  transform: translate(-50%, -50%);
+}
+.rnd-btn--xs {
+  font-size: 0.5rem;
+}
+.rnd-btn--sm {
+  font-size: 0.7rem;
+}
+.rnd-btn--lg {
+  font-size: 1.3rem;
+}
+.rnd-btn--xl {
+  font-size: 1.5rem;
+}
+.rnd-btn--danger {
+  background-color: var(--danger);
+  color: #fff;
+}
+.rnd-btn--disable {
+  background-color: var(--hazard);
+  /* color: #000; */
+}
+.rnd-btn--disable::after {
+  content: "!";
+  left: 50%;
+}
+.rnd-btn--delete::after {
+  content: "\000D7";
+}
+.rnd-btn--reset::after {
+  content: "\021BA";
+  transform: translate(-53%, -52%);
+}
+.rnd-btn--set-default {
+  background-color: var(--success);
+  /* color: rgb(255, 251, 0); */
+}
+.rnd-btn--set-default::after {
+  content: "\02299";
+  top: 42%;
+  left: 49%;
+}
+.rnd-btn--move {
+  background-color: var(--warning);
+}
+.rnd-btn--move::after {
+  content: "\025BF";
+  font-size: 2.5rem;
+  top: 47%;
+}
+.rnd-btn--move--up::after {
+  content: "\025B5";
+  top: 41%;
+}
+.rnd-btn--add {
+  background-color: var(--success);
+}
+.rnd-btn--add::after {
+  content: "+";
+  left: 50%;
+}
+.rnd-btn--settings {
+  border: var(--line-weight-hvy) solid var(--txt-colour);
+  background-color: var(--bg-colour);
+  opacity: 1;
+  transition: transform, opacity ease-in-out 0.3s;
+}
+.rnd-btn--settings::after {
+  color: var(--txt-colour);
+  content: "\02237";
+  top: 38%;
+  left: 50%;
+}
+.rnd-btn--settings--close {
+  align-self: flex-end;
+  order: -1;
+  margin-bottom: 0.2em;
+}
+.rnd-btn--settings--open {
+  margin: 0 0 0 -0.3em;
+}
+.rnd-btn--settings--open-is {
+  opacity: 0;
+}

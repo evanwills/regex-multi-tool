@@ -1,0 +1,18 @@
+
+.main-btn {
+  border: none;
+  padding: 0.3rem 0.5rem;
+  width: 5rem;
+  text-transform: uppercase;
+}
+.main-btn--test {
+  background-color:var(--success);
+}
+.main-btn--replace,
+.main-btn--modify {
+  background-color:var(--warning);
+}
+.main-btn--reset {
+  background-color: var(--danger);
+  color: var(--txt-colour);
+}
