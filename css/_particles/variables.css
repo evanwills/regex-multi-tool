@@ -24,6 +24,11 @@
   --ease: ease-in-out;
   --line-weight: 0.05rem;
   --line-weight-hvy: .1rem;
+
+  --danger: rgb(200,0,0);
+  --hazard: rgb(231, 227, 10);
+  --success: rgb(77, 201, 128);
+  --warning: rgb(143, 150, 219);
 }
 
 .ui-darkmode {

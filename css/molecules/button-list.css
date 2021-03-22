@@ -1,0 +1,29 @@
+
+.btn-list {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+}
+
+.btn-list > li {
+  width: 1fr;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.btn-list > li:first-child > .btn-list__btn::before,
+.btn-list > li:first-child > .btn-list__btn::after {
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
+.btn-list > li:last-child > .btn-list__btn::before,
+.btn-list > li:last-child > .btn-list__btn::after {
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+
+.btn-list--small {
+  font-size: 86%;
+}
