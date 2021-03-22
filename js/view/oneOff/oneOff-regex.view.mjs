@@ -101,7 +101,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
       --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${getTabI(tabIndex)}">
         ${options.map(option => (option.current)
-          ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
+          ? html`<option value="" title="current position (${option.pos})"></option>`
           : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
         )}
       </select><!--

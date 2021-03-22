@@ -1,6 +1,6 @@
 
 
-input, textarea {
+input, textarea, select {
   background-color: var(--bg-colour);
   border-color: var(--txt-colour);
   border-width: var(--line-weight-hvy);

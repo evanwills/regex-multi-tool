@@ -14,7 +14,7 @@
   border: var(--line-weight-hvy) solid var(--txt-colour);
   border-radius: 50%;
   color: var(--txt-colour);
-  content: "✗";
+  content: "\02717";
   display: inline-block;
   font-size: 0.86rem;
   height: 1em;
@@ -26,16 +26,16 @@
   width: 1em;
 }
 .cb-btn__label--star::before {
-  content: "★" !important;
+  content: "\02605" !important;
 }
 .cb-btn__label--heart::before {
-  content: "♥" !important;
+  content: "\02665" !important;
 }
 .cb-btn__label--search::before {
-  content: "⌕" !important;
+  content: "\02315" !important;
 }
 .cb-btn__label--target::before {
-  content: "⌖" !important;
+  content: "\02316" !important;
 }
 .cb-btn__label:hover {
   cursor: pointer;
@@ -55,7 +55,7 @@
   background-color: var(--bg-colour);
   border-color: var(--bg-colour);
   color: var(--txt-colour);
-  content: "✓";
+  content: "\02713";
 }
 .cb-btn__input:focus + .cb-btn__label {
   outline: 0.15rem dotted var(--txt-colour);

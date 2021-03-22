@@ -76,7 +76,7 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
     return html`
     <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label">
       <h4 id="${id}-label" class="radio-grp__h">${label}</h4>
-      <ul class="list-clean list-inline radio-grp">
+      <ul class="list-clean list-clean--tight list-inline radio-grp">
         ${btns.map(btn => singleRadioBtn(
           id,
           btn.label,

@@ -112,7 +112,7 @@
 .r-pair__move-to__wrap {
   background-color: var(--txt-colour);
   border-radius: 0.825rem;
-  color: #000;
+  color: var(--bg-colour);
   display: inline-block;
   height: 1.75rem;
   padding-right: 0.5rem;
@@ -124,4 +124,6 @@
 }
 .r-pair__move-to__field {
   border: none;
+  background-color: var(--txt-colour);
+  color: var(--bg-colour)
 }
