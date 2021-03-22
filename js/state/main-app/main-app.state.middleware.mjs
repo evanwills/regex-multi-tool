@@ -5,7 +5,7 @@ let loop = 0
 
 export const mainAppMW = store => next => action => {
   // const _state = store.getState()
-  console.log('action:', action)
+  // console.log('action:', action)
   switch (action.type) {
     case mainAppActions.SET_MODE:
       if (loop === 0) {

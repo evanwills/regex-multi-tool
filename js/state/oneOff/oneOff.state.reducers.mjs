@@ -323,7 +323,7 @@ const updatePairEscaped = (pairs, id) => {
  *                  updated
  */
 const updatePairMultiLine = (pairs, id) => {
-  console.log('id:', id)
+  // console.log('id:', id)
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
@@ -348,7 +348,7 @@ const updatePairMultiLine = (pairs, id) => {
  *                  updated
  */
 const updatePairFullWidth = (pairs, id) => {
-  console.log('id:', id)
+  // console.log('id:', id)
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
@@ -394,7 +394,7 @@ const movePairUp = (pairs, id) => {
  */
 const movePairDown = (pairs, id) => {
   const _pos = getPos(pairs, id)
-  console.log('_pos:', _pos)
+  // console.log('_pos:', _pos)
   if (_pos > -1) {
     return movePairTo(pairs, id, _pos + 1)
   } else {
@@ -584,8 +584,8 @@ const closePairSettings = (pairs) => {
  *                  disabled/enabled
  */
 const togglePairSettings = (pairs, id, open) => {
-  console.log('id:', id)
-  console.log('open:', open)
+  // console.log('id:', id)
+  // console.log('open:', open)
   return pairs.map(pair => {
     if (pair.id === id) {
       if (pair.settingsOpen !== open) {
@@ -695,8 +695,8 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
       return togglePairSettings(state, action.payload, false)
 
     case regexPairActions.SET_FOCUSED_ID:
-      console.log('SET_FOCUSED_ID')
-      console.log('action.payload:', action.payload)
+      // console.log('SET_FOCUSED_ID')
+      // console.log('action.payload:', action.payload)
       return closePairSettings(state, action.payload)
 
     default:

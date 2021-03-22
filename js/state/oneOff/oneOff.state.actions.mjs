@@ -187,9 +187,9 @@ export const getAutoDipatchOneOffTabClick = (_dispatch) => {
 export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
   return function (e) {
     const _meta = getActionMeta(this.value)
-    console.log('this.id:', this.id)
-    console.log('this.value:', this.value)
-    console.log('_meta:', _meta)
+    // console.log('this.id:', this.id)
+    // console.log('this.value:', this.value)
+    // console.log('_meta:', _meta)
     let _type = ''
 
     switch (_meta.type) {

@@ -206,7 +206,7 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
 
   if (_dir === 'up') {
     if (pos === 1) {
-      console.log('pos:', pos)
+      // console.log('pos:', pos)
       return ''
     }
     _newPos = pos - 1
