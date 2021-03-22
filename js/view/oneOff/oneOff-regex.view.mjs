@@ -313,8 +313,8 @@ export const regexPair = (props) => {
 
   return html`
   <li>
-    <article id="${props.id}" class="r-pair settings_wrap">
-      <header class="r-pair__header"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
+    <article id="${props.id}" class="r-pair r-pair--${props.pos} settings_wrap">
+      <header class="r-pair__header sr-only"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
       <main class="r-pair__main${(props.fullWidth) ? ' r-pair__main--full-width' : ''}">
         ${(props.regex.error !== '') ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
         <label for="${props.id}-regex" class="r-pair__label r-pair__label--regex">Regex</label>
@@ -341,10 +341,10 @@ export const regexPair = (props) => {
           : ''}
       </main>
 
-      ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0)}
+      ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0, 'xs')}
 
       <footer class="r-pair__footer settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
-        <ul class="r-pair__control clean-list">
+        <ul class="r-pair__control list-clean">
             ${checkboxField(
               props.id,
               'Multi-line input',
@@ -371,7 +371,7 @@ export const regexPair = (props) => {
             )}
         </ul>
 
-        <ul class="r-pair__sibling-ctrl clean-list">
+        <ul class="r-pair__sibling-ctrl list-clean">
           <li class="r-pair__sibling-ctrl__before">
             ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair,
                 tabIndex)}<!--
@@ -391,7 +391,7 @@ export const regexPair = (props) => {
           </li>
         </ul>
 
-        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex)}
+        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex, 'xs')}
       </footer>
     </article>
   </li>
@@ -400,7 +400,7 @@ export const regexPair = (props) => {
 
 export const oneOffRegexView = (props, eventHandlers) => {
   return html`<section>
-    <ul class="clean-list">
+    <ul class="list-clean">
       ${props.pairs.map(pair => regexPair({ ...pair, events: eventHandlers }))}
     </ul>
   </section>`

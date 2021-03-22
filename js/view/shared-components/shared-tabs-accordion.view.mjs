@@ -38,9 +38,9 @@ const tabBlockInner = (groupID, activeID, block, tabEvent) => {
 export const tabBlock = (groupID, activeID, blocks, tabEvent, isMobileAccordion) => {
   return html`
     <!-- START: tabBlock() -->
-    <section class="tab-wrapper${boolTrue(isMobileAccordion) ? ' tab-wrapper--mobile' : ''}">
+    <section class="tab-wrapper ${boolTrue(isMobileAccordion) ? 'tab-wrapper--mobile' : 'tab-wrapper--tab'}">
       <nav class="tab-nav">
-        <ul class="clean-list tab-nav__list">
+        <ul class="list-clean tab-nav__list">
           ${blocks.map(block => html`
           <li>
             ${tabNavItem(groupID, activeID, block, tabEvent)}

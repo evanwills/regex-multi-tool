@@ -1,8 +1,22 @@
+import { repeatable } from './repeatable/repeatable-init.mjs'
+import { dispatchRegisterAction } from './state/repeatable/repeatable.state.actions.mjs'
 import { store } from './state/regexMulti-state.mjs'
 import { getMainAppView } from './view/templates.mjs'
+import { userSettingsSubscriber } from './subscribers/user-settings.subscriber.mjs'
+import { historySubscriber } from './subscribers/history.subscriber.mjs'
 
 const mainView = getMainAppView(document.body, store)
 
+dispatchRegisterAction(
+  store.dispatch,
+  repeatable.getActionsList(),
+  repeatable.setFirstAction()
+)
+
 mainView()
 
-const unsubscribe = store.subscribe(mainView)
+const unsubscribers = {
+  ui: store.subscribe(mainView),
+  userSettings: store.subscribe(userSettingsSubscriber(store)),
+  history: store.subscribe(historySubscriber(store))
+}

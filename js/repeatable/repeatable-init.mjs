@@ -74,9 +74,9 @@ function Repeatable (url, _remote, docs, api) {
   // START: private property declarations
 
   /**
-   * The function to be called when modifying the input
+   * The object containing the function and metadata for the current action
    *
-   * @var {function} actionFunction
+   * @var {config} currentAction
    */
   let currentAction = null
 
@@ -309,6 +309,34 @@ function Repeatable (url, _remote, docs, api) {
     return _output
   }
 
+  const getActionMeta = (action) => {
+    if (typeof action !== 'undefined' && action !== null) {
+      const { func, ..._action } = action
+      return _action
+    }
+    return false
+  }
+
+  /**
+   * Get basic information about an action
+   *
+   * (Used for building a menu of available actions)
+   *
+   * @param {object} action object
+   *
+   * @returns {object} basic metadata for an action
+   */
+  const getActionMetaBasic = (action) => {
+    if (typeof action !== 'undefined' && action !== null) {
+      return {
+        id: action.id,
+        name: action.id,
+        group: action.group
+      }
+    }
+    return false
+  }
+
   //  END:  private method declaration
   // ============================================
   // START: public method declaration
@@ -363,6 +391,43 @@ function Repeatable (url, _remote, docs, api) {
   }
 
   /**
+   * Get the ID for the current action
+   *
+   * @returns {string}
+   */
+  this.setFirstAction = function () {
+    if (!invalidString('action', getParams)) {
+      const ID = getParams.action.toLowerCase()
+      const firstAction = registry.filter(_action => _action.id === ID)
+
+      if (firstAction.length === 1) {
+        currentAction = firstAction[0]
+        return currentAction.id
+      }
+    }
+    return ''
+  }
+
+  /**
+   * Get the ID for the current action
+   *
+   * @returns {string}
+   */
+  this.getCurrentActionID = function () {
+    console.log('currentAction:', currentAction)
+    return (currentAction !== null) ? currentAction.id : ''
+  }
+
+  /**
+   * Get the ID for the current action
+   *
+   * @returns {string}
+   */
+  this.getCurrentActionMeta = function () {
+    return getActionMeta(currentAction)
+  }
+
+  /**
    * Get a list of objects for all registered actions.
    *
    * Returns an array of objects that is safe to be added
@@ -374,11 +439,7 @@ function Repeatable (url, _remote, docs, api) {
    * @returns {Array}
    */
   this.getActionsList = function () {
-    return registry.map(action => {
-      // Remove the action function from the action object
-      const { func, ..._action } = action
-      return _action
-    })
+    return registry.map(action => getActionMetaBasic(action))
   }
 
   /**

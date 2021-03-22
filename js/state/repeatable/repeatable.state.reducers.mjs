@@ -17,7 +17,7 @@ const defaultRepeat = {
     // Additional input fields (may be numbers or texts)
     // NOTE: Extra inputs contain everything about the extra input,
     //       not just it's current value
-    inputExtra: [],
+    inputExtra: {},
     // The primary output field
     // (the modified version of inputPrimary)
     outputPrimary: '',
@@ -46,9 +46,9 @@ const sortActionsList = (actionsList) => {
   const publicActions = []
 
   const sortByActionLabel = (a, b) => {
-    if (a.label < b.label) {
+    if (a.name < b.name) {
       return -1
-    } else if (a.label > b.label) {
+    } else if (a.name > b.name) {
       return 1
     }
     return 0
@@ -57,14 +57,14 @@ const sortActionsList = (actionsList) => {
   // Get group names
   const groupList = actionsList.map(action => action.group)
   groupList.sort()
-  for (let a = 0; a < groupList; a += 1) {
-    if (groupList[a] !== 'public') {
+  for (let a = 0; a < groupList.length; a += 1) {
+    if (typeof groupedActions[groupList[a]] === 'undefined' && groupList[a] !== 'public') {
       groupedActions[groupList[a]] = []
     }
   }
 
   // Add actions to groups
-  for (let a = 0; a < actionsList; a += 1) {
+  for (let a = 0; a < actionsList.length; a += 1) {
     const prop = actionsList[a].group
     if (prop === 'public') {
       publicActions.push(actionsList[a])
@@ -81,7 +81,6 @@ const sortActionsList = (actionsList) => {
   // Put public actions at the bottom of the list
   publicActions.sort(sortByActionLabel)
   groupedActions.public = publicActions
-
   return groupedActions
 }
 
@@ -128,7 +127,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       return (action.payload !== false)
         ? {
             ...state,
-            currentAction: action.payload,
+            activeAction: action.payload,
             fields: {
               inputLabel: action.payload.inputLabel,
               inputPrimary: '',
@@ -141,7 +140,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
           }
         : state
 
-    case repeatActions.REGISTER_ALL_ACTION:
+    case repeatActions.REGISTER_ALL_ACTIONS:
       return {
         ...state,
         allActions: sortActionsList(action.payload)

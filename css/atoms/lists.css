@@ -1,0 +1,17 @@
+
+.list-clean {
+  margin: 0;
+  padding: 0;
+}
+.list-clean > li {
+  margin: 0;
+  padding: 0.3rem 0;
+  list-style-type: none;
+}
+.list-clean--tight > li {
+  padding: 0;
+}
+
+.list-inline {
+  display: flex;
+}

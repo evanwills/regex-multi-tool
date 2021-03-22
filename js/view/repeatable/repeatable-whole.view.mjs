@@ -1,6 +1,11 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { ucFirst, isNotEmptyStr } from '../../utility-functions.mjs'
-import { getEventHandlers, getAutoDispatchToggleNav, getAutoDispatchSetAction, getAutoDispatchToggleDebug } from '../../state/repeatable.state.mjs'
+import { ucFirst, isNonEmptyStr } from '../../utility-functions.mjs'
+import {
+  getEventHandlers
+  // getAutoDispatchToggleNav,
+  // getAutoDispatchSetAction,
+  // getAutoDispatchToggleDebug
+} from '../../state/repeatable/repeatable.state.mjs'
 import { store } from '../../state/regexMulti-state.mjs'
 
 const getDebugGET = (debug) => (debug === true) ? '&debug=debug' : ''
@@ -13,7 +18,7 @@ const navLink = (_baseURL, _debug, _click) => (_action) => {
   `
 }
 
-const eventHandlers = getEventHandlers(store.dispatch)
+export const eventHandlers = getEventHandlers(store.dispatch)
 
 export const actionNav = (_open, _baseURL, _actions, _debug, _dispatch) => {
   const navClass = (_open === true) ? 'open' : 'close'
@@ -42,7 +47,7 @@ export const actionNav = (_open, _baseURL, _actions, _debug, _dispatch) => {
   `
 }
 
-const singleExtraInputView = (props, url) => {
+export const singleExtraInputView = (props, url) => {
   const id = props.id
   let get = ''
   if (typeof url.searchParams[id] !== 'undefined') {
@@ -90,7 +95,7 @@ export const repeatableUI = (props) => {
 
       <h3>${props.name}</h3>
 
-      ${(isNotEmptyStr(props.description)) ? html`<p>${props.description}</p>` : ''}
+      ${(isNonEmptyStr(props.description)) ? html`<p>${props.description}</p>` : ''}
     </section>
   `
 }

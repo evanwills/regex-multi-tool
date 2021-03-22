@@ -1,3 +1,5 @@
+import { isNonEmptyStr } from '../../utility-functions.mjs'
+
 export const repeatActions = {
   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',
   REGISTER_ALL_ACTIONS: 'REPEATABLE_REGISTER_ALL_ACTIONS',
@@ -71,13 +73,20 @@ export const getAutoDispatchUpdateField = (_dispatch) => {
  * @param _dispatch
  * @returns
  */
-export const dispatchRegisterAction = (_dispatch) => (repeatablen) => {
-  const aType = (Array.isArray(repeatablen))
+export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
+  const aType = (Array.isArray(repeatable))
     ? repeatActions.REGISTER_ALL_ACTIONS
     : repeatActions.REGISTER_SINGLE_ACTION
 
   _dispatch({
     type: aType,
-    payload: repeatablen
+    payload: repeatable
   })
+
+  if (isNonEmptyStr(actionID)) {
+    _dispatch({
+      type: repeatActions.SET_ACTION,
+      payload: actionID
+    })
+  }
 }
