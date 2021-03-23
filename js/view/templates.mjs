@@ -2,14 +2,15 @@ import { html, render } from '../lit-html/lit-html.mjs'
 import { oneOffUI } from './oneOff/oneOff-whole.view.mjs'
 // import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
-import { getEventHandlers as getOneOffEventHandlers } from '../state/oneOff/oneOff.state.mjs'
-import { getEventHandlers as getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.mjs'
+import { getOneOffEventHandlers } from '../state/oneOff/oneOff.state.actions.mjs'
+import { getRepeatableEventHandlers } from '../state/repeatable/repeatable.state.actions.mjs'
 import { getAutoDispatchMainAppEvent } from '../state/main-app/main-app.state.actions.mjs'
 // import { eventHandlers } from './repeatable/repeatable-whole.view.mjs'
-import { checkboxBtn } from './shared-components/shared-checkbox-btn.view.mjs'
+import { checkboxBtn, radioBtnGroup } from './shared-components/shared-checkbox-btn.view.mjs'
 import { getUIEventHandlers } from '../state/user-settings/user-settings.state.mjs'
 import { openCloseBtn } from './shared-components/shared-openClose-btn.view.mjs'
 import { colourInput } from './shared-components/shared-input-fields.view.mjs'
+import { repeatableUI } from './repeatable/repeatable-whole.view.mjs'
 
 /**
  * Template for header block for Regex multi tool
@@ -31,16 +32,16 @@ export const header = (isSimple, changeHandler) => {
     <h1 class="header-1">Regex multi tool</h1>
     <!-- <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
 
-    <ul class="btn-list btn-list--small">
-      <li><!--
-        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-btn__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
-        --><label for="mode-simple" class="btn-list__btn radio-btn__label">One-off</label><!--
+    <ul class="radio-grp list-clean list-clean--tight list-inline mode-control"><!--
+      --><li><!--
+        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-grp__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
+        --><label for="mode-simple" class="radio-grp__label">One-off</label><!--
       --></li>
       <li><!--
-        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-btn__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
-        --><label for="mode-fancy" class="btn-list__btn radio-btn__label">Repeatable</label><!--
-        --></li>
-    </ul>
+        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-grp__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
+        --><label for="mode-fancy" class="radio-grp__label">Repeatable</label><!--
+        --></li><!--
+    --></ul>
   </header>`
 }
 
@@ -70,18 +71,22 @@ export const footer = (buttons, eventHandler, userSettings) => {
 const uiModeButtons = (uiMode, eventHandler, tabIndex) => {
   const modes = ['Dark', 'Light', 'Custom']
 
-  return html`
-  <ul class="list-clean list-inline">
-    ${modes.map(mode => checkboxBtn(
-              'ui-mode',
-              mode + ' mode',
-              mode.toLowerCase() + 'Mode',
-              (uiMode === mode.toLowerCase()),
-              eventHandler,
-              tabIndex, '', true)
-    )}
-  </ul>
-  `
+  const btns = modes.map(mode => {
+    const _id = mode.toLowerCase()
+    return {
+      value: _id + 'Mode',
+      label: mode
+    }
+  })
+
+  return radioBtnGroup(
+    'ui-mode',
+    'Theme',
+    uiMode,
+    btns,
+    eventHandler,
+    tabIndex
+  )
 }
 
 const userSettingsUI = (props, eventHandlers) => {
@@ -97,18 +102,18 @@ const userSettingsUI = (props, eventHandlers) => {
       <ul class="list-clean">
         ${checkboxBtn('user-debug', 'Debug mode', 'debugMode', props.debug, eventHandlers.simpleEvent, tabIndex)}
         ${checkboxBtn('user-localStorage', 'Save state locally', 'localStorage', props.localStorage, eventHandlers.simpleEvent, tabIndex)}
-        <li>
-          ${uiModeButtons(props.uiMode, eventHandlers.valueEvent, tabIndex)}
+        <li class="input-pair input-pair--top-2">
+          <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
+          --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
+          --><span class="input-pair__suffix">${px}px</span>
         </li>
       </ul>
     </div>
     <div role="group" aria-labelledby="user-UI-settings" class="ui-settings__ui">
-      <h2 id="user-UI-settings" class="ui-settings__h ui-settings__h--2">User interface settings</h2>
+      <h2 id="user-UI-settings" class="ui-settings__h ui-settings__h--2">Theme settings</h2>
       <ul class="list-clean">
-        <li class="input-pair">
-          <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
-          --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
-          --><span class="input-pair__suffix">${px}px</span>
+        <li>
+          ${uiModeButtons(props.uiMode, eventHandlers.valueEvent, tabIndex)}
         </li>
         ${(props.uiMode === 'customMode')
           ? html`
@@ -123,10 +128,6 @@ const userSettingsUI = (props, eventHandlers) => {
     ${openCloseBtn('user-settings', 'close', 'user interface', isOpen, eventHandlers.simpleEvent, tabIndex)}
   </div>
   `
-}
-
-export const repeatableUI = (props) => {
-  return html`<h1>Do regex stuff</h1>`
 }
 
 export const getMainAppView = (domNode, store) => {
@@ -146,15 +147,16 @@ export const getMainAppView = (domNode, store) => {
 
     const newProps = { ...state, events: { ...eventHandlers } }
 
+    if (!isSimple) {
+      newProps.href = props.url.actionHref
+    }
+
     const buttons = (isSimple)
       ? ['Test', 'Replace', 'Reset']
       : ['Modify', 'Reset']
 
-    // console.log('mainApp()')
-    // console.log('newProps:', newProps)
-
     const UI = html`
-      <div class="regex-multi ui-${props.userSettings.uiMode}">
+      <div class="regex-multi ui-${props.userSettings.uiMode} ${(props.mode === 'oneOff') ? 'oneOff' : 'repeatable'}-mode">
         ${header(isSimple, mainEvent)}
         ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
         ${footer(

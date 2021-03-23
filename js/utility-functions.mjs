@@ -77,6 +77,7 @@ export const getURLobject = (url) => {
     host: '',
     hostname: '',
     href: '',
+    actionHref: '',
     origin: '',
     password: '',
     pathname: '',
@@ -129,10 +130,13 @@ export const getURLobject = (url) => {
         tmp = output.search.split('&')
 
         for (i = 0; i < tmp.length; i += 1) {
-          tmp[i] = tmp[i].split('=')
-          key = tmp[i][0]
-          output.searchParams[key] = cleanGET(tmp[i][1])
-          output.searchParamsRaw[key] = tmp[i][1]
+          tmp[i] = tmp[i].trim()
+          if (tmp[i] !== '') {
+            tmp[i] = tmp[i].split('=')
+            key = tmp[i][0]
+            output.searchParams[key] = cleanGET(tmp[i][1])
+            output.searchParamsRaw[key] = tmp[i][1]
+          }
         }
 
         output.search = '?' + output.search
@@ -143,6 +147,8 @@ export const getURLobject = (url) => {
       }
     }
   }
+
+  output.actionHref = stripGETaction(output.href)
 
   return output
 }
@@ -611,7 +617,8 @@ export const makeSearchStr = (url) => {
     if (isBool(value)) {
       value = (value) ? 'true' : 'false'
     }
-    output += sep + key + '=' + encodeURIComponent(value)
+    output += sep + key + '=' + value
+    // output += sep + key + '=' + encodeURIComponent(value)
     sep = '&'
   }
   return output
@@ -630,9 +637,6 @@ export const makeURLstr = (url) => {
   return url.pathname +
          makeSearchStr(url) +
          url.hash
-  // return url.origin +
-  //       url.port +
-  //       url.pathname +
-  //       makeSearchStr(url) +
-  //       url.hash
 }
+
+export const stripGETaction = (href) => href.replace(/[?&]action=[^&#]+(?=[&#]|^)?/gi, '')

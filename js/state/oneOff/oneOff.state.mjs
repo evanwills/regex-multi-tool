@@ -59,13 +59,3 @@ export const oneOff = {
   reducers: oneOffReducer,
   middleware: oneOffMW
 }
-
-export const getEventHandlers = (dispatch) => {
-  return {
-    simplePair: getAutoDispatchOneOffPairSimpleEvent(dispatch),
-    pairValue: getAutoDispatchOneOffPairValueEvent(dispatch),
-    simpleGeneral: getAutoDipatchOneOffSimpleEvent(dispatch),
-    generalValue: getAutoDispatchOneOffValueEvent(dispatch),
-    navClick: getAutoDipatchOneOffTabClick(dispatch)
-  }
-}

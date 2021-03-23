@@ -1,0 +1,44 @@
+
+
+input, textarea, select {
+  background-color: var(--bg-colour);
+  border-color: var(--txt-colour);
+  border-width: var(--line-weight-hvy);
+  color: var(--txt-colour);
+  font-size: 1rem;
+  padding: 0.2rem 0.3rem;
+}
+
+textarea.lg {
+  height: 20rem;
+}
+textarea.xl {
+  height: 35rem;
+}
+
+.input-pair {
+  display: flex;
+  justify-content: space-between;
+}
+.input-pair__label {
+  flex-grow: 1;
+  padding-right: 1rem;
+  text-align: right;
+}
+.input-pair__suffix {
+  min-width: 1.5rem;
+}
+.input-pair__input {
+  align-items: center;
+}
+.input-pair__input[type=range] {
+  position: relative;
+  bottom: 0.4rem;
+}
+.input-pair--top-2 {
+  margin-top: 2rem !important;
+}
+
+.oneOff-input__split__input {
+  width: 4rem;
+}

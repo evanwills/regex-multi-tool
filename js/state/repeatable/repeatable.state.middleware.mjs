@@ -9,20 +9,9 @@ import {
   // isFunction,
   // getURLobject
 } from '../../utility-functions.mjs'
+import { urlActions } from '../url/url.state.all.mjs'
 
-// export const repeatActions = {
-//   REGISTER_ALL_ACTIONS: 'REPEATABLE_REGISTER_ALL_ACTIONS',
-//   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',
-//   REGISTER_GROUP: 'REPEATABLE_REGISTER_GROUP',
-//   SET_ACTION: 'REPEATABLE_SET_ACTON',
-//   UPDATE_FIELD: 'REPEATABLE_UPDATE_FIELD',
-//   MODIFY_INPUT: 'REPEATABLE_MODIFY_INPUT',
-//   RESET_ACTION: 'REPEATABLE_RESET_ACTION', // Only used by middleware
-//   TOGGLE_NAV: 'REPEATABLE_TOGGLE_NAV',
-//   TOGGLE_DEBUG: 'REPEATABLE_TOGGLE_DEBUG',
-//   ERROR: 'REPEATABLE_ERROR',
-//   INIT: 'REPEATABLE_INIT'
-// }
+let loop = 0
 
 export const modifyInput = ({ getState, dispatch }) => next => action => {
 }
@@ -76,20 +65,30 @@ export const repeatableMW = store => next => action => {
       })
 
     case repeatActions.SET_ACTION:
-      if (repeatable.setAction(action.payload)) {
-        return next({
-          ...action,
-          payload: getActionMeta(
-            _state.repeat.allActions,
-            action.payload
-          )
-        })
-      } else {
-        return next({
-          type: repeatActions.ERROR,
-          payload: 'Could not set action "' + action.payload + '"'
-        })
+      if (loop === 0) {
+        loop = 1
+        if (repeatable.setAction(action.payload)) {
+          loop = 0;
+          store.dispatch({
+            ...action,
+            payload: repeatable.getCurrentActionMeta()
+          })
+          return next({
+            type: urlActions.UPDATE_GET,
+            payload: {
+              key: 'action',
+              value: action.payload
+            }
+          })
+        } else {
+          loop = 0;
+          return next({
+            type: repeatActions.ERROR,
+            payload: 'Could not set action "' + action.payload + '"'
+          })
+        }
       }
+
 
     case repeatActions.UPDATE_FIELD:
       if (action.payload.id !== 'input') {

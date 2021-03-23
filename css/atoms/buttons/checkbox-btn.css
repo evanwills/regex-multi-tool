@@ -1,0 +1,62 @@
+
+.cb-btn__label {
+  display: block;
+  border: var(--line-weight-hvy) solid var(--txt-colour);
+  max-width: 24rem;
+  padding: 0.2rem 1.75rem;
+  position: relative;
+  text-align: center;
+}
+.cb-btn__label--centre {
+  margin: 0.1rem auto;
+}
+.cb-btn__label--badge::before {
+  border: var(--line-weight-hvy) solid var(--txt-colour);
+  border-radius: 50%;
+  color: var(--txt-colour);
+  content: "\02717";
+  display: inline-block;
+  font-size: 0.86rem;
+  height: 1em;
+  left: 0.35rem;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1em;
+}
+.cb-btn__label--star::before {
+  content: "\02605" !important;
+}
+.cb-btn__label--heart::before {
+  content: "\02665" !important;
+}
+.cb-btn__label--search::before {
+  content: "\02315" !important;
+}
+.cb-btn__label--target::before {
+  content: "\02316" !important;
+}
+.cb-btn__label:hover {
+  cursor: pointer;
+}
+.cb-btn__input {
+  display: inline-block;
+  position: absolute;
+  opacity: 0;
+  margin-right: -1rem;
+  margin-bottom: -1rem;
+}
+.cb-btn__input:checked + .cb-btn__label {
+  background-color: var(--over-colour-rev);
+  color: var(--bg-colour);
+}
+.cb-btn__input:checked + .cb-btn__label--badge::before {
+  background-color: var(--bg-colour);
+  border-color: var(--bg-colour);
+  color: var(--txt-colour);
+  content: "\02713";
+}
+.cb-btn__input:focus + .cb-btn__label {
+  outline: 0.15rem dotted var(--txt-colour);
+}

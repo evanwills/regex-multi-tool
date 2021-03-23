@@ -1,7 +1,10 @@
 import { userSettingsActions } from './user-settings.state.actions.mjs'
+import { urlActions } from '../url/url.state.all.mjs'
 import { isInt, isStr } from '../../utility-functions.mjs'
 
 const validColour = (colour) => (isStr(colour) && colour.match(/^#[0-9a-f]{3,6}$/i))
+
+let loop = 0
 
 export const userSettingsMW = store => next => action => {
   switch (action.type) {
@@ -13,6 +16,22 @@ export const userSettingsMW = store => next => action => {
         })
       } else {
         console.error('FONT-SIZE NOT UPDATED: Font size must be an integer between 8 and 32', action.payload)
+      }
+      break
+
+    case userSettingsActions.TOGGLE_DEBUG:
+      if (loop === 0) {
+        loop += 1
+        store.dispatch(action)
+        loop = 0
+        const state = store.getState()
+        return next({
+          type: urlActions.UPDATE_GET,
+          payload: {
+            key: 'debug',
+            value: state.userSettings.debug
+          }
+        })
       }
       break
 

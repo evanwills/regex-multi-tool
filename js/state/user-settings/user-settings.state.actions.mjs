@@ -15,8 +15,9 @@ export const userSettingsActions = {
 export const getAutoDipatchSettingsSimpleEvent = (_dispatch) => {
   return function (e) {
     let _type = ''
+
     switch (this.value) {
-      case 'debug':
+      case 'debugMode':
         _type = userSettingsActions.TOGGLE_DEBUG
         break
 

@@ -81,7 +81,17 @@ const sortActionsList = (actionsList) => {
   // Put public actions at the bottom of the list
   publicActions.sort(sortByActionLabel)
   groupedActions.public = publicActions
-  return groupedActions
+
+  const output = []
+
+  for (const prop in groupedActions) {
+    output.push({
+      name: prop,
+      actions: groupedActions[prop]
+    })
+  }
+
+  return output
 }
 
 /**
@@ -185,13 +195,13 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
         ? { ...state, fields: { ...state.fields, groups: action.payload } }
         : state
 
-    case repeatActions.REPEATABLE_TOGGLE_NAV:
+    case repeatActions.TOGGLE_NAV:
       return {
         ...state,
         navOpen: !state.navOpen
       }
 
-    case repeatActions.REPEATABLE_TOGGLE_DEBUG:
+    case repeatActions.TOGGLE_DEBUG:
       return {
         ...state,
         debug: !state.debug

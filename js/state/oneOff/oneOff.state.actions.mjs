@@ -56,7 +56,7 @@ const getActionMeta = (input) => {
   if (meta.id.match(/^R[0-9]{9}$/) && meta.type !== '') {
     return meta
   } else {
-    console.log('input:', input)
+    console.info('input:', input)
     throw Error('The input must match a regex pair ID plus the primary action type and optionally an action type modifier')
   }
 }
@@ -187,9 +187,6 @@ export const getAutoDipatchOneOffTabClick = (_dispatch) => {
 export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
   return function (e) {
     const _meta = getActionMeta(this.value)
-    console.log('this.id:', this.id)
-    console.log('this.value:', this.value)
-    console.log('_meta:', _meta)
     let _type = ''
 
     switch (_meta.type) {
@@ -330,5 +327,15 @@ export const registerOneOffEngine = (_dispatch) => (_engine) => {
   })
 }
 
+
+export const getOneOffEventHandlers = (dispatch) => {
+  return {
+    simplePair: getAutoDispatchOneOffPairSimpleEvent(dispatch),
+    pairValue: getAutoDispatchOneOffPairValueEvent(dispatch),
+    simpleGeneral: getAutoDipatchOneOffSimpleEvent(dispatch),
+    generalValue: getAutoDispatchOneOffValueEvent(dispatch),
+    navClick: getAutoDipatchOneOffTabClick(dispatch)
+  }
+}
 //  END:  Action creators
 // ==============================================

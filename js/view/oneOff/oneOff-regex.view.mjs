@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { getID, getTabI, isStr, isBool } from '../../utility-functions.mjs'
+import { getID, getTabI, isStr, isBool, isNonEmptyStr } from '../../utility-functions.mjs'
 import { openCloseBtn } from '../shared-components/shared-openClose-btn.view.mjs'
 import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
 
@@ -101,7 +101,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
       --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${getTabI(tabIndex)}">
         ${options.map(option => (option.current)
-          ? html`<option value="" title="current position (${option.pos})" selected="selected"></option>`
+          ? html`<option value="" title="current position (${option.pos})"></option>`
           : html`<option value="${option.value}" title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
         )}
       </select><!--
@@ -206,7 +206,6 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
 
   if (_dir === 'up') {
     if (pos === 1) {
-      console.log('pos:', pos)
       return ''
     }
     _newPos = pos - 1
@@ -316,12 +315,12 @@ export const regexPair = (props) => {
     <article id="${props.id}" class="r-pair r-pair--${props.pos} settings_wrap">
       <header class="r-pair__header sr-only"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
       <main class="r-pair__main${(props.fullWidth) ? ' r-pair__main--full-width' : ''}">
-        ${(props.regex.error !== '') ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">props.regex.error</p>` : ''}
+        ${(isNonEmptyStr(props.regex.error)) ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">${props.regex.error}</p>` : ''}
         <label for="${props.id}-regex" class="r-pair__label r-pair__label--regex">Regex</label>
         ${(props.multiLine)
           ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__txt r-pair__field r-pair__field--regex" @change=${props.events.pairValue} placeholder="regular expression">${props.regex.pattern}</textarea>`
           : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__input r-pair__field r-pair__field--regex" value="${props.regex.pattern}" @change=${props.events.pairValue} placeholder="regular expression" />`}
-        ${(props.flags.error !== '') ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">props.flags.error</p>` : ''}
+        ${(isNonEmptyStr(props.flags.error)) ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">${props.flags.error}</p>` : ''}
         <label for="${props.id}-flags" class="r-pair__label r-pair__label--flags">Flags</label>
         <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="r-pair__input r-pair__field--flags" value="${props.flags.flags}" @keyup=${props.events.pairValue} placeholder="i" />
         <label for="${props.id}-replace" class="r-pair__label r-pair__label--replace">Replace</label>

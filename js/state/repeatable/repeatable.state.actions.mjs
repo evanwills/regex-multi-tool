@@ -14,59 +14,52 @@ export const repeatActions = {
   INIT: 'REPEATABLE_INIT'
 }
 
-export const getAutoDispatchSetAction = (_dispatch) => {
+export const getAutoDispatchHrefAction = (_dispatch) => {
   return function (e) {
+    e.preventDefault()
+    let _action = this.href.replace(/^.*?[?&]action=([^&#]+)(?:[&#].*?)?$/i, '$1')
+
+    if (_action !== this.href) {
+      _dispatch({
+        type: repeatActions.SET_ACTION,
+        payload: _action
+      })
+    } else {
+      console.warn('Could not determin the action to be set')
+    }
+  }
+}
+
+export const getAutoDispatchSimpleAction = (_dispatch) => {
+  return function (e) {
+    let _type = ''
+
+    switch (this.value) {
+      case 'toggle-nav':
+        _type = repeatActions.TOGGLE_NAV
+        break
+    }
+
     _dispatch({
-      type: repeatActions.SET_ACTION,
-      payload: this.dataset.id
+      type: _type
     })
   }
 }
 
-export const getAutoDispatchToggleDebug = (_dispatch) => {
+export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
+    let _type = ''
+
+    switch (this.id) {
+    }
+
     _dispatch({
-      type: repeatActions.TOGGLE_DEBUG
+      type: _type,
+      payload: this.value
     })
   }
 }
 
-export const getAutoDispatchToggleNav = (_dispatch) => {
-  return function (e) {
-    _dispatch({
-      type: repeatActions.TOGGLE_NAV
-    })
-  }
-}
-
-export const getAutoDispatchModifyInput = (_dispatch) => {
-  return function (e) {
-    _dispatch({
-      type: repeatActions.MODIFY_INPUT
-    })
-  }
-}
-
-// export const getAutoDispatchRegisterAction = (_dispatch, _action) => {
-//   return function (e) {
-//     _dispatch({
-//       type: repeatActions.REGISTER_ACTION,
-//       payload: _action
-//     })
-//   }
-// }
-
-export const getAutoDispatchUpdateField = (_dispatch) => {
-  return function (e) {
-    _dispatch({
-      type: repeatActions.UPDATE_FIELD,
-      payload: {
-        id: this.id,
-        value: this.value
-      }
-    })
-  }
-}
 
 /**
  *
@@ -88,5 +81,13 @@ export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
       type: repeatActions.SET_ACTION,
       payload: actionID
     })
+  }
+}
+
+export const getRepeatableEventHandlers = (dispatch) => {
+  return {
+    hrefEvent: getAutoDispatchHrefAction(dispatch),
+    simpleEvent: getAutoDispatchSimpleAction(dispatch),
+    valueEvent: getAutoDispatchValueAction(dispatch),
   }
 }

@@ -19,6 +19,7 @@ export const initialState = {
   host: '',
   hostname: '',
   href: '',
+  actionHref: '',
   origin: '',
   password: '',
   pathname: '',
@@ -35,7 +36,8 @@ const updateHref = (url) => {
   if (href !== url.href) {
     return {
       ...url,
-      href: href
+      href: href,
+      actionHref: href.replace(/^(.*?[?&])action=.*?(?=[&#].*)$/i, '$1')
     }
   }
   return url
@@ -53,7 +55,6 @@ export const urlReducer = (state = initialState, action) => {
       break
 
     case urlActions.UPDATE_GET:
-      console.log('action:', action)
       if (isNonEmptyStr(action.payload.key)) {
         if (isNonEmptyStr(action.payload.value) || isNumeric(action.payload.value) || isBool(action.payload.value)) {
           if (state.searchParams[action.payload.key] !== action.payload.value) {

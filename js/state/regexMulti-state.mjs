@@ -50,7 +50,7 @@ export const store = createStore(
   combineReducers({
     mode: modeReducer,
     oneOff: oneOff.reducers,
-    repeat: repeatable.reducers,
+    repeatable: repeatable.reducers,
     url: urlReducer,
     userSettings: userSettings.reducer
     // userSettings: (state = userSettings.state, action) => state

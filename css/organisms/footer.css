@@ -1,0 +1,61 @@
+
+.regex-multi__footer {
+  background-color: var(--over-colour);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.regex-multi__footer > .rnd-btn--settings {
+  position: absolute;
+  right: 0.4rem;
+  bottom: 0.3rem;
+}
+
+.action-btns {
+  margin: 0 2rem 0 0;
+  padding: 0;
+  display: flex;
+}
+
+.btn-wrap {
+  list-style-type: none;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+}
+.btn-wrap:last-child {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.ui-settings.settings {
+  justify-content: space-between;
+  padding: 1rem 1.5rem 2.5rem;
+  transform-origin: 97.5% 97.5%;
+}
+.ui-settings__h--1 {
+  margin-top: 0;
+}
+.ui-settings .rnd-btn--settings--close {
+  bottom: 0.2rem;
+  position: absolute;
+  right: 0.2rem;
+}
+
+@media screen and (min-width: 35rem) {
+  .ui-settings {
+    display: flex;
+  }
+  .ui-settings__h {
+    margin-top: 0;
+  }
+  .ui-settings__general {
+    max-width: calc(45% - 1rem);
+    width: calc(45% - 1rem);
+    padding-right: 1rem;
+  }
+  .ui-settings__ui {
+    max-width: 22rem;
+    width: 55%;
+  }
+}

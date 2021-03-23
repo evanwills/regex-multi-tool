@@ -1,0 +1,41 @@
+
+.settings {
+  background-color: var(--over-colour);
+  bottom: 0;
+  box-shadow: 0 0 1.5rem var(--over-colour);
+  left: 0;
+  padding: 0.5rem;
+  position: absolute;
+  right: 0;
+  transition: transform var(--ease) var(--timing);
+  transform-origin: 2% 90%;
+  width: 100%;
+  z-index: 100;
+}
+
+.settings__wrap {
+  position: relative;
+}
+
+.settings + * {
+  transition-delay: calc(var(--timing) * 0.25);
+  transition-timing-function: var(--ease);
+  transition-duration: calc(var(--timing) * 0.75);
+  transition-property: opacity;
+}
+
+.settings--opened {
+  transform: scale(1);
+}
+
+.settings--opened > * {
+  opacity: 1;
+}
+
+.settings--closed {
+  transform: scale(0);
+}
+
+.settings--closed > * {
+  opacity: 0;
+}

@@ -1,0 +1,111 @@
+.action-nav__wrap {
+  --btn-width: 1.8rem;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0;
+  transform-origin: right;
+  transition: transform var(--ease) var(--timing);
+  width: 17rem;
+  z-index: 100;
+}
+.action-nav {
+  background-color: var(--over-colour-rev);
+  bottom: 0;
+  color: var(--bg-colour);
+  left: 0;
+  max-width: 17rem;
+  overflow: auto visible;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.action-nav--closed {
+  transform: translateX(17rem)
+}
+.action-nav--opened {
+  transform: translateX(0)
+}
+
+.action-nav__toggle--open {
+  border-top-left-radius: calc(var(--btn-width) / 2);
+  border-bottom-left-radius: calc(var(--btn-width) / 2);
+  display: inline-block;
+  height: var(--btn-width);
+  left: calc(var(--btn-width) * -1);
+  position: absolute;
+  text-indent: -100rem;
+  top: 0;
+  width: var(--btn-width);
+}
+.action-nav__toggle--open::after {
+  color: var(--bg-colour);
+  content: '\025C2';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--btn-width);
+  height: var(--btn-width);
+  text-indent: 0;
+  font-size: 2.5rem;
+  transition: transform var(--ease) var(--timing);
+}
+.action-nav__toggle--open.action-nav__toggle--opened::after {
+  transform: rotate(60deg) translate(-0.45rem, -0.85rem);
+}
+.action-nav__toggle--open.action-nav__toggle--closed::after {
+  transform: rotate(0deg) translate(-0.3rem, -1.05rem);
+}
+.action-nav__toggle--close {
+  background-color: var(--over-colour);
+  bottom: 0;
+  border: none;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 50;
+  transform-origin: right;
+  transition: transform var(--ease) var(--timing);
+  width: 100%;
+}
+.action-nav__toggle--close.action-nav__toggle--closed {
+  transform: translateX(100%)
+}
+.action-nav__toggle--close.action-nav__toggle--opened {
+  transform: translateX(0)
+
+}
+
+.action-nav__group-name {
+  padding: 0.3rem 0.5rem;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--txt-colour);
+  background-color: var(--bg-colour);
+}
+
+.action-nav__actions {
+  border-bottom: var(--line-weight-hvy) solid var(--bg-colour);
+}
+
+.action-nav__link {
+  color: var(--bg-colour);
+  text-decoration: none;
+  display: block;
+  padding: .5rem;
+  border-top: var(--line-weight-hvy) solid var(--bg-colour);
+}
+
+.action-nav__link--active {
+  background-color: var(--success)
+}
+
+.action-nav__link:hover, .action-nav__link:focus {
+  color: var(--txt-colour);
+  background-color: var(--over-colour);
+  text-decoration: underline;
+}

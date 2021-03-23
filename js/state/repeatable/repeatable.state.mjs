@@ -1,11 +1,6 @@
 // import { createSlice } from '../../redux/redux-toolkit.mjs'
 import {
   repeatActions,
-  getAutoDispatchSetAction,
-  getAutoDispatchToggleDebug,
-  getAutoDispatchToggleNav,
-  getAutoDispatchModifyInput,
-  getAutoDispatchUpdateField,
   dispatchRegisterAction
 } from './repeatable.state.actions.mjs'
 import { repeatableReducer } from './repeatable.state.reducers.mjs'
@@ -45,14 +40,4 @@ export const repeatable = {
   reducers: repeatableReducer,
   middleware: repeatableMW,
   register: dispatchRegisterAction
-}
-
-export const getEventHandlers = (dispatch) => {
-  return {
-    setAction: getAutoDispatchSetAction(dispatch),
-    toggleDebug: getAutoDispatchToggleDebug(dispatch),
-    toggleNav: getAutoDispatchToggleNav(dispatch),
-    modifyInput: getAutoDispatchModifyInput(dispatch),
-    updateField: getAutoDispatchUpdateField(dispatch)
-  }
 }
