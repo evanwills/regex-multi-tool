@@ -19,3 +19,8 @@
   padding: 0.3rem 0.3rem 0.3rem 0;
   transform: scaleY(50%);
 }
+
+.mode-control {
+  margin: 0 !important;
+  font-size: 0.86rem;
+}

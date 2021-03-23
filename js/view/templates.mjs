@@ -32,16 +32,16 @@ export const header = (isSimple, changeHandler) => {
     <h1 class="header-1">Regex multi tool</h1>
     <!-- <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
 
-    <ul class="btn-list btn-list--small">
-      <li><!--
-        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-btn__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
-        --><label for="mode-simple" class="btn-list__btn radio-btn__label">One-off</label><!--
+    <ul class="radio-grp list-clean list-clean--tight list-inline mode-control"><!--
+      --><li><!--
+        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-grp__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
+        --><label for="mode-simple" class="radio-grp__label">One-off</label><!--
       --></li>
       <li><!--
-        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-btn__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
-        --><label for="mode-fancy" class="btn-list__btn radio-btn__label">Repeatable</label><!--
-        --></li>
-    </ul>
+        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-grp__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
+        --><label for="mode-fancy" class="radio-grp__label">Repeatable</label><!--
+        --></li><!--
+    --></ul>
   </header>`
 }
 

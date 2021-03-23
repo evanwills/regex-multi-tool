@@ -13,7 +13,7 @@ const navGroup = (actionGroup, href, eventHandler) => {
   return html`
     <li class="action-group">
       <h2 class="action-group__name">${ucFirst(actionGroup.name)}</h2>
-      <ul class="action-group__actions">
+      <ul class="list-clean action-group__actions">
         ${actionGroup.actions.map((action) => navLink(
           href,
           action,
@@ -33,7 +33,7 @@ export const repeatableActionNav = (_open, _baseURL, _actions, events) => {
   return html`
     <button id="action-toggle" class="action-nav__toggle action-nav__toggle--${navClass}" @click=${events.simpleEvent}>${(_open === false) ? 'Open' : 'Close'}</button>
     <nav id="action-nav" class="action-nav action-nav--${navClass}">
-      <ul>
+      <ul class="list-clean">
         ${_actions.map((actionGroup) => navGroup(actionGroup, _href.join(''), events.hrefEvent))}
       </ul>
     </nav>
