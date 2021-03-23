@@ -68,11 +68,16 @@ export const repeatableMW = store => next => action => {
       if (loop === 0) {
         loop = 1
         if (repeatable.setAction(action.payload)) {
-          loop = 0;
           store.dispatch({
             ...action,
             payload: repeatable.getCurrentActionMeta()
           })
+          if (_state.repeatable.navOpen) {
+            store.dispatch({
+              type: repeatActions.TOGGLE_NAV
+            })
+          }
+          loop = 0;
           return next({
             type: urlActions.UPDATE_GET,
             payload: {
@@ -87,8 +92,9 @@ export const repeatableMW = store => next => action => {
             payload: 'Could not set action "' + action.payload + '"'
           })
         }
+      } else {
+        return next(action)
       }
-
 
     case repeatActions.UPDATE_FIELD:
       if (action.payload.id !== 'input') {

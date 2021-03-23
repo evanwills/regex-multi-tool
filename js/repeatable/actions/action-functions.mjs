@@ -962,7 +962,6 @@ function fixPoliciesAnchorLinksV1 (input, extraInputs, GETvars) {
     if (hash1 === '#' || hash2 === '#') {
       if (value1 !== 'top' && value2 !== 'top') {
         const subID = (hash1 === '#') ? value1 : value2
-        // console.log('tmpID:', tmpID)
         const _id = makeIdSafe(linkText, subID)
 
         if (labelsAndIDs.indexOf(_id) >= 0) {
@@ -1017,7 +1016,6 @@ doStuff.register({
  */
 function stripTableStyles (input, extraInputs, GETvars) {
   const tableInner = (whole) => {
-    console.log('whole:', whole)
     return whole.replace(/\sstyle="[^"]+"/igs, '')
   }
 

@@ -32,6 +32,8 @@ export const userSettingsMW = store => next => action => {
             value: state.userSettings.debug
           }
         })
+      } else {
+        return next(action)
       }
       break
 

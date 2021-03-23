@@ -39,6 +39,40 @@ const allExtraInputsView = (props, url) => {
 
 }
 
+/**
+ * Get a template for "Repetable" action description
+ *
+ * NOTE: Because it's often useful to have HTML in a description
+ *       and lit-html (or the browser/renderer) encodes any strings
+ *       in the template, we need to bypass this by creating an HTML
+ *       element and put the description in it.
+ *
+ * @param {string} description
+ *
+ * @returns {string}
+ */
+const renderDescription = (description) => {
+  if (isNonEmptyStr(description)) {
+    if (description.indexOf('<') > -1) {
+      // Description contains HTML so put it in an HTML DOM element
+      // to bypass renderer sanisation
+
+      // If description already has a <P> tag, make the wrapper a
+      // <DIV> otherswise make the wrapper a <P>
+      const wrapper = (description.indexOf('<p') > -1) ? 'div' : 'p'
+      const tmpDesc = document.createElement(wrapper)
+
+      tmpDesc.className = 'repeatable-desc'
+      tmpDesc.innerHTML = description
+
+      return html`${tmpDesc}`
+    } else {
+      return html`<p class="repeatable-desc">${description}</p>`
+    }
+  }
+  return ''
+}
+
 export const repeatableUI = (props) => {
   let extraInputs
   let actionList = []
@@ -50,6 +84,9 @@ export const repeatableUI = (props) => {
     // blah
   }
 
+  console.group('repeatableUI()')
+  console.log('props:', props)
+  console.groupEnd()
   return html`
     <section>
       <h2>Repeatable regex actions</h2>
@@ -61,9 +98,9 @@ export const repeatableUI = (props) => {
         props.events,
         activeActionID)}
 
-      <h3>${props.name}</h3>
+      <h3>${props.activeAction.name}</h3>
 
-      ${(isNonEmptyStr(props.description)) ? html`<p>${props.description}</p>` : ''}
+      ${renderDescription(props.activeAction.description)}
     </section>
   `
 }
