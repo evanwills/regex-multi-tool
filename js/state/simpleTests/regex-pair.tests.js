@@ -5,11 +5,7 @@ import {
 
 let state = regexPairsReducer()
 
-console.log('state:', state)
-console.log('state[0].id:', state[0].id)
-
 const id = state[0].id
-console.log('id:', id)
 
 const action1 = {
   type: regexPairActions.UPDATE_REGEX,
@@ -21,10 +17,6 @@ const action1 = {
 }
 state = regexPairsReducer(state, action1)
 
-console.group('action 1')
-console.log('state:', state)
-console.groupEnd()
-
 const action2 = {
   type: regexPairActions.UPDATE_REPLACE,
   payload: {
@@ -33,10 +25,6 @@ const action2 = {
   }
 }
 state = regexPairsReducer(state, action2)
-
-console.group('action 2')
-console.log('state:', state)
-console.groupEnd()
 
 const action3 = {
   type: regexPairActions.UPDATE_FLAGS,
@@ -47,10 +35,6 @@ const action3 = {
   }
 }
 state = regexPairsReducer(state, action3)
-
-console.group('action 3')
-console.log('state:', state)
-console.groupEnd()
 
 const action4a = {
   type: regexPairActions.UPDATE_DELIMS,

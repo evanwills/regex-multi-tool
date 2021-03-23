@@ -1,8 +1,8 @@
 
 .settings {
-  background-color: var(--over-color);
+  background-color: var(--over-colour);
   bottom: 0;
-  box-shadow: 0 0 1.5rem var(--over-color);
+  box-shadow: 0 0 1.5rem var(--over-colour);
   left: 0;
   padding: 0.5rem;
   position: absolute;

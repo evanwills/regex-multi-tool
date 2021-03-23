@@ -42,6 +42,7 @@ const allExtraInputsView = (props, url) => {
 export const repeatableUI = (props) => {
   let extraInputs
   let actionList = []
+  const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id)) ? props.activeAction.id : ''
 
   if (Array.isArray(props.chainable)) {
     // blah
@@ -53,7 +54,12 @@ export const repeatableUI = (props) => {
     <section>
       <h2>Repeatable regex actions</h2>
 
-      ${repeatableActionNav(props.navOpen, props.href, props.allActions, props.events)}
+      ${repeatableActionNav(
+        props.navOpen,
+        props.href,
+        props.allActions,
+        props.events,
+        activeActionID)}
 
       <h3>${props.name}</h3>
 

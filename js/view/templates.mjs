@@ -155,11 +155,8 @@ export const getMainAppView = (domNode, store) => {
       ? ['Test', 'Replace', 'Reset']
       : ['Modify', 'Reset']
 
-    // console.log('mainApp()')
-    // console.log('newProps:', newProps)
-
     const UI = html`
-      <div class="regex-multi ui-${props.userSettings.uiMode}">
+      <div class="regex-multi ui-${props.userSettings.uiMode} ${(props.mode === 'oneOff') ? 'oneOff' : 'repeatable'}-mode">
         ${header(isSimple, mainEvent)}
         ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
         ${footer(

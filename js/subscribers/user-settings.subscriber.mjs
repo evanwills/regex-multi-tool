@@ -37,8 +37,6 @@ const makeRGBA = (hex) => {
   }
 
   if (c === 3) {
-    console.log('makeRGBA()')
-    console.log('makeRGBA()')
     return 'rgba(' + output + ', .85)'
   }
   throw Error('makeRGBA() could not parse ' + hex + ' into decimal RGB values.')
@@ -61,7 +59,6 @@ export const userSettingsSubscriber = (store) => {
     } else if (previousSettings.customTxt !== currentSettings.customTxt) {
       root.style.setProperty('--custom-txt', currentSettings.customTxt)
     } else if (previousSettings.customOver !== currentSettings.customOver) {
-      console.log('makeRGBA(' + currentSettings.customOver + ')', makeRGBA(currentSettings.customOver))
       root.style.setProperty(
         '--custom-over-colour',
         makeRGBA(currentSettings.customOver)

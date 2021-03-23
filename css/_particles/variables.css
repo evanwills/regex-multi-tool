@@ -16,8 +16,8 @@
 
   --bg-colour: var(--dark-bg, #2d2b2b);
   --txt-colour: var(--dark-txt ,#fff);
-  --over-color: var(--dark-over-colour, rgba(0,0,0, 0.85));
-  --over-color-rev: var(--dark-over-colour-rev, rgba(0,0,0, 0.85));
+  --over-colour: var(--dark-over-colour, rgba(0,0,0, 0.85));
+  --over-colour-rev: var(--dark-over-colour-rev, rgba(0,0,0, 0.85));
 
   --font-size: 16px;
   --timing: 0.4s;
@@ -34,20 +34,20 @@
 .ui-darkmode {
   --bg-colour: var(--dark-bg, #2d2b2b);
   --txt-colour: var(--dark-txt ,#fff);
-  --over-color: var(--dark-over-colour, rgba(0,0,0, 0.85));
-  --over-color-rev: var(--dark-over-colour-rev, rgba(0,0,0, 0.85));
+  --over-colour: var(--dark-over-colour, rgba(0,0,0, 0.85));
+  --over-colour-rev: var(--dark-over-colour-rev, rgba(0,0,0, 0.85));
 }
 
 .ui-lightMode {
   --bg-colour: var(--light-bg, #2d2b2b);
   --txt-colour: var(--light-txt ,#fff);
-  --over-color: var(--light-over-colour, rgba(0,0,0, 0.85));
-  --over-color-rev: var(--light-over-colour-rev, rgba(0,0,0, 0.85));
+  --over-colour: var(--light-over-colour, rgba(0,0,0, 0.85));
+  --over-colour-rev: var(--light-over-colour-rev, rgba(0,0,0, 0.85));
 }
 
 .ui-customMode {
   --bg-colour: var(--custom-bg, #2d2b2b);
   --txt-colour: var(--custom-txt ,#fff);
-  --over-color: var(--custom-over-colour, rgba(0,0,0, 0.85));
-  --over-color-rev: var(--custom-over-colour-rev, rgba(0,0,0, 0.85));
+  --over-colour: var(--custom-over-colour, rgba(0,0,0, 0.85));
+  --over-colour-rev: var(--custom-over-colour-rev, rgba(0,0,0, 0.85));
 }

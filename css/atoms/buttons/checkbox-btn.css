@@ -48,7 +48,7 @@
   margin-bottom: -1rem;
 }
 .cb-btn__input:checked + .cb-btn__label {
-  background-color: var(--over-color-rev);
+  background-color: var(--over-colour-rev);
   color: var(--bg-colour);
 }
 .cb-btn__input:checked + .cb-btn__label--badge::before {

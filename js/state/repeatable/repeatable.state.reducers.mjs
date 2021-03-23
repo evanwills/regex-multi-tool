@@ -195,13 +195,13 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
         ? { ...state, fields: { ...state.fields, groups: action.payload } }
         : state
 
-    case repeatActions.REPEATABLE_TOGGLE_NAV:
+    case repeatActions.TOGGLE_NAV:
       return {
         ...state,
         navOpen: !state.navOpen
       }
 
-    case repeatActions.REPEATABLE_TOGGLE_DEBUG:
+    case repeatActions.TOGGLE_DEBUG:
       return {
         ...state,
         debug: !state.debug

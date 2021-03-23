@@ -2,6 +2,7 @@ import { combineReducers } from '../../redux/redux.mjs'
 // import { createSlice } from '@reduxjs/toolkit'
 import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID } from '../../utility-functions.mjs'
+import { isInt } from '../../utility-functions.mjs'
 
 // ==============================================
 // START: Utility functions
@@ -12,36 +13,13 @@ import { getID } from '../../utility-functions.mjs'
 //  *
 //  * @returns {void}
 //  */
-// const slowPoke = () => {
+// const slowPoke = (loops) => {
+//   const _loops = (isInt(loops) && loops > 1 && loops < 1000) ? loops : 15
+//
 //   console.groupCollapsed('slowPoke()')
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
-//   console.log(Math.sqrt(Date.now() * Math.PI))
+//   for (let a = 0; a < loops; a += 1) {
+//     console.log(Math.sqrt(Date.now() * Math.PI))
+//   }
 //   console.groupEnd()
 // }
 
@@ -814,7 +792,6 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.SET_DO_SPLIT:
-      console.log('state.split.doSplit:', state.split.doSplit)
       return {
         ...state,
         split: {
@@ -847,7 +824,6 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.SET_STRIP_AFTER:
-      console.log('state:', state)
       return {
         ...state,
         strip: {
@@ -857,7 +833,6 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
       }
 
     case oneOffActions.TOGGLE_SETTINGS:
-      console.log('state:', state)
       return {
         ...state,
         settingsOpen: !state.settingsOpen

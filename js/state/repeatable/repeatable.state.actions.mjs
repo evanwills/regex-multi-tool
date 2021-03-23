@@ -16,6 +16,7 @@ export const repeatActions = {
 
 export const getAutoDispatchHrefAction = (_dispatch) => {
   return function (e) {
+    e.preventDefault()
     let _action = this.href.replace(/^.*?[?&]action=([^&#]+)(?:[&#].*?)?$/i, '$1')
 
     if (_action !== this.href) {
@@ -34,37 +35,8 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
     let _type = ''
 
     switch (this.value) {
-      case 'updateChain':
-        _type = oneOffActions.UPDATE_CHAIN
-        break
-
-      case 'setOutput':
-        _type = oneOffActions.SET_OUTPUT
-        break
-
-      case 'setMatches':
-        _type = oneOffActions.SET_MATCHES
-        break
-
-      case 'reset':
-        _type = oneOffActions.RESET
-        break
-
-      case 'split-input':
-        _type = oneOffActions.SET_DO_SPLIT
-        break
-
-      case 'trim-before':
-        _type = oneOffActions.SET_STRIP_BEFORE
-        break
-
-      case 'trim-after':
-        _type = oneOffActions.SET_STRIP_AFTER
-        break
-
-      case 'input-toggleSettings-open':
-      case 'input-toggleSettings-close':
-        _type = oneOffActions.TOGGLE_SETTINGS
+      case 'toggle-nav':
+        _type = repeatActions.TOGGLE_NAV
         break
     }
 
@@ -79,17 +51,6 @@ export const getAutoDispatchValueAction = (_dispatch) => {
     let _type = ''
 
     switch (this.id) {
-      case 'setEngine':
-        _type = oneOffActions.SET_ENGINE
-        break
-
-      case 'setInput':
-        _type = oneOffActions.SET_INPUT
-        break
-
-      case 'setSplitter':
-        _type = oneOffActions.SET_SPLITTER
-        break
     }
 
     _dispatch({
@@ -125,8 +86,8 @@ export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
 
 export const getRepeatableEventHandlers = (dispatch) => {
   return {
-    hrefAction: getAutoDispatchHrefAction(dispatch),
-    simpleAction: getAutoDispatchSimpleAction(dispatch),
-    valueAction: getAutoDispatchValueAction(dispatch),
+    hrefEvent: getAutoDispatchHrefAction(dispatch),
+    simpleEvent: getAutoDispatchSimpleAction(dispatch),
+    valueEvent: getAutoDispatchValueAction(dispatch),
   }
 }

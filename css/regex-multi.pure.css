@@ -8,7 +8,7 @@
 @import 'organisms/regex-pair.css';
 @import 'organisms/settings-block.css';
 
-@import 'molecules/button-list.css';
+@import 'molecules/repeatable-nav.css';
 @import 'molecules/tab-nav.css';
 
 @import 'atoms/typeography.css';

@@ -414,7 +414,6 @@ function Repeatable (url, _remote, docs, api) {
    * @returns {string}
    */
   this.getCurrentActionID = function () {
-    console.log('currentAction:', currentAction)
     return (currentAction !== null) ? currentAction.id : ''
   }
 

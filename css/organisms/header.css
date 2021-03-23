@@ -1,7 +1,7 @@
 
 .regex-multi__header {
   align-items: center;
-  background-color: var(--over-color);
+  background-color: var(--over-colour);
   display: grid;
   grid-template-columns: 1fr auto;
   left: 0;
@@ -9,6 +9,10 @@
   position: fixed;
   right: 0;
   top: 0;
+}
+.repeatable-mode .regex-multi__header {
+  padding-right: 3rem;
+
 }
 .regex-multi__header .header-1 {
   color: var(--txt-colour);

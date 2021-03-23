@@ -71,7 +71,6 @@ export const singleRadioBtn = (id, label, value, isChecked, eventHandler, tabInd
  * @returns {html}
  */
 export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge) => {
-  // console.log('value:', value)
   if (isNonEmptyStr(label)) {
     return html`
     <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label">

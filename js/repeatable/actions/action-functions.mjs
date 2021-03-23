@@ -270,8 +270,6 @@ const makeAccordion = (input, extraInputs, GETvars) => {
 
   switch (extraInputs.mode()) {
     case 'headings':
-      console.log('regexHead', regexHead)
-      console.log('regexHead.test(input)', regexHead.test(input))
       return headingFunc(input)
       // return ''
       // break
