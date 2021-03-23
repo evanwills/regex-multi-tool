@@ -13,3 +13,19 @@ Both parts can run in directly in the browser using Javascript or utilise a serv
 The user interface is written in pure Javascript using the [lit-html](https://lit-html.polymer-project.org/)
 
 This is an experement to see if I can build a sophisiticated Javascript based tool without any build step.
+
+# TODO
+
+* ~~Dark mode theme~~ _[done]_
+* ~~Light mode theme~~ _[done]_
+* ~~User managed custom theme~~ _[done]_
+* ~~browser history updating~~ _[done]_
+* ~~Remove dependence on Sass~~ _[done]_
+* Local "Repeatable" implementation _[in progress]_
+* Export Regex API (TypeScript) to ES Modules _[in progress]_
+* Implement Local storage
+* Implement Service worker
+* Make all actions that modify text asynchronous
+* Remote Regex test (oneOff)
+* Remote Do Regex stuff (repeatable)
+* Move local actions that modify text into a web worker (if that's even possible)
