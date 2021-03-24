@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { ucFirst, idSafe } from '../../utility-functions.mjs'
+import { isNonEmptyStr, isStr, isStrNum, boolTrue, ucFirst, idSafe } from '../../utility-functions.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field
@@ -19,7 +19,7 @@ export const getAttr = (attr, props, prefix) => {
     ? prefix.trim() + ucFirst(attr.trim())
     : attr
 
-  return (typeof props[_attr] === 'number' || (typeof props[_attr] === 'string' && props[_attr].trim() !== ''))
+  return (isNumber(props[_attr]) || isNonEmptyStr(props[_attr]))
     ? ' ' + attr.toLowerCase() + '="' + props[_attr] + '"'
     : ''
 }
@@ -38,16 +38,10 @@ export const getAttr = (attr, props, prefix) => {
  * @returns {string} HTML element class name
  */
 export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
-  const _cls = (typeof prefix === 'string' && prefix.trim() !== '')
-    ? prefix.trim() + 'Class'
-    : 'class'
-  const _suffix = (typeof BEMelement === 'string' && BEMelement.trim() !== '')
-    ? '__' + BEMelement.trim()
-    : ''
-  const _modifier = (typeof BEMmodifier === 'string' && BEMmodifier.trim() !== '')
-    ? '--' + BEMmodifier.trim()
-    : ''
-  let _output = (typeof props[_cls] === 'string') ? props[_cls].trim() : ''
+  const _cls = (isNonEmptyStr(prefix)) ? prefix.trim() + 'Class' : 'class'
+  const _suffix = (isNonEmptyStr(BEMelement)) ? '__' + BEMelement.trim() : ''
+  const _modifier = (isNonEmptyStr(BEMmodifier)) ? '--' + BEMmodifier.trim() : ''
+  let _output = (isStr(props[_cls])) ? props[_cls].trim() : ''
   _output = (_output === '' && typeof props.class === 'string') ? props.class.trim() : ''
 
   return (_output !== '') ? _output + _suffix + _modifier : ''
@@ -90,8 +84,8 @@ export const getAttrs = (attrArr, props, prefix) => {
  * @returns {boolean} HTML attribute with value or empty string
  */
 export const getBoolAttr = (attr, props, reverse) => {
-  const output = (typeof props[attr] === 'boolean' && props[attr] === true)
-  return (typeof reverse === 'boolean' && reverse === true) ? !output : output
+  const output = boolTrue(props[attr])
+  return (boolTrue(reverse)) ? !output : output
 }
 
 /**
@@ -126,9 +120,9 @@ export const label = (props) => {
 export const dataOption = (input) => {
   const _type = typeof input.option
   if (_type === 'object') {
-    const _selected = (typeof input.default === 'boolean' && input.default === true)
+    const _selected = (boolTrue(input.default))
     return html`<option value="${input.value}" ?selected=${_selected}>`
-  } else if (_type === 'string' || _type === 'number') {
+  } else if (isStrNum(_type)) {
     return html`<option value="${input}">`
   } else {
     throw Error('dataOption() expects input to be either a string, a number or an object with a "value" property (and optionally a "default" property). ' + _type + ' given!')
@@ -178,11 +172,9 @@ export const getListAttr = (props) => {
  * @returns {string}
  */
 export const getDescbyAttr = (props) => {
-  if (typeof props.desc !== 'undefined' && props.desc.trim() !== '') {
-    return ' aria-describedby="' + props.id + '-describe"'
-  } else {
-    return ''
-  }
+  return (isNonEmptyStr(props.desc))
+    ? ' aria-describedby="' + props.id + '-describe"'
+    : ''
 }
 /**
  * Get a description block for a input field.
@@ -192,7 +184,7 @@ export const getDescbyAttr = (props) => {
  * @returns {lit-html}
  */
 export const describedBy = (props) => {
-  return (typeof props.desc === 'string' && props.desc.trim() !== '')
+  return (isNonEmptyStr(props.desc))
     ? html`<div id="${props.id}-describe" class=${getClassName(props, 'desc')}>${props.desc}</div>`
     : ''
 }
@@ -215,7 +207,7 @@ export const textInput = (props, multiLine) => {
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
 
-  if (typeof multiLine === 'boolean' && multiLine === true) {
+  if (boolTrue(multiLine)) {
     return html`
       ${label(props)}
       <textarea id="${props.id}"${txtProps} class="${getClassName(props, 'input')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} ?spellcheck=${getBoolAttr('spellcheck', props)} ?autocomplete=${getBoolAttr('autocomplete', props)}${_descBy} @change=${props.change}>${props.value}</textarea>
@@ -247,17 +239,16 @@ export const textInput = (props, multiLine) => {
  * @return {lit-html}
  */
 const selectOption = (props) => {
-  const _value = (typeof props === 'string')
+  const _value = (isStr(props))
     ? props
     : props.value
-  const _label = (typeof props === 'string')
+  const _label = (isStr(props))
     ? props
-    : (typeof props.label === 'string' && props.label.trim() !== '')
+    : (isNonEmptyStr(props.label))
         ? props.label
         : props.value
-  const _selected = (typeof props.selected === 'boolean' && props.selected === true)
 
-  return html`<option value=${_value} ?selected=${_selected}>${_label.trim()}</option>`
+  return html`<option value=${_value} ?selected=${boolTrue(props.selected)}>${_label.trim()}</option>`
 }
 
 /**

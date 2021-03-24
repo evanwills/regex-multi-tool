@@ -10,10 +10,9 @@
   right: 0;
   top: 0;
 }
-.repeatable-mode .regex-multi__header {
+/* .repeatable-mode .regex-multi__header {
   padding-right: 3rem;
-
-}
+} */
 .regex-multi__header .header-1 {
   color: var(--txt-colour);
   font-family: Verdana, Geneva, Tahoma, sans-serif;

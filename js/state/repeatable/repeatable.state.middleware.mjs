@@ -70,7 +70,10 @@ export const repeatableMW = store => next => action => {
         if (repeatable.setAction(action.payload)) {
           store.dispatch({
             ...action,
-            payload: repeatable.getCurrentActionMeta()
+            payload: {
+              ...repeatable.getCurrentActionMeta(),
+              get: _state.url.searchParams
+            }
           })
           if (_state.repeatable.navOpen) {
             store.dispatch({

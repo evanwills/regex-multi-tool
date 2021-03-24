@@ -1,3 +1,5 @@
+import { isBool } from '../../utility-functions.mjs'
+import { invalidStrNum, isNumeric, boolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 import { repeatActions } from './repeatable.state.actions.mjs'
 
 /**
@@ -113,6 +115,75 @@ const objectExistsInList = (objectList, id) => {
 }
 
 /**
+ * Get object whose keys match the list of extra IDs for extra input
+ * fields and whose value match either the defaults set when the
+ * action was registered or values set via GET variables
+ *
+ * @param {array}  extraInputs List of extra input fields as defined
+ *                             when the action was registered
+ * @param {object} get         key/value pairs from the URL's search
+ *                             parameters (aka GET variables)
+ *
+ * @returns {object} List of key/value pairs with the initial value
+ *                   for each extraInput field
+ */
+const getExtraInputKeyValues = (extraInputs, get) => {
+  const output = {}
+  for (const field in extraInputs) {
+    const _field = extraInputs[field]
+    const _get = (!invalidStrNum(_field.id, get)) ? get[_field.id] : ''
+    switch (_field.type) {
+      case 'text':
+      case 'textarea':
+        if (_get !== '') {
+          output[_field.id] = _get
+        } else if (!invalidStrNum('default', _field)) {
+          output[_field.id] = _field.default
+        } else {
+          output[_field.id] = ''
+        }
+        break
+
+      case 'number':
+        if (_get !== '') {
+          output[_field.id] = _get * 1
+        } else if (!isNumeric(_field.default)) {
+          output[_field.id] = _field.default * 1
+        } else {
+          output[_field.id] = ''
+        }
+        break
+
+      case 'radio':
+      case 'select':
+        if (_get !== '') {
+          output[_field.id] = _get
+        } else {
+          const defaultValue = _field.options.filter(option => boolTrue(option.default)).map(option => option.value)
+          output[_field.id] = (defaultValue.length > 0)
+            ? defaultValue[0]
+            : ''
+        }
+        break
+
+      case 'checkbox':
+        const checkBoxes = {}
+        for (const box in _field.options) {
+          const _box = _field.options[box]
+          // need to make value work as GET variable
+          const getKey = makeAttributeSafe(_field.id + '-' + _box.value)
+          checkBoxes[_box.value] = (isBool(get[getKey]))
+            ? get[getKey]
+            : boolTrue(_box.default)
+        }
+        output[_field.id] = checkBoxes
+        break;
+    }
+  }
+  return output
+}
+
+/**
  * Check whether a field should update.
  *
  * @param {array}         fields List of all fields that could be updated
@@ -131,6 +202,14 @@ const fieldShouldUpdate = (fields, id, value) => {
   return false
 }
 
+/**
+ * Reducer for Repeatable state
+ *
+ * @param {object} state
+ * @param {object} action
+ *
+ *  @returns {object}
+ */
 export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
   switch (action.type) {
     case repeatActions.SET_ACTION:
@@ -141,7 +220,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
             fields: {
               inputLabel: action.payload.inputLabel,
               inputPrimary: '',
-              inputExtra: action.payload.extraInputs,
+              inputExtra: getExtraInputKeyValues(action.payload.extraInputs, action.payload.get),
               outputLabel: action.payload.outputLabel,
               outputPrimary: '',
               outputExtra: [],

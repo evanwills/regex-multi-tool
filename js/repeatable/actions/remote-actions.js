@@ -2,7 +2,7 @@
 /* global doStuff */
 
 // doStuff.register({
-//   action: 'Base64',
+//   id: 'Base64',
 //   description: 'Encode/Decode Base64 string',
 //   // group: 'it',
 //   ignore: true,
@@ -29,7 +29,7 @@
 // })
 
 doStuff.register({
-  action: 'BackwardsSort',
+  id: 'BackwardsSort',
   description: 'Sort a (line separated) list of text by from the end of the line (rather than the begining).',
   // group: 'it',
   // ignore: true,

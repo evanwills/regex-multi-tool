@@ -95,7 +95,7 @@ const exposeChickens = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'doChicken',
+  id: 'doChicken',
   description: 'Change all vowels into chickens',
   // docURL: 'docs/expose-chickens.html',
   docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/expose-chickens',
@@ -285,7 +285,7 @@ const makeAccordion = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'heading2accordion',
+  id: 'heading2accordion',
   description: 'Convert content to an accordion using specific headings as the separator for the accordion',
   // docsURL: '',
   extraInputs: [
@@ -415,7 +415,7 @@ function jsSyntaxHighlight (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'jsSyntaxHighlight',
+  id: 'jsSyntaxHighlight',
   func: jsSyntaxHighlight,
   ignore: false,
   name: 'Syntax highlighting for JS'
@@ -460,7 +460,7 @@ function incrementH (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'incrementH',
+  id: 'incrementH',
   func: incrementH,
   ignore: false,
   name: 'Decrement or Increment HTML heading',
@@ -565,7 +565,7 @@ function matchPaymentIDs (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'matchPaymentIDs',
+  id: 'matchPaymentIDs',
   func: matchPaymentIDs,
   ignore: true,
   name: 'Match unfinished payment IDs to confirmed payments.',
@@ -652,7 +652,7 @@ function urlDecodeEncode (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'urlDecodeEncode',
+  id: 'urlDecodeEncode',
   description: 'Add or remove URI encoding from a URL',
   func: urlDecodeEncode,
   ignore: false,
@@ -752,7 +752,7 @@ function acuLogoClean (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'acuLogoClean',
+  id: 'acuLogoClean',
   func: acuLogoClean,
   group: 'mer',
   ignore: true,
@@ -779,7 +779,7 @@ function staffAccessCard (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'staffAccessCard',
+  id: 'staffAccessCard',
   func: staffAccessCard,
   description: 'Generate a staff access card URL with email and gender bound in',
   // docsURL: '',
@@ -854,7 +854,7 @@ function fixCEGunitURLs (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'fixCEGunitURLs',
+  id: 'fixCEGunitURLs',
   func: fixCEGunitURLs,
   description: 'Fix CEG unit modal URLs',
   // docsURL: '',
@@ -985,7 +985,7 @@ function fixPoliciesAnchorLinksV1 (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'fixPoliciesAnchorLinksV1',
+  id: 'fixPoliciesAnchorLinksV1',
   func: fixPoliciesAnchorLinksV1,
   description: '',
   // docsURL: '',
@@ -1027,7 +1027,7 @@ function stripTableStyles (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'stripTableStyles',
+  id: 'stripTableStyles',
   func: stripTableStyles,
   description: 'Remove style attributes (inline styles) from HTML',
   // docsURL: '',
@@ -1061,7 +1061,7 @@ function base64 (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'Base64',
+  id: 'Base64',
   description: 'Encode/Decode Base64 string',
   func: base64,
   // group: 'it',
@@ -1124,7 +1124,7 @@ const commaSepThousand = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'commaSepThousand',
+  id: 'commaSepThousand',
   func: commaSepThousand,
   description: '',
   // docsURL: '',
@@ -1296,7 +1296,7 @@ const formatHandbookPolicy = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'formatHandbookPolicy',
+  id: 'formatHandbookPolicy',
   func: formatHandbookPolicy,
   description: '',
   // docsURL: '',
@@ -2269,7 +2269,7 @@ const htmlSpecialChars = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'htmlSpecialChars',
+  id: 'htmlSpecialChars',
   func: htmlSpecialChars,
   description: '',
   // docsURL: '',

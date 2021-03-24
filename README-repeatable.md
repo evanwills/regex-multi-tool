@@ -112,7 +112,7 @@ After you've defined the function, you need to register it by calling
 2. They can only contain alpha-numeric characters
 3. They must be a minimum of 6 characters long and a maximum of 50
    characters long
-5. They must be unique (case insensitive when compared)
+4. They must be unique (case insensitive when compared)
 
 ### About `group` names
 
@@ -183,12 +183,6 @@ option value/label pair. You can do so by defining option objects.
 2. __`label`__: {string} _[required]_ The text visible to the user
 3. `default`: {boolean} _[optional]_ Whether or not this field/option 
    is checked/selected by default
-
-__NOTE:__ If there is a `GET` variable matching the ID of the field
-          and the value of that `GET` variable matches the value of
-          the option, then that option will be checked/selected by
-          default.
-
 -----
 
 ## Using the values from extra input fields
@@ -333,14 +327,17 @@ GET variables are also URL decoded. (But JSON objects are not parsed)
 
 ### Presetting _extra input_ fields
 
-For text type fields, if the field's ID matches a GET variable,
-then the value of the GET variable is used as the default value
-for that field.
+For text type fields, numeric fields, radio fields and select fields: 
+if the field's ID matches a GET variable, then the value of the GET 
+variable is used as the default value for that field.
 
-For checkbox, radio & select fields, if the field's `name` matches
-a get variable and the field's (or option's) value matches the 
-value of the GET variable then that field/option will be 
-checked/selected.
+Because checkbox fields have multiple fields for the same ID (when 
+the action is registered), the expected GET variable pattern would 
+be `[field ID]-[checkbox value]`<br />
+e.g. If the checkbox group ID is `mood` and the checkbox's
+     value is `unsure` then the GET variable would be `mood-unsure` 
+     or `mood-unsure=true`.<br />
+     When rendered this checkbox would be checked by default.
 
 ### Using GET variables within action function
 
@@ -386,19 +383,18 @@ join tools together to perform more complex actions. At the moment
 __*"Regex Multi-tool (repeatable)"*__ can't do that. However in the future, *it will!*
 
 When registering an action a new property will be available: 
-`chaindedActions` which will be an array of chained action objects.
+`chainded` which will be an array of chained action ID strings or chained action objects.
 
 ```json
-chainedActions: [
-  {
-    "actionID": "XXXX",
-    "required": false,
-    "order": {
-      "position": 0,
-      "force": false
+{
+  "chained": [
+    "XXXX", // ID for chained action (assumend to be optional)
+    {
+      "id": "YYYY",     // ID for chained action
+      "required": false // Whether or not the chained action is always to be performed when the main action is called
     }
-  }
-]
+  ]
+}
 ```
 
 #### Chained action object
@@ -407,36 +403,15 @@ chainedActions: [
 * `required` - {boolean} *[optional]* Whether or not the action must
                always be performed when the main action is performed<br />
                (assumed `FALSE` if absent)
-* `order` - {object} *[optional]* The order in which the chanied 
-               action is performed<br />
-               (If absent, chained actions will be performed after 
-               the main action (i.e. the one being registered) in the
-               order they're listed
-* `position` - {number} *[mandatory]* [default: `0`] position within 
-               the chain that this action will be performed <br >
-               By default the user can change the order in which the
-               chained action can be performed
-  * If `position` is less than zero, it will be performed before the
-                  action in the order of its position
-  * If `position` is greater than zero it will be performed after 
-                  the action in the order of its position
-  * If `position` is zero *[default value]* it will performed after 
-                  the main according to its position in the 
-                  chainedActions list, along with other chained 
-                  actions that have no position 
-  * If more than one action has the same `position` value it will be 
-    performed in order of its position in the chainedActions list 
-    relative to others with the same `position` value
-* `force` - {boolean} *[optional]* If `force` is `TRUE` user will not
-            be able to change the order in which this chained action 
-            is performed
+
 
 #### User interface for chained actions
 
-When an action has chained actions associated with it, a list of 
-checkboxes will be shown to the user. One for each action. 
+Chained actions are listed as checkbox buttons, in the order they 
+appear in the `chained` array 
 
-Where a chained action is required, the checkbox will be read-only.
+Where a chained action is required, the checkbox will be checked 
+and read-only.
 
 If the chained action has extra fields when the checkbox is ticked,
 a new fieldset will be shown with all that action's extra input 
@@ -446,6 +421,11 @@ fields.
 >           the value from the main output field will be passed to 
 >           the next chained action. But all output fields will be 
 >           shown.
+
+> __NOTE ALSO:__ Chained actions that are designated as required 
+>           when the parent action is registered will be run when 
+>           the parent action is run regardless of whether the 
+>           user forces the required state to false
 
 ### Extra outputs
 
@@ -457,13 +437,16 @@ When registering an action a new property will be available:
 `extraOutputs` which will be an array of extra output objects.
 
 ```json
-"extraOutputs": [
-  {
-    "outputID": "XXXX",
-    "singleLine": false,
-    "before": false
-  }
-]
+{
+  "extraOutputs": [
+    "XXXX", // ID for extra output (assumed to be textarea and rendered after main input)
+    {
+      "id": "YYYY",        // ID for extra output
+      "singleLine": false, // render as <input type="text" />
+      "before": false
+    }
+  ]
+}
 ```
 
 Only the `outputID` is required.

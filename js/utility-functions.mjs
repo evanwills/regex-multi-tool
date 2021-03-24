@@ -134,7 +134,7 @@ export const getURLobject = (url) => {
           if (tmp[i] !== '') {
             tmp[i] = tmp[i].split('=')
             key = tmp[i][0]
-            output.searchParams[key] = cleanGET(tmp[i][1])
+            output.searchParams[key] = cleanGET(isStr(tmp[i][1]) ? tmp[i][1] : 'true')
             output.searchParamsRaw[key] = tmp[i][1]
           }
         }
@@ -239,6 +239,17 @@ export const isNumeric = (input) => {
   } else {
     return false
   }
+}
+
+/**
+ * Check whether something is either a string or number
+ *
+ * @param {any} input Value that should be numeric
+ *
+ * @returns {boolean} TRUE if the input is either a string or number
+ */
+export const isStrNum = (input) => {
+  return (isNumeric(input) || isStr(input))
 }
 
 export const isInt = (input) => (isNumeric(input) && !isNaN(parseInt(input)))
@@ -436,7 +447,7 @@ export const makeAttributeSafe = (_attr) => {
     throw new Error('makeAttributeSafe() expects only parameter "_attr" to be a non-empty string. ' + typeof _attr + ' given.')
   }
 
-  _output = _attr.replace(/[^a-z0-9_\\-]+/ig, '')
+  _output = _attr.replace(/[^a-z0-9_\-]+/ig, '')
 
   if (_output === '') {
     throw new Error('makeAttributeSafe() expects only parameter "_attr" to be string that can be used as an HTML class name or ID. "' + _attr + '" cannot be used. After cleaning, it became an empty string.')
@@ -575,6 +586,16 @@ export const getID = () => {
  */
 export const idSafe = (input) => {
   return input.replace(/[^a-z0-9_-]/ig, '')
+}
+
+const propSafeInner = (whole, alpha, num) => {
+  const _num = isNumeric(num) ? num : ''
+  return alpha.toUpperCase() + _num
+}
+
+export const propSafe = (input) => {
+  const output = input.replace(/^[^a-z0-9]+|[^a-z0-9]+$/ig, '')
+  return output.replace(/^[^a-z0-9]+(?:([a-z])|([0-9]))/ig, propSafeInner)
 }
 
 const escapeChars = [

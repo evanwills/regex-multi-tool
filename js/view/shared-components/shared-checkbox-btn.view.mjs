@@ -13,7 +13,8 @@ import { isNonEmptyStr, getTabI, boolTrue, makeAttributeSafe } from '../../utili
  * @param {function} eventHandler Function that handles change events
  * @param {number}   tabIndex     Value for input's tabindex attribute
  * @param {string}   badge        custom badge (modifier class suffix)
- * @param {boolean}  isRadio
+ * @param {boolean}  isRadio      Whether or not the output field
+ *                                should be a radio input or checkbox
  *
  * @returns {html}
  */
@@ -32,6 +33,72 @@ export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex,
   <!--  END:  checkboxBtn() -->
   `
 }
+
+const getFieldDesc = (id, description) => html`<div id="${id}-desc" class="field-description">${description}</div>`
+
+/**
+ * Get a complete HTML block for a group of radio buttons.
+ *
+ * @param {string}   id           ID of the radio group
+ * @param {string}   label        Label for the radio group (or empty
+ *                                string if no label)
+ * @param {string}   value        Current value for the radio group
+ * @param {array}    btns         List of radio button options
+ * @param {function} eventHandler Event handler function
+ * @param {number}   tabIndex     Value for input's tabindex attribute
+ * @param {string}   badge        custom badge (modifier class suffix)
+ * @param {boolean}  isRadio      Whether or not the output field
+ *                                should be a radio input or checkbox
+ *
+ * @returns {html}
+ */
+export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge, isRadio, description) => {
+  let _describe = ''
+  let _describedBy = ''
+
+  if (isNonEmptyStr(description)) {
+    _describedBy = id +'-desc'
+    _describe = getFieldDesc(id, description)
+  }
+  if (isNonEmptyStr(label)) {
+    return html`
+    <div class="checkbox-grp__wrapper" role="group" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
+      <h4 id="${id}-label" class="checkbox-grp__h">${label}</h4>
+      <ul class="list-clean">
+        ${btns.map(btn => checkboxBtn(
+          id,
+          btn.label,
+          btn.value,
+          (btn.value === value),
+          eventHandler,
+          tabIndex,
+          badge,
+          isRadio
+        ))}
+      </ul>
+      ${_describedBy}
+    </div>
+    `
+  } else {
+    return html`
+      <ul class="list-clean list-inline checkbox-grp" role="group" ?aria-describedby="${_describedBy}">
+        ${btns.map(btn => checkboxBtn(
+          id,
+          btn.label,
+          btn.value,
+          (btn.value === value),
+          eventHandler,
+          tabIndex,
+          badge,
+          isRadio
+        ))}
+      </ul>
+      ${_describedBy}
+    `
+  }
+}
+
+
 
 /**
  * Get HTML for a single radio button field with label and
@@ -70,10 +137,18 @@ export const singleRadioBtn = (id, label, value, isChecked, eventHandler, tabInd
  *
  * @returns {html}
  */
-export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge) => {
+export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge, description) => {
+  let _describe = ''
+  let _describedBy = ''
+
+  if (isNonEmptyStr(description)) {
+    _describedBy = id +'-desc'
+    _describe = getFieldDesc(id, description)
+  }
+
   if (isNonEmptyStr(label)) {
     return html`
-    <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label">
+    <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
       <h4 id="${id}-label" class="radio-grp__h">${label}</h4>
       <ul class="list-clean list-clean--tight list-inline radio-grp">
         ${btns.map(btn => singleRadioBtn(
@@ -86,11 +161,12 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
           badge
         ))}
       </ul>
+      ${_describedBy}
     </div>
     `
   } else {
     return html`
-      <ul class="list-clean list-inline radio-grp" role="radiogroup">
+      <ul class="list-clean list-inline radio-grp" role="radiogroup" ?aria-describedby="${_describedBy}">
         ${btns.map(btn => singleRadioBtn(
           id,
           btn.label,
@@ -101,6 +177,7 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
           badge
         ))}
       </ul>
+      ${_describedBy}
     `
   }
 }

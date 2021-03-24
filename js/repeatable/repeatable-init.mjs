@@ -6,14 +6,17 @@
  * @author Evan Wills <evan.i.wills@gmail.com
  * @url https://github.com/evanwills/regex-multi-tool
  */
+import {  } from '../utility-functions.mjs'
 import {
+  isStr,
   isNumeric,
   invalidString,
   isFunction,
   boolTrue,
   invalidBool,
   invalidNum,
-  getURLobject
+  getURLobject,
+  isNonEmptyStr
 } from '../utility-functions.mjs'
 
 // ======================================================
@@ -164,9 +167,9 @@ function Repeatable (url, _remote, docs, api) {
       }
     }
 
-    tmp = invalidString('action', config)
+    tmp = invalidString('id', config)
     if (tmp !== false) {
-      throw Error(errorMsg + 'an "action" property that is a non-empty string. ' + tmp + ' given.')
+      throw Error(errorMsg + 'an "id" property that is a non-empty string. ' + tmp + ' given.')
     }
 
     tmp = invalidString('name', config)
@@ -174,7 +177,7 @@ function Repeatable (url, _remote, docs, api) {
       throw Error(errorMsg + 'a "name" property that is a non-empty string. ' + tmp + ' given.')
     }
 
-    config.remote = (typeof config.remote === 'boolean' && config.remote === true)
+    config.remote = (boolTrue(config.remote))
 
     if (config.remote === true) {
       // This is a remote action so it doesn't need to have an action funciton
@@ -188,34 +191,6 @@ function Repeatable (url, _remote, docs, api) {
       // This is a local action so it MUST have an action function
       if (typeof config.func === 'undefined' || !isFunction(config.func)) {
         throw Error(errorMsg + 'a "func" property that is a plain javascript function. ' + tmp + ' given.')
-      }
-    }
-
-    // Validate chained actions
-    if (typeof config.chainedActions !== 'undefined') {
-      if (Array.isArray(config.chainedActions)) {
-        for (let a = 0; a < config.chainedActions.length; a += 1) {
-          tmp = invalidString('actionID', config.chainedActions[a])
-          if (tmp !== false) {
-            throw Error(errorMsg + 'that chained action ' + a + ' contains an "actionID" property that is a non-empty string. ' + tmp + ' given.')
-          }
-          tmp = invalidBool('required', config.chainedActions[a])
-          if (tmp !== false && tmp !== 'undefined') {
-            throw Error(errorMsg + 'that if chained action ' + a + ' contains a "required" property, that "required" is boolean. ' + tmp + ' given.')
-          }
-          if (typeof config.chainedActions[a].order !== 'undefined') {
-            tmp = invalidNum('position', config.chainedActions[a].order)
-            if (tmp !== false && tmp !== 'undefined') {
-              throw Error(errorMsg + 'that if chained action ' + a + ' contains an "order" property, that "order" object must contain a "position" property that is a number. ' + tmp + ' given.')
-            }
-            tmp = invalidBool('force', config.chainedActions[a].order)
-            if (tmp !== false && tmp !== 'undefined') {
-              throw Error(errorMsg + 'that if chained action ' + a + ' contains an "order" property, that "order" object must contain a "force" property that is boolean. ' + tmp + ' given.')
-            }
-          }
-        }
-      } else {
-        throw Error(errorMsg + 'an action with a "chainedActions" property that the "chainedActions" property must be an array. ' + typeof config.chainedActions + ' given.')
       }
     }
 
@@ -240,22 +215,21 @@ function Repeatable (url, _remote, docs, api) {
     // ====================================================
     // START: setting defaults for optional fields
 
-    config.inputLabel = (typeof config.inputLabel !== 'string' || config.inputLabel.trim() === '')
-      ? 'Input'
-      : config.inputLabel
+    config.inputLabel = (isNonEmptyStr(config.inputLabel))
+      ? config.inputLabel
+      : 'Input'
 
-    config.outputLabel = (typeof config.outputLabel !== 'string' || config.outputLabel.trim() === '')
-      ? 'Output'
-      : config.outputLabel
+    config.outputLabel = (isNonEmptyStr(config.outputLabel))
+      ? config.outputLabel
+      : 'Output'
 
     config.docsURL = (typeof config.docsURL === 'string')
       ? config.docsURL
       : ''
 
-    config.action = config.action.toLowerCase()
-    config.id = config.action
+    config.action = config.id.toLowerCase()
 
-    config.rawGET = (typeof config.rawGET === 'boolean' && config.rawGET === true)
+    config.rawGET = boolTrue(config.rawGET)
 
     config.extraInputs = (typeof config.extraInputs !== 'undefined' && Array.isArray(config.extraInputs))
       ? config.extraInputs
@@ -265,17 +239,35 @@ function Repeatable (url, _remote, docs, api) {
       ? config.chained
       : []
 
-    config.description = (typeof config.extraInputs !== 'string')
+    config.description = (isStr(config.description))
       ? config.description
       : ''
 
     //  END:  setting defaults for optional fields
     // ====================================================
+    // console.log('registry:', registry)
 
-    registry = [...registry, config]
+    registry = [...registry, filterNonProps(config)]
 
     // console.log('registry:', registry)
     return true
+  }
+
+  function filterNonProps (config) {
+    const output = {}
+    const okKeys = [
+      'id', 'func', 'remote', 'name', 'description',
+      'group', 'docsURL', 'extraInputs', 'extraOutputs',
+      'chained', 'rawGet', 'inputLabel', 'outputLabel'
+    ]
+    const lOkKeys = okKeys.map(item => item.toLowerCase())
+
+    for ( const prop in config) {
+      const i = lOkKeys.indexOf(prop.toLowerCase())
+      if (i > -1)
+      output[okKeys[i]] = config[prop]
+    }
+    return output;
   }
 
   /**
@@ -320,11 +312,12 @@ function Repeatable (url, _remote, docs, api) {
       _action.chained = []
       if (chained.length > 0) {
         for (let a = 0; a < chained.length; a += 1) {
+          console.log('chained[' + a + ']:', chained[a])
           const tmp = getWholeAction(chained[a], true)
           if (tmp !== false) {
             _action.chained.push({
-              ...chained,
-              action: tmp
+              tmp,
+              required: boolTrue(chained[a].required)
             })
           }
         }
@@ -364,7 +357,7 @@ function Repeatable (url, _remote, docs, api) {
    *                   action ID
    */
   const getWholeAction = (actionID, noChained) => {
-    const newAction = registry.filter(action => action.action === actionID)
+    const newAction = registry.filter(action => action.id === actionID)
 
     if (newAction.length === 1) {
       if (boolTrue(noChained)) {
@@ -521,8 +514,8 @@ function Repeatable (url, _remote, docs, api) {
     let output = true
 
     for (let a = 0; a < registry.length; a += 1) {
-      if (Array.isArray(registry[a].chainedActions) && registry[a].chainedActions.length > 0) {
-        const chain = registry[a].chainedActions
+      if (Array.isArray(registry[a].chained) && registry[a].chained.length > 0) {
+        const chain = registry[a].chained
 
         for (let b = 0; b < chain.length; b += 1) {
           let ok = true
@@ -531,7 +524,7 @@ function Repeatable (url, _remote, docs, api) {
             output = false
             ok = false
           }
-          registry[a].chainedActions[b].ok = ok
+          registry[a].chained[b].ok = ok
         }
       }
     }

@@ -257,7 +257,7 @@ function completeUpdate (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'CIM Scripts',
+  id: 'CIM Scripts',
   description: '<p>Select an option from the list below</p>',
   func: completeUpdate,
   extraInputs: [
@@ -631,7 +631,7 @@ function RUL (input) {
 // }
 
 // doStuff.register({
-//   action: 'fixUnitMOdalLinks',
+//   id: 'fixUnitMOdalLinks',
 //   description: 'Fix handbook (and Course Browser) unit modal links',
 //   func: fixUnitMOdalLinks,
 //   group: 'cim',

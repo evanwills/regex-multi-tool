@@ -72,7 +72,7 @@ function CEGcourseAdvice (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'CEGcourseAdvice',
+  id: 'CEGcourseAdvice',
   // description: 'Remove all whitespace from HTML Code',
   func: CEGcourseAdvice,
   group: 'it',
@@ -94,7 +94,7 @@ function sitecoreMM2matrixMM (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'sitecoreMM2matrixMM',
+  id: 'sitecoreMM2matrixMM',
   // description: 'Remove all whitespace from HTML Code',
   func: sitecoreMM2matrixMM,
   group: 'it',
@@ -132,7 +132,7 @@ function newRelicify (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'newRelicify',
+  id: 'newRelicify',
   func: newRelicify,
   group: 'it',
   ignore: false,
@@ -639,7 +639,7 @@ function fixSassLintIssues (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'fixSassLintIssues',
+  id: 'fixSassLintIssues',
   func: fixSassLintIssues,
   description: 'Fix common issues identified by sass-lint and use standard branding variables for colour and spacing.',
   // docsURL: '',
@@ -722,7 +722,7 @@ const kssCommentBlock = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'kssCommentBlock',
+  id: 'kssCommentBlock',
   func: kssCommentBlock,
   description: 'Generate a KSS comment block (or make HTML code safe to use in a KSS comment block',
   // docsURL: '',
@@ -820,7 +820,7 @@ const sortComponentsAlpha = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'sortComponentsAlpha',
+  id: 'sortComponentsAlpha',
   func: sortComponentsAlpha,
   description: 'Sort list of components into alphabetical order',
   // docsURL: '',
@@ -924,7 +924,7 @@ const uniqueCharsOnly = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'uniqueCharsOnly',
+  id: 'uniqueCharsOnly',
   func: uniqueCharsOnly,
   description: 'Remove duplicate characters from a string',
   // docsURL: '',
@@ -1047,7 +1047,7 @@ const sitecore2local = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'sitecore2local',
+  id: 'sitecore2local',
   func: sitecore2local,
   description: 'Rewrite URLs to point to local version of CSS, font & JS files. Plus rewrite image URLs to point to server.',
   // docsURL: '',
@@ -1168,7 +1168,7 @@ const transformSchoolsJSON = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'transformSchoolsJSON',
+  id: 'transformSchoolsJSON',
   func: transformSchoolsJSON,
   description: 'Transform RYI Suburb/Schools JSON string to JavaScript variable for use in WWW RYI from</p><p>For creating the JavaScript variable use in the public website RYI form</p><ol><li>Copy the whole JSON (supplied by marketing) into the text box below</li><li>click MODIFY INPUT (green button on the bottom left)</li><li>Copy the (modified) contents of the text box</li><li>Then replace the existing variable in the sitecore <code>ryi-script.js</code> file</li></ol><p>',
   // docsURL: '',

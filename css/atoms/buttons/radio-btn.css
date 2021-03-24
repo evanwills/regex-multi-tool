@@ -1,5 +1,6 @@
 
 .radio-grp {
+  align-items: stretch;
   align-content: stretch;
   border: var(--line-weight-hvy) solid var(--txt-colour);
   border-radius: 2em;
@@ -22,6 +23,7 @@
   text-align: center;
   transition: color var(--ease) var(--timing) background-color var(--ease) var(--timing);
   width: calc(100% + .5rem);
+  height: 100%;
 }
 .radio-grp__label::after {
   background-color: var(--bg-colour);

@@ -32,7 +32,7 @@ function getVarsToFileName (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'getVarsToFileName',
+  id: 'getVarsToFileName',
   func: getVarsToFileName,
   group: 'even',
   ignore: false,
@@ -78,7 +78,7 @@ function extractURLs (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'extractURLs',
+  id: 'extractURLs',
   func: extractURLs,
   group: 'evan',
   ignore: false,
@@ -116,7 +116,7 @@ function fixDS (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'fixDS',
+  id: 'fixDS',
   func: fixDS,
   group: 'evan',
   ignore: false,
@@ -149,7 +149,7 @@ function stringToConstFormat (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'stringToConstFormat',
+  id: 'stringToConstFormat',
   func: stringToConstFormat,
   group: 'evan',
   ignore: false,
@@ -190,7 +190,7 @@ function formAdminLocalURLs (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'formAdminLocalURLs',
+  id: 'formAdminLocalURLs',
   func: formAdminLocalURLs,
   ignore: false,
   group: 'evan',
@@ -233,7 +233,7 @@ function buildAcroSQL (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'buildAcroSQL',
+  id: 'buildAcroSQL',
   func: buildAcroSQL,
   group: 'evan',
   ignore: true,
@@ -274,7 +274,7 @@ function fixSet (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'fixSet',
+  id: 'fixSet',
   func: fixSet,
   group: 'evan',
   ignore: true,
@@ -316,7 +316,7 @@ function animalCrossing1 (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'animalCrossing1',
+  id: 'animalCrossing1',
   func: animalCrossing1,
   description: 'Rewrite Animal Crossing price list table',
   // docsURL: '',
@@ -354,7 +354,7 @@ function CSSclean (input, extraInputs, GETvars) {
 }
 
 doStuff.register({
-  action: 'CSSclean',
+  id: 'CSSclean',
   func: CSSclean,
   description: '',
   // docsURL: '',
@@ -641,7 +641,7 @@ const artBotSpeeds = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'artBotSpeeds',
+  id: 'artBotSpeeds',
   func: artBotSpeeds,
   description: '',
   // docsURL: '',
@@ -767,7 +767,7 @@ ${_in}
 }
 
 doStuff.register({
-  action: 'acusysQueries',
+  id: 'acusysQueries',
   func: acusysQueries,
   description: '',
   // docsURL: '',
@@ -828,7 +828,7 @@ const emailHashSearch = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'emailHashSearch',
+  id: 'emailHashSearch',
   func: emailHashSearch,
   description: '',
   // docsURL: '',
@@ -933,7 +933,7 @@ const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'fixBadSitecoreMerge',
+  id: 'fixBadSitecoreMerge',
   func: fixBadSitecoreMerge,
   description: 'Copy the entire output of <code>$ git status;</code> and paste it below',
   // docsURL: '',
@@ -1009,7 +1009,7 @@ const acceptChanges = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'acceptChanges',
+  id: 'acceptChanges',
   func: acceptChanges,
   description: '',
   // docsURL: '',
@@ -1087,7 +1087,7 @@ const sideAccordionIDs = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'sideAccordionIDs',
+  id: 'sideAccordionIDs',
   func: sideAccordionIDs,
   description: '',
   // docsURL: '',
@@ -1164,7 +1164,7 @@ const bash2windows = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'bash2windows',
+  id: 'bash2windows',
   func: bash2windows,
   description: '',
   // docsURL: '',
@@ -1228,7 +1228,7 @@ const fixTime = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'fixTime',
+  id: 'fixTime',
   func: fixTime,
   description: '',
   // docsURL: '',
@@ -1322,7 +1322,7 @@ const downloadMatrixAssets = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'downloadMatrixAssets',
+  id: 'downloadMatrixAssets',
   func: downloadMatrixAssets,
   description: '',
   // docsURL: '',
@@ -1374,7 +1374,7 @@ const checkoutWSonly = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'checkoutWSonly',
+  id: 'checkoutWSonly',
   func: checkoutWSonly,
   description: 'When a file in a git repo only has changed line end characters. Just checkout the file to remove the line end changes',
   // docsURL: '',
@@ -1550,7 +1550,7 @@ const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'transformSchoolsJSONevan',
+  id: 'transformSchoolsJSONevan',
   func: transformSchoolsJSONevan,
   description: 'Transform RYI Suburb/Schools JSON string to JavaScript variable for use in WWW RYI from</p><p>For creating the JavaScript variable use in the public website RYI form</p><ol><li>Copy the whole JSON (supplied by marketing) into the text box below</li><li>click MODIFY INPUT (green button on the bottom left)</li><li>Copy the (modified) contents of the text box</li><li>Then replace the existing variable in the sitecore <code>ryi-script.js</code> file</li></ol><p>',
   // docsURL: '',
@@ -1617,7 +1617,7 @@ const fixHandbookURLs = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'fixHandbookURLs',
+  id: 'fixHandbookURLs',
   func: fixHandbookURLs,
   description: '',
   // docsURL: '',
@@ -1687,7 +1687,7 @@ const extractInicode = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({
-  action: 'extractInicode',
+  id: 'extractInicode',
   func: extractInicode,
   description: 'Extract Unicode chars and their HTML Character entities from the contents of <a href="https://dev.w3.org/html5/html-author/charref">W3C\'s Character Entity Reference Chart</a> (<a href="view-source:https://dev.w3.org/html5/html-author/charref">source</a>) and make a JavaScript array for find/replace',
   // docsURL: '',

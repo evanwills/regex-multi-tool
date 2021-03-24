@@ -1,7 +1,7 @@
 .action-nav__wrap {
   --btn-width: 1.8rem;
   position: fixed;
-  top: 0;
+  top: 1.8rem;
   right: 0;
   bottom: 0;
   padding: 0;
@@ -29,13 +29,14 @@
 }
 
 .action-nav__toggle--open {
+  background-color: var(--txt-colour);
   border-top-left-radius: calc(var(--btn-width) / 2);
   border-bottom-left-radius: calc(var(--btn-width) / 2);
+  color: transparent;
   display: inline-block;
   height: var(--btn-width);
   left: calc(var(--btn-width) * -1);
   position: absolute;
-  text-indent: -100rem;
   top: 0;
   width: var(--btn-width);
 }
@@ -61,6 +62,7 @@
 }
 .action-nav__toggle--close {
   background-color: var(--over-colour);
+  color: transparent;
   bottom: 0;
   border: none;
   left: 0;
