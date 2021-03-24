@@ -1,5 +1,23 @@
 # __*"Regex Multi-tool (repeatable)"*__
 
+1. [How __*"Regex Multi-tool (repeatable)"*__ works](#how-regex-multi-tool-repeatable-works)
+2. [The `action` function](tThe-action-function)
+3. [Registering an `action` function](#registering-an-action-function)
+    1. [About `action` identifiers](#about-action-identifiers)
+    2. [About `group` names](#about-group-names)
+    3. [About `extraInput` objects](#about-extraInput-objects)
+       1. [`option` objects](#option-objects)
+4. [Using the values from extra input fields](#using-the-values-from-extra-input-fields)
+    1. [Checkbox fields](#checkbox-fields)
+5. [Using GET variables from the URL](#using-get-variables-from-the-url)
+6. [Regular expressions](#regular-expressions)
+7. [Upcoming features](#upcoming-features)
+    1. [Chained actions](#chained-actions)
+        1. [Chained action object](#chained-action-object)
+        2. [User interface for chained actions](#user-interface-for-chained-actions)
+    2. [Extra outputs](#extra-outputs)
+8. [More reading](#more-reading)
+
 ## How __*"Regex Multi-tool (repeatable)"*__ works
 
 So you have some dodgy text and you'd like to clean it up? Well 
@@ -37,7 +55,7 @@ There are a few things you need to know about the `action` function:
       from URL
 3. It must return a string (to be used as the replacement contents
    for the "Text to be modified" textarea
-4. It must be a pure function (i.e. it *must not* make changes to 
+4. It should be a pure function (i.e. it *must not* make changes to 
    variables that are not defined within the function and *must not* 
    change the user interface)
 5. It (probably) shouldn't make fetch/XHR requests
@@ -47,14 +65,14 @@ There are a few things you need to know about the `action` function:
 After you've defined the function, you need to register it by calling
 `doStuff.register()`, which accepts an object with the following keys:
 
-1. __`func`__: {function} _[required]_ (forbidden/ignored for remote 
-   actions)<br />
-   The function (the name of the function, not quoted)
-2. __`action`__: {string} _[required]_ [Action identifier](#about-action-identifiers).<br />
+1. __`id`__: {string} _[required]_ [Action identifier](#about-action-identifiers).<br />
    The GET '`action`' value that tells the script that this is the 
    right action function to use
+2. __`func`__: {function} _[required]_ (forbidden/ignored for remote 
+   actions)<br />
+   The function (the name of the function, not quoted)
 3. __`remote`__: {boolean} _[optional]_ (required for remote actions)
-   If true, it indicates that the action is to be run on the same 
+   If `TRUE`, it indicates that the action is to be run on the same 
    server __*"Regex Multi-tool (repeatable)"*__ is served from, via an API call. 
    (currently only `json.php`)
 4. __`name`__: {string} _[required]_ Used as the sub-title when the
@@ -94,8 +112,7 @@ After you've defined the function, you need to register it by calling
 2. They can only contain alpha-numeric characters
 3. They must be a minimum of 6 characters long and a maximum of 50
    characters long
-4. They are case insensitive when compared
-5. They must be unique
+5. They must be unique (case insensitive when compared)
 
 ### About `group` names
 
@@ -356,11 +373,7 @@ XRegExp adds a lot of very useful extra functionality to RegExp.
 Checkout the [XRegExp documentation](https://github.com/slevithan/xregexp/blob/master/README.md)
 for more info on how to use it.
 
-
-## More reading
-
-* [Helper & utility functions](README.utils.md)
-* [PHP API](README.php.md)
+---
 
 ## Upcoming features
 
@@ -433,3 +446,35 @@ fields.
 >           the value from the main output field will be passed to 
 >           the next chained action. But all output fields will be 
 >           shown.
+
+### Extra outputs
+
+If you are performing an action and would like to have multiple outputs (e.g. converting form field IDs to HTML form fields fields _AND_ HTML form submission results HTML _AND_ a user receipt email HTML)
+
+This will allow you to specify multiple output fields
+
+When registering an action a new property will be available: 
+`extraOutputs` which will be an array of extra output objects.
+
+```json
+"extraOutputs": [
+  {
+    "outputID": "XXXX",
+    "singleLine": false,
+    "before": false
+  }
+]
+```
+
+Only the `outputID` is required.
+
+If `singleLine` is omitted it is assumed to be false i.e. `<textarea>` is used by default
+If `before` is omitted it is assumed that the extra output is to be rendered after the main output.
+
+Extra outputs are rendered in order of appearance.
+
+-----
+## More reading
+
+* [Helper & utility functions](README.utils.md)
+* [PHP API](README.php.md)

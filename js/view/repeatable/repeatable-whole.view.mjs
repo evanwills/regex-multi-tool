@@ -3,9 +3,6 @@ import { ucFirst, isNonEmptyStr } from '../../utility-functions.mjs'
 import { store } from '../../state/regexMulti-state.mjs'
 import { repeatableActionNav } from './repeatable-nav.view.mjs'
 
-const getDebugGET = (debug) => (debug === true) ? '&debug=debug' : ''
-
-
 export const singleExtraInputView = (props, url) => {
   const id = props.id
   let get = ''
@@ -35,8 +32,8 @@ export const singleExtraInputView = (props, url) => {
   }
 }
 
-const allExtraInputsView = (props, url) => {
-
+const allExtraInputsView = (props, searchParams) => {
+  return ''
 }
 
 /**
@@ -83,10 +80,7 @@ export const repeatableUI = (props) => {
   } else {
     // blah
   }
-
-  console.group('repeatableUI()')
-  console.log('props:', props)
-  console.groupEnd()
+  console.log('pops:', props)
   return html`
     <section>
       <h2>Repeatable regex actions</h2>
@@ -101,6 +95,7 @@ export const repeatableUI = (props) => {
       <h3>${props.activeAction.name}</h3>
 
       ${renderDescription(props.activeAction.description)}
+      ${allExtraInputsView(props.activeAction)}
     </section>
   `
 }

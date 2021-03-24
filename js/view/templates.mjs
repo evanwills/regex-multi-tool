@@ -149,6 +149,7 @@ export const getMainAppView = (domNode, store) => {
 
     if (!isSimple) {
       newProps.href = props.url.actionHref
+      newProps.get = props.url.searchParams
     }
 
     const buttons = (isSimple)

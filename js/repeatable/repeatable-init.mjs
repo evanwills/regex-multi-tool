@@ -10,6 +10,7 @@ import {
   isNumeric,
   invalidString,
   isFunction,
+  boolTrue,
   invalidBool,
   invalidNum,
   getURLobject
@@ -260,6 +261,10 @@ function Repeatable (url, _remote, docs, api) {
       ? config.extraInputs
       : []
 
+    config.chained = (typeof config.chained !== 'undefined' && Array.isArray(config.chained))
+      ? config.chained
+      : []
+
     config.description = (typeof config.extraInputs !== 'string')
       ? config.description
       : ''
@@ -311,7 +316,19 @@ function Repeatable (url, _remote, docs, api) {
 
   const getActionMeta = (action) => {
     if (typeof action !== 'undefined' && action !== null) {
-      const { func, ..._action } = action
+      const { func, chained, ..._action } = action
+      _action.chained = []
+      if (chained.length > 0) {
+        for (let a = 0; a < chained.length; a += 1) {
+          const tmp = getWholeAction(chained[a], true)
+          if (tmp !== false) {
+            _action.chained.push({
+              ...chained,
+              action: tmp
+            })
+          }
+        }
+      }
       return _action
     }
     return false
@@ -332,6 +349,29 @@ function Repeatable (url, _remote, docs, api) {
         id: action.id,
         name: action.name,
         group: action.group
+      }
+    }
+    return false
+  }
+
+  /**
+   *
+   * @param {string}  actionID  ID of the action to be gotten
+   * @param {boolean} noChained Whether to remove the chained
+   *                            (and func) property from the output
+   *
+   * @returns {object} The object for the action specified by the
+   *                   action ID
+   */
+  const getWholeAction = (actionID, noChained) => {
+    const newAction = registry.filter(action => action.action === actionID)
+
+    if (newAction.length === 1) {
+      if (boolTrue(noChained)) {
+        const { func, chained, ...output } = newAction[0]
+        return output
+      } else {
+        return newAction[0]
       }
     }
     return false
@@ -380,10 +420,10 @@ function Repeatable (url, _remote, docs, api) {
    *                    FALSE if the action could not be found
    */
   this.setAction = function (actionID) {
-    const newAction = registry.filter(action => action.action === actionID)
+    const newAction = getWholeAction(actionID)
 
-    if (newAction.length === 1) {
-      currentAction = newAction[0]
+    if (newAction.length !== false) {
+      currentAction = newAction
       return true
     }
 
