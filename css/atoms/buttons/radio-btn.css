@@ -1,5 +1,5 @@
 
-.radio-grp {
+.radio-grp__items {
   align-items: stretch;
   align-content: stretch;
   border: var(--line-weight-hvy) solid var(--txt-colour);
@@ -9,7 +9,7 @@
   overflow: hidden;
   position: relative;
 }
-.radio-grp > li {
+.radio-grp__items > li {
   flex-grow: 1;
 }
 .radio-grp__label {

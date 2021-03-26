@@ -1,0 +1,43 @@
+
+.repeatable-extraInput__wrap,
+.repeatable-field .radio-grp__wrapper,
+.repeatable-field .checkbox-grp__wrapper
+{
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-areas:  "error error"
+  "label field"
+  "description description"
+}
+.repeatable-field .cb-btn__label { max-width: 100%; }
+
+
+@media screen and (min-width: 25rem) {
+  .repeatable-extraInput__wrap,
+  .repeatable-field .radio-grp__wrapper,
+  .repeatable-field .checkbox-grp__wrapper {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    grid-template-areas:  "error error"
+                          "label field"
+                          "description description"
+  }
+
+  .repeatable-extraInput__wrap label,
+  .repeatable-field .checkbox-grp__h,
+  .repeatable-field .radio-grp__h {
+    font-weight: normal;
+    grid-area: "label";
+    margin: 0;
+    padding: 0.5rem 1rem 0.5rem 0;
+    text-align: right;
+  }
+
+  .repeatable-extraInput__wrap input,
+  .repeatable-extraInput__wrap select,
+  .repeatable-extraInput__wrap textarea,
+  .repeatable-field .checkbox-grp__items
+  .repeatable-field .radio-grp__items {
+    grid-area: "field";
+  }
+}

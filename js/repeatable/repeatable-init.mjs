@@ -12,7 +12,7 @@ import {
   isNumeric,
   invalidString,
   isFunction,
-  boolTrue,
+  isBoolTrue,
   invalidBool,
   invalidNum,
   getURLobject,
@@ -177,7 +177,7 @@ function Repeatable (url, _remote, docs, api) {
       throw Error(errorMsg + 'a "name" property that is a non-empty string. ' + tmp + ' given.')
     }
 
-    config.remote = (boolTrue(config.remote))
+    config.remote = (isBoolTrue(config.remote))
 
     if (config.remote === true) {
       // This is a remote action so it doesn't need to have an action funciton
@@ -229,7 +229,7 @@ function Repeatable (url, _remote, docs, api) {
 
     config.action = config.id.toLowerCase()
 
-    config.rawGET = boolTrue(config.rawGET)
+    config.rawGET = isBoolTrue(config.rawGET)
 
     config.extraInputs = (typeof config.extraInputs !== 'undefined' && Array.isArray(config.extraInputs))
       ? config.extraInputs
@@ -256,7 +256,7 @@ function Repeatable (url, _remote, docs, api) {
   function filterNonProps (config) {
     const output = {}
     const okKeys = [
-      'id', 'func', 'remote', 'name', 'description',
+      'id', 'action', 'func', 'remote', 'name', 'description',
       'group', 'docsURL', 'extraInputs', 'extraOutputs',
       'chained', 'rawGet', 'inputLabel', 'outputLabel'
     ]
@@ -307,8 +307,10 @@ function Repeatable (url, _remote, docs, api) {
   }
 
   const getActionMeta = (action) => {
-    if (typeof action !== 'undefined' && action !== null) {
+    console.log('action:', action)
+    if (typeof action !== 'undefined' && action !== false) {
       const { func, chained, ..._action } = action
+
       _action.chained = []
       if (chained.length > 0) {
         for (let a = 0; a < chained.length; a += 1) {
@@ -317,7 +319,7 @@ function Repeatable (url, _remote, docs, api) {
           if (tmp !== false) {
             _action.chained.push({
               tmp,
-              required: boolTrue(chained[a].required)
+              required: isBoolTrue(chained[a].required)
             })
           }
         }
@@ -357,10 +359,18 @@ function Repeatable (url, _remote, docs, api) {
    *                   action ID
    */
   const getWholeAction = (actionID, noChained) => {
-    const newAction = registry.filter(action => action.id === actionID)
+    // const newAction = registry.filter(action => action.id === actionID)
+    const actionid = actionID.toLowerCase()
+    const newAction = registry.filter(action => {
+      return action.action === actionid
+    })
+    console.group('getWholeAction()')
+    console.log('actionID:', actionID)
+    console.log('newAction:', newAction)
+    console.groupEnd()
 
     if (newAction.length === 1) {
-      if (boolTrue(noChained)) {
+      if (isBoolTrue(noChained)) {
         const { func, chained, ...output } = newAction[0]
         return output
       } else {

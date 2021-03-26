@@ -1,5 +1,5 @@
 import { isBool } from '../../utility-functions.mjs'
-import { invalidStrNum, isNumeric, boolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
+import { invalidStrNum, isNumeric, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 import { repeatActions } from './repeatable.state.actions.mjs'
 
 /**
@@ -159,7 +159,7 @@ const getExtraInputKeyValues = (extraInputs, get) => {
         if (_get !== '') {
           output[_field.id] = _get
         } else {
-          const defaultValue = _field.options.filter(option => boolTrue(option.default)).map(option => option.value)
+          const defaultValue = _field.options.filter(option => isBoolTrue(option.default)).map(option => option.value)
           output[_field.id] = (defaultValue.length > 0)
             ? defaultValue[0]
             : ''
@@ -174,7 +174,7 @@ const getExtraInputKeyValues = (extraInputs, get) => {
           const getKey = makeAttributeSafe(_field.id + '-' + _box.value)
           checkBoxes[_box.value] = (isBool(get[getKey]))
             ? get[getKey]
-            : boolTrue(_box.default)
+            : isBoolTrue(_box.default)
         }
         output[_field.id] = checkBoxes
         break;

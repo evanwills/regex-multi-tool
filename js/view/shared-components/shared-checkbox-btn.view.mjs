@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isNonEmptyStr, getTabI, boolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
+import { isNonEmptyStr, getTabI, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 
 /**
  * Get a whole checkbox input with label and wrapping li tag with
@@ -19,7 +19,7 @@ import { isNonEmptyStr, getTabI, boolTrue, makeAttributeSafe } from '../../utili
  * @returns {html}
  */
 export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge, isRadio) => {
-  const _isRadio = boolTrue(isRadio)
+  const _isRadio = isBoolTrue(isRadio)
   const _id = (_isRadio)
     ? id + '-' + makeAttributeSafe(value.toString())
     : id
@@ -64,7 +64,7 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
     return html`
     <div class="checkbox-grp__wrapper" role="group" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
       <h4 id="${id}-label" class="checkbox-grp__h">${label}</h4>
-      <ul class="list-clean">
+      <ul class="list-clean checkbox-grp__items">
         ${btns.map(btn => checkboxBtn(
           id,
           btn.label,
@@ -81,7 +81,7 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
     `
   } else {
     return html`
-      <ul class="list-clean list-inline checkbox-grp" role="group" ?aria-describedby="${_describedBy}">
+      <ul class="list-clean list-inline checkbox-grp__items" role="group" ?aria-describedby="${_describedBy}">
         ${btns.map(btn => checkboxBtn(
           id,
           btn.label,
@@ -150,7 +150,7 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
     return html`
     <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
       <h4 id="${id}-label" class="radio-grp__h">${label}</h4>
-      <ul class="list-clean list-clean--tight list-inline radio-grp">
+      <ul class="list-clean list-clean--tight list-inline radio-grp__items">
         ${btns.map(btn => singleRadioBtn(
           id,
           btn.label,
@@ -166,7 +166,7 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
     `
   } else {
     return html`
-      <ul class="list-clean list-inline radio-grp" role="radiogroup" ?aria-describedby="${_describedBy}">
+      <ul class="list-clean list-inline radio-grp__items" role="radiogroup" ?aria-describedby="${_describedBy}">
         ${btns.map(btn => singleRadioBtn(
           id,
           btn.label,

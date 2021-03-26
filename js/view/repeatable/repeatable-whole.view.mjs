@@ -1,54 +1,9 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { ucFirst, isNonEmptyStr, isStr } from '../../utility-functions.mjs'
-import { store } from '../../state/regexMulti-state.mjs'
+import { isNonEmptyStr, isStr, isInt } from '../../utility-functions.mjs'
 import { repeatableActionNav } from './repeatable-nav.view.mjs'
-import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
-import { radioBtnGroup } from '../shared-components/shared-checkbox-btn.view.mjs'
+import { textInputField } from '../shared-components/shared-input-fields.view.mjs'
+import { allExtraInputsView } from './repeatable-extraInputs.view.mjs'
 
-const maxLabelLen = (last, current) => {
-  if (isStr(current.label)) {
-    return (current.label.length > last) ? current.label.length : last
-  }
-  return (current.value.length > last) ? current.value.length : last
-}
-
-export const singleExtraInputView = (props, eventHandler, tabIndex) => {
-  let get = (typeof searchParams[props.id] !== 'undefined')
-    ? searchParams[props.id]
-    : ''
-
-  switch (props.type) {
-    case 'textarea':
-      break
-
-    case 'number':
-      break
-
-    case 'radio':
-      const maxLen = props.options.reduce(maxLabelLen, 0)
-      return (maxLen > 32)
-        ? checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandler, tabIndex, '', true)
-        : radioBtnGroup(props.id, props.label, props.value, props.options, eventHandler, tabIndex)
-      break
-
-    case 'checkbox':
-      return checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandler, tabIndex, '', true)
-      break
-
-    case 'select':
-      break
-
-    case 'text':
-    default:
-      break
-  }
-}
-
-const allExtraInputsView = (fieldMeta, fieldValues) => {
-  console.log('fieldMeta:', fieldMeta)
-  console.log('fieldMeta.extraInputs:', fieldMeta.extraInputs)
-  return ''
-}
 
 /**
  * Get a template for "Repetable" action description
@@ -88,6 +43,7 @@ export const repeatableUI = (props) => {
   let extraInputs
   let actionList = []
   const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id)) ? props.activeAction.id : ''
+  const hasAction = isNonEmptyStr(props.activeAction.id)
 
   console.log('props:', props)
 
@@ -101,7 +57,7 @@ export const repeatableUI = (props) => {
       <h2>Repeatable regex actions</h2>
 
       ${repeatableActionNav(
-        props.navOpen,
+        (hasAction) ? props.navOpen : true,
         props.href,
         props.allActions,
         props.events,
@@ -110,7 +66,25 @@ export const repeatableUI = (props) => {
       <h3>${props.activeAction.name}</h3>
 
       ${renderDescription(props.activeAction.description)}
-      ${allExtraInputsView(props.activeAction, props.fields.extraInputs, props.get)}
+      <ul class="list-clean repeatable-field__wraper">
+        ${allExtraInputsView(props.activeAction, props.fields.inputExtra, props.events)}
+      </ul>
+      ${(hasAction)
+        ? html`
+        <div class="repeatable-primaryInput__wrap">
+        ${textInputField(
+            {
+              ...props.activeAction,
+              label: props.activeAction.inputLabel,
+              change: props.events.valueEvent,
+              value: props.fields.inputPrimary,
+              class: 'repeatable-primaryInput'
+            },
+            true
+          )}
+          </div>`
+        : html`<p>Choose an action from the action menu (top right)</p>`
+      }
     </section>
   `
 }

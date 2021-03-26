@@ -163,19 +163,26 @@ export const getURLobject = (url) => {
  *
  * @returns {boolean} TRUE if the input is a string
  */
-export const isStr = (input, notEmpty) => {
-  return (typeof input === 'string')
-}
+export const isStr = (input) => (typeof input === 'string')
 
 /**
  * Tests whether a value is a string and not empty (after being trimmed)
  *
- * @param {any} input Value that should be a string
+ * e.g.
+ *  * isNonEmptyStr('A') = TRUE
+ *  * isNonEmptyStr('\nA, B, C\t') = TRUE
+ *  * isNonEmptyStr('123456') = TRUE
+ *  * isNonEmptyStr('0') = TRUE
+ *  * isNonEmptyStr(12345) = FALSE
+ *  * isNonEmptyStr(0) = FALSE
+ *  * isNonEmptyStr(' ') = FALSE
+ *  * isNonEmptyStr('\n\t') = FALSE
+ *
+ * @param {any} input Value that should be a non-empty string
+ *
  * @returns {boolean}
  */
-export const isNonEmptyStr = (input) => {
-  return (isStr(input) && input.trim() !== '')
-}
+export const isNonEmptyStr = (input) => (isStr(input) && input.trim() !== '')
 
 /**
  * Check whether something is a boolean
@@ -184,33 +191,43 @@ export const isNonEmptyStr = (input) => {
  *
  * @returns {boolean} TRUE if the input is a boolean
  */
-export const isBool = (input) => {
-  return (typeof input === 'boolean')
-}
+export const isBool = (input) => (typeof input === 'boolean')
 
 /**
  * Return TRUE if the input is boolean and is true otherwise
  * return FALSE
  *
- * @param {any} input value that shoudl be a boolean
+ * e.g.
+ *  * isBoolTrue(true) = TRUE
+ *  * isBoolTrue(false) = FALSE
+ *  * isBoolTrue() = FALSE
+ *  * isBoolTrue(0) = FALSE
+ *  * isBoolTrue(1) = FALSE
+ *  * isBoolTrue('true') = FALSE
+ *
+ * @param {any} input value that should be boolean and _TRUE_
  *
  * @returns {boolean}
  */
-export const boolTrue = (input) => {
-  return (typeof input === 'boolean' && input === true)
-}
+export const isBoolTrue = (input) => (typeof input === 'boolean' && input === true)
 
 /**
  * Return TRUE if the input is boolean and is FALSE otherwise
  * return FALSE
  *
+ * e.g.
+ *  * isBoolTrue(false) = TRUE
+ *  * isBoolTrue(true) = FALSE
+ *  * isBoolTrue() = FALSE
+ *  * isBoolTrue(0) = FALSE
+ *  * isBoolTrue(1) = FALSE
+ *  * isBoolTrue('true') = FALSE
+ *
  * @param {any} input value that shoudl be a boolean
  *
  * @returns {boolean}
  */
-export const boolFalse = (input) => {
-  return (typeof input === 'boolean' && input === false)
-}
+export const isBoolFalse = (input) => (typeof input === 'boolean' && input === false)
 
 /**
  * Check whether something is a number
@@ -248,9 +265,7 @@ export const isNumeric = (input) => {
  *
  * @returns {boolean} TRUE if the input is either a string or number
  */
-export const isStrNum = (input) => {
-  return (isNumeric(input) || isStr(input))
-}
+export const isStrNum = (input) => (isNumeric(input) || isStr(input))
 
 export const isInt = (input) => (isNumeric(input) && !isNaN(parseInt(input)))
 

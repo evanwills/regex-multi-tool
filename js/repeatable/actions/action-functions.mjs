@@ -104,8 +104,8 @@ doStuff.register({
       id: 'year',
       label: 'Year chicken was hatched',
       type: 'number',
-      min: 2013,
-      max: 2019,
+      min: 2016,
+      max: 2022,
       step: 1,
       default: 2019
     },

@@ -7,6 +7,7 @@
 @import 'organisms/footer.css';
 @import 'organisms/regex-pair.css';
 @import 'organisms/settings-block.css';
+@import 'organisms/repeatable-extraInputs.css';
 
 @import 'molecules/repeatable-nav.css';
 @import 'molecules/tab-nav.css';

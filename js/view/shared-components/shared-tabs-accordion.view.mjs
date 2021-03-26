@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isStr, ucFirst, boolTrue } from '../../utility-functions.mjs'
+import { isStr, ucFirst, isBoolTrue } from '../../utility-functions.mjs'
 /**
  *
  * @param {string}   groupID
@@ -13,7 +13,7 @@ const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
   const label = (isStr(props.label)) ? props.label : ucFirst(props.id)
   return html`
     <!-- START: tabNavItem() -->
-      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}${boolTrue(isAccordion) ? ' tab-nav--accordion' : ''}" @click=${eventHandler} accesskey="${props.id.substr(0, 1)}">${label}</a>
+      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}${isBoolTrue(isAccordion) ? ' tab-nav--accordion' : ''}" @click=${eventHandler} accesskey="${props.id.substr(0, 1)}">${label}</a>
     <!--  END:  tabNavItem() -->
   `
 }
@@ -38,7 +38,7 @@ const tabBlockInner = (groupID, activeID, block, tabEvent) => {
 export const tabBlock = (groupID, activeID, blocks, tabEvent, isMobileAccordion) => {
   return html`
     <!-- START: tabBlock() -->
-    <section class="tab-wrapper ${boolTrue(isMobileAccordion) ? 'tab-wrapper--mobile' : 'tab-wrapper--tab'}">
+    <section class="tab-wrapper ${isBoolTrue(isMobileAccordion) ? 'tab-wrapper--mobile' : 'tab-wrapper--tab'}">
       <nav class="tab-nav">
         <ul class="list-clean tab-nav__list">
           ${blocks.map(block => html`
