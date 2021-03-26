@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import { makeHTMLsafe } from '../../utility-functions.mjs'
 import { isFunction } from '../../utility-functions.mjs'
 import { isNonEmptyStr, isNumeric, isStr, isInt, isStrNum, isBoolTrue, ucFirst, idSafe, isNumber, getClassName } from '../../utility-functions.mjs'
 
@@ -249,22 +250,21 @@ export const textInputField = (props, multiLine) => {
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
   // console.group('textInputField()')
-  // console.log('props:', props)
+  // console.log('props.value:', props.value)
+  // console.log('multiLine:', multiLine)
   // console.groupEnd()
 
-  if (isBoolTrue(multiLine)) {
-    return html`
+  return (isBoolTrue(multiLine))
+    ? html`
       ${getLabel(props)}
-      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}">${props.value}</textarea>
+      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}", .value="${makeHTMLsafe(props.value)}"></textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
-  } else {
-    return html`
+    : html`
       ${getLabel(props)}
       <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}" />${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
-  }
 }
 
 /**

@@ -8,7 +8,7 @@ import { repeatActions } from './repeatable.state.actions.mjs'
  *
  * @constant {object} defaultRepeat
  */
-const defaultRepeat = {
+export const defaultRepeat = {
   // Complete list of all actions grouped by user group
   allActions: {},
   // Action currently being used
@@ -16,7 +16,7 @@ const defaultRepeat = {
   fields: {
     // The primary input field for repeatable actions
     // (Always plain text)
-    inputPrimary: '',
+    inputPrimary: 'The quick brown fox jumped over the lazy dog',
     // Additional input fields (may be numbers or texts)
     // NOTE: Extra inputs contain everything about the extra input,
     //       not just it's current value
@@ -203,7 +203,7 @@ const fieldShouldUpdate = (fields, id, value) => {
   return false
 }
 
-const updateFields = (state, payload) => {
+const updateFields = (state, payload, debug) => {
   const { id, key, value } = payload
   // console.group('updateFields()')
   // console.log('id:', id)
@@ -243,10 +243,17 @@ const updateFields = (state, payload) => {
       }
 
     case 'output':
-      return {
-        ...state,
-        outputPrimary: value
-      }
+
+      return (isBoolTrue(debug))
+        ? {
+          ...state,
+          outputPrimary: value
+        }
+        : {
+          ...state,
+          inputPrimary: value
+        }
+
   }
   return state
 }
@@ -292,7 +299,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       // console.log('payload:', action.payload)
       return {
         ...state,
-        fields: updateFields(state.fields, action.payload)
+        fields: updateFields(state.fields, action.payload, state.debug)
       }
 
     case repeatActions.MODIFY_INPUT:
@@ -323,7 +330,6 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       }
 
     case repeatActions.TOGGLE_DEBUG:
-      console.log('state:', state)
       return {
         ...state,
         debug: !state.debug

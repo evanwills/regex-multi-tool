@@ -304,10 +304,10 @@ export const invalidString = (prop, input, notEmpty) => {
   }
 
   tmp = typeof input[prop]
-  notEmpty = isBool(notEmpty) ? notEmpty : true
+  const _notEmpty = isBool(notEmpty) ? notEmpty : true
   if (tmp !== 'string') {
     return tmp
-  } else if (notEmpty === true && input[prop].trim() === '') {
+  } else if (_notEmpty === true && input[prop].trim() === '') {
     return 'empty string'
   } else {
     return false
@@ -698,7 +698,7 @@ export const stripGETaction = (href) => href.replace(/[?&]action=[^&#]+(?=[&#]|^
   let _output = (isStr(props[_cls])) ? props[_cls].trim() : ''
 
   _output += (_output !== '') ? _suffix : ''
-  _output += (_output !== '' && _modifier !== '') ? ' ' + _output + _suffix + _modifier : ''
+  _output += (_output !== '' && _modifier !== '') ? ' ' + _output + _modifier : ''
 
   return _output
 }

@@ -13,6 +13,7 @@ import {
   isNumber,
   invalidString,
   isFunction,
+  isBool,
   isBoolTrue,
   invalidBool,
   invalidNum,
@@ -286,7 +287,7 @@ function Repeatable (url, _remote, docs, api) {
     const output = {}
     for (const key in extraInputs) {
       const val = extraInputs[key]
-      if (isStr(val) || isNumber(val) || isBoolTrue(val)) {
+      if (isStr(val) || isNumber(val) || isBool(val)) {
         output[key] = () => val
       } else {
         output[key] = (id) => {

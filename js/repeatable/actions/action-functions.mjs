@@ -43,11 +43,11 @@ import { repeatable as doStuff } from '../repeatable-init.mjs'
  * @returns {string} modified version user input
  */
 const exposeChickens = (input, extraInputs, GETvars) => {
-  console.group('exposeChickens()')
-  console.log('input:', input)
-  console.log('extraInputs:', extraInputs)
-  console.log('GETvars:', GETvars)
-  console.groupEnd()
+  // console.group('exposeChickens()')
+  // console.log('input:', input)
+  // console.log('extraInputs:', extraInputs)
+  // console.log('GETvars:', GETvars)
+  // console.groupEnd()
 
   const _unsure = (extraInputs.mood('unsure')) ? ' I think' : ''
   const _angry = extraInputs.mood('angry')

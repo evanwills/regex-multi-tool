@@ -39,10 +39,23 @@ const renderDescription = (description) => {
   return ''
 }
 
+const inputValue = (props) => {
+  if (props.debug === false && props.fields.outputPrimary !== '') {
+    console.log('returning primary output')
+    return props.fields.outputPrimary
+  } else {
+    console.log('returning primary input')
+    return props.fields.inputPrimary
+  }
+}
+
 export const repeatableUI = (props) => {
   let extraInputs
   let actionList = []
-  const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id)) ? props.activeAction.id : ''
+  const _debug = props.debug
+  const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id))
+    ? props.activeAction.id
+    : ''
   const hasAction = isNonEmptyStr(props.activeAction.id)
 
   if (Array.isArray(props.chainable)) {
@@ -50,6 +63,7 @@ export const repeatableUI = (props) => {
   } else {
     // blah
   }
+
   return html`
     <section>
       <h2>Repeatable regex actions</h2>
@@ -81,6 +95,17 @@ export const repeatableUI = (props) => {
           },
           true
         )}
+        ${(_debug) ? textInputField(
+          {
+            ...props.activeAction,
+            label: props.activeAction.outputLabel,
+            change: props.events.valueEvent,
+            value: props.fields.outputPrimary,
+            class: 'repeat-input',
+            id: props.activeAction.id + '-primaryOutput'
+          },
+          true
+        ) : ''}
 
         </div>`
         : html`<p>Choose an action from the action menu (top right)</p>`
