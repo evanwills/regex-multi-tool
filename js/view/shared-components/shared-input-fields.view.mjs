@@ -1,6 +1,6 @@
 import { html } from '../../lit-html/lit-html.mjs'
 import { isFunction } from '../../utility-functions.mjs'
-import { isNonEmptyStr, isNumeric, isStr, isInt, isStrNum, isBoolTrue, ucFirst, idSafe, isNumber } from '../../utility-functions.mjs'
+import { isNonEmptyStr, isNumeric, isStr, isInt, isStrNum, isBoolTrue, ucFirst, idSafe, isNumber, getClassName } from '../../utility-functions.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field
@@ -23,31 +23,6 @@ export const getAttr = (attr, props, prefix) => {
   return (isNumber(props[_attr]) || isNonEmptyStr(props[_attr]))
     ? ' ' + attr.toLowerCase() + '="' + props[_attr] + '"'
     : ''
-}
-
-/**
- * Get string to use as class name for HTML element
- *
- * @param {object} props       properties for the element
- * @param {string} BEMelement  BEM *element* class name suffix
- * @param {string} BEMmodifier BEM *modifier* class name suffix
- * @param {string} prefix      Prefix for object property name to
- *                             allow for the component to have
- *                             multiple elements with different
- *                             values for the same attribute name
- *
- * @returns {string} HTML element class name
- */
-export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
-  const _cls = (isNonEmptyStr(prefix)) ? prefix.trim() + 'Class' : 'class'
-  const _suffix = (isNonEmptyStr(BEMelement)) ? '__' + BEMelement.trim() : ''
-  const _modifier = (isNonEmptyStr(BEMmodifier)) ? '--' + BEMmodifier.trim() : ''
-  let _output = (isStr(props[_cls])) ? props[_cls].trim() : ''
-
-  _output += (_output !== '') ? _suffix : ''
-  _output += (_output !== '' && _modifier !== '') ? ' ' + _output + _suffix + _modifier : ''
-
-  return _output
 }
 
 /**
@@ -99,7 +74,6 @@ export const getBoolAttr = (attr, props, reverse) => {
  * @returns {lit-html}
  */
 export const getLabel = (props) => {
-  console.log('getClassName(props, "label"):', getClassName(props, 'label'))
   return html`<label for="${props.id}" class="${getClassName(props, 'label')}">
     ${props.label}
   </label>`
@@ -188,8 +162,6 @@ export const getDescbyAttr = (props) => {
  * @returns {lit-html}
  */
 export const describedBy = (props) => {
-  console.log('getClassName(props, "desc"):', getClassName(props, 'desc'))
-
   return (isNonEmptyStr(props.desc))
     ? html`<div id="${props.id}-describe" class=${getClassName(props, 'desc')}>${props.desc}</div>`
     : ''
@@ -276,19 +248,17 @@ export const textInputField = (props, multiLine) => {
   )
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
-  console.group('textInputField()')
-  console.log('props:', props)
-  console.groupEnd()
+  // console.group('textInputField()')
+  // console.log('props:', props)
+  // console.groupEnd()
 
   if (isBoolTrue(multiLine)) {
-    console.log('getClassName(props, "input", "multi-line"):', getClassName(props, 'input', 'multi-line'))
     return html`
       ${getLabel(props)}
       <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}">${props.value}</textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
   } else {
-    console.log('getClassName(props, "input"):', getClassName(props, 'input'))
     return html`
       ${getLabel(props)}
       <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}" />${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
@@ -308,24 +278,23 @@ export const textInputField = (props, multiLine) => {
 export const numberInputField = (props) => {
   const _descBy = getDescbyAttr(props)
 
-  console.group('numberInputField()')
-  console.log('props:', props)
-  console.groupEnd()
+  // console.group('numberInputField()')
+  // console.log('props:', props)
+  // console.groupEnd()
 
-    console.log('getClassName(props, "input", "number"):', getClassName(props, 'input', 'number'))
   return html`
     ${getLabel(props)}
-    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" min="${propOrEmpty(props.min)}" max="${propOrEmpty(props.max)}" step="${propOrEmpty(props.step)}" />
+    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" min="${propOrEmpty(props.min)}" max="${propOrEmpty(props.max)}" step="${propOrEmpty(props.step)}" />
     ${(_descBy !== '') ? describedBy(props) : ''}
   `
 }
 
-export const colourInput = (id, label, value, eventHandler, tabIndex) => {
+export const colourInput = (props) => {
   return html`
     <li class="input-pair">
-      <label for="set-customMode-${id}" class="input-pair__label">Custom mode ${label} colour:</label>
-      <input type="color" id="set-customMode-${id}" class="input-pair__input" value="${value}" tabindex="${tabIndex}" @change=${eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} /><!--
-      --><span class="input-pair__suffix" style="background-color: ${value};">&nbsp;</span>
+      <label for="set-customMode-${props.id}" class="input-pair__label">Custom mode ${props.label} colour:</label>
+      <input type="color" id="set-customMode-${props.id}" class="input-pair__input" value="${props.value}" tabindex="${props.tabIndex}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} /><!--
+      --><span class="input-pair__suffix" style="background-color: ${props.value};">&nbsp;</span>
     </li>
   `
 }

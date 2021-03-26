@@ -1,3 +1,4 @@
+import { getMeta } from '../../utility-functions.mjs'
 import { isNonEmptyStr } from '../../utility-functions.mjs'
 
 export const repeatActions = {
@@ -33,6 +34,11 @@ export const getAutoDispatchHrefAction = (_dispatch) => {
 export const getAutoDispatchSimpleAction = (_dispatch) => {
   return function (e) {
     let _type = ''
+    // console.group('inside getAutoDispatchSimpleAction()')
+    // console.log('this:', this)
+    // console.log('this.value:', this.value)
+    // console.log('this.id:', this.id)
+    // console.groupEnd()
 
     switch (this.value) {
       case 'toggle-nav':
@@ -40,23 +46,56 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
         break
     }
 
-    _dispatch({
-      type: _type
-    })
+    if (_type !== '') {
+      _dispatch({
+        type: _type
+      })
+    }
   }
 }
 
 export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
     let _type = ''
+    const meta = getMeta(this.id)
+    // console.group('getAutoDispatchValueAction()')
+    // console.log('meta:', meta)
+    // console.log('this:', this)
+    // console.log('this.checked:', this.checked)
 
-    switch (this.id) {
+    switch (meta.type) {
+      case 'extraInputs':
+        // console.log('this.value:', this.value)
+        _dispatch({
+          type: repeatActions.UPDATE_FIELD,
+          payload: {
+            id: 'extraInputs',
+            key: meta.extra,
+            value: this.value,
+            action: meta.id
+          }
+        })
+        break
+
+      case 'primaryInput':
+        _dispatch({
+          type: repeatActions.UPDATE_FIELD,
+          payload: {
+            id: 'input',
+            key: '',
+            value: this.value
+          }
+        })
+        break
     }
 
-    _dispatch({
-      type: _type,
-      payload: this.value
-    })
+    // if (_type !== '') {
+    //   _dispatch({
+    //     type: _type,
+    //     payload: this.value
+    //   })
+    // }
+    // console.groupEnd()
   }
 }
 

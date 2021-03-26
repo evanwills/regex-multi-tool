@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import { isBool } from '../../utility-functions.mjs'
 import { isNonEmptyStr, getTabI, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 
 /**
@@ -20,14 +21,14 @@ import { isNonEmptyStr, getTabI, isBoolTrue, makeAttributeSafe } from '../../uti
  */
 export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge, isRadio) => {
   const _isRadio = isBoolTrue(isRadio)
-  const _id = (_isRadio)
-    ? id + '-' + makeAttributeSafe(value.toString())
-    : id
+  const _id = id + '-' + makeAttributeSafe(value.toString())
+  const _name = (_isRadio) ? id : _id
+  const _type = (_isRadio) ? 'radio' : 'checkbox'
 
   return html`
   <!-- START: checkboxBtn() -->
   <li>
-    <input type="${(_isRadio) ? 'radio' : 'checkbox'}" id="${_id}" name="${id}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
+    <input type="${_type}" id="${_id}" name="${_name}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
     <label for="${_id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
   </li>
   <!--  END:  checkboxBtn() -->
@@ -35,6 +36,9 @@ export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex,
 }
 
 const getFieldDesc = (id, description) => html`<div id="${id}-desc" class="field-description">${description}</div>`
+
+const cbIsChecked = (value, allValues) => (allValues[value])
+const radioIsChecked = (value, allValues) => (value == allValues)
 
 /**
  * Get a complete HTML block for a group of radio buttons.
@@ -53,6 +57,7 @@ const getFieldDesc = (id, description) => html`<div id="${id}-desc" class="field
  * @returns {html}
  */
 export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge, isRadio, description) => {
+  const _isRadio = isBoolTrue(isRadio)
   let _describe = ''
   let _describedBy = ''
 
@@ -60,20 +65,24 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
     _describedBy = id +'-desc'
     _describe = getFieldDesc(id, description)
   }
+
+  const isChecked = (_isRadio) ? radioIsChecked : cbIsChecked
+
+
   if (isNonEmptyStr(label)) {
     return html`
-    <div class="checkbox-grp__wrapper" role="group" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
-      <h4 id="${id}-label" class="checkbox-grp__h">${label}</h4>
-      <ul class="list-clean checkbox-grp__items">
+    <div class="checkable-grp__wrap checkbox-grp__wrapper" role="group" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
+      <h4 id="${id}-label" class="checkable-grp__h checkbox-grp__h">${label}</h4>
+      <ul class="list-clean checkable-grp__items checkbox-grp__items">
         ${btns.map(btn => checkboxBtn(
           id,
           btn.label,
           btn.value,
-          (btn.value === value),
+          isChecked(btn.value, value),
           eventHandler,
           tabIndex,
           badge,
-          isRadio
+          _isRadio
         ))}
       </ul>
       ${_describedBy}
@@ -81,16 +90,16 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
     `
   } else {
     return html`
-      <ul class="list-clean list-inline checkbox-grp__items" role="group" ?aria-describedby="${_describedBy}">
+      <ul class="list-clean list-inline checkable-grp__wrap checkbox-grp__items" role="group" ?aria-describedby="${_describedBy}">
         ${btns.map(btn => checkboxBtn(
           id,
           btn.label,
           btn.value,
-          (btn.value === value),
+          isChecked(btn.value, value),
           eventHandler,
           tabIndex,
           badge,
-          isRadio
+          _isRadio
         ))}
       </ul>
       ${_describedBy}
@@ -148,8 +157,8 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
 
   if (isNonEmptyStr(label)) {
     return html`
-    <div class="radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
-      <h4 id="${id}-label" class="radio-grp__h">${label}</h4>
+    <div class="checkable-grp__wrap radio-grp__wrapper" role="radiogroup" aria-labelledby="${id}-label" ?aria-describedby="${_describedBy}">
+      <h4 id="${id}-label" class="checkable-grp__h radio-grp__h">${label}</h4>
       <ul class="list-clean list-clean--tight list-inline radio-grp__items">
         ${btns.map(btn => singleRadioBtn(
           id,
@@ -166,7 +175,7 @@ export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, ba
     `
   } else {
     return html`
-      <ul class="list-clean list-inline radio-grp__items" role="radiogroup" ?aria-describedby="${_describedBy}">
+      <ul class="list-clean list-inline checkable-grp__wrap radio-grp__items" role="radiogroup" ?aria-describedby="${_describedBy}">
         ${btns.map(btn => singleRadioBtn(
           id,
           btn.label,

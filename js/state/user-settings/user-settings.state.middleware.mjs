@@ -1,6 +1,7 @@
 import { userSettingsActions } from './user-settings.state.actions.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
 import { isInt, isStr } from '../../utility-functions.mjs'
+import { repeatActions } from '../repeatable/repeatable.state.actions.mjs'
 
 const validColour = (colour) => (isStr(colour) && colour.match(/^#[0-9a-f]{3,6}$/i))
 
@@ -22,7 +23,10 @@ export const userSettingsMW = store => next => action => {
     case userSettingsActions.TOGGLE_DEBUG:
       if (loop === 0) {
         loop += 1
-        store.dispatch(action)
+        store.dispatch({
+          ...action,
+          type: repeatActions.TOGGLE_DEBUG
+        })
         loop = 0
         const state = store.getState()
         return next({

@@ -564,12 +564,13 @@ export const ucFirst = (input) => {
 }
 
 export const getMeta = (input) => {
-  const _tmp = input.split('-', 3)
+  const _tmp = input.split('-', 4)
 
   return {
     id: _tmp[0].trim(),
     type: isStr(_tmp[1]) ? _tmp[1].trim() : '',
-    extra: isStr(_tmp[2]) ? _tmp[2].trim() : ''
+    extra: isStr(_tmp[2]) ? _tmp[2].trim() : '',
+    suffix: isStr(_tmp[3]) ? _tmp[3].trim() : ''
   }
 }
 
@@ -676,3 +677,28 @@ export const makeURLstr = (url) => {
 }
 
 export const stripGETaction = (href) => href.replace(/[?&]action=[^&#]+(?=[&#]|^)?/gi, '')
+
+/**
+ * Get string to use as class name for HTML element
+ *
+ * @param {object} props       properties for the element
+ * @param {string} BEMelement  BEM *element* class name suffix
+ * @param {string} BEMmodifier BEM *modifier* class name suffix
+ * @param {string} prefix      Prefix for object property name to
+ *                             allow for the component to have
+ *                             multiple elements with different
+ *                             values for the same attribute name
+ *
+ * @returns {string} HTML element class name
+ */
+ export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
+  const _cls = (isNonEmptyStr(prefix)) ? prefix.trim() + 'Class' : 'class'
+  const _suffix = (isNonEmptyStr(BEMelement)) ? '__' + BEMelement.trim() : ''
+  const _modifier = (isNonEmptyStr(BEMmodifier)) ? '--' + BEMmodifier.trim() : ''
+  let _output = (isStr(props[_cls])) ? props[_cls].trim() : ''
+
+  _output += (_output !== '') ? _suffix : ''
+  _output += (_output !== '' && _modifier !== '') ? ' ' + _output + _suffix + _modifier : ''
+
+  return _output
+}

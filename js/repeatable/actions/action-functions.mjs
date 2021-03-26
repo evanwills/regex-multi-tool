@@ -43,6 +43,12 @@ import { repeatable as doStuff } from '../repeatable-init.mjs'
  * @returns {string} modified version user input
  */
 const exposeChickens = (input, extraInputs, GETvars) => {
+  console.group('exposeChickens()')
+  console.log('input:', input)
+  console.log('extraInputs:', extraInputs)
+  console.log('GETvars:', GETvars)
+  console.groupEnd()
+
   const _unsure = (extraInputs.mood('unsure')) ? ' I think' : ''
   const _angry = extraInputs.mood('angry')
   const _excited = extraInputs.mood('excited')
@@ -50,6 +56,7 @@ const exposeChickens = (input, extraInputs, GETvars) => {
   // matches the ID (or name) of the input field
   const _gender = extraInputs.gender()
   const _year = extraInputs.year()
+
 
   let _boc = 'BOC! BOC!!'
   let _chicken = 'chicken'

@@ -4,43 +4,18 @@ import {
   isNumeric,
   isStr,
   isNumber,
-  isBool
+  isBool,
+  ucFirst
   // invalidString,
   // isFunction,
   // getURLobject
 } from '../../utility-functions.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
+import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 let loop = 0
 
 export const modifyInput = ({ getState, dispatch }) => next => action => {
-}
-
-/**
- * Convert Redux state for (repeatable) extra inputs to an object
- * with the same keys but the value is a function that returns the
- * value for the origin key
- *
- * @param {object} inputs
- *
- * @returns {object}
- */
-const convertInputsToFunctions = (inputs) => {
-  const output = {}
-  for (const key in inputs) {
-    const val = inputs[key]
-    if (isStr(val) || isNumber(val) || isBool(val)) {
-      output[key] = () => val
-    } else {
-      output[key] = (id) => {
-        if (typeof val[id] === 'boolean') {
-          return val[id]
-        } else {
-          throw Error(key + '() expects input to be one of the following IDs: "' + Object.keys(val).join('", "') + '"')
-        }
-      }
-    }
-  }
 }
 
 const getActionMeta = (allActions, actionID) => {
@@ -103,7 +78,7 @@ export const repeatableMW = store => next => action => {
       if (action.payload.id !== 'input') {
         // Lets see what type of field this is and ensure that
         // the value going into the store is the correct type.
-        const field = _state.fields.inputExtra.filter(_field => _field.id === action.payload.id)
+        const field = _state.repeatable.activeAction.extraInputs.filter(_field => _field.id === action.payload.key)
 
         if (field[0].type === 'number') {
           if (isNumeric(action.payload.value)) {
@@ -111,7 +86,7 @@ export const repeatableMW = store => next => action => {
               ...action,
               payload: {
                 ...action.payload,
-                value: (action.payload * 1)
+                value: (action.payload.value * 1)
               }
             })
           }
@@ -120,14 +95,22 @@ export const repeatableMW = store => next => action => {
       return next(action)
 
     case repeatActions.MODIFY_INPUT:
-      if (_state.repeat.activeAction.remote === true) {
+      if (_state.repeatable.activeAction.remote === true) {
         // This needs to be a fetch request to the host server
         return next(action)
       } else {
-        return next(repeatable.run(
-          _state.repeat.fields.inputPrimary,
-          convertInputsToFunctions(_state.repeat.fields.inputExtra)
-        ))
+        return next({
+          type: repeatActions.UPDATE_FIELD,
+          payload: {
+            id: 'output',
+            key: '',
+            value: repeatable.run(
+              _state.repeatable.fields.inputPrimary,
+              _state.repeatable.fields.inputExtra,
+              _state.url.searchParams
+            )
+          }
+        })
       }
 
     default:

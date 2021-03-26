@@ -20,14 +20,27 @@ const wrapField = (field) => html`<div class="repeatable-extraInput__wrap">${fie
 export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
   let _tabIndex = (isInt(tabIndex)) ? tabIndex : 0
 
-  console.log('props:', props)
+  // console.group('singleExtraInputView()')
+  // console.log('props.id:', props.id)
+  // console.log('props:', props)
+  // console.log('props.value:', props.value)
+  // console.groupEnd()
   switch (props.type) {
     case 'textarea':
-      return wrapField(textInputField(props, true))
+      return wrapField(textInputField(
+        {
+          ...props,
+          eventHandler: eventHandlers.valueEvent
+        },
+        true
+      ))
       break
 
     case 'number':
-      return wrapField(numberInputField(props))
+      return wrapField(numberInputField({
+        ...props,
+        eventHandler: eventHandlers.valueEvent
+      }))
       break
 
     case 'radio':
@@ -38,25 +51,38 @@ export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
       break
 
     case 'checkbox':
-      return checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.simpleEvent, _tabIndex, '', true)
+      return checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex)
       break
 
     case 'select':
-      return wrapField(selectField(props))
+      return wrapField(selectField({
+        ...props,
+        eventHandler: eventHandlers.valueEvent
+      }))
       break
 
     case 'text':
     default:
-      return wrapField(textInputField(props, false))
+      return wrapField(textInputField(
+        {
+          ...props,
+          eventHandler: eventHandlers.valueEvent
+        },
+        false
+      ))
       break
   }
 }
 
 export const allExtraInputsView = (fieldMeta, fieldValues, eventHandlers) => {
+  // console.group('allExtraInputsView()')
+  // console.log('fieldMeta:', fieldMeta)
+  // console.log('fieldValues:', fieldValues)
+  // console.groupEnd()
   if (Array.isArray(fieldMeta.extraInputs)) {
   return fieldMeta.extraInputs.map(field => html`
     <li class="repeatable-field">
-      ${singleExtraInputView({ ...field, value: fieldValues[field.id] }, eventHandlers)}
+      ${singleExtraInputView({ ...field, value: fieldValues[field.id], id: fieldMeta.id + '-extraInputs-' + field.id }, eventHandlers)}
     </li>`)
   } else {
     return ''

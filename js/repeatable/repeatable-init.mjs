@@ -10,6 +10,7 @@ import {  } from '../utility-functions.mjs'
 import {
   isStr,
   isNumeric,
+  isNumber,
   invalidString,
   isFunction,
   isBoolTrue,
@@ -271,8 +272,9 @@ function Repeatable (url, _remote, docs, api) {
   }
 
   /**
-   * Convert extraInputs values from Redux store into callable
-   * functions expected by repeatable actions
+   * Convert Redux state for (repeatable) extra inputs to an object
+   * with the same keys but the value is a function that returns the
+   * value for the origin key
    *
    * This is an "Adaptor" pattern function
    *
@@ -280,41 +282,34 @@ function Repeatable (url, _remote, docs, api) {
    *
    * @returns {object}
    */
-  function convert (extraInputs) {
-    const _output = {}
-    for (let a = 0; a < currentAction.extraInputs.length; a += 1) {
-      const _field = currentAction.extraInputs
-      const _key = _field.id
-      if (typeof extraInputs[_key] !== 'undefined') {
-        let value = extraInputs[_key]
-
-        if (_field.type !== 'checkbox') {
-          if (typeof value === 'string') {
-            if (_field.type === 'number' && isNumeric(value)) {
-              value = extraInputs[_key] * 1
-            }
-          }
-          _output[_key] = () => value
-        } else {
-          _output[_key] = (val) => {
-            return (typeof value[val] === 'boolean') ? value[val] : null
+  function convertInputsToFunctions (extraInputs) {
+    const output = {}
+    for (const key in extraInputs) {
+      const val = extraInputs[key]
+      if (isStr(val) || isNumber(val) || isBoolTrue(val)) {
+        output[key] = () => val
+      } else {
+        output[key] = (id) => {
+          if (typeof val[id] === 'boolean') {
+            return val[id]
+          } else {
+            throw Error(key + '() expects input to be one of the following IDs: "' + Object.keys(val).join('", "') + '"')
           }
         }
       }
     }
-
-    return _output
+    return output
   }
 
   const getActionMeta = (action) => {
-    console.log('action:', action)
+    // console.log('action:', action)
     if (typeof action !== 'undefined' && action !== false) {
       const { func, chained, ..._action } = action
 
       _action.chained = []
       if (chained.length > 0) {
         for (let a = 0; a < chained.length; a += 1) {
-          console.log('chained[' + a + ']:', chained[a])
+          // console.log('chained[' + a + ']:', chained[a])
           const tmp = getWholeAction(chained[a], true)
           if (tmp !== false) {
             _action.chained.push({
@@ -364,10 +359,10 @@ function Repeatable (url, _remote, docs, api) {
     const newAction = registry.filter(action => {
       return action.action === actionid
     })
-    console.group('getWholeAction()')
-    console.log('actionID:', actionID)
-    console.log('newAction:', newAction)
-    console.groupEnd()
+    // console.group('getWholeAction()')
+    // console.log('actionID:', actionID)
+    // console.log('newAction:', newAction)
+    // console.groupEnd()
 
     if (newAction.length === 1) {
       if (isBoolTrue(noChained)) {
@@ -496,9 +491,9 @@ function Repeatable (url, _remote, docs, api) {
    *
    * @returns {string} modified version user input
    */
-  this.run = function (input, extraInputs) {
+  this.run = function (input, extraInputs, searchParams) {
     return currentAction.func(
-      input, convert(extraInputs), getParams
+      input, convertInputsToFunctions(extraInputs), searchParams
     )
   }
 

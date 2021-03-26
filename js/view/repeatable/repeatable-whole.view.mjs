@@ -45,8 +45,6 @@ export const repeatableUI = (props) => {
   const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id)) ? props.activeAction.id : ''
   const hasAction = isNonEmptyStr(props.activeAction.id)
 
-  console.log('props:', props)
-
   if (Array.isArray(props.chainable)) {
     // blah
   } else {
@@ -71,18 +69,20 @@ export const repeatableUI = (props) => {
       </ul>
       ${(hasAction)
         ? html`
-        <div class="repeatable-primaryInput__wrap">
+        <div class="repeat-input">
         ${textInputField(
-            {
-              ...props.activeAction,
-              label: props.activeAction.inputLabel,
-              change: props.events.valueEvent,
-              value: props.fields.inputPrimary,
-              class: 'repeatable-primaryInput'
-            },
-            true
-          )}
-          </div>`
+          {
+            ...props.activeAction,
+            label: props.activeAction.inputLabel,
+            change: props.events.valueEvent,
+            value: props.fields.inputPrimary,
+            class: 'repeat-input',
+            id: props.activeAction.id + '-primaryInput'
+          },
+          true
+        )}
+
+        </div>`
         : html`<p>Choose an action from the action menu (top right)</p>`
       }
     </section>

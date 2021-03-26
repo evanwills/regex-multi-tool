@@ -1,3 +1,6 @@
+import { repeatActions } from '../repeatable/repeatable.state.actions.mjs'
+import { oneOffActions } from '../oneOff/oneOff.state.actions.mjs'
+
 export const mainAppActions = {
   SET_MODE: 'MAIN-APP_SET_MODE',
   MODIFY: 'MAIN-APP_MODIFY',
@@ -19,12 +22,15 @@ export const getAutoDispatchMainAppEvent = (_dispatch) => {
         return
 
       case 'modify':
+        _type = repeatActions.MODIFY_INPUT
+        break
+
       case 'replace':
-        _type = mainAppActions.MODIFY
+        _type = oneOffActions.SET_OUTPUT
         break
 
       case 'test':
-        _type = mainAppActions.TEST
+        _type = oneOffActions.SET_MATCHES
         break
 
       case 'reset':

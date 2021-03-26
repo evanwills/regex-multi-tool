@@ -100,8 +100,8 @@ const userSettingsUI = (props, eventHandlers) => {
     <div role="group" aria-labelledby="user-general-settings" class="ui-settings__general">
       <h2 id="user-general-settings" class="ui-settings__h ui-settings__h--1">General settings</h2>
       <ul class="list-clean">
-        ${checkboxBtn('user-debug', 'Debug mode', 'debugMode', props.debug, eventHandlers.simpleEvent, tabIndex)}
-        ${checkboxBtn('user-localStorage', 'Save state locally', 'localStorage', props.localStorage, eventHandlers.simpleEvent, tabIndex)}
+        ${checkboxBtn('user', 'Debug mode', 'debugMode', props.debug, eventHandlers.simpleEvent, tabIndex)}
+        ${checkboxBtn('user', 'Save state locally', 'localStorage', props.localStorage, eventHandlers.simpleEvent, tabIndex)}
         <li class="input-pair input-pair--top-2">
           <label for="set-fontSize" class="input-pair__label">Font size:</label><!--
           --><input type="range" id="set-fontSize" class="input-pair__input" value="${px}" min="8" max="40" step="1" placeholder="px" tabindex="${tabIndex}" @change=${eventHandlers.valueEvent} /><!--
@@ -117,10 +117,34 @@ const userSettingsUI = (props, eventHandlers) => {
         </li>
         ${(props.uiMode === 'customMode')
           ? html`
-            ${colourInput('bg', 'background', props.customBG, eventHandlers.valueEvent, tabIndex)}
-            ${colourInput('txt', 'text', props.customTxt, eventHandlers.valueEvent, tabIndex)}
-            ${colourInput('over', 'overlay', props.customOver, eventHandlers.valueEvent, tabIndex)}
-            ${colourInput('rev', 'reverse overlay', props.customRev, eventHandlers.valueEvent, tabIndex)}`
+            ${colourInput({
+              id: 'bg',
+              label: 'background',
+              value: props.customBG,
+              eventHandler: eventHandlers.valueEvent,
+              tabIndex: tabIndex
+            })}
+            ${colourInput({
+              id: 'txt',
+              label: 'text',
+              value: props.customTxt,
+              eventHandler: eventHandlers.valueEvent,
+              tabIndex: tabIndex
+            })}
+            ${colourInput({
+              id: 'over',
+              label: 'overlay',
+              value: props.customOver,
+              eventHandler: eventHandlers.valueEvent,
+              tabIndex: tabIndex
+            })}
+            ${colourInput({
+              id: 'rev',
+              label: 'reverse overlay',
+              value: props.customRev,
+              eventHandler: eventHandlers.valueEvent,
+              tabIndex: tabIndex
+            })}`
           : ''}
       </ul>
     </div>

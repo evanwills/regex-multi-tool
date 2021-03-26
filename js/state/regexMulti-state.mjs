@@ -60,10 +60,10 @@ export const store = createStore(
     applyMiddleware(
       logger,
       crashReporter,
-      oneOff.middleware,
-      repeatable.middleware,
       userSettings.middleware,
-      mainAppMW
+      mainAppMW,
+      oneOff.middleware,
+      repeatable.middleware
     )
 
   )

@@ -1,4 +1,5 @@
 import { isBool } from '../../utility-functions.mjs'
+import { isStr } from '../../utility-functions.mjs'
 import { invalidStrNum, isNumeric, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
 import { repeatActions } from './repeatable.state.actions.mjs'
 
@@ -202,6 +203,54 @@ const fieldShouldUpdate = (fields, id, value) => {
   return false
 }
 
+const updateFields = (state, payload) => {
+  const { id, key, value } = payload
+  // console.group('updateFields()')
+  // console.log('id:', id)
+  // console.log('key:', key)
+  // console.log('value:', value)
+  // console.log('state.inputExtra[' + key + ']:', state.inputExtra[key])
+  // console.log('isNumeric(state.inputExtra[' + key + ']):', isNumeric(state.inputExtra[key]))
+  // console.log('isStr(state.inputExtra[' + key + ']):', isStr(state.inputExtra[key]))
+  // console.log('state.inputExtra[' + key + '] !== value', state.inputExtra[key] !== value)
+  // console.groupEnd()
+  switch (id) {
+    case 'extraInputs':
+      if ((isNumeric(state.inputExtra[key]) || isStr(state.inputExtra[key])) && state.inputExtra[key] !== value) {
+        const tmp = { ...state.inputExtra }
+        tmp[key] = value
+        console.log('tmp:', tmp)
+        return {
+          ...state,
+          inputExtra: tmp
+        }
+      } else if (isBool(state.inputExtra[key][value])) {
+        const tmp1 = { ...state.inputExtra[key] }
+        tmp1[value] = !tmp1[value]
+        const _inputExtra = { ...state.inputExtra }
+        _inputExtra[key] = tmp1
+        return {
+          ...state,
+          inputExtra: _inputExtra
+        }
+      }
+      break;
+
+    case 'input':
+      return {
+        ...state,
+        inputPrimary: value
+      }
+
+    case 'output':
+      return {
+        ...state,
+        outputPrimary: value
+      }
+  }
+  return state
+}
+
 /**
  * Reducer for Repeatable state
  *
@@ -211,6 +260,9 @@ const fieldShouldUpdate = (fields, id, value) => {
  *  @returns {object}
  */
 export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
+  // console.group('repeatableReducer()')
+  // console.log('action:', action)
+  // console.groupEnd()
   switch (action.type) {
     case repeatActions.SET_ACTION:
       return (action.payload !== false)
@@ -236,21 +288,11 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       }
 
     case repeatActions.UPDATE_FIELD:
+      // console.log('type:', repeatActions.UPDATE_FIELD)
+      // console.log('payload:', action.payload)
       return {
         ...state,
-        fields: {
-          ...state.fields,
-          inputs: state.fields.inputs.map((field) => {
-            if (field.id === action.payload.id) {
-              return {
-                ...field,
-                value: action.payload.value
-              }
-            } else {
-              return field
-            }
-          })
-        }
+        fields: updateFields(state.fields, action.payload)
       }
 
     case repeatActions.MODIFY_INPUT:
@@ -281,6 +323,7 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       }
 
     case repeatActions.TOGGLE_DEBUG:
+      console.log('state:', state)
       return {
         ...state,
         debug: !state.debug
