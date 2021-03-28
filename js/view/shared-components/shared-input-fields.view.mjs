@@ -247,8 +247,10 @@ export const textInputField = (props, multiLine) => {
     ['pattern', 'placeholder', 'list', 'maxlength', 'minlength', 'size'],
     props
   )
+
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
+
   // console.group('textInputField()')
   // console.log('props.value:', props.value)
   // console.log('multiLine:', multiLine)
@@ -257,7 +259,7 @@ export const textInputField = (props, multiLine) => {
   return (isBoolTrue(multiLine))
     ? html`
       ${getLabel(props)}
-      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}", .value="${makeHTMLsafe(props.value)}"></textarea>
+      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}" .value="${props.value}"></textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
     : html`

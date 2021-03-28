@@ -541,17 +541,16 @@ export const groupNameToLabel = (input) => {
  *
  * @returns {string} HTML entity encoded string
  */
-export const makeHTMLsafe = (input, doubleEncode) => {
-  const htmlChars = [
-    [/'/g, '&apos;'],
-    [/"/g, '&quot;'],
-    [/</g, '&lt;'],
-    [/>/g, '&gt;']
-  ]
+export const makeHTMLsafe = (input, doubleEncode, inputField) => {
+  const htmlChars = [[/</g, '&lt;'], [/>/g, '&gt;']]
   const amp = [/&/g, '&amp;']
   const findReplace = (typeof doubleEncode === 'boolean' && doubleEncode === true)
     ? [...htmlChars, amp]
     : [amp, ...htmlChars]
+
+  if (isBoolTrue(inputField)) {
+    htmlChars.concat([[/'/g, '&apos;'], [/"/g, '&quot;']])
+  }
 
   return findReplace.reduce(
     (accumulator, pair) => accumulator.replace(pair[0], pair[1]),

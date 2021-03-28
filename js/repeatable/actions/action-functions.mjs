@@ -6,6 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
+
 /**
  * action-functions.js contains all the possible actions available to
  * "Do JS regex stuff"
@@ -46,6 +47,11 @@ const exposeChickens = (input, extraInputs, GETvars) => {
   // console.group('exposeChickens()')
   // console.log('input:', input)
   // console.log('extraInputs:', extraInputs)
+  // console.log('extraInputs.year():', extraInputs.year())
+  // console.log('extraInputs.gender():', extraInputs.gender())
+  // console.log('extraInputs.mood("unsure"):', extraInputs.mood('unsure'))
+  // console.log('extraInputs.mood("angry"):', extraInputs.mood('angry'))
+  // console.log('extraInputs.mood("excited"):', extraInputs.mood('excited'))
   // console.log('GETvars:', GETvars)
   // console.groupEnd()
 
