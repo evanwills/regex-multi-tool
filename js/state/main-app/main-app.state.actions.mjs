@@ -3,6 +3,7 @@ import { oneOffActions } from '../oneOff/oneOff.state.actions.mjs'
 
 export const mainAppActions = {
   SET_MODE: 'MAIN-APP_SET_MODE',
+  SET_GROUPS: 'MAIN-APP_SET_GROUPS',
   MODIFY: 'MAIN-APP_MODIFY',
   TEST: 'MAIN-APP_TEST',
   RESET: 'MAIN-APP_RESET',

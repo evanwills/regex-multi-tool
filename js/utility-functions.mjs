@@ -1,3 +1,4 @@
+/* globals localStorage, history */
 /* jslint browser: true */
 
 /**
@@ -151,6 +152,44 @@ export const getURLobject = (url) => {
   output.actionHref = stripGETaction(output.href)
 
   return output
+}
+
+export const localStoreageEnhanceUrl = (url) => {
+  const _url = getURLobject(url)
+
+  const _mode = localStorage.getItem('mode')
+  if (isNonEmptyStr(_mode)) {
+    if (!isNonEmptyStr(_url.searchParams.mode)) {
+      _url.searchParams.mode = _mode
+    }
+
+    if (isNonEmptyStr(_url.searchParams.groups)) {
+      const _groups = localStorage.getItem('groups')
+      if (isNonEmptyStr(_groups)) {
+        _url.searchParams.groups = _groups
+      }
+    }
+    const _repeat = localStorage.getItem('repeatable')
+    if (isNonEmptyStr(_repeat)) {
+      const _rep = JSON.parse(_repeat)
+      if (!isNonEmptyStr(_url.searchParams.action) && isNonEmptyStr(_rep.activeAction.id)) {
+        _url.searchParams.action = _rep.activeAction.id
+      }
+      if (!isBoolTrue(_url.searchParams.debug) && isBoolTrue(_rep.debug)) {
+        _url.searchParams.debug = true
+      }
+    }
+  }
+
+  const newSearch = makeSearchStr(_url)
+
+  if (_url.search !== newSearch) {
+    _url.search = newSearch
+    _url.href = _url.protocol + '//' + _url.host + _url.port + _url.pathname + _url.search + _url.hash
+    history.replaceState({}, '', _url.href)
+  }
+
+  return _url
 }
 
 // ======================================================
@@ -462,7 +501,7 @@ export const makeAttributeSafe = (_attr) => {
     throw new Error('makeAttributeSafe() expects only parameter "_attr" to be a non-empty string. ' + typeof _attr + ' given.')
   }
 
-  _output = _attr.replace(/[^a-z0-9_\-]+/ig, '')
+  _output = _attr.replace(/[^a-z0-9_-]+/ig, '')
 
   if (_output === '') {
     throw new Error('makeAttributeSafe() expects only parameter "_attr" to be string that can be used as an HTML class name or ID. "' + _attr + '" cannot be used. After cleaning, it became an empty string.')
@@ -690,7 +729,7 @@ export const stripGETaction = (href) => href.replace(/[?&]action=[^&#]+(?=[&#]|^
  *
  * @returns {string} HTML element class name
  */
- export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
+export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
   const _cls = (isNonEmptyStr(prefix)) ? prefix.trim() + 'Class' : 'class'
   const _suffix = (isNonEmptyStr(BEMelement)) ? '__' + BEMelement.trim() : ''
   const _modifier = (isNonEmptyStr(BEMmodifier)) ? '--' + BEMmodifier.trim() : ''

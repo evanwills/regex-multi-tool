@@ -67,6 +67,20 @@ export const userSettingsReducer = (state = initialUserSettingsState, action) =>
         ...state,
         customRev: action.payload
       }
+
+    case userSettingsActions.RESTORE:
+      const newState = { ...state } // eslint-disable-line
+      let hasChanged = false // eslint-disable-line
+      for (const key in action.payload) {
+        // console.log('key:', key)
+        // console.log('action.payload[' + key + ']:', action.payload[key])
+        // console.log('state[' + key + ']:', state[key])
+        if (typeof state[key] === typeof action.payload[key] && state[key] !== action.payload[key]) {
+          hasChanged = true
+          newState[key] = action.payload[key]
+        }
+      }
+      return (hasChanged === true) ? newState : state
   }
 
   return state

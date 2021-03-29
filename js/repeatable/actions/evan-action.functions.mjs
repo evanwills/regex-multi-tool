@@ -1734,12 +1734,7 @@ doStuff.register({
  */
 const tab2markdown = (input, extraInputs, GETvars) => {
   let rows = input.split('\n')
-  rows = rows.map(row => {
-    console.log('row:', row)
-    row = row.split("\t")
-    console.log('row:', row)
-    return row.map(col => col.trim())
-  })
+  rows = rows.map(row => row.split('\t').map(col => col.trim()))
 
   const pad = (_input, len, header) => {
     const char = (_input.length > 0) ? ' ' : '-'
@@ -1748,9 +1743,6 @@ const tab2markdown = (input, extraInputs, GETvars) => {
 
     if (isBoolTrue(header)) {
       while (_output.length < len) {
-        console.log('_output.length:', _output.length)
-        console.log('len:', len)
-        console.log(_output.length + ' < ' + len + ':', _output.length < len)
         if (a === false) {
           _output = char + _output
         } else {
@@ -1760,16 +1752,10 @@ const tab2markdown = (input, extraInputs, GETvars) => {
       }
     } else if (isNumeric(_input)) {
       while (_output.length < len) {
-        console.log('_output.length:', _output.length)
-        console.log('len:', len)
-        console.log(_output.length + ' < ' + len + ':', _output.length < len)
         _output = char + _output
       }
     } else {
       while (_output.length < len) {
-        console.log('_output.length:', _output.length)
-        console.log('len:', len)
-        console.log(_output.length + ' < ' + len + ':', _output.length < len)
         _output += char
       }
     }
@@ -1779,9 +1765,7 @@ const tab2markdown = (input, extraInputs, GETvars) => {
 
   const cols = []
   for (let a = 0; a < rows.length; a += 1) {
-    console.log('rows[' + a + ']:', rows[a])
     for (let b = 0; b < rows[a].length; b += 1) {
-      console.log('rows[' + a + '][' + b + ']:', rows[a][b])
       const c = rows[a][b].length
       if (typeof cols[b] !== 'number' || cols[b] < c) {
         cols[b] = c
@@ -1789,25 +1773,20 @@ const tab2markdown = (input, extraInputs, GETvars) => {
     }
   }
 
-  console.log('cols:', cols)
-
   const headerRow = cols.map(col => '')
 
-  rows = [].concat(rows.slice(0,1), [headerRow], rows.slice(1))
-  console.log('rows:', rows)
+  rows = [].concat(rows.slice(0, 1), [headerRow], rows.slice(1))
 
   let output = ''
   for (let a = 0; a < rows.length; a += 1) {
-    console.log('output:', output)
     output += '|'
     for (let b = 0; b < rows[a].length; b += 1) {
       output += pad(rows[a][b], cols[b], a === 0)
     }
     output += '\n'
-    console.log('output:', output)
   }
 
-  return output.trim();
+  return output.trim()
 }
 
 doStuff.register({

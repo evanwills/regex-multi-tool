@@ -1,17 +1,17 @@
 import { repeatActions } from './repeatable.state.actions.mjs'
 import { repeatable } from '../../repeatable/repeatable-init.mjs'
 import {
-  isNumeric,
-  isStr,
-  isNumber,
-  isBool,
-  ucFirst
+  isNumeric
+  // isStr,
+  // isNumber,
+  // isBool,
+  // ucFirst
   // invalidString,
   // isFunction,
   // getURLobject
 } from '../../utility-functions.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
-import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
+// import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 let loop = 0
 
@@ -50,12 +50,15 @@ export const repeatableMW = store => next => action => {
               get: _state.url.searchParams
             }
           })
+
           if (_state.repeatable.navOpen) {
             store.dispatch({
               type: repeatActions.TOGGLE_NAV
             })
           }
-          loop = 0;
+
+          loop = 0
+
           return next({
             type: urlActions.UPDATE_GET,
             payload: {
@@ -64,7 +67,8 @@ export const repeatableMW = store => next => action => {
             }
           })
         } else {
-          loop = 0;
+          loop = 0
+
           return next({
             type: repeatActions.ERROR,
             payload: 'Could not set action "' + action.payload + '"'

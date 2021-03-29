@@ -1,5 +1,4 @@
-import { getMeta } from '../../utility-functions.mjs'
-import { isNonEmptyStr } from '../../utility-functions.mjs'
+import { getMeta, isNonEmptyStr } from '../../utility-functions.mjs'
 
 export const repeatActions = {
   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',
@@ -18,7 +17,7 @@ export const repeatActions = {
 export const getAutoDispatchHrefAction = (_dispatch) => {
   return function (e) {
     e.preventDefault()
-    let _action = this.href.replace(/^.*?[?&]action=([^&#]+)(?:[&#].*?)?$/i, '$1')
+    const _action = this.href.replace(/^.*?[?&]action=([^&#]+)(?:[&#].*?)?$/i, '$1')
 
     if (_action !== this.href) {
       _dispatch({
@@ -56,8 +55,9 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
 
 export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
-    let _type = ''
     const meta = getMeta(this.id)
+    // let _type = ''
+
     // console.group('getAutoDispatchValueAction()')
     // console.log('meta:', meta)
     // console.log('this:', this)
@@ -99,7 +99,6 @@ export const getAutoDispatchValueAction = (_dispatch) => {
   }
 }
 
-
 /**
  *
  * @param _dispatch
@@ -127,6 +126,6 @@ export const getRepeatableEventHandlers = (dispatch) => {
   return {
     hrefEvent: getAutoDispatchHrefAction(dispatch),
     simpleEvent: getAutoDispatchSimpleAction(dispatch),
-    valueEvent: getAutoDispatchValueAction(dispatch),
+    valueEvent: getAutoDispatchValueAction(dispatch)
   }
 }

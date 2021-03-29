@@ -1,3 +1,5 @@
+/* globals localStorage */
+
 /**
  * This file contains the main code for the "repeatable"
  * functionality part of Regex Multi-Tool
@@ -6,20 +8,21 @@
  * @author Evan Wills <evan.i.wills@gmail.com
  * @url https://github.com/evanwills/regex-multi-tool
  */
-import {  } from '../utility-functions.mjs'
 import {
   isStr,
-  isNumeric,
+  // isNumeric,
   isNumber,
   invalidString,
   isFunction,
   isBool,
   isBoolTrue,
-  invalidBool,
-  invalidNum,
+  // invalidBool,
+  // invalidNum,
   getURLobject,
   isNonEmptyStr
 } from '../utility-functions.mjs'
+
+import { url } from '../url.mjs'
 
 // ======================================================
 // START: pure helper function
@@ -237,9 +240,7 @@ function Repeatable (url, _remote, docs, api) {
       ? config.extraInputs
       : []
 
-    config.chained = (typeof config.chained !== 'undefined' && Array.isArray(config.chained))
-      ? config.chained
-      : []
+    config.chained = (Array.isArray(config.chained)) ? config.chained : []
 
     config.description = (isStr(config.description))
       ? config.description
@@ -264,12 +265,13 @@ function Repeatable (url, _remote, docs, api) {
     ]
     const lOkKeys = okKeys.map(item => item.toLowerCase())
 
-    for ( const prop in config) {
+    for (const prop in config) {
       const i = lOkKeys.indexOf(prop.toLowerCase())
-      if (i > -1)
-      output[okKeys[i]] = config[prop]
+      if (i > -1) {
+        output[okKeys[i]] = config[prop]
+      }
     }
-    return output;
+    return output
   }
 
   /**
@@ -323,6 +325,10 @@ function Repeatable (url, _remote, docs, api) {
       return _action
     }
     return false
+  }
+
+  const runChained = (input, extraInputs, searchParams, chained) => {
+
   }
 
   /**
@@ -489,13 +495,28 @@ function Repeatable (url, _remote, docs, api) {
    *               key/value pairs
    *               NOTE: numeric strings are converted to numbers and
    *                     "true" & "false" are converted to booleans
+   * @param {array}  chained List of strings matching IDs of chained
+   *               actions to be used. (Only actions that are in both
+   *               the supplied list passed to this function _AND_
+   *               the list of chained actions supplied with the
+   *               primary action was registered will be used)
    *
    * @returns {string} modified version user input
    */
-  this.run = function (input, extraInputs, searchParams) {
-    return currentAction.func(
-      input, convertInputsToFunctions(extraInputs), searchParams
-    )
+  this.run = function (input, extraInputs, searchParams, chained) {
+    const _extraInputs = convertInputsToFunctions(extraInputs)
+
+    console.log('Array.isArray(currentAction.chained):', Array.isArray(currentAction.chained))
+    console.log('currentAction.chained.length:', currentAction.chained.length)
+    console.log('Array.isArray(chained):', Array.isArray(chained))
+
+    if (currentAction.chained.length > 0 && Array.isArray(chained) && chained.length > 0) {
+      return runChained(input, _extraInputs, searchParams, chained)
+    } else {
+      return currentAction.func(
+        input, _extraInputs, searchParams
+      )
+    }
   }
 
   this.getDocsURL = function () {
@@ -504,6 +525,17 @@ function Repeatable (url, _remote, docs, api) {
 
   this.getApiURL = function () {
     return apiURL
+  }
+
+  /**
+   * Get comma separated list of group names user belongs to
+   *
+   * @params {void}
+   *
+   * @returns {string}
+   */
+  this.getGroups = function () {
+    return actionGroups.join(',')
   }
 
   /**
@@ -520,7 +552,7 @@ function Repeatable (url, _remote, docs, api) {
     let output = true
 
     for (let a = 0; a < registry.length; a += 1) {
-      if (Array.isArray(registry[a].chained) && registry[a].chained.length > 0) {
+      if (registry[a].chained.length > 0) {
         const chain = registry[a].chained
 
         for (let b = 0; b < chain.length; b += 1) {
@@ -585,7 +617,7 @@ const tmpApiURL = (typeof apiURL === 'string' && apiURL !== '') ? apiURL : 'docs
 // START: instantiate repeatable
 
 export const repeatable = new Repeatable(
-  getURLobject(window.location),
+  url,
   tmpRemote,
   tmpDocsURL,
   tmpApiURL

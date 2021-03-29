@@ -52,6 +52,8 @@ export const userSettingsSubscriber = (store) => {
     const previousSettings = currentSettings
     const state = store.getState()
 
+    console.log('inside userSettingsSubscriber()')
+
     currentSettings = state.userSettings
 
     if (previousSettings.customBg !== currentSettings.customBg) {
@@ -75,4 +77,13 @@ export const userSettingsSubscriber = (store) => {
       )
     }
   }
+}
+
+export const forceUIupdate = (state) => {
+  const root = document.documentElement
+  root.style.setProperty('--custom-bg', state.customBg)
+  root.style.setProperty('--custom-txt', state.customTxt)
+  root.style.setProperty('--custom-over-colour', makeRGBA(state.customOver))
+  root.style.setProperty('--custom-over-colour-rev', makeRGBA(state.customRev))
+  root.style.setProperty('--font-size', state.fontSize + 'rem')
 }
