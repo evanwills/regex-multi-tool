@@ -6,7 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-
+import { isBoolTrue, isNumeric } from '../../utility-functions.mjs'
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name
@@ -1707,10 +1707,118 @@ doStuff.register({
   group: 'evan',
   ignore: false,
   // inputLabel: '',
-  name: 'Extract unicode chars'
+  name: 'Z Extract unicode chars'
   // remote: false,
   // rawGet: false,
 })
 
-//  END: Action name
+//  END:  extract unicode chars
+// ====================================================================
+// START: Tab delimited to Markdown table
+
+/**
+ * Convert Tab delimited data to Markdown table
+ *
+ * created by: Evan Wills
+ * created: 2021-03-29
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const tab2markdown = (input, extraInputs, GETvars) => {
+  let rows = input.split('\n')
+  rows = rows.map(row => {
+    console.log('row:', row)
+    row = row.split("\t")
+    console.log('row:', row)
+    return row.map(col => col.trim())
+  })
+
+  const pad = (_input, len, header) => {
+    const char = (_input.length > 0) ? ' ' : '-'
+    let a = false
+    let _output = _input
+
+    if (isBoolTrue(header)) {
+      while (_output.length < len) {
+        console.log('_output.length:', _output.length)
+        console.log('len:', len)
+        console.log(_output.length + ' < ' + len + ':', _output.length < len)
+        if (a === false) {
+          _output = char + _output
+        } else {
+          _output = _output + char
+        }
+        a = !a
+      }
+    } else if (isNumeric(_input)) {
+      while (_output.length < len) {
+        console.log('_output.length:', _output.length)
+        console.log('len:', len)
+        console.log(_output.length + ' < ' + len + ':', _output.length < len)
+        _output = char + _output
+      }
+    } else {
+      while (_output.length < len) {
+        console.log('_output.length:', _output.length)
+        console.log('len:', len)
+        console.log(_output.length + ' < ' + len + ':', _output.length < len)
+        _output += char
+      }
+    }
+
+    return char + _output + char + '|'
+  }
+
+  const cols = []
+  for (let a = 0; a < rows.length; a += 1) {
+    console.log('rows[' + a + ']:', rows[a])
+    for (let b = 0; b < rows[a].length; b += 1) {
+      console.log('rows[' + a + '][' + b + ']:', rows[a][b])
+      const c = rows[a][b].length
+      if (typeof cols[b] !== 'number' || cols[b] < c) {
+        cols[b] = c
+      }
+    }
+  }
+
+  console.log('cols:', cols)
+
+  const headerRow = cols.map(col => '')
+
+  rows = [].concat(rows.slice(0,1), [headerRow], rows.slice(1))
+  console.log('rows:', rows)
+
+  let output = ''
+  for (let a = 0; a < rows.length; a += 1) {
+    console.log('output:', output)
+    output += '|'
+    for (let b = 0; b < rows[a].length; b += 1) {
+      output += pad(rows[a][b], cols[b], a === 0)
+    }
+    output += '\n'
+    console.log('output:', output)
+  }
+
+  return output.trim();
+}
+
+doStuff.register({
+  id: 'tab2markdown',
+  func: tab2markdown,
+  description: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false,
+  name: 'Convert Tab delimited data to Markdown table'
+})
+
+//  END:  Tab delimited to Markdown table
 // ====================================================================
