@@ -1,7 +1,7 @@
 import { html } from '../../lit-html/lit-html.mjs'
 import { isStr, isInt } from '../../utility-functions.mjs'
 import { radioBtnGroup, checkboxBtnGroup } from '../shared-components/shared-checkbox-btn.view.mjs'
-import { textInputField, numberInputField } from '../shared-components/shared-input-fields.view.mjs'
+import { textInputField, numberInputField, selectField } from '../shared-components/shared-input-fields.view.mjs'
 
 
 const maxLabelLen = (last, current) => {
@@ -34,32 +34,27 @@ export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
         },
         true
       ))
-      break
 
     case 'number':
       return wrapField(numberInputField({
         ...props,
         eventHandler: eventHandlers.valueEvent
       }))
-      break
 
     case 'radio':
       const maxLen = props.options.reduce(maxLabelLen, 0)
       return (maxLen > 32)
         ? checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex, '', true)
         : radioBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex)
-      break
 
     case 'checkbox':
       return checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex)
-      break
 
     case 'select':
       return wrapField(selectField({
         ...props,
         eventHandler: eventHandlers.valueEvent
       }))
-      break
 
     case 'text':
     default:

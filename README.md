@@ -21,9 +21,9 @@ This is an experement to see if I can build a sophisiticated Javascript based to
 * ~~User managed custom theme~~ _[done]_
 * ~~browser history updating~~ _[done]_
 * ~~Remove dependence on Sass~~ _[done]_
-* Local "Repeatable" implementation _[in progress]_
+* ~~Local "Repeatable" implementation~~ _[done]_
 * Export Regex API (TypeScript) to ES Modules _[in progress]_
-* Implement Local storage
+* Implement Local storage _[in progress]_
 * Implement Service worker
 * Make all actions that modify text asynchronous
 * Remote Regex test (oneOff)
