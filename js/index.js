@@ -27,12 +27,12 @@ let forceUiUpdate = false
 // ========================================================
 // START: pre-setting from URL and local storage
 
-if (isNonEmptyStr(tmpState.url.searchParams.action)) {
-  store.dispatch({
-    type: repeatActions.SET_ACTION,
-    payload: tmpState.url.searchParams.action
-  })
-}
+// if (isNonEmptyStr(tmpState.url.searchParams.action)) {
+//   store.dispatch({
+//     type: repeatActions.SET_ACTION,
+//     payload: tmpState.url.searchParams.action
+//   })
+// }
 const _repeatable = localStorage.getItem('repeatable')
 if (isNonEmptyStr(_repeatable)) {
   try {
@@ -74,7 +74,7 @@ const userSettings = localStorage.getItem('userSettings')
 if (isNonEmptyStr(userSettings)) {
   try {
     const _userSettings = JSON.parse(userSettings)
-    console.log('_userSettings:', _userSettings)
+    // console.log('_userSettings:', _userSettings)
     store.dispatch({
       type: userSettingsActions.RESTORE,
       payload: _userSettings

@@ -65,7 +65,9 @@ const cleanGET = (input) => {
  * (see: https://developer.mozilla.org/en-US/docs/Web/API/URL/URL)
  *
  * convert a URL string into a URL object
- * @param {string} url url to be parsed
+ *
+ * @param {string} url url to be parsed (usually from window.location)
+ *
  * @returns {URL} url object, identical to new URL() call
  *                (except the hash can be before or after
  *                 the GET string)
@@ -154,6 +156,15 @@ export const getURLobject = (url) => {
   return output
 }
 
+/**
+ * Enhance URL object with values pulled from local storage
+ *
+ * @param {string} url url to be parsed (usually from window.location)
+ *
+ * @returns {URL} url object, identical to new URL() call
+ *                (except the hash can be before or after
+ *                 the GET string)
+ */
 export const localStoreageEnhanceUrl = (url) => {
   const _url = getURLobject(url)
 
@@ -163,12 +174,14 @@ export const localStoreageEnhanceUrl = (url) => {
       _url.searchParams.mode = _mode
     }
 
-    if (isNonEmptyStr(_url.searchParams.groups)) {
+    if (!isNonEmptyStr(_url.searchParams.groups)) {
       const _groups = localStorage.getItem('groups')
+
       if (isNonEmptyStr(_groups)) {
         _url.searchParams.groups = _groups
       }
     }
+
     const _repeat = localStorage.getItem('repeatable')
     if (isNonEmptyStr(_repeat)) {
       const _rep = JSON.parse(_repeat)
@@ -188,7 +201,6 @@ export const localStoreageEnhanceUrl = (url) => {
     _url.href = _url.protocol + '//' + _url.host + _url.port + _url.pathname + _url.search + _url.hash
     history.replaceState({}, '', _url.href)
   }
-
   return _url
 }
 

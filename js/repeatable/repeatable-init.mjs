@@ -1,5 +1,3 @@
-/* globals localStorage */
-
 /**
  * This file contains the main code for the "repeatable"
  * functionality part of Regex Multi-Tool
@@ -18,7 +16,7 @@ import {
   isBoolTrue,
   // invalidBool,
   // invalidNum,
-  getURLobject,
+  // getURLobject,
   isNonEmptyStr
 } from '../utility-functions.mjs'
 

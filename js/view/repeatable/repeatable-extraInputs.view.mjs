@@ -3,7 +3,6 @@ import { isStr, isInt } from '../../utility-functions.mjs'
 import { radioBtnGroup, checkboxBtnGroup } from '../shared-components/shared-checkbox-btn.view.mjs'
 import { textInputField, numberInputField, selectField } from '../shared-components/shared-input-fields.view.mjs'
 
-
 const maxLabelLen = (last, current) => {
   if (isStr(current.label)) {
     return (current.label.length > last) ? current.label.length : last
@@ -11,14 +10,14 @@ const maxLabelLen = (last, current) => {
   return (current.value.length > last) ? current.value.length : last
 }
 
-const makeProps = (action, extraInput) => {
+// const makeProps = (action, extraInput) => {
 
-}
+// }
 
 const wrapField = (field) => html`<div class="repeatable-extraInput__wrap">${field}</div>`
 
 export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
-  let _tabIndex = (isInt(tabIndex)) ? tabIndex : 0
+  const _tabIndex = (isInt(tabIndex)) ? tabIndex : 0
 
   // console.group('singleExtraInputView()')
   // console.log('props.id:', props.id)
@@ -42,7 +41,7 @@ export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
       }))
 
     case 'radio':
-      const maxLen = props.options.reduce(maxLabelLen, 0)
+      const maxLen = props.options.reduce(maxLabelLen, 0) // eslint-disable-line
       return (maxLen > 32)
         ? checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex, '', true)
         : radioBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex)
@@ -65,7 +64,6 @@ export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
         },
         false
       ))
-      break
   }
 }
 
@@ -75,10 +73,11 @@ export const allExtraInputsView = (fieldMeta, fieldValues, eventHandlers) => {
   // console.log('fieldValues:', fieldValues)
   // console.groupEnd()
   if (Array.isArray(fieldMeta.extraInputs)) {
-  return fieldMeta.extraInputs.map(field => html`
-    <li class="repeatable-field">
-      ${singleExtraInputView({ ...field, value: fieldValues[field.id], id: fieldMeta.id + '-extraInputs-' + field.id }, eventHandlers)}
-    </li>`)
+    return fieldMeta.extraInputs.map(field => html`
+      <li class="repeatable-field">
+        ${singleExtraInputView({ ...field, value: fieldValues[field.id], id: fieldMeta.id + '-extraInputs-' + field.id }, eventHandlers)}
+      </li>`
+    )
   } else {
     return ''
   }

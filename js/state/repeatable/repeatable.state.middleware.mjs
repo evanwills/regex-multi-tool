@@ -18,16 +18,16 @@ let loop = 0
 export const modifyInput = ({ getState, dispatch }) => next => action => {
 }
 
-const getActionMeta = (allActions, actionID) => {
-  for (const prop in allActions) {
-    const action = allActions[prop].filter(_action => _action.id === actionID)
+// const getActionMeta = (allActions, actionID) => {
+//   for (const prop in allActions) {
+//     const action = allActions[prop].filter(_action => _action.id === actionID)
 
-    if (action.length === 1) {
-      return action[0]
-    }
-  }
-  return false
-}
+//     if (action.length === 1) {
+//       return action[0]
+//     }
+//   }
+//   return false
+// }
 
 export const repeatableMW = store => next => action => {
   const _state = store.getState()
