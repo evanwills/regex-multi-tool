@@ -1,6 +1,17 @@
 # Regex Multi Tool
 
-Tool for testing regular expressions and creating mini tools for modifying text with regular expressions.
+## Getting started
+
+Download from Github https://github.com/evanwills/regex-multi-tool
+
+```sh
+$ npm install
+$ npm run dev
+```
+
+## About
+
+This is a tool for testing regular expressions and creating mini tools for repeatedly, programtically modifying text with the help of regular expressions.
 
 *Regex multi tool* aims to merge two seperate but related tools I've been working on for years.
 
@@ -23,9 +34,10 @@ This is an experement to see if I can build a sophisiticated Javascript based to
 * ~~Remove dependence on Sass~~ _[done]_
 * ~~Local "Repeatable" implementation~~ _[done]_
 * Export Regex API (TypeScript) to ES Modules _[in progress]_
-* Implement Local storage _[in progress]_
+* Implement Local storage _[mostly done]_
 * Implement Service worker
 * Make all actions that modify text asynchronous
 * Remote Regex test (oneOff)
 * Remote Do Regex stuff (repeatable)
 * Move local actions that modify text into a web worker (if that's even possible)
+* Move state management to web worker

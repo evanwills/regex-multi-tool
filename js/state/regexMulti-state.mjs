@@ -23,7 +23,7 @@ import { urlReducer } from './url/url.state.all.mjs'
 import { url } from '../url.mjs'
 
 const initialState = {
-  mode: 'oneOff',
+  mode: 'repeatable',
   groups: '',
   oneOff: oneOff.state,
   repeat: repeatable.state,
