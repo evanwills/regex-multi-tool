@@ -19,11 +19,6 @@ const wrapField = (field) => html`<div class="repeatable-extraInput__wrap">${fie
 export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
   const _tabIndex = (isInt(tabIndex)) ? tabIndex : 0
 
-  // console.group('singleExtraInputView()')
-  // console.log('props.id:', props.id)
-  // console.log('props:', props)
-  // console.log('props.value:', props.value)
-  // console.groupEnd()
   switch (props.type) {
     case 'textarea':
       return wrapField(textInputField(

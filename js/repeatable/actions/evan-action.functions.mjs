@@ -50,7 +50,6 @@ function extractURLs (input, extraInputs, GETvars) {
   let sep = ''
 
   matches = regex.exec(input)
-  console.log('matches:', matches)
 
   while (Array.isArray(matches)) {
     // URLs.push(matches[2])
@@ -71,7 +70,6 @@ function extractURLs (input, extraInputs, GETvars) {
     output += sep + matches[2] + '\n\t..\\' + dir + '\\' + matches[3]
     sep = '\n\n'
     matches = regex.exec(input)
-    console.log('matches:', matches)
   }
 
   return output
@@ -259,7 +257,6 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 function fixSet (input, extraInputs, GETvars) {
-  console.log('inside fixSet()')
   const replaceCallback = (whole, func, value, prop, key1a, key1b, key2a, key2b) => {
     key2a = (typeof key2a === 'undefined') ? '' : key2a
     key2b = (typeof key2b === 'undefined') ? '' : key2b
@@ -803,18 +800,18 @@ const emailHashSearch = (input, extraInputs, GETvars) => {
   let IDstring = ''
   let sep = ''
   let output = ''
-  console.log('rows:', rows)
+
   for (let a = 0; a < rows.length; a += 1) {
     if (rows[a].trim() !== '') {
       const row = rows[a].split('\t')
-      console.log('row:', row)
+
       if (row[1].trim() !== '') {
         const ref = row[1].split('_')
-        console.log('ref:', ref)
-        const acro = ref[0].trim()
+        // const acro = ref[0].trim()
         const id = ref[1].trim()
-        console.log('acro:', acro)
-        console.log('id:', id)
+
+        // console.log('acro:', acro)
+        // console.log('id:', id)
         IDs.push(id)
         IDstring += sep + id
         sep = ', '
@@ -896,8 +893,9 @@ const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
 
     if (uncommitted === true) {
       file = line.replace(/^(?:deleted|modified):[\\t ]*/, '')
-      console.log('file:', file)
-      console.log('line:', line)
+      // console.log('file:', file)
+      // console.log('line:', line)
+
       if (file !== line) {
         checkoutFiles += sepCO + '"' + file + '"'
         sepCO = '\\\n\t'
@@ -973,17 +971,17 @@ const acceptChanges = (input, extraInputs, GETvars) => {
   const doAdd = extraInputs.add('add')
 
   oursTheirs = (typeof oursTheirs === 'string') ? oursTheirs : 'theirs'
-  console.log('lines:', lines)
-  console.log('lines.length:', lines.length)
-  console.log('oursTheirs:', oursTheirs)
+  // console.log('lines:', lines)
+  // console.log('lines.length:', lines.length)
+  // console.log('oursTheirs:', oursTheirs)
 
   for (let a = 0; a < lines.length; a += 1) {
-    console.log('lines[' + a + ']:', lines[a])
+    // console.log('lines[' + a + ']:', lines[a])
     line = lines[a].trim()
-    console.log('line:', line)
+    // console.log('line:', line)
     if (line.substr(0, 14) === 'both modified:') {
       line = line.replace(/^both modified:\s+/, '')
-      console.log('line:', line)
+      // console.log('line:', line)
 
       if (line !== '') {
         if (doCheckout === true) {
@@ -992,7 +990,7 @@ const acceptChanges = (input, extraInputs, GETvars) => {
         if (doAdd === true) {
           output += 'git add "' + line + '";\n'
         }
-        console.log('output:', output)
+        // console.log('output:', output)
       }
     }
 
@@ -1073,15 +1071,15 @@ const sideAccordionIDs = (input, extraInputs, GETvars) => {
   )
 
   const replaceFunc = (whole, ifPart, varPart) => {
-    console.log('whole:', whole)
-    console.log('ifPart:', ifPart)
-    console.log('varPart:', varPart)
+    // console.log('whole:', whole)
+    // console.log('ifPart:', ifPart)
+    // console.log('varPart:', varPart)
     let _varPart = varPart.replace(/[^a-zA-Z]+/ig, '-')
     _varPart = _varPart.replace(/([a-z])(?=[A-Z])/g, '$1-')
     return ifPart + ' id="' + _varPart.toLowerCase() + '"'
   }
 
-  console.log('regex:', regex)
+  // console.log('regex:', regex)
 
   return input.replace(regex, replaceFunc)
 }
@@ -1148,8 +1146,8 @@ const bash2windows = (input, extraInputs, GETvars) => {
 
   if (whichWay === 'win2bash') {
     output = backForward(input)
-    console.log('input:', input)
-    console.log('input.substr(1, 1):', input.substr(1, 1))
+    // console.log('input:', input)
+    // console.log('input.substr(1, 1):', input.substr(1, 1))
     if (input.substr(1, 1) === ':') {
       output = prefix.bash + output
     }
@@ -1263,22 +1261,22 @@ const downloadMatrixAssets = (input, extraInputs, GETvars) => {
   const _regex = /^(?:https?:)?\/\/[a-z]+\.acu\.edu\.au\/(.*?)\/([a-z0-9._-]+?\.[a-z]+)$/i
 
   const parseURL = (whole, path, file) => {
-    console.group('parseURL()')
-    console.log('whole:', whole)
-    console.log('path:', path)
-    console.log('file:', file)
-    console.groupEnd()
+    // console.group('parseURL()')
+    // console.log('whole:', whole)
+    // console.log('path:', path)
+    // console.log('file:', file)
+    // console.groupEnd()
     return 'getURL "' + path + '" "' + file + '";' + '\n'
   }
 
   const _URLs = URLs.filter(url => (url.trim() !== '')).map(url => {
-    console.group('URLs.map()')
+    // console.group('URLs.map()')
     const _url = url.trim()
     const _line = _url.replace(_regex, parseURL)
-    console.log('_url:', _url)
-    console.log('_regex:', _regex)
-    console.log('_line:', _line)
-    console.groupEnd()
+    // console.log('_url:', _url)
+    // console.log('_regex:', _regex)
+    // console.log('_line:', _line)
+    // console.groupEnd()
     return _line
   })
 
@@ -1358,14 +1356,14 @@ const checkoutWSonly = (input, extraInputs, GETvars) => {
   const modified = []
   for (let a = 0; a < lines.length; a += 1) {
     if (lines[a].includes('modified')) {
-      console.log('lines[' + a + ']:', lines[a])
+      // console.log('lines[' + a + ']:', lines[a])
       let line = lines[a].replace(/^\s*modified:\s+/, '')
       line = line.trim()
       // const tmp = line.replace(/\s+)/g, '')
       // if (line !== tmp) {
       //   line = '"' + tmp + '"'
       // }
-      console.log('line:', line)
+      // console.log('line:', line)
       modified.push(line)
     }
   }
@@ -1413,13 +1411,13 @@ const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
   }
 
   const outputMode = extraInputs.output()
-  console.log(outputMode)
+  // console.log(outputMode)
 
   const output = []
   const output2 = {}
   const output3 = {}
-  let suburbCount = 0
-  let schoolCount = 0
+  // let suburbCount = 0
+  // let schoolCount = 0
   // const allSuburbs = []
   // const allSchools = []
   let tmp = ''
@@ -1432,12 +1430,12 @@ const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
 
   for (let a = 0; a < json.Suburbs.length; a += 1) {
     const suburb = json.Suburbs[a]
-    suburbCount += 1
+    // suburbCount += 1
     output2[suburb.Name] = []
 
     // console.log('suburb:', suburb)
     for (let b = 0; b < suburb.Schools.length; b += 1) {
-      schoolCount += 1
+      // schoolCount += 1
       const better = {
         id: suburb.Schools[b].ID,
         name: suburb.Schools[b].Name,
@@ -1472,8 +1470,8 @@ const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
     }
   }
 
-  console.log('Suburb count:', suburbCount)
-  console.log('School count:', schoolCount)
+  // console.log('Suburb count:', suburbCount)
+  // console.log('School count:', schoolCount)
 
   switch (outputMode) {
     case 'suburb':
@@ -1524,11 +1522,11 @@ const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
     case 'object2':
       _tmp = Object.keys(output2)
       for (tmp in output2) {
-        console.log('tmp:', tmp)
+        // console.log('tmp:', tmp)
         let _key = tmp.replace(/[^a-z]+/ig, '')
-        console.log('_key:', _key)
+        // console.log('_key:', _key)
         _key = _key.toLowerCase()
-        console.log('_key:', _key)
+        // console.log('_key:', _key)
         output3[_key] = {
           name: tmp,
           schools: output2[tmp]
@@ -1658,19 +1656,19 @@ const extractInicode = (input, extraInputs, GETvars) => {
     const matches = cells.match(/^.*?<td class="named"><code>&amp;([^;]+);(?:\s+&amp;[^;]+;)*<\/code><td class="hex"><code>&amp;#x[^;]+;<\/code><td class="dec"><code>&amp;#([^;]+);<\/code><td class="desc">(.*)/i)
 
     if (matches === null) {
-      console.log('Nothing was matched')
-      console.log('matches === null:', matches === null)
-      console.log('cells:', cells)
+      // console.log('Nothing was matched')
+      // console.log('matches === null:', matches === null)
+      // console.log('cells:', cells)
       return ''
     } else if ((!extraInputs.bigSmall('ascii') &&
       matches[2] <= 128) ||
       (!extraInputs.bigSmall('high') &&
       matches[2] > 9999)
     ) {
-      console.log('matches === null:', matches === null)
-      console.log('matches[2] (' + matches[2] + ') <= 128:', matches[2] <= 128)
-      console.log('matches[2] (' + matches[2] + ') > 9999:', matches[2] > 9999)
-      console.log('cells:', cells)
+      // console.log('matches === null:', matches === null)
+      // console.log('matches[2] (' + matches[2] + ') <= 128:', matches[2] <= 128)
+      // console.log('matches[2] (' + matches[2] + ') > 9999:', matches[2] > 9999)
+      // console.log('cells:', cells)
       return ''
     }
 

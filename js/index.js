@@ -65,7 +65,7 @@ if (isNonEmptyStr(_repeatable)) {
       }
     }
   } catch (e) {
-    console.log('contents of localStorage.repeatable: ' + _repeatable)
+    // console.log('contents of localStorage.repeatable: ' + _repeatable)
     console.error('Failed to parse "repeatable" state: ' + e)
   }
 }

@@ -1,9 +1,12 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isNonEmptyStr, isStr, isInt } from '../../utility-functions.mjs'
+import {
+  // isInt,
+  isNonEmptyStr
+  // isStr,
+} from '../../utility-functions.mjs'
 import { repeatableActionNav } from './repeatable-nav.view.mjs'
 import { textInputField } from '../shared-components/shared-input-fields.view.mjs'
 import { allExtraInputsView } from './repeatable-extraInputs.view.mjs'
-
 
 /**
  * Get a template for "Repetable" action description
@@ -39,19 +42,19 @@ const renderDescription = (description) => {
   return ''
 }
 
-const inputValue = (props) => {
-  if (props.debug === false && props.fields.outputPrimary !== '') {
-    console.log('returning primary output')
-    return props.fields.outputPrimary
-  } else {
-    console.log('returning primary input')
-    return props.fields.inputPrimary
-  }
-}
+// const inputValue = (props) => {
+//   if (props.debug === false && props.fields.outputPrimary !== '') {
+//     console.log('returning primary output')
+//     return props.fields.outputPrimary
+//   } else {
+//     console.log('returning primary input')
+//     return props.fields.inputPrimary
+//   }
+// }
 
 export const repeatableUI = (props) => {
-  let extraInputs
-  let actionList = []
+  // let extraInputs
+  // let actionList = []
   const _debug = props.debug
   const activeActionID = (typeof props.activeAction !== 'undefined' && isNonEmptyStr(props.activeAction.id))
     ? props.activeAction.id
@@ -95,17 +98,19 @@ export const repeatableUI = (props) => {
           },
           true
         )}
-        ${(_debug) ? textInputField(
-          {
-            ...props.activeAction,
-            label: props.activeAction.outputLabel,
-            change: props.events.valueEvent,
-            value: props.fields.outputPrimary,
-            class: 'repeat-input',
-            id: props.activeAction.id + '-primaryOutput'
-          },
-          true
-        ) : ''}
+        ${(_debug)
+          ? textInputField(
+            {
+              ...props.activeAction,
+              label: props.activeAction.outputLabel,
+              change: props.events.valueEvent,
+              value: props.fields.outputPrimary,
+              class: 'repeat-input',
+              id: props.activeAction.id + '-primaryOutput'
+            },
+            true
+          )
+          : ''}
 
         </div>`
         : html`<p>Choose an action from the action menu (top right)</p>`

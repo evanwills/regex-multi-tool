@@ -193,6 +193,7 @@ export const getMainAppView = (domNode, store) => {
         )}
       </div>
     `
+    // console.log('UI:', UI)
     render(UI, domNode)
   }
 }

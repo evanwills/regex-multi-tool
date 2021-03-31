@@ -105,12 +105,14 @@ export const getAutoDispatchValueAction = (_dispatch) => {
  * @returns
  */
 export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
-  const aType = (Array.isArray(repeatable))
+  const _type = (Array.isArray(repeatable))
     ? repeatActions.REGISTER_ALL_ACTIONS
     : repeatActions.REGISTER_SINGLE_ACTION
 
+  // console.log('repeatable:', repeatable)
+  // console.log('actionID:', actionID)
   _dispatch({
-    type: aType,
+    type: _type,
     payload: repeatable
   })
 

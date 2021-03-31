@@ -187,9 +187,9 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
   const _kssCommentStart = multiLitRegexReplace(kssCommStart, _kssReplace)
   const _kssCommentEnd = multiLitRegexReplace(kssCommEnd, _kssReplace)
   const tab2space = (whole, before, after) => {
-    console.log('whole:', whole)
-    console.log('before:', before)
-    console.log('after:', after)
+    // console.log('whole:', whole)
+    // console.log('before:', before)
+    // console.log('after:', after)
     return '\n *' + after.replace(/\t/g, '  ')
   }
 
@@ -708,7 +708,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const kssCommentBlock = (input, extraInputs, GETvars) => {
-  console.log("extraInputs.wholeComment('true'):", extraInputs.wholeComment('true'))
+  // console.log("extraInputs.wholeComment('true'):", extraInputs.wholeComment('true'))
 
   if (extraInputs.wholeComment('true')) {
     return makeKssComment(
@@ -870,8 +870,8 @@ const uniqueCharsOnly = (input, extraInputs, GETvars) => {
     if (found.indexOf(src[a]) === -1 && dataSet.indexOf(src[a]) >= 0) {
       found.push(src[a])
       if (found.length === dataSet.length) {
-        console.log('a', a)
-        console.log('src.length', src.length)
+        // console.log('a', a)
+        // console.log('src.length', src.length)
         break
       }
     }
@@ -900,8 +900,8 @@ const uniqueCharsOnly = (input, extraInputs, GETvars) => {
   output = '$dictionary = array('
   for (let a = 0; a < digits.length; a += 1) {
     sep1 = ''
-    console.log('digits[' + a + ']:', digits[a])
-    console.log('digits[' + a + '].length:', digits[a].length)
+    // console.log('digits[' + a + ']:', digits[a])
+    // console.log('digits[' + a + '].length:', digits[a].length)
     output += sep0 + '\n\tarray( '
     for (let b = 0; b < digits[a].length; b += 1) {
       output += sep1 + "'" + digits[a][b] + "'"
@@ -984,66 +984,61 @@ const sitecore2local = (input, extraInputs, GETvars) => {
 
   const regex = [
     {
-      find: '/assets/acupublic/(?:custom)?(?=(?:css|js|fonts)/)',
+      find: /\/assets\/acupublic\/(?:custom)?(?=(?:css|js|fonts)\/)/ig,
       replace: '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic/'
       // replace: '../'
     }, {
-      find: '(<img src=")(?=/-/media/feature/)',
+      find: /(<img src=")(?=\/-\/media\/feature\/)/ig,
       replace: '$1https://' + extraInputs.domain() + '.acu.edu.au'
     // }, {
     //   find: '\\.\\.(?=\\/js\\/(?:cta-bar|sticky|side-accordion)\\.js)',
     //   replace: '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic'
     }, {
-      find: '\\s+target=""',
+      find: /\s+target=""/ig,
       replace: ''
     }, {
-      find: '\\s+v-model="[^"]*"',
+      find: /\s+v-model="[^"]*"/ig,
       replace: ''
     }, {
-      find: '(\\s+id=")([^"]+)(?=")',
+      find: /(\s+id=")([^"]+)(?=")/ig,
       replace: idClean
     }, {
-      find: '\\s*<meta (?:name|property)="[^"]+"(?:\\s*/)?>',
+      find: /\s*<meta (?:name|property)="[^"]+"(?:\s*\/)?>/ig,
       replace: ''
     }, {
-      find: '(<meta http-equiv="X-UA-Compatible" content="IE=edge" />).*?(?=\\s*<meta name="viewport")',
-      replace: '$1',
-      flags: 'is'
-    }, {
-      find: ' type="text/javascript"',
-      replace: ''
-    }, {
-      find: '<%--.*?--%>',
-      replace: '',
-      flags: 'igs'
-    }, {
-      find: '(<input type="hidden" id="hdnStickyEncodeValue" />.*?</button>.*?</label>\\s+)+',
-      replace: '$1',
-      flags: 'igs'
-    }, {
-      find: '<!--(GoogleAnalytics Section) Starts-->.*?<!--GoogleAnalytics Section Ends-->',
-      replace: '',
-      flags: 'igs'
-    }, {
-      find: '<linked-c.*?data-code=[\'"]([^\'"]+)[\'"] data-name=[\'"]([^\'"]+)[\'"].*?</linked-co>',
-      replace: '<a href="/Handbook/Handbook-2021/Course/unit/$1" title="$2">$1</a>',
-      flags: 'igs'
-    }, {
-      find: '/sitecore%20modules/Web/ExperienceForms/scripts/',
-      replace: '../js/sitecore/'
-    }, {
-      find: '(href="#)course(?=overview")',
+      find: /(<meta http-equiv="X-UA-Compatible" content="IE=edge" \/>).*?(?=\s*<meta name="viewport")/is,
       replace: '$1'
     }, {
-      find: '<script.*?src="[^"]+(?:bluebird|addevent)[^"]+".*?></script>',
+      find: / type="text\/javascript"/ig,
       replace: ''
     }, {
-      find: '(src=")[^"]+((?:acu-logo-white|acu_logo_purple|askacu).svg)[^"]*(?=")',
+      find: /<%--.*?--%>/igs,
+      replace: ''
+    }, {
+      find: /(<input type="hidden" id="hdnStickyEncodeValue" \/>.*?<\/button>.*?<\/label>\s+)+/igs,
+      replace: '$1'
+    }, {
+      find: /<!--(GoogleAnalytics Section) Starts-->.*?<!--GoogleAnalytics Section Ends-->/igs,
+      replace: ''
+    }, {
+      find: /<linked-c.*?data-code=['"]([^'"]+)['"] data-name=['"]([^'"]+)['"].*?<\/linked-co>/igs,
+      replace: '<a href="/Handbook/Handbook-2021/Course/unit/$1" title="$2">$1</a>'
+    }, {
+      find: /\/sitecore%20modules\/Web\/ExperienceForms\/scripts\//ig,
+      replace: '../js/sitecore/'
+    }, {
+      find: /(href="#)course(?=overview")/ig,
+      replace: '$1'
+    }, {
+      find: /<script.*?src="[^"]+(?:bluebird|addevent)[^"]+".*?><\/script>/ig,
+      replace: ''
+    }, {
+      find: /(src=")[^"]+((?:acu-logo-white|acu_logo_purple|askacu).svg)[^"]*(?=")/ig,
       replace: '$1../img/$2'
     }
   ]
 
-  return multiRegexReplace(input, regex)
+  return multiLitRegexReplace(input, regex)
 }
 
 doStuff.register({
@@ -1081,114 +1076,4 @@ doStuff.register({
 })
 
 //  END: Sitecore HTML to local HTML
-// ====================================================================
-// START: Transform RYI Suburb/Schools JSON
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const transformSchoolsJSON = (input, extraInputs, GETvars) => {
-  let json
-
-  const sortByKey = (obj) => {
-    const output = {}
-    const keys = Object.keys(obj)
-    keys.sort()
-    for (let a = 0; a < keys.length; a += 1) {
-      output[keys[a]] = obj[keys[a]]
-    }
-
-    return output
-  }
-
-  const noQuotes = (input) => {
-    return JSON.stringify(input).replace(
-      /"([^"]+)"(?=:)/ig, '$1').replace(/^(\[|\{)/, '$1\n  ').replace(/(\}|\])$/,
-      '\n$1\n'
-    )
-  }
-
-  if (extraInputs.mode() === 'suburbs') {
-    try {
-      json = JSON.parse(input.replace(/(^|[\r\n])[\t ]*\/\/[^\r\n]+/ig, ''))
-    } catch (e) {
-      console.error('Schools JSON failed to parse.', e)
-      return ''
-    }
-    return '\n\n/**' +
-           '\n * A list of Australian suburbs hosting High Schools that offer' +
-           '\n * ATAR programs.' +
-           '\n *' +
-           '\n * NOTE: This variable was generated using' +
-           '\n *       https://test-webapps.acu.edu.au/mini-apps/do-JS-regex-stuff/?group=mer&action=transformschoolsjson' +
-           '\n *       (following the instructions in the tool)' +
-           '\n *' +
-           '\n *       The tool converts the JSON into a Javascript variable' +
-           '\n *       appropriate for use in this script' +
-           '\n *' +
-           '\n *       (Repo for the tool is at https://gitlab.acu.edu.au/evwills/do-JS-regex-stuff)\n *' +
-           '\n * @var {array} RYIschoolSuburbs\n */\n' +
-           'var RYIschoolSuburbs = ' +
-           noQuotes(json.Suburbs)
-  } else if (extraInputs.mode() === 'studyArea') {
-    try {
-      json = JSON.parse(input.replace(/^var Campuses = /, '').replace(/([a-z]+)(?=:)/ig, '"$1"'))
-    } catch (e) {
-      console.error('failed to parse study area object', e)
-      return ''
-    }
-
-    for (const campus in json) {
-      for (const level in json[campus]) {
-        if (typeof json[campus][level] !== 'string') {
-          json[campus][level] = sortByKey(json[campus][level])
-        }
-      }
-    }
-
-    console.log('json:', json)
-    return 'var Campuses = ' + noQuotes(json)
-  } else {
-    console.error('No mode specified.')
-    return ''
-  }
-}
-
-doStuff.register({
-  id: 'transformSchoolsJSON',
-  func: transformSchoolsJSON,
-  description: 'Transform RYI Suburb/Schools JSON string to JavaScript variable for use in WWW RYI from</p><p>For creating the JavaScript variable use in the public website RYI form</p><ol><li>Copy the whole JSON (supplied by marketing) into the text box below</li><li>click MODIFY INPUT (green button on the bottom left)</li><li>Copy the (modified) contents of the text box</li><li>Then replace the existing variable in the sitecore <code>ryi-script.js</code> file</li></ol><p>',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'mode',
-    type: 'radio',
-    label: 'What to transform',
-    options: [{
-      value: 'suburbs',
-      label: 'Convert Suburbs JSON to variable'
-    }, {
-      value: 'studyArea',
-      label: 'Alphabetise study areas',
-      default: true
-    }]
-  }],
-  group: 'mer',
-  ignore: false,
-  name: 'Transform RYI Suburb/Schools JSON'
-})
-
-//  END:  Transform RYI Suburb/Schools JSON
 // ====================================================================

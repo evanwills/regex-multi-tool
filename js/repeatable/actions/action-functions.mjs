@@ -63,7 +63,6 @@ const exposeChickens = (input, extraInputs, GETvars) => {
   const _gender = extraInputs.gender()
   const _year = extraInputs.year()
 
-
   let _boc = 'BOC! BOC!!'
   let _chicken = 'chicken'
   let output = ''
@@ -695,87 +694,6 @@ doStuff.register({
 
 //  END:  Match unfinished payment IDs to confirmed payments.
 // ====================================================================
-// START: SVG ACU Logo cleanup
-
-/**
- * acuLogoClean() remove all unnecessary junk from the ACU logo
- *
- * created by: Evan Wills
- * created: 2019-09-23
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function acuLogoClean (input, extraInputs, GETvars) {
-  const regexes = [{
-    find: /<g id="_Group_"[^>]+>/i,
-    replace: '<g class="logo-txt">'
-  }, {
-    find: / class="cls-2"/i,
-    replace: '---baahh---'
-  }, {
-    find: / class="cls-2"/ig,
-    replace: ''
-  }, {
-    find: /---baahh---/i,
-    replace: ' class="cls-2"'
-  }, {
-    find: / (?:id|data-name)="[^"]+"/ig,
-    replace: ''
-  }, {
-    find: /<\/?g>/ig,
-    replace: ''
-  }, {
-    find: /\s+/g,
-    replace: ' '
-  }, {
-    find: /(?: (?=[<,{}@/.])|([>,{};/.]) )/g,
-    replace: '$1'
-  }, {
-    find: ' id="acu-logo"',
-    replace: ''
-  }, {
-    find: '</svg>',
-    replace: '</g></svg>'
-  }, {
-    find: 'Artboard 1',
-    replace: 'Australian Catholic University (ACU)'
-  }, {
-    find: /(<style xmlns="http:\/\/www\.w3\.org\/2000\/svg">).*?(?=<\/style>)/i,
-    replace: '$1.cls-1{fill:#ed0c00;}.cls-2,.logo-txt{fill:#fff;}@media print{.logo-txt,.cls-1{fill:#3c1053;}}'
-  }, {
-    find: /<g class="logo-txt">/ig,
-    replace: '---blah---'
-  }, {
-    find: '---blah---',
-    replace: '<g class="logo-txt">'
-  }, {
-    find: '---blah---',
-    replace: ''
-  }]
-
-  return multiLitRegexReplace(input, regexes)
-}
-
-doStuff.register({
-  id: 'acuLogoClean',
-  func: acuLogoClean,
-  group: 'mer',
-  ignore: true,
-  name: 'Minify ACU Logo SVG'
-  // description: 'Fix heading levels when Migrating HTML from one system to another',
-  // docURL: '',
-})
-
-//  END:  Syntax highlighting for JS
-// ====================================================================
 // START: Staff Access Card URL
 
 function staffAccessCard (input, extraInputs, GETvars) {
@@ -1168,12 +1086,12 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const formatHandbookPolicy = (input, extraInputs, GETvars) => {
-  let currentHeading = 0
+  // let currentHeading = 0
   let depth = 0
-  let openSections = 0
-  let closeSections = 0
+  // let openSections = 0
+  // let closeSections = 0
   let output = input
-  const knownIDs = []
+  // const knownIDs = []
 
   /**
    * Convert heading text to a human readable ID attribute
@@ -1182,33 +1100,33 @@ const formatHandbookPolicy = (input, extraInputs, GETvars) => {
    *
    * @returns {string} HTML 4.0 safe full id attribute string
    */
-  function makeID (_input) {
-    let _output = _input.trim()
-    let tmp = ''
-    let a = 0
+  // function makeID (_input) {
+  //   let _output = _input.trim()
+  //   let tmp = ''
+  //   let a = 0
 
-    // clean up heading text to make it ID safe (and human readable)
-    _output = _output.toLowerCase()
-    _output = _output.replace(/[^a-z0-9_-]+/g, '-') // strip undesirable chars
-    _output = _output.replace(/-+_+-+/g, '_') // strip bad join combos
-    _output = _output.replace(/_+-+_+/g, '-') // strip bad join combos
+  //   // clean up heading text to make it ID safe (and human readable)
+  //   _output = _output.toLowerCase()
+  //   _output = _output.replace(/[^a-z0-9_-]+/g, '-') // strip undesirable chars
+  //   _output = _output.replace(/-+_+-+/g, '_') // strip bad join combos
+  //   _output = _output.replace(/_+-+_+/g, '-') // strip bad join combos
 
-    // Handle duplicate IDs
-    tmp = _output
-    while (knownIDs.indexOf(tmp) > -1) {
-      tmp = _output + '__' + a // possible unique ID
-      a += 1
-    }
+  //   // Handle duplicate IDs
+  //   tmp = _output
+  //   while (knownIDs.indexOf(tmp) > -1) {
+  //     tmp = _output + '__' + a // possible unique ID
+  //     a += 1
+  //   }
 
-    // Make sure we have a unique ID
-    _output = (tmp !== _output) ? tmp : _output
+  //   // Make sure we have a unique ID
+  //   _output = (tmp !== _output) ? tmp : _output
 
-    // Add the unique ID to the list of all IDs on the page
-    knownIDs.push(_output)
+  //   // Add the unique ID to the list of all IDs on the page
+  //   knownIDs.push(_output)
 
-    // send a complete ID attribute back
-    return ' id="' + _output + '"'
-  }
+  //   // send a complete ID attribute back
+  //   return ' id="' + _output + '"'
+  // }
 
   /**
    * Prefix SECTION tags to H tags
@@ -1219,36 +1137,36 @@ const formatHandbookPolicy = (input, extraInputs, GETvars) => {
    *
    * @returns {string}
    */
-  const wrapSection =(whole, hNum, headingText) => {
-    let id = makeID(headingText)
-    let sectionTags = ''
+  // const wrapSection = (whole, hNum, headingText) => {
+  //   let id = makeID(headingText)
+  //   let sectionTags = ''
 
-    if (hNum > currentHeading) {
-      // Deeper level heading
-      hNum = currentHeading
-      openSections = hNum - currentHeading // In a well structured document this will always be 1
-      depth += openSections
+  //   if (hNum > currentHeading) {
+  //     // Deeper level heading
+  //     hNum = currentHeading
+  //     openSections = hNum - currentHeading // In a well structured document this will always be 1
+  //     depth += openSections
 
-      for (let a = 0; a < depth; a += 1) {
-        sectionTags = '<section' + id + '>' + sectionTags
-        id = ''
-      }
-    } else if (hNum < currentHeading) {
-      // Shallower level heading
-      hNum = currentHeading
-      closeSections = currentHeading - hNum // In a well structured document this will always be 1
-      depth -= closeSections
+  //     for (let a = 0; a < depth; a += 1) {
+  //       sectionTags = '<section' + id + '>' + sectionTags
+  //       id = ''
+  //     }
+  //   } else if (hNum < currentHeading) {
+  //     // Shallower level heading
+  //     hNum = currentHeading
+  //     closeSections = currentHeading - hNum // In a well structured document this will always be 1
+  //     depth -= closeSections
 
-      for (let a = 0; a < depth; a += 1) {
-        sectionTags += '</section>'
-      }
-      sectionTags += '<section' + id + '>'
-    } else {
-      // Same level heading
-      sectionTags = '</section><section' + id + '>'
-    }
-    return sectionTags + whole
-  }
+  //     for (let a = 0; a < depth; a += 1) {
+  //       sectionTags += '</section>'
+  //     }
+  //     sectionTags += '<section' + id + '>'
+  //   } else {
+  //     // Same level heading
+  //     sectionTags = '</section><section' + id + '>'
+  //   }
+  //   return sectionTags + whole
+  // }
 
   function listClasses (whole, close, tag, attrs) {
     const isOpen = close !== '/'
@@ -1264,25 +1182,25 @@ const formatHandbookPolicy = (input, extraInputs, GETvars) => {
       9: 'list-decimal'
     }
 
-    console.group('listClasses()')
-    console.log('whole:', whole)
-    console.log('close:', close)
-    console.log('tag:', tag)
-    console.log('attrs:', attrs)
+    // console.group('listClasses()')
+    // console.log('whole:', whole)
+    // console.log('close:', close)
+    // console.log('tag:', tag)
+    // console.log('attrs:', attrs)
 
     if (tag === 'li') {
       // strip styles from list items.
-      console.log('List item')
-      console.groupEnd()
+      // console.log('List item')
+      // console.groupEnd()
       return '<' + close + tag + attrs.replace(/\s+style="[^"]*"/ig, '') + '>'
     } else {
-      console.log('Ordered list')
-      console.log('depth:', depth)
-      console.log('isOpen:', isOpen)
+      // console.log('Ordered list')
+      // console.log('depth:', depth)
+      // console.log('isOpen:', isOpen)
       depth = (isOpen) ? depth + 1 : depth - 1
-      console.log('depth:', depth)
+      // console.log('depth:', depth)
     }
-    console.log('typeof listClasses[' + depth + ']:', typeof listClasses[depth])
+    // console.log('typeof listClasses[' + depth + ']:', typeof listClasses[depth])
 
     if (isOpen && typeof listClasses[depth] === 'string') {
       console.groupEnd()

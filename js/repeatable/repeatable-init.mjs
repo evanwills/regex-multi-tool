@@ -6,6 +6,7 @@
  * @author Evan Wills <evan.i.wills@gmail.com
  * @url https://github.com/evanwills/regex-multi-tool
  */
+
 import {
   isStr,
   // isNumeric,
@@ -325,9 +326,9 @@ function Repeatable (url, _remote, docs, api) {
     return false
   }
 
-  const runChained = (input, extraInputs, searchParams, chained) => {
+  // const runChained = (input, extraInputs, searchParams, chained) => {
 
-  }
+  // }
 
   /**
    * Get basic information about an action
@@ -441,7 +442,7 @@ function Repeatable (url, _remote, docs, api) {
   this.setFirstAction = function () {
     if (!invalidString('action', getParams)) {
       const ID = getParams.action.toLowerCase()
-      const firstAction = registry.filter(_action => _action.id === ID)
+      const firstAction = registry.filter(_action => _action.action === ID)
 
       if (firstAction.length === 1) {
         currentAction = firstAction[0]
@@ -504,17 +505,17 @@ function Repeatable (url, _remote, docs, api) {
   this.run = function (input, extraInputs, searchParams, chained) {
     const _extraInputs = convertInputsToFunctions(extraInputs)
 
-    console.log('Array.isArray(currentAction.chained):', Array.isArray(currentAction.chained))
-    console.log('currentAction.chained.length:', currentAction.chained.length)
-    console.log('Array.isArray(chained):', Array.isArray(chained))
+    // console.log('Array.isArray(currentAction.chained):', Array.isArray(currentAction.chained))
+    // console.log('currentAction.chained.length:', currentAction.chained.length)
+    // console.log('Array.isArray(chained):', Array.isArray(chained))
 
-    if (currentAction.chained.length > 0 && Array.isArray(chained) && chained.length > 0) {
-      return runChained(input, _extraInputs, searchParams, chained)
-    } else {
-      return currentAction.func(
-        input, _extraInputs, searchParams
-      )
-    }
+    // if (currentAction.chained.length > 0 && Array.isArray(chained) && chained.length > 0) {
+    //   return runChained(input, _extraInputs, searchParams, chained)
+    // } else {
+    return currentAction.func(
+      input, _extraInputs, searchParams
+    )
+    // }
   }
 
   this.getDocsURL = function () {

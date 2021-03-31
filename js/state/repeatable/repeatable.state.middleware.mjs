@@ -32,6 +32,8 @@ export const modifyInput = ({ getState, dispatch }) => next => action => {
 export const repeatableMW = store => next => action => {
   const _state = store.getState()
 
+  // console.log('action:', action)
+
   switch (action.type) {
     case repeatActions.INIT:
       return next({
@@ -103,6 +105,7 @@ export const repeatableMW = store => next => action => {
         // This needs to be a fetch request to the host server
         return next(action)
       } else {
+        // console.log('about to run action')
         return next({
           type: repeatActions.UPDATE_FIELD,
           payload: {

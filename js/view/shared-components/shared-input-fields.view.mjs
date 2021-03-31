@@ -1,7 +1,18 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { makeHTMLsafe } from '../../utility-functions.mjs'
-import { isFunction } from '../../utility-functions.mjs'
-import { isNonEmptyStr, isNumeric, isStr, isInt, isStrNum, isBoolTrue, ucFirst, idSafe, isNumber, getClassName } from '../../utility-functions.mjs'
+// import { makeHTMLsafe } from '../../utility-functions.mjs'
+import {
+  getClassName,
+  idSafe,
+  isBoolTrue,
+  // isFunction,
+  // isInt,
+  isNonEmptyStr,
+  isNumber,
+  // isNumeric,
+  isStr,
+  isStrNum,
+  ucFirst
+} from '../../utility-functions.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field
@@ -168,68 +179,82 @@ export const describedBy = (props) => {
     : ''
 }
 
-const getStandardAttrs = (props) => {
-  const allBoolAttrs = ['required', 'readonly', 'disabled']
-  const output = {}
+// const getStandardAttrs = (props) => {
+//   const allBoolAttrs = ['required', 'readonly', 'disabled']
+//   const output = {}
 
-  for (let a = 0; a < allBoolAttrs.length; a += 1) {
-    if (isBoolTrue(props[allBoolAttrs[a]])) {
-      output[allBoolAttrs[a]] = props[allBoolAttrs[a]]
-    }
-  }
+//   for (let a = 0; a < allBoolAttrs.length; a += 1) {
+//     if (isBoolTrue(props[allBoolAttrs[a]])) {
+//       output[allBoolAttrs[a]] = props[allBoolAttrs[a]]
+//     }
+//   }
 
-  if (isInt(props.tabIndex)) {
-    output.tabindex = props.tabIndex
-  }
+//   if (isInt(props.tabIndex)) {
+//     output.tabindex = props.tabIndex
+//   }
 
-  if (isFunction(props.change)) {
-    output.change = props.change
-  }
+//   if (isFunction(props.change)) {
+//     output.change = props.change
+//   }
 
-  if (isFunction(props.click)) {
-    output.click = props.click
-  }
+//   if (isFunction(props.click)) {
+//     output.click = props.click
+//   }
 
-  console.log('props:', props)
-  console.log('props.description:', props.description)
-  if (isNonEmptyStr(props.description)) {
-    output['aria-describedby'] = getDescbyAttr(props)
-  }
+//   console.log('props:', props)
+//   console.log('props.description:', props.description)
+//   if (isNonEmptyStr(props.description)) {
+//     output['aria-describedby'] = getDescbyAttr(props)
+//   }
 
-  return output
-}
+//   return output
+// }
 
-const getOptionalAttrs = (props, isNumb) => {
-  const _isNum = isBoolTrue(isNumb)
-  const attrs = (_isNum)
-    ? ['min', 'max', 'step']
-    : ['minLength', 'maxLength', 'spellcheck']
-  const validator = (_isNum) ? isInt : isNonEmptyStr
+// const getOptionalAttrs = (props, isNumb) => {
+//   const _isNum = isBoolTrue(isNumb)
+//   const attrs = (_isNum)
+//     ? ['min', 'max', 'step']
+//     : ['minLength', 'maxLength', 'spellcheck']
+//   const validator = (_isNum) ? isInt : isNonEmptyStr
 
-  const allStrAttrs = ['pattern', 'placeholder']
+//   const allStrAttrs = ['pattern', 'placeholder']
 
-  const output = {}
-  for (let a = 0; a < attrs.length; a += 1) {
-    if (validator(props[attrs[a]])) {
-      output[attrs[a]] = props[attrs[a]]
-    }
-  }
+//   const output = {}
+//   for (let a = 0; a < attrs.length; a += 1) {
+//     if (validator(props[attrs[a]])) {
+//       output[attrs[a]] = props[attrs[a]]
+//     }
+//   }
 
-  for (let a = 0; a < allStrAttrs.length; a += 1) {
-    if (isNonEmptyStr(props[allStrAttrs[a]])) {
-      output[allStrAttrs[a]] = props[allStrAttrs[a]]
-    }
-  }
+//   for (let a = 0; a < allStrAttrs.length; a += 1) {
+//     if (isNonEmptyStr(props[allStrAttrs[a]])) {
+//       output[allStrAttrs[a]] = props[allStrAttrs[a]]
+//     }
+//   }
 
-  // return output
-  return {
-    ...output,
-    ...getStandardAttrs(props)
-  }
-}
+//   // return output
+//   return {
+//     ...output,
+//     ...getStandardAttrs(props)
+//   }
+// }
 
-const propOrEmpty = (input) => {
-  return (isStrNum(input)) ? input : ''
+/**
+ * Get a string to be used as an HTML attribute value
+ *
+ * @param {any} input Value to be returned (hopefully) String or
+ *                    number
+ * @param {string, undefined} defaultStr default string if input is
+ *                   not valid
+ *
+ * @returns {string} String to be used as an HTML attribute value
+ */
+const propOrEmpty = (input, defaultStr) => {
+  return (isStrNum(input))
+    ? input
+    : isStr(defaultStr)
+      ? defaultStr
+      : ''
 }
 
 /**
@@ -243,13 +268,20 @@ const propOrEmpty = (input) => {
  * @return {lit-html}
  */
 export const textInputField = (props, multiLine) => {
-  const txtProps = getAttrs(
-    ['pattern', 'placeholder', 'list', 'maxlength', 'minlength', 'size'],
-    props
-  )
+  // const txtProps = getAttrs(
+  //   ['pattern', 'placeholder', 'list', 'maxlength', 'minlength', 'size'],
+  //   props
+  // )
 
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
+
+  const _pattern = propOrEmpty(props.pattern, '.*')
+  const _minLen = propOrEmpty(props.minlength, '0')
+  const _place = propOrEmpty(props.placeholder, props.label)
+  const _disabled = getBoolAttr('disabled', props)
+  const _required = getBoolAttr('required', props)
+  const _read = getBoolAttr('readonly', props)
 
   // console.group('textInputField()')
   // console.log('props.value:', props.value)
@@ -259,12 +291,12 @@ export const textInputField = (props, multiLine) => {
   return (isBoolTrue(multiLine))
     ? html`
       ${getLabel(props)}
-      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}" .value="${props.value}"></textarea>
+      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${_required} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '100000')}" minlength="${_minLen}" .value="${props.value}"></textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
     : html`
       ${getLabel(props)}
-      <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" maxlength="${propOrEmpty(props.maxlength)}" minlength="${propOrEmpty(props.minlength)}" />${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
+      <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '1000')}" minlength="${_minLen}" />${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
 }
@@ -286,7 +318,7 @@ export const numberInputField = (props) => {
 
   return html`
     ${getLabel(props)}
-    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern)}" placeholder="${propOrEmpty(props.placeholder)}" min="${propOrEmpty(props.min)}" max="${propOrEmpty(props.max)}" step="${propOrEmpty(props.step)}" />
+    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern, '.*')}" placeholder="${propOrEmpty(props.placeholder, props.label)}" min="${propOrEmpty(props.min)}" max="${propOrEmpty(props.max)}" step="${propOrEmpty(props.step)}" />
     ${(_descBy !== '') ? describedBy(props) : ''}
   `
 }
@@ -318,6 +350,8 @@ export const colourInput = (props) => {
  * @return {lit-html}
  */
 const selectOption = (props) => {
+  console.group('selectOption()')
+  console.log('props:', props)
   const _value = (isStr(props))
     ? props
     : props.value
@@ -327,6 +361,9 @@ const selectOption = (props) => {
         ? props.label
         : props.value
 
+  console.log('_value:', _value)
+  console.log('_label:', _label)
+  console.groupEnd()
   return html`<option value=${_value} ?selected=${isBoolTrue(props.selected)}>${_label.trim()}</option>`
 }
 
@@ -343,7 +380,7 @@ export const selectField = (props) => {
 
   return html`
     ${getLabel(props)}
-    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)}${_descBy} @change=${props.change}>
+    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.change}>
       ${props.options.map(selectOption)}
     </select>
     ${(_descBy !== '') ? describedBy(props) : ''}

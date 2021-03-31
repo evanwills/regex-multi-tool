@@ -10,6 +10,7 @@
   .repeatable-extraInput__wrap,
   .repeatable-field .checkable-grp__wrap {
     display: grid;
+    align-items: center;
     grid-template-columns: 15rem 1fr;
     grid-template-areas:  "error error"
                           "label field"
