@@ -168,20 +168,33 @@ export const getURLobject = (url) => {
 export const localStoreageEnhanceUrl = (url) => {
   const _url = getURLobject(url)
 
-  const _mode = localStorage.getItem('mode')
-  if (isNonEmptyStr(_mode)) {
-    if (!isNonEmptyStr(_url.searchParams.mode)) {
-      _url.searchParams.mode = _mode
+  const _sMode = _url.searchParams.mode
+  if (isNonEmptyStr(_sMode)) {
+    localStorage.setItem('mode', _sMode)
+  } else {
+    const _lMode = localStorage.getItem('mode')
+    if (isNonEmptyStr(_lMode)) {
+      _url.searchParams.mode = _lMode
     }
+  }
 
-    if (!isNonEmptyStr(_url.searchParams.groups)) {
-      const _groups = localStorage.getItem('groups')
+  const _sGroup = isNonEmptyStr(_url.searchParams.groups)
+    ? _url.searchParams.groups
+    : isNonEmptyStr(_url.searchParams.group)
+      ? _url.searchParams.group
+      : ''
 
-      if (isNonEmptyStr(_groups)) {
-        _url.searchParams.groups = _groups
-      }
+  if (_sGroup !== '') {
+    localStorage.setItem('groups', _sGroup)
+  } else {
+    const _lGroups = localStorage.getItem('groups')
+    if (isNonEmptyStr(_lGroups)) {
+      _url.searchParams.groups = _lGroups
     }
+  }
 
+  const _sAction = _url.searchParams.action
+  if (!isNonEmptyStr(_sAction)) {
     const _repeat = localStorage.getItem('repeatable')
     if (isNonEmptyStr(_repeat)) {
       const _rep = JSON.parse(_repeat)

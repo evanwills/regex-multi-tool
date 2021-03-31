@@ -69,7 +69,7 @@ export const oneOffUI = (props) => {
   return html`
   <!-- START: oneOffUI() -->
   <h2 class="tool-heading">One-Off regex test</h2>
-
+  <p class="alert">NOTE: Regex Multi Tool's <em>OneOff</em> mode is not yet working.</p>
   <div class="oneOff">
     ${tabBlock(
       'oneOff',

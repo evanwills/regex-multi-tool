@@ -11,6 +11,7 @@
 
 @import 'molecules/repeatable-nav.css';
 @import 'molecules/tab-nav.css';
+@import 'molecules/alert.css';
 
 @import 'atoms/typeography.css';
 @import 'atoms/screen-reader.css';

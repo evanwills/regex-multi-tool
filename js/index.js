@@ -13,6 +13,16 @@ import { userSettingsActions } from './state/user-settings/user-settings.state.a
 import { url } from './url.mjs'
 
 const mainView = getMainAppView(document.body, store)
+
+const userSettingsSub = userSettingsSubscriber(store)
+
+const unsubscribers = { // eslint-disable-line
+  ui: store.subscribe(mainView),
+  userSettings: store.subscribe(userSettingsSub),
+  history: store.subscribe(historySubscriber(store)),
+  localStorage: store.subscribe(localStorageSubscriber(store))
+}
+
 repeatable.verifyChained()
 
 dispatchRegisterAction(
@@ -102,15 +112,6 @@ if (isNonEmptyStr(url.searchParams.groups)) {
 // ========================================================
 
 mainView()
-
-const userSettingsSub = userSettingsSubscriber(store)
-
-const unsubscribers = { // eslint-disable-line
-  ui: store.subscribe(mainView),
-  userSettings: store.subscribe(userSettingsSub),
-  history: store.subscribe(historySubscriber(store)),
-  localStorage: store.subscribe(localStorageSubscriber(store))
-}
 
 if (forceUiUpdate === true) {
   const tmp = store.getState()

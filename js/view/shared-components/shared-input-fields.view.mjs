@@ -350,8 +350,8 @@ export const colourInput = (props) => {
  * @return {lit-html}
  */
 const selectOption = (props) => {
-  console.group('selectOption()')
-  console.log('props:', props)
+  // console.group('selectOption()')
+  // console.log('props:', props)
   const _value = (isStr(props))
     ? props
     : props.value
@@ -361,9 +361,9 @@ const selectOption = (props) => {
         ? props.label
         : props.value
 
-  console.log('_value:', _value)
-  console.log('_label:', _label)
-  console.groupEnd()
+  // console.log('_value:', _value)
+  // console.log('_label:', _label)
+  // console.groupEnd()
   return html`<option value=${_value} ?selected=${isBoolTrue(props.selected)}>${_label.trim()}</option>`
 }
 

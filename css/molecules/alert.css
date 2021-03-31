@@ -1,0 +1,9 @@
+.alert {
+  background-color: var(--txt-colour);
+  border: var(--line-weight) solid var(--bg-colour);
+  color: var(--danger);
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem;
+  padding: 2rem;
+}
