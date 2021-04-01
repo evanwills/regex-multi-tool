@@ -4,19 +4,9 @@
 // other global functions available:
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction, makeHumanReadableAttr
 
-import { isStr } from '../../utility-functions.mjs'
+import { isBoolTrue } from '../../utility-functions.mjs'
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-
-const unitDescriptionIDs = {
-  2021: 2347176,
-  2020: 2317124,
-  2019: 1423077,
-  2018: 1256438,
-  2017: 948634,
-  2016: 763485,
-  2015: 2045535
-}
 
 // ====================================================================
 // START: Convert Schedule of Unit Offerings to 2020
@@ -339,29 +329,32 @@ doStuff.register({
   name: 'CIM Scripts'
 })
 
-const unitDescriptionLinksInner = (yearID, doModal) => (whole, spaceBefore1, spaceBefore2, code, spaceAfter1, spaceAfter2) => {
-  const before = (spaceBefore1 !== '' || spaceBefore2 !== '') ? ' ': ''
-  const after = (spaceAfter1 !== '' || spaceAfter2 !== '') ? ' ': ''
+const unitDescriptionLinksInner = (yearID, doModal) => {
+  const modalClass = (isBoolTrue(doModal)) ? 'js-remot-model' : 'no-js-modal'
+  return (whole, spaceBefore1, spaceBefore2, code, spaceAfter1, spaceAfter2) => {
+    const before = (spaceBefore1 !== '' || spaceBefore2 !== '') ? ' ': ''
+    const after = (spaceAfter1 !== '' || spaceAfter2 !== '') ? ' ': ''
 
-  const output = before + '<a href="./?a=' + yearID + '?unit=' + code + '">' + code + '</a>' + after
-
-  console.groupEnd()
-  return output
-
-  // return '<a href="' + link.replace(/href="([^"]+)"/i, replacer) + '" class="js-remote-modal">' + code + _close
+    return before +
+           '<a href="./?a=' + yearID + '?unit=' + code + '" class="' + modalClass + '">' +
+           code +
+           '</a>' +
+           after
+  }
 }
 
 const fixUnitDescriptionLinks = (input, extraInputs, GETvars) => {
   return input.replace(
     /(?:(\s*)<a[^>]*>(\s*))?([A-Z]{4}[0-9]{3})(?:(\s*)<\/a>)?(\s*)/gs,
-    unitDescriptionLinksInner(extraInputs.year())
+    unitDescriptionLinksInner(extraInputs.year(), extraInputs.doModal('openModal'))
   )
 }
 
 doStuff.register({
   id: 'fixUnitLinks',
-  description: '<p>Select an option from the list below</p>',
+  description: '<p>Set the year</p>',
   func: fixUnitDescriptionLinks,
+  inputLabel: 'Metadata field content',
   extraInputs: [
     {
       id: 'year',
