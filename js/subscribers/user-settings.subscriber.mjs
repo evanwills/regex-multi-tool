@@ -52,7 +52,7 @@ export const userSettingsSubscriber = (store) => {
     const previousSettings = currentSettings
     const state = store.getState()
 
-    console.log('inside userSettingsSubscriber()')
+    // console.log('inside userSettingsSubscriber()')
 
     currentSettings = state.userSettings
 

@@ -355,16 +355,17 @@ const selectOption = (props) => {
   const _value = (isStr(props))
     ? props
     : props.value
-  const _label = (isStr(props))
+  let _label = (isStrNum(props))
     ? props
     : (isNonEmptyStr(props.label))
         ? props.label
         : props.value
 
+  _label = isStr(_label) ? _label.trim() : _label
   // console.log('_value:', _value)
   // console.log('_label:', _label)
   // console.groupEnd()
-  return html`<option value=${_value} ?selected=${isBoolTrue(props.selected)}>${_label.trim()}</option>`
+  return html`<option value=${_value} ?selected=${isBoolTrue(props.selected)}>${_label}</option>`
 }
 
 /**
@@ -378,9 +379,10 @@ const selectOption = (props) => {
 export const selectField = (props) => {
   const _descBy = getDescbyAttr(props)
 
+  console.log(props)
   return html`
     ${getLabel(props)}
-    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.change}>
+    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.eventHandler}>
       ${props.options.map(selectOption)}
     </select>
     ${(_descBy !== '') ? describedBy(props) : ''}

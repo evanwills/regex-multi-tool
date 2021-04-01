@@ -4,8 +4,19 @@
 // other global functions available:
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction, makeHumanReadableAttr
 
+import { isStr } from '../../utility-functions.mjs'
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
+
+const unitDescriptionIDs = {
+  2021: 2347176,
+  2020: 2317124,
+  2019: 1423077,
+  2018: 1256438,
+  2017: 948634,
+  2016: 763485,
+  2015: 2045535
+}
 
 // ====================================================================
 // START: Convert Schedule of Unit Offerings to 2020
@@ -31,7 +42,7 @@ const clickHereForUnitDescriptionsLink = (input) => input.replace(
 const sampleCourseMap = (input) => {
   const regex = [{
     find: /(<a[^>]*>\s*?)?([A-Z]{4}[0-9]{3})(<\/a>)?/gm,
-    replace: '<a class="js-remote-modal" href="./?a=2347384?unit=$2&amp;SQ_DESIGN_NAME=modal">$2</a>'
+    replace: '<a class="js-remote-modal" href="./?a=2347384?unit=$2">$2</a>'
   }, {
     find: /<a[^>]*>(handbook)(<\/a>)/igm,
     replace: '<a href="./?a=2345662">$1$2'
@@ -122,79 +133,6 @@ const WIPExtendedCalendar = (input) => {
 
   return multiLitRegexReplace(removeAll(input), findReplace, 'igm')
 }
-
-// Jon with no idea haha
-function completeUpdate (input, extraInputs, GETvars) {
-  switch (extraInputs.additional()) {
-    case 'ACPP':
-      return admissionToCourseworkProgramsPolicyLink(input)
-
-    case 'RWS':
-      return removeAll(input)
-
-    case 'SUOT':
-      return scheduleOfUnitOfferingsTableFormatting(input)
-
-    case 'SU':
-      return unitDescriptionLinks(input)
-
-    case 'CHUD':
-      return clickHereForUnitDescriptionsLink(input)
-
-    case 'SCM':
-      return sampleCourseMap(input)
-
-    case 'U&C':
-      return unitsAndCosts(input)
-
-    case 'CAD':
-      return classAllocationDates(input)
-
-    case 'CT':
-      return cleanTables(input)
-
-    case 'EC':
-      return WIPExtendedCalendar(input)
-  }
-}
-
-doStuff.register({
-  id: 'CIM Scripts',
-  description: '<p>Select an option from the list below</p>',
-  func: completeUpdate,
-  extraInputs: [
-    {
-      id: 'additional',
-      label: 'What changes do you want to make',
-      type: 'select',
-      options: [
-        { value: 'vdefault', label: 'Select an option', default: true },
-        // { value: 'SUO', label: 'Add 4th column to Schedule of Unit Offerings'},
-        { value: 'ACPP', label: 'Admission to Coursework Programs Policy link' },
-        { value: 'CHUD', label: 'Click here for Unit Descriptions link' },
-        // { value: 'RAA', label: 'Remove bad code from WORD' },
-        { value: 'RWS', label: 'Remove White Space' },
-        { value: 'SCM', label: 'Sample Course Map' },
-        { value: 'SU', label: 'Unit Description links' },
-        { value: 'CT', label: 'Clean Tables' },
-        { value: 'SUOT', label: 'Schedule of Unit Offerings Table Formatting' },
-        { value: 'CAD', label: 'Class Allocation Dates' },
-        { value: 'EC', label: 'WIP - Extended Calendar' },
-        { value: 'U&C', label: 'Units and Costs' }
-      ]
-    // }, {
-    //   id: 'OtherOptions',
-    //   label: 'What additions do you want to include',
-    //   type: 'radio',
-    //   options: [
-    //     { value: 'UL', label: 'Remove Underline' }
-    //   ]
-    }
-  ],
-  group: 'cim',
-  ignore: false,
-  name: 'CIM Scripts'
-})
 
 //  END:  Convert Schedule of Unit Offerings to 2020
 // ====================================================================
@@ -311,8 +249,145 @@ function RUL (input) {
   return output
 }
 
+function noModal (input) {
+  let output = input.replace(/(?:\?|\&amp;)SQ_DESIGN_NAME=modal/ig, '')
+
+
+  return output
+}
+
 //  END:  Jon's Schedule of Unit Offerings Tables
 // ====================================================================
 
 // START: Fix handbook (and Course Browser) unit modal links
 // ====================================================================
+
+// Jon with no idea haha
+function completeUpdate (input, extraInputs, GETvars) {
+  console.log('inside completeUpdate()')
+  console.log('extraInputs.additional():', extraInputs.additional())
+  switch (extraInputs.additional()) {
+    case 'ACPP':
+      return admissionToCourseworkProgramsPolicyLink(input)
+
+    case 'CAD':
+      return classAllocationDates(input)
+
+    case 'CHUD':
+      return clickHereForUnitDescriptionsLink(input)
+
+    case 'CT':
+      return cleanTables(input)
+
+    case 'EC':
+      return WIPExtendedCalendar(input)
+
+    case 'RWS':
+      return removeAll(input)
+
+    case 'SCM':
+      return sampleCourseMap(input)
+
+    case 'SU':
+      console.log('about to update unit description links')
+      return unitDescriptionLinks(input)
+
+    case 'SUOT':
+      return scheduleOfUnitOfferingsTableFormatting(input)
+
+    case 'U&C':
+      return unitsAndCosts(input)
+  }
+}
+
+doStuff.register({
+  id: 'CIMscripts',
+  description: '<p>Select an option from the list below</p>',
+  func: completeUpdate,
+  extraInputs: [
+    {
+      id: 'additional',
+      label: 'What changes do you want to make',
+      type: 'select',
+      options: [
+        { value: 'vdefault', label: 'Select an option', default: true },
+        // { value: 'SUO', label: 'Add 4th column to Schedule of Unit Offerings'},
+        { value: 'ACPP', label: 'Admission to Coursework Programs Policy link' },
+        { value: 'CHUD', label: 'Click here for Unit Descriptions link' },
+        // { value: 'RAA', label: 'Remove bad code from WORD' },
+        { value: 'RWS', label: 'Remove White Space' },
+        { value: 'SCM', label: 'Sample Course Map' },
+        { value: 'SU', label: 'Unit Description links' },
+        { value: 'CT', label: 'Clean Tables' },
+        { value: 'SUOT', label: 'Schedule of Unit Offerings Table Formatting' },
+        { value: 'CAD', label: 'Class Allocation Dates' },
+        { value: 'EC', label: 'WIP - Extended Calendar' },
+        { value: 'U&C', label: 'Units and Costs' },
+        { value: 'noModal', label: 'Remove link to modal for units' }
+      ]
+    // }, {
+    //   id: 'OtherOptions',
+    //   label: 'What additions do you want to include',
+    //   type: 'radio',
+    //   options: [
+    //     { value: 'UL', label: 'Remove Underline' }
+    //   ]
+    }
+  ],
+  group: 'cim',
+  ignore: false,
+  name: 'CIM Scripts'
+})
+
+const unitDescriptionLinksInner = (yearID, doModal) => (whole, spaceBefore1, spaceBefore2, code, spaceAfter1, spaceAfter2) => {
+  const before = (spaceBefore1 !== '' || spaceBefore2 !== '') ? ' ': ''
+  const after = (spaceAfter1 !== '' || spaceAfter2 !== '') ? ' ': ''
+
+  const output = before + '<a href="./?a=' + yearID + '?unit=' + code + '">' + code + '</a>' + after
+
+  console.groupEnd()
+  return output
+
+  // return '<a href="' + link.replace(/href="([^"]+)"/i, replacer) + '" class="js-remote-modal">' + code + _close
+}
+
+const fixUnitDescriptionLinks = (input, extraInputs, GETvars) => {
+  return input.replace(
+    /(?:(\s*)<a[^>]*>(\s*))?([A-Z]{4}[0-9]{3})(?:(\s*)<\/a>)?(\s*)/gs,
+    unitDescriptionLinksInner(extraInputs.year())
+  )
+}
+
+doStuff.register({
+  id: 'fixUnitLinks',
+  description: '<p>Select an option from the list below</p>',
+  func: fixUnitDescriptionLinks,
+  extraInputs: [
+    {
+      id: 'year',
+      label: 'Which year do these units applie to',
+      type: 'select',
+      options: [
+        { value: '', label: 'Select an option', default: true },
+        { value: 2347176, label: '2021' },
+        { value: 2317124, label: '2020' },
+        { value: 1423077, label: '2019' },
+        { value: 1256438, label: '2018' },
+        { value: 948634, label: '2017' },
+        { value: 763485, label: '2016' },
+        { value: 2045535, label: '2015' }
+      ]
+    },
+    {
+      id: 'doModal',
+      label: 'Modal',
+      type: 'checkbox',
+      options: [
+        { value: 'openModal', label: 'Open unit description in a modal' }
+      ]
+    }
+  ],
+  group: 'cim',
+  ignore: false,
+  name: 'Fix unit description links'
+})

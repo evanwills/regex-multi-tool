@@ -3,7 +3,7 @@
 export const localStorageSubscriber = (store) => () => {
   const tmpState = store.getState()
 
-  console.log('inside localStorageSubscriber()')
+  // console.log('inside localStorageSubscriber()')
 
   if (localStorage.getItem('mode') !== tmpState.mode) {
     localStorage.setItem('mode', tmpState.mode)
