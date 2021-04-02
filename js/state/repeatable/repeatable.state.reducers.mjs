@@ -219,7 +219,7 @@ const updateFields = (state, payload, debug) => {
       if ((isNumeric(state.inputExtra[key]) || isStr(state.inputExtra[key])) && state.inputExtra[key] !== value) {
         const tmp = { ...state.inputExtra }
         tmp[key] = value
-        console.log('tmp:', tmp)
+        // console.log('tmp:', tmp)
         return {
           ...state,
           inputExtra: tmp

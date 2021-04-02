@@ -1,5 +1,3 @@
-/* globals localStorage */
-
 import { repeatable } from './repeatable/repeatable-init.mjs'
 import { repeatActions, dispatchRegisterAction } from './state/repeatable/repeatable.state.actions.mjs'
 import { store } from './state/regexMulti-state.mjs'
@@ -7,7 +5,7 @@ import { getMainAppView } from './view/templates.mjs'
 import { userSettingsSubscriber, forceUIupdate } from './subscribers/user-settings.subscriber.mjs'
 import { historySubscriber } from './subscribers/history.subscriber.mjs'
 import { localStorageSubscriber } from './subscribers/localStorage.subscriber.mjs'
-import { isNonEmptyStr } from './utility-functions.mjs'
+import { isNonEmptyStr, getFromLocalStorage } from './utility-functions.mjs'
 import { mainAppActions } from './state/main-app/main-app.state.actions.mjs'
 import { userSettingsActions } from './state/user-settings/user-settings.state.actions.mjs'
 import { url } from './url.mjs'
@@ -24,11 +22,15 @@ const unsubscribers = { // eslint-disable-line
 }
 
 repeatable.verifyChained()
+const localRepeat = getFromLocalStorage('repeatable')
 
 dispatchRegisterAction(
   store.dispatch,
   repeatable.getActionsList(),
-  repeatable.setFirstAction()
+  repeatable.setFirstAction(
+    url.searchParams,
+    localRepeat.fields.inputExtra
+  )
 )
 
 const tmpState = store.getState()
@@ -37,62 +39,36 @@ let forceUiUpdate = false
 // ========================================================
 // START: pre-setting from URL and local storage
 
-// if (isNonEmptyStr(tmpState.url.searchParams.action)) {
-//   store.dispatch({
-//     type: repeatActions.SET_ACTION,
-//     payload: tmpState.url.searchParams.action
-//   })
-// }
-const _repeatable = localStorage.getItem('repeatable')
-if (isNonEmptyStr(_repeatable)) {
-  try {
-    const _tmp = JSON.parse(_repeatable)
-    if (isNonEmptyStr(_tmp.activeAction.id)) {
+if (localRepeat !== null) {
+  if (isNonEmptyStr(localRepeat.activeAction.id)) {
+    store.dispatch({
+      type: repeatActions.UPDATE_FIELD,
+      payload: {
+        id: 'input',
+        key: '',
+        value: localRepeat.fields.inputPrimary
+      }
+    })
+
+    if (tmpState.repeatable.debug !== localRepeat.debug) {
       store.dispatch({
-        type: repeatActions.UPDATE_FIELD,
-        payload: {
-          id: 'input',
-          key: '',
-          value: _tmp.fields.inputPrimary
-        }
+        type: repeatActions.TOGGLE_DEBUG
       })
-
-      for (const key in _tmp.fields.extraInputs) {
-        store.dispatch({
-          type: repeatActions.UPDATE_FIELD,
-          payload: {
-            id: 'extraInputs',
-            key: key,
-            value: _tmp.fields.extraInputs[key]
-          }
-        })
-      }
-
-      if (tmpState.repeatable.debug !== _tmp.debug) {
-        store.dispatch({
-          type: repeatActions.TOGGLE_DEBUG
-        })
-      }
     }
-  } catch (e) {
-    // console.log('contents of localStorage.repeatable: ' + _repeatable)
-    console.error('Failed to parse "repeatable" state: ' + e)
+  } else {
+    console.error('Failed to parse "repeatable" state')
   }
 }
-const userSettings = localStorage.getItem('userSettings')
+const userSettings = getFromLocalStorage('userSettings')
 
-if (isNonEmptyStr(userSettings)) {
-  try {
-    const _userSettings = JSON.parse(userSettings)
-    // console.log('_userSettings:', _userSettings)
-    store.dispatch({
-      type: userSettingsActions.RESTORE,
-      payload: _userSettings
-    })
-    forceUiUpdate = true
-  } catch (e) {
-    console.error('Failed to parse userSettings: ' + e)
-  }
+if (userSettings !== null) {
+  store.dispatch({
+    type: userSettingsActions.RESTORE,
+    payload: userSettings
+  })
+  forceUiUpdate = true
+} else {
+  console.error('Failed to parse userSettings')
 }
 
 if (isNonEmptyStr(url.searchParams.mode)) {

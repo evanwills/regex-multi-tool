@@ -231,20 +231,13 @@ function scheduleOfUnitOfferingsTableFormatting (input) {
 // ====================================================================
 // START: Jon's remove underline
 
-function RUL (input) {
-  let output = ''
+// function RUL (input) {
+//   let output = ''
 
-  output = removeAll(input)
-  output = output.replace(/<\/?(?:ul|em)>/igm, '')
-  return output
-}
-
-function noModal (input) {
-  let output = input.replace(/(?:\?|\&amp;)SQ_DESIGN_NAME=modal/ig, '')
-
-
-  return output
-}
+//   output = removeAll(input)
+//   output = output.replace(/<\/?(?:ul|em)>/igm, '')
+//   return output
+// }
 
 //  END:  Jon's Schedule of Unit Offerings Tables
 // ====================================================================
@@ -330,10 +323,10 @@ doStuff.register({
 })
 
 const unitDescriptionLinksInner = (yearID, doModal) => {
-  const modalClass = (isBoolTrue(doModal)) ? 'js-remot-model' : 'no-js-modal'
+  const modalClass = (isBoolTrue(doModal)) ? 'js-remote-modal' : 'no-js-modal'
   return (whole, spaceBefore1, spaceBefore2, code, spaceAfter1, spaceAfter2) => {
-    const before = (spaceBefore1 !== '' || spaceBefore2 !== '') ? ' ': ''
-    const after = (spaceAfter1 !== '' || spaceAfter2 !== '') ? ' ': ''
+    const before = (spaceBefore1 !== '' || spaceBefore2 !== '') ? ' ' : ''
+    const after = (spaceAfter1 !== '' || spaceAfter2 !== '') ? ' ' : ''
 
     return before +
            '<a href="./?a=' + yearID + '?unit=' + code + '" class="' + modalClass + '">' +
@@ -352,7 +345,7 @@ const fixUnitDescriptionLinks = (input, extraInputs, GETvars) => {
 
 doStuff.register({
   id: 'fixUnitLinks',
-  description: '<p>Set the year</p>',
+  description: '<p>This tool finds unit codes and converts them to links to unit descriptions. If the unit code is already linked, it will rewrite the link to conform the controls below.</p><ol><li>Set the year that applies to the unit/course</li><li>If you wish to enable unit description in the modal, Check the "<em>Open unit description in a modal</em>" checkbox otherwise modal will be explicitly blocked.</li></ol>',
   func: fixUnitDescriptionLinks,
   inputLabel: 'Metadata field content',
   extraInputs: [

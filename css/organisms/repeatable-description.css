@@ -1,0 +1,25 @@
+.repeatable-desc {
+  border: var(--line-weight) solid var(--over-colour-rev);
+  padding: 1rem;
+}
+
+.repeatable-desc p {
+  margin: 0.5rem 0;
+  padding: 0;
+}
+
+.repeatable-desc p:first-child {
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
+.repeatable-desc ol {
+  margin: 0;
+  padding: 0;
+}
+
+.repeatable-desc li {
+  margin: 0 0 0 1rem;
+  padding: 0.5rem 0.5rem 0;
+}
+

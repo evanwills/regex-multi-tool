@@ -9,6 +9,7 @@
 
 import {
   isStr,
+  isStrNum,
   // isNumeric,
   isNumber,
   invalidString,
@@ -112,13 +113,6 @@ function Repeatable (url, _remote, docs, api) {
     : 'docs/regex-multi-tool_repeatable-actions_help.html'
 
   /**
-   * List of URL GET variables
-   *
-   * @var {object} getParams
-   */
-  const getParams = url.searchParams
-
-  /**
    * Wheter regex multi-tool is being served via HTTPS
    *
    * @var {boolean} isHTTPS
@@ -130,8 +124,7 @@ function Repeatable (url, _remote, docs, api) {
    *
    * @var {boolean} noIgnore
    */
-  const noIgnore = (typeof getParams.noIgnore !== 'undefined' &&
-  (getParams.noIgnore === true || getParams.noIgnore === 1))
+  const noIgnore = isBoolTrue(url.searchParams.noIgnore)
 
   /**
    * List of objects where the key is the action name and the value
@@ -255,6 +248,132 @@ function Repeatable (url, _remote, docs, api) {
     return true
   }
 
+  /**
+   * Get default value from URL GET variable or local storage
+   *
+   * @param {string} prop
+   * @param {object} get
+   * @param {object} local
+   *
+   * @returns {string, number, boolean, null}
+   */
+  const getDefaultValue = (prop, get, local) => {
+    if (typeof get[prop] !== 'undefined') {
+      return get[prop]
+    } else if (typeof local[prop] !== 'undefined') {
+      return local[prop]
+    }
+    return null
+  }
+
+  /**
+   * Get the default value for a checkbox input in order of priority
+   *
+   * 1. checkbox value as URL GET variable
+   * 2. checkbox label as URL GET variable
+   * 3. checkbox value as local storage variable
+   * 4. checkbox label as local storage GET variable
+   * 5. false
+   *
+   * @param {string} prop
+   * @param {object} get
+   * @param {object} local
+   *
+   * @returns {boolean}
+   */
+  const getOptionDefault = (value, label, get, local) => {
+    if (isBool(get[value])) {
+      return get[value]
+    } else if (isBool(get[label])) {
+      return get[label]
+    } else if (isBool(local[value])) {
+      return local[value]
+    } else if (isBool(local[label])) {
+      return local[label]
+    }
+    return false
+  }
+
+  /**
+   * Update the extra input default values from URL GET/Search
+   * parameters and/or local storage
+   *
+   * GET variable is tested first, then local storage
+   *
+   * @param {array} extraInputs List of extra inputs supplied when
+   *                            an action is registered
+   *
+   * @returns {array} List of extra inputs with the default values
+   *                  updated based on URL GET/Search parameters
+   */
+  function presetDefaults (extraInputs, getParams, localParams) {
+    // getParams
+    const output = []
+    let options
+    let hasChanged = false
+
+    for (let a = 0; a < extraInputs.length; a += 1) {
+      if (extraInputs[a].type === 'checkbox') {
+        options = extraInputs[a].options.map(option => {
+          return {
+            ...option,
+            default: getOptionDefault(
+              option.value,
+              option.label,
+              getParams,
+              localParams[extraInputs[a].id]
+            )
+          }
+        })
+        hasChanged = true
+        output.push({
+          ...extraInputs[a],
+          options: options
+        })
+      } else {
+        const defaultVar = getDefaultValue(extraInputs[a].id, getParams, localParams)
+        if (defaultVar !== null) {
+          if (extraInputs[a].type === 'radio' || extraInputs[a].type === 'select') {
+            options = extraInputs[a].options.map(option => {
+              return {
+                ...option,
+                default: (option.value == defaultVar || option.label == defaultVar) // eslint-disable-line
+              }
+            })
+            output.push({
+              ...extraInputs[a],
+              options: options
+            })
+            hasChanged = true
+          } else {
+            if (isStrNum(getParams[extraInputs[a].id])) {
+              output.push({
+                ...extraInputs[a],
+                value: getParams[extraInputs[a].id]
+              })
+              hasChanged = true
+            } else {
+              output.push(extraInputs[a])
+            }
+          }
+        } else {
+          output.push(extraInputs[a])
+        }
+      }
+    }
+    return {
+      options: output,
+      hasChanged: hasChanged
+    }
+  }
+
+  /**
+   * Remove any redundant properties from action config.
+   *
+   * @param {object} config Object supplied when
+   *
+   * @returns {object}
+   */
   function filterNonProps (config) {
     const output = {}
     const okKeys = [
@@ -439,13 +558,29 @@ function Repeatable (url, _remote, docs, api) {
    *
    * @returns {string}
    */
-  this.setFirstAction = function () {
+  this.setFirstAction = function (getParams, localParams) {
     if (!invalidString('action', getParams)) {
-      const ID = getParams.action.toLowerCase()
-      const firstAction = registry.filter(_action => _action.action === ID)
+      const _action = getParams.action.toLowerCase()
+      const firstAction = registry.filter(oneAction => (oneAction.action === _action))
 
       if (firstAction.length === 1) {
-        currentAction = firstAction[0]
+        const tmp = presetDefaults(firstAction[0].extraInputs, getParams, localParams)
+
+        currentAction = (tmp.hasChanged)
+          ? {
+              ...firstAction[0],
+              extraInputs: tmp.options
+            }
+          : firstAction[0]
+
+        if (tmp.hasChanged) {
+          // Replace action object with new version containing updated defaults
+          registry = registry.map(oldAction => (oldAction.action === _action)
+            ? currentAction
+            : oldAction
+          )
+        }
+
         return currentAction.id
       }
     }
@@ -574,13 +709,13 @@ function Repeatable (url, _remote, docs, api) {
   // START: proceedural part of code (constructor stuff)
 
   // Get single group from URL GET variables
-  if (typeof getParams.group !== 'undefined') {
-    actionGroups = addToGroup(actionGroups, getParams.group)
+  if (typeof url.searchParams.group !== 'undefined') {
+    actionGroups = addToGroup(actionGroups, url.searchParams.group)
   }
 
   // Get multiple groups from URL GET variables
-  if (typeof getParams.groups !== 'undefined' && getParams.groups !== '') {
-    const groupsList = getParams.groups.split(',')
+  if (typeof url.searchParams.groups !== 'undefined' && url.searchParams.groups !== '') {
+    const groupsList = url.searchParams.groups.split(',')
 
     for (let a = 0; a < groupsList.length; a += 1) {
       actionGroups = addToGroup(actionGroups, groupsList[a])

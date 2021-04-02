@@ -1,6 +1,11 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isBool } from '../../utility-functions.mjs'
-import { isNonEmptyStr, getTabI, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
+import {
+  getTabI,
+  // isBool,
+  isBoolTrue,
+  isNonEmptyStr,
+  makeAttributeSafe
+} from '../../utility-functions.mjs'
 
 /**
  * Get a whole checkbox input with label and wrapping li tag with
@@ -35,10 +40,10 @@ export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex,
   `
 }
 
-const getFieldDesc = (id, description) => html`<div id="${id}-desc" class="field-description">${description}</div>`
+// const getFieldDesc = (id, description) => html`<div id="${id}-desc" class="field-description">${description}</div>`
 
 const cbIsChecked = (value, allValues) => (allValues[value])
-const radioIsChecked = (value, allValues) => (value == allValues)
+const radioIsChecked = (value, allValues) => (value == allValues) // eslint-disable-line
 
 /**
  * Get a complete HTML block for a group of radio buttons.
@@ -58,16 +63,16 @@ const radioIsChecked = (value, allValues) => (value == allValues)
  */
 export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge, isRadio, description) => {
   const _isRadio = isBoolTrue(isRadio)
-  let _describe = ''
+  // let _describe = ''
   let _describedBy = ''
 
   if (isNonEmptyStr(description)) {
-    _describedBy = id +'-desc'
-    _describe = getFieldDesc(id, description)
+    _describedBy = id + '-desc'
+    // _describe = getFieldDesc(id, description)
   }
+  console.log('value:', value)
 
   const isChecked = (_isRadio) ? radioIsChecked : cbIsChecked
-
 
   if (isNonEmptyStr(label)) {
     return html`
@@ -107,8 +112,6 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
   }
 }
 
-
-
 /**
  * Get HTML for a single radio button field with label and
  * wrapping <LI>.
@@ -147,12 +150,12 @@ export const singleRadioBtn = (id, label, value, isChecked, eventHandler, tabInd
  * @returns {html}
  */
 export const radioBtnGroup = (id, label, value, btns, eventHandler, tabIndex, badge, description) => {
-  let _describe = ''
+  // let _describe = ''
   let _describedBy = ''
 
   if (isNonEmptyStr(description)) {
-    _describedBy = id +'-desc'
-    _describe = getFieldDesc(id, description)
+    _describedBy = id + '-desc'
+    // _describe = getFieldDesc(id, description)
   }
 
   if (isNonEmptyStr(label)) {

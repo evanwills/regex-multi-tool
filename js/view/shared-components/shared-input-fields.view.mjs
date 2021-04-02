@@ -2,13 +2,14 @@ import { html } from '../../lit-html/lit-html.mjs'
 // import { makeHTMLsafe } from '../../utility-functions.mjs'
 import {
   getClassName,
-  idSafe,
+  isBool,
   isBoolTrue,
   // isFunction,
   // isInt,
   isNonEmptyStr,
   isNumber,
   // isNumeric,
+  idSafe,
   isStr,
   isStrNum,
   ucFirst
@@ -352,9 +353,15 @@ export const colourInput = (props) => {
 const selectOption = (props) => {
   // console.group('selectOption()')
   // console.log('props:', props)
+
+  const _selected = isBool(props.selected)
+    ? props.selected
+    : isBoolTrue(props.default)
+
   const _value = (isStr(props))
     ? props
     : props.value
+
   let _label = (isStrNum(props))
     ? props
     : (isNonEmptyStr(props.label))
@@ -362,10 +369,13 @@ const selectOption = (props) => {
         : props.value
 
   _label = isStr(_label) ? _label.trim() : _label
+
   // console.log('_value:', _value)
   // console.log('_label:', _label)
+  // console.log('_selected:', _selected)
   // console.groupEnd()
-  return html`<option value=${_value} ?selected=${isBoolTrue(props.selected)}>${_label}</option>`
+
+  return html`<option value=${_value} ?selected=${_selected}>${_label}</option>`
 }
 
 /**
@@ -379,7 +389,7 @@ const selectOption = (props) => {
 export const selectField = (props) => {
   const _descBy = getDescbyAttr(props)
 
-  console.log(props)
+  // console.log('props:', props)
   return html`
     ${getLabel(props)}
     <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.eventHandler}>
