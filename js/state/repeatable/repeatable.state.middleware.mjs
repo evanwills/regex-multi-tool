@@ -1,15 +1,17 @@
 import { repeatActions } from './repeatable.state.actions.mjs'
 import { repeatable } from '../../repeatable/repeatable-init.mjs'
 import {
+  // isBool,
+  // isFunction,
+  // isNumber,
   isNumeric
   // isStr,
-  // isNumber,
-  // isBool,
-  // ucFirst
   // invalidString,
-  // isFunction,
-  // getURLobject
-} from '../../utility-functions.mjs'
+} from '../../utilities/validation.mjs'
+// import {
+//   // ucFirst
+//   // getURLobject
+// } from '../../utilities/sanitise.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
 // import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 

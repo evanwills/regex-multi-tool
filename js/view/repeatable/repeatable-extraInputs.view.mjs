@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { isStr, isInt } from '../../utility-functions.mjs'
+import { isStr, isInt } from '../../utilities/validation.mjs'
 import { radioBtnGroup, checkboxBtnGroup } from '../shared-components/shared-checkbox-btn.view.mjs'
 import { textInputField, numberInputField, selectField } from '../shared-components/shared-input-fields.view.mjs'
 

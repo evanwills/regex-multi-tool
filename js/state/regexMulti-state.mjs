@@ -18,7 +18,7 @@ import { mainAppMW } from './main-app/main-app.state.middleware.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
 import { userSettings } from './user-settings/user-settings.state.mjs'
-import { isStr } from '../utility-functions.mjs'
+import { isStr } from '../utilities/validation.mjs'
 import { urlReducer } from './url/url.state.all.mjs'
 import { url } from '../url.mjs'
 
@@ -59,8 +59,8 @@ export const store = createStore(
   initialState,
   compose(
     applyMiddleware(
-      logger,
       crashReporter,
+      logger,
       userSettings.middleware,
       mainAppMW,
       oneOff.middleware,

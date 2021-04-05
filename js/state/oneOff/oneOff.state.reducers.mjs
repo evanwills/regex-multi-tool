@@ -1,8 +1,8 @@
 import { combineReducers } from '../../redux/redux.mjs'
 // import { createSlice } from '@reduxjs/toolkit'
 import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
-import { getID } from '../../utility-functions.mjs'
-import { isInt } from '../../utility-functions.mjs'
+import { getID } from '../../utilities/sanitise.mjs'
+// import { isInt } from '../../utilities/validation.mjs'
 
 // ==============================================
 // START: Utility functions

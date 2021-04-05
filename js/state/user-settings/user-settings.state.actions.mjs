@@ -1,4 +1,4 @@
-import { getMeta } from '../../utility-functions.mjs'
+import { getMeta } from '../../utilities/sanitise.mjs'
 
 export const userSettingsActions = {
   TOGGLE_DEBUG: 'USER_SETTINGS_TOGGLE_DEBUG',

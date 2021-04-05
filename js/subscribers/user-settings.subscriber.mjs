@@ -1,6 +1,6 @@
 /* global document */
 
-import { isInt } from '../utility-functions.mjs'
+import { isInt } from '../utilities/validation.mjs'
 
 const hex2dec = (input) => {
   const hex = ['a', 'b', 'c', 'd', 'e', 'f']

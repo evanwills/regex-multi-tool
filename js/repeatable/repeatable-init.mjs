@@ -8,19 +8,18 @@
  */
 
 import {
-  isStr,
-  isStrNum,
-  // isNumeric,
-  isNumber,
-  invalidString,
-  isFunction,
-  isBool,
-  isBoolTrue,
   // invalidBool,
   // invalidNum,
-  // getURLobject,
-  isNonEmptyStr
-} from '../utility-functions.mjs'
+  invalidString,
+  isBool,
+  isBoolTrue,
+  isFunction,
+  isNonEmptyStr,
+  isNumber,
+  // isNumeric,
+  isStr,
+  isStrNum
+} from '../utilities/validation.mjs'
 
 import { url } from '../url.mjs'
 

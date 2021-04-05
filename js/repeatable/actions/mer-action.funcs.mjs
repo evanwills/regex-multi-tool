@@ -3,7 +3,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 
-import { isNonEmptyStr } from '../../utility-functions.mjs'
+import { isNonEmptyStr } from '../../utilities/validation.mjs'
 
 // import { url } from '../url.mjs'
 // ====================================================================

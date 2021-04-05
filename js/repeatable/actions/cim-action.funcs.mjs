@@ -4,7 +4,7 @@
 // other global functions available:
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction, makeHumanReadableAttr
 
-import { isBoolTrue } from '../../utility-functions.mjs'
+import { isBoolTrue } from '../../utilities/validation.mjs'
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 

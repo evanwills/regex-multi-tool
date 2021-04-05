@@ -1,4 +1,9 @@
-import { isNonEmptyStr, isNumeric, isBool, makeURLstr } from '../../utility-functions.mjs'
+import {
+  isBool,
+  isNonEmptyStr,
+  isNumeric
+} from '../../utilities/validation.mjs'
+import { makeURLstr } from '../../utilities/url.mjs'
 
 /**
  * This file handles updating URL parts middleware has intercepted

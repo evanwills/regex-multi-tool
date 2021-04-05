@@ -1,6 +1,6 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { stripGETaction } from '../../utility-functions.mjs'
-import { ucFirst } from '../../utility-functions.mjs'
+import { stripGETaction } from '../../utilities/url.mjs'
+import { ucFirst } from '../../utilities/sanitise.mjs'
 
 const navLink = (_baseURL, _action, _click, currentActionID) => {
   return html`
@@ -50,7 +50,6 @@ export const repeatableActionNav = (_open, _baseURL, _actions, events, currentAc
 // &Del;
 // &#x02207;
 // &#8711;
-
 
 // &equiv;
 // &Congruent;

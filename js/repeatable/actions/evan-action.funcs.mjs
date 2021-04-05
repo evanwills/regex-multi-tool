@@ -6,7 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isNumeric } from '../../utility-functions.mjs'
+import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name

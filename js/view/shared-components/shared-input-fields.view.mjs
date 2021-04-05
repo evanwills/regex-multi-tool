@@ -1,7 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-// import { makeHTMLsafe } from '../../utility-functions.mjs'
 import {
-  getClassName,
   isBool,
   isBoolTrue,
   // isFunction,
@@ -9,11 +7,15 @@ import {
   isNonEmptyStr,
   isNumber,
   // isNumeric,
-  idSafe,
   isStr,
-  isStrNum,
+  isStrNum
+} from '../../utilities/validation.mjs'
+import {
+  getClassName,
+  idSafe,
+  // makeHTMLsafe,
   ucFirst
-} from '../../utility-functions.mjs'
+} from '../../utilities/sanitise.mjs'
 
 /**
  * Get the attribute string for an HTML input/select/textarea field

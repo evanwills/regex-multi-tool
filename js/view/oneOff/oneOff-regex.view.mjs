@@ -1,5 +1,10 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import { getID, getTabI, isStr, isBool, isNonEmptyStr } from '../../utility-functions.mjs'
+import {
+  isBool,
+  isStr,
+  isNonEmptyStr
+} from '../../utilities/validation.mjs'
+import { getID, getTabI } from '../../utilities/sanitise.mjs'
 import { openCloseBtn } from '../shared-components/shared-openClose-btn.view.mjs'
 import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
 

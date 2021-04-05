@@ -1,6 +1,13 @@
-import { isBool } from '../../utility-functions.mjs'
-import { isStr } from '../../utility-functions.mjs'
-import { invalidStrNum, isNumeric, isBoolTrue, makeAttributeSafe } from '../../utility-functions.mjs'
+import {
+  invalidStrNum,
+  isBool,
+  isBoolTrue,
+  isNumeric,
+  isStr
+} from '../../utilities/validation.mjs'
+import {
+  makeAttributeSafe
+} from '../../utilities/sanitise.mjs'
 import { repeatActions } from './repeatable.state.actions.mjs'
 
 /**
@@ -168,7 +175,7 @@ const getExtraInputKeyValues = (extraInputs, get) => {
         break
 
       case 'checkbox':
-        const checkBoxes = {}
+        const checkBoxes = {} // eslint-disable-line
         for (const box in _field.options) {
           const _box = _field.options[box]
           // need to make value work as GET variable
@@ -178,7 +185,7 @@ const getExtraInputKeyValues = (extraInputs, get) => {
             : isBoolTrue(_box.default)
         }
         output[_field.id] = checkBoxes
-        break;
+        break
     }
   }
   return output
@@ -234,7 +241,7 @@ const updateFields = (state, payload, debug) => {
           inputExtra: _inputExtra
         }
       }
-      break;
+      break
 
     case 'input':
       return {
@@ -246,14 +253,13 @@ const updateFields = (state, payload, debug) => {
 
       return (isBoolTrue(debug))
         ? {
-          ...state,
-          outputPrimary: value
-        }
+            ...state,
+            outputPrimary: value
+          }
         : {
-          ...state,
-          inputPrimary: value
-        }
-
+            ...state,
+            inputPrimary: value
+          }
   }
   return state
 }

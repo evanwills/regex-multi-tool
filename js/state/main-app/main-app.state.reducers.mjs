@@ -1,4 +1,4 @@
-import { isStr } from '../../utility-functions.mjs'
+import { isStr } from '../../utilities/validation.mjs'
 import { mainAppActions } from './main-app.state.actions.mjs'
 
 export const modeReducer = (state = 'oneOff', action = { type: 'default' }) => {

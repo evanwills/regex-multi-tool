@@ -1,5 +1,5 @@
 import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
-import { getID, convertEscaped } from '../../utility-functions.mjs'
+import { getID, convertEscaped } from '../../utilities/sanitise.mjs'
 import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 // ==============================================

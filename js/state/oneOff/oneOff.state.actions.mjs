@@ -1,4 +1,4 @@
-import { getMeta } from '../../utility-functions.mjs'
+import { getMeta } from '../../utilities/sanitise.mjs'
 
 /**
  * List of actions that can be performed on individual regex pair
@@ -327,7 +327,6 @@ export const registerOneOffEngine = (_dispatch) => (_engine) => {
   })
 }
 
-
 export const getOneOffEventHandlers = (dispatch) => {
   return {
     simplePair: getAutoDispatchOneOffPairSimpleEvent(dispatch),
@@ -337,5 +336,6 @@ export const getOneOffEventHandlers = (dispatch) => {
     navClick: getAutoDipatchOneOffTabClick(dispatch)
   }
 }
+
 //  END:  Action creators
 // ==============================================

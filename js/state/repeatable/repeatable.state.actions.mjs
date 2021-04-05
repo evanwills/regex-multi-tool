@@ -1,4 +1,5 @@
-import { getMeta, isNonEmptyStr } from '../../utility-functions.mjs'
+import { getMeta } from '../../utilities/sanitise.mjs'
+import { isNonEmptyStr } from '../../utilities/validation.mjs'
 
 export const repeatActions = {
   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',

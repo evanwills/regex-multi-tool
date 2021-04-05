@@ -1,7 +1,7 @@
 /* jslint browser: true */
 /* global fetch */
 
-import { isIterable, isFunction } from '../utility-functions.mjs'
+import { isIterable, isFunction } from '../utilities/validation.mjs'
 
 /**
  * Run multiple regular expressions sequentially on a single string

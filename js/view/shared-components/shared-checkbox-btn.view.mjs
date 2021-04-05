@@ -1,11 +1,13 @@
 import { html } from '../../lit-html/lit-html.mjs'
 import {
-  getTabI,
   // isBool,
   isBoolTrue,
-  isNonEmptyStr,
+  isNonEmptyStr
+} from '../../utilities/validation.mjs'
+import {
+  getTabI,
   makeAttributeSafe
-} from '../../utility-functions.mjs'
+} from '../../utilities/sanitise.mjs'
 
 /**
  * Get a whole checkbox input with label and wrapping li tag with

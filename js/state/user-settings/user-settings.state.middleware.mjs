@@ -1,6 +1,6 @@
 import { userSettingsActions } from './user-settings.state.actions.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
-import { isInt, isStr } from '../../utility-functions.mjs'
+import { isInt, isStr } from '../../utilities/validation.mjs'
 import { repeatActions } from '../repeatable/repeatable.state.actions.mjs'
 
 const validColour = (colour) => (isStr(colour) && colour.match(/^#[0-9a-f]{3,6}$/i))
@@ -39,7 +39,6 @@ export const userSettingsMW = store => next => action => {
       } else {
         return next(action)
       }
-      break
 
     case userSettingsActions.SET_CUSTOM_MODE_BG:
     case userSettingsActions.SET_CUSTOM_MODE_TXT:

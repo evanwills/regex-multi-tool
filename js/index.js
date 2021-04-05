@@ -5,7 +5,8 @@ import { getMainAppView } from './view/templates.mjs'
 import { userSettingsSubscriber, forceUIupdate } from './subscribers/user-settings.subscriber.mjs'
 import { historySubscriber } from './subscribers/history.subscriber.mjs'
 import { localStorageSubscriber } from './subscribers/localStorage.subscriber.mjs'
-import { isNonEmptyStr, getFromLocalStorage } from './utility-functions.mjs'
+import { isNonEmptyStr } from './utilities/validation.mjs'
+import { getFromLocalStorage } from './utilities/general.mjs'
 import { mainAppActions } from './state/main-app/main-app.state.actions.mjs'
 import { userSettingsActions } from './state/user-settings/user-settings.state.actions.mjs'
 import { url } from './url.mjs'
@@ -22,6 +23,7 @@ const unsubscribers = { // eslint-disable-line
 }
 
 repeatable.verifyChained()
+
 const localRepeat = getFromLocalStorage('repeatable')
 
 dispatchRegisterAction(
