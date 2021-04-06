@@ -10,7 +10,7 @@ import {
 
 export const getFromLocalStorage = (prop) => {
   const tmp = localStorage.getItem(prop)
-  if (isNonEmptyStr(tmp)) {
+  if (tmp !== null && isNonEmptyStr(tmp)) {
     try {
       return JSON.parse(tmp)
     } catch (e) {

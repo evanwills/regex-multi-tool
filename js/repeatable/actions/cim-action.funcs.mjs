@@ -345,13 +345,13 @@ const fixUnitDescriptionLinks = (input, extraInputs, GETvars) => {
 
 doStuff.register({
   id: 'fixUnitLinks',
-  description: '<p>This tool finds unit codes and converts them to links to unit descriptions. If the unit code is already linked, it will rewrite the link to conform the controls below.</p><ol><li>Set the year that applies to the unit/course</li><li>If you wish to enable unit description in the modal, Check the "<em>Open unit description in a modal</em>" checkbox otherwise modal will be explicitly blocked.</li></ol>',
+  description: '<p>This tool finds unit codes and converts them to links to unit descriptions. If the unit code is already linked, it will rewrite the link to conform the controls below.</p><ol><li>Set the year that applies to the unit/course</li><li>If you wish to enable unit description opening in a modal, Check the "<em>Open unit description in a modal</em>" checkbox otherwise modal will be explicitly blocked.</li></ol>',
   func: fixUnitDescriptionLinks,
   inputLabel: 'Metadata field content',
   extraInputs: [
     {
       id: 'year',
-      label: 'Which year do these units applie to',
+      label: 'Which year applies to these units',
       type: 'select',
       options: [
         { value: '', label: 'Select an option', default: true },

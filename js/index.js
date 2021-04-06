@@ -25,13 +25,16 @@ const unsubscribers = { // eslint-disable-line
 repeatable.verifyChained()
 
 const localRepeat = getFromLocalStorage('repeatable')
+// const extra = (typeof )
 
 dispatchRegisterAction(
   store.dispatch,
   repeatable.getActionsList(),
   repeatable.setFirstAction(
     url.searchParams,
-    localRepeat.fields.inputExtra
+    (localRepeat !== null)
+      ? localRepeat.fields.inputExtra
+      : null
   )
 )
 
@@ -58,7 +61,7 @@ if (localRepeat !== null) {
       })
     }
   } else {
-    console.error('Failed to parse "repeatable" state')
+    console.info('Could not find action ID to initialise. User will have to specify manually.')
   }
 }
 const userSettings = getFromLocalStorage('userSettings')
