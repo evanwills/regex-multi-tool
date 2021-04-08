@@ -11,7 +11,7 @@ import { mainAppActions } from './state/main-app/main-app.state.actions.mjs'
 import { userSettingsActions } from './state/user-settings/user-settings.state.actions.mjs'
 import { url } from './url.mjs'
 
-navigator.serviceWorker.register('/regexMulti.sw.js')
+navigator.serviceWorker.register('./regexMulti.sw.js')
 
 const mainView = getMainAppView(document.body, store)
 
