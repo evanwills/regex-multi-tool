@@ -294,7 +294,7 @@ export const textInputField = (props, multiLine) => {
   return (isBoolTrue(multiLine))
     ? html`
       ${getLabel(props)}
-      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${_required} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '100000')}" minlength="${_minLen}" .value="${props.value}"></textarea>
+      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${_required} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '1000000')}" minlength="${_minLen}" .value="${props.value}"></textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
     : html`
