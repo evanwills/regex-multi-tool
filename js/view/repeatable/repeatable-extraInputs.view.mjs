@@ -37,7 +37,7 @@ export const singleExtraInputView = (props, eventHandlers, tabIndex) => {
 
     case 'radio':
       const maxLen = props.options.reduce(maxLabelLen, 0) // eslint-disable-line
-      console.log('props.value:', props.value)
+      // console.log('props.value:', props.value)
       return (maxLen > 32)
         ? checkboxBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex, '', true)
         : radioBtnGroup(props.id, props.label, props.value, props.options, eventHandlers.valueEvent, _tabIndex)

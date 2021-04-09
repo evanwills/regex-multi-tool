@@ -29,7 +29,7 @@ export const header = (isSimple, changeHandler) => {
 
   return html`
   <header class="regex-multi__header">
-    <h1 class="header-1">Regex multi tool</h1>
+    <h1 class="header-1">Regex multi-tool</h1>
     <!-- <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
 
     <ul class="radio-grp list-clean list-clean--tight list-inline mode-control"><!--

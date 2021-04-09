@@ -6,7 +6,7 @@ remote='evwills@test-webapps.acu.edu.au';
 inputSW='regexMulti.sw.js';
 outputSW='dist/'$inputSW
 
-# npm run build
+npm run build
 
 
 echo; echo; echo '==================================================';
@@ -43,7 +43,7 @@ fi
 
 # Get a list of all the assets built by Vite JS, wrap them in quotes
 # and separate with a comma
-assets=$(ls dist/assets/ | sed "s/\([^ \t]\+\)[\t ]*/'assets\/\1', /ig")
+assets=$(ls dist/assets/ | sed "s/\([^ \t]\+\)[\t ]*/'\/assets\/\1', /ig")
 assetList=$assets
 
 # Make string safe to use in Sed regular expression
@@ -52,23 +52,24 @@ assets=$(echo $assets | sed 's/\([./]\)/\\\1/g')
 # Remove the trailing comma from the last file
 assets=$(echo $assets | sed 's/,$//')
 
-# Strip out the list of files in the local version of the ServiceWorker
-# Replace reference to local favicon.ico with list of all compiled assets
-sed -i "s/'\/favicon\.ico'/$assets/" $outputSW;
 
-# # Add the insert of built assets in the urlsToCache array
-# sed -i "s/--CACHE--/$assets/" $outputSW
-# sed -i "s/[\t\ ]*--CACHE--[\r\n\t\ ]*//g" $outputSW
+# Strip out all the CSS files in the local version of the ServiceWorker
+sed -i "s/[\t ]*'\/\?css\/\([^.]\+\.\)\+css',\?[\t \r\n\m]*//" $outputSW;
+
+# Replace reference to local favicon.ico with list of all compiled assets
+sed -i "s/'\.\?\/\?favicon\.ico'/$assets/" $outputSW;
+
 
 echo 'ServiceWorker version: '$versionNum
 echo 'Compiled assets: '$assetList;
 
-# tail -n 50 $outputSW
+# tail -n 100 $outputSW
+# exit;
 
 
+echo; echo;
 echo; echo; echo 'Completed prep for prod Service Worker';
 echo; echo; echo '==================================================';
-# exit;
 
 #  END:  Rewriting cacheable file list
 # ==================================================
@@ -81,8 +82,13 @@ echo; echo; echo '==================================================';
 echo; echo; echo 'Uploading to Bilby';
 echo; echo;
 
+bilbySW="dist/bilby-$inputSW"
+echo '$bilbySW: '$bilbySW
+cp $outputSW $bilbySW;
+sed -i "s/\([\t ]*'\/\)/\1regex-multi-tool\//ig" $bilbySW
+
 scp dist/index.html $local:/var/www/html/regex-multi-tool/;
-scp $outputSW $local:/var/www/html/regex-multi-tool/;
+scp $bilbySW $local:/var/www/html/regex-multi-tool/$inputSW;
 
 echo; echo 'Removing old compiled files.'; echo; echo;
 
@@ -105,5 +111,5 @@ echo; echo; echo '==================================================';
 # ==================================================
 
 if [ -f build-n-deploy--to-test.sh ]
-then	./build-n-deploy--to-test.sh "$local" "$remote" "$outputSW";
+then	./build-n-deploy--to-test.sh "$local" "$remote" "$inputSW" "$outputSW";
 fi

@@ -18,7 +18,7 @@ export const getFromLocalStorage = (prop) => {
     }
     return tmp
   }
-  console.error('Could not get "' + prop + '" from local storage')
+  console.warn('Could not get "' + prop + '" from local storage')
 
   return null
 }

@@ -1,0 +1,7 @@
+{
+  "plugins": [
+    "stylelint-order"
+  ],
+  "ignoreFiles": ["**/*.js"],
+  "order/properties-alphabetical-order": true
+}
