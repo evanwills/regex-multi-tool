@@ -15,15 +15,19 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(url.path + 'regexMulti.sw.js')
 }
 
-console.log('window.location.href:', window.location.href)
-
+// Bind the store into the main view to enable auto-dispatching
+// event handlers in views
 const mainView = getMainAppView(document.body, store)
 
-const userSettingsSub = userSettingsSubscriber(store)
+// ------------------------------------------------------------------
+// TODO: Move userSettings, history & localStorage subscriber
+//       functionality out of subscribers and into middleware.
+//       This will give them access to the current action's
+//       `type` property and hopefully improve performance
 
 const unsubscribers = { // eslint-disable-line
   ui: store.subscribe(mainView),
-  userSettings: store.subscribe(userSettingsSub),
+  userSettings: store.subscribe(userSettingsSubscriber(store)),
   history: store.subscribe(historySubscriber(store)),
   localStorage: store.subscribe(localStorageSubscriber(store))
 }
@@ -31,7 +35,6 @@ const unsubscribers = { // eslint-disable-line
 repeatable.verifyChained()
 
 const localRepeat = getFromLocalStorage('repeatable')
-// const extra = (typeof )
 
 dispatchRegisterAction(
   store.dispatch,
