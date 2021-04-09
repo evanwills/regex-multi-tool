@@ -26,6 +26,7 @@ export const getURLobject = (url) => {
     actionHref: '',
     origin: '',
     password: '',
+    path: '',
     pathname: '',
     port: '',
     protocol: '',
@@ -58,6 +59,7 @@ export const getURLobject = (url) => {
       }
       if (typeof urlParts[5] !== 'undefined') {
         output.pathname = urlParts[5]
+        output.path = urlParts[5].replace(/\/[^/]+$/i, '/')
       }
 
       if (typeof urlParts[6] !== 'undefined') {

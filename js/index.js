@@ -12,8 +12,10 @@ import { userSettingsActions } from './state/user-settings/user-settings.state.a
 import { url } from './url.mjs'
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/regexMulti.sw.js')
+  navigator.serviceWorker.register(url.path + 'regexMulti.sw.js')
 }
+
+console.log('window.location.href:', window.location.href)
 
 const mainView = getMainAppView(document.body, store)
 
