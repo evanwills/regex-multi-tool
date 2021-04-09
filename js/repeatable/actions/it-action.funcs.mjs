@@ -1050,25 +1050,29 @@ doStuff.register({
     id: 'domain',
     label: 'Domain',
     type: 'select',
-    options: [{
-      value: 'uat',
-      label: 'UAT'
-    }, {
-      value: 'auth.uat',
-      label: 'Auth UAT'
-    }, {
-      value: 'qa',
-      label: 'QA'
-    }, {
-      value: 'auth.qa',
-      label: 'Auth QA'
-    }, {
-      value: 'www',
-      label: 'WWW'
-    }, {
-      value: 'auth',
-      label: 'Auth WWW'
-    }]
+    // default: 'www',
+    options: [
+      {
+        value: 'uat',
+        label: 'UAT'
+      }, {
+        value: 'auth.uat',
+        label: 'Auth UAT'
+      }, {
+        value: 'qa',
+        label: 'QA'
+      }, {
+        value: 'auth.qa',
+        label: 'Auth QA'
+      }, {
+        value: 'www',
+        label: 'WWW',
+        default: true
+      }, {
+        value: 'auth',
+        label: 'Auth WWW'
+      }
+    ]
   }],
   group: 'it',
   ignore: false,

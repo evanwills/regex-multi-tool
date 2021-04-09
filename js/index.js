@@ -1,18 +1,24 @@
 import { repeatable } from './repeatable/repeatable-init.mjs'
-import { repeatActions, dispatchRegisterAction } from './state/repeatable/repeatable.state.actions.mjs'
+import {
+  // repeatActions,
+  dispatchRegisterAction
+} from './state/repeatable/repeatable.state.actions.mjs'
 import { store } from './state/regexMulti-state.mjs'
 import { getMainAppView } from './view/templates.mjs'
-import { userSettingsSubscriber, forceUIupdate } from './subscribers/user-settings.subscriber.mjs'
+import {
+  userSettingsSubscriber,
+  forceUIupdate
+} from './subscribers/user-settings.subscriber.mjs'
 import { historySubscriber } from './subscribers/history.subscriber.mjs'
 import { localStorageSubscriber } from './subscribers/localStorage.subscriber.mjs'
-import { isNonEmptyStr } from './utilities/validation.mjs'
+import { isBool, isNonEmptyStr } from './utilities/validation.mjs'
 import { getFromLocalStorage } from './utilities/general.mjs'
 import { mainAppActions } from './state/main-app/main-app.state.actions.mjs'
 import { userSettingsActions } from './state/user-settings/user-settings.state.actions.mjs'
 import { url } from './url.mjs'
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register(url.path + 'regexMulti.sw.js')
+  // navigator.serviceWorker.register(url.path + 'regexMulti.sw.js')
 }
 
 // Bind the store into the main view to enable auto-dispatching
@@ -42,7 +48,7 @@ dispatchRegisterAction(
   repeatable.setFirstAction(
     url.searchParams,
     (localRepeat !== null)
-      ? localRepeat.fields.inputExtra
+      ? localRepeat.extraInputs
       : null
   )
 )
@@ -54,25 +60,21 @@ let forceUiUpdate = false
 // START: pre-setting from URL and local storage
 
 if (localRepeat !== null) {
-  if (isNonEmptyStr(localRepeat.activeAction.id)) {
+  if (isNonEmptyStr(localRepeat.input)) {
     store.dispatch({
-      type: repeatActions.UPDATE_FIELD,
-      payload: {
-        id: 'input',
-        key: '',
-        value: localRepeat.fields.inputPrimary
-      }
+      type: mainAppActions.SET_INPUT,
+      payload: localRepeat.input
     })
-
-    if (tmpState.repeatable.debug !== localRepeat.debug) {
-      store.dispatch({
-        type: repeatActions.TOGGLE_DEBUG
-      })
-    }
-  } else {
-    console.info('Could not find action ID to initialise. User will have to specify manually.')
   }
+  if (isBool(localRepeat.debug) && tmpState.debug !== localRepeat.debug) {
+    store.dispatch({
+      type: mainAppActions.TOGGLE_DEBUG
+    })
+  }
+} else {
+  console.info('Nothing in local storage.')
 }
+
 const userSettings = getFromLocalStorage('userSettings')
 
 if (userSettings !== null) {

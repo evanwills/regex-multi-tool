@@ -7,7 +7,10 @@ export const mainAppActions = {
   MODIFY: 'MAIN-APP_MODIFY',
   TEST: 'MAIN-APP_TEST',
   RESET: 'MAIN-APP_RESET',
-  HELP: 'MAIN-APP_HELP'
+  HELP: 'MAIN-APP_HELP',
+  SET_INPUT: 'MAIN-APP_SET_INPUT',
+  SET_OUTPUT: 'MAIN-APP_SET_OUTPUT',
+  TOGGLE_DEBUG: 'MAIN-APP_TOGGLE_DEBUG'
 }
 
 export const getAutoDispatchMainAppEvent = (_dispatch) => {
@@ -38,11 +41,30 @@ export const getAutoDispatchMainAppEvent = (_dispatch) => {
         _type = mainAppActions.RESET
         break
 
+      case 'input':
+        _dispatch({
+          type: mainAppActions.SET_INPUT,
+          payload: this.value
+        })
+        return
+
+      case 'output':
+        _dispatch({
+          type: mainAppActions.SET_OUTPUT,
+          payload: this.value
+        })
+        return
+
       case 'help':
         _type = mainAppActions.HELP
         break
+
+      case 'debug':
+        _type = mainAppActions.TOGGLE_DEBUG
+        break
     }
 
+    console.log('dispatching type:', _type)
     _dispatch({ type: _type })
   }
 }

@@ -1,5 +1,6 @@
 import { getMeta } from '../../utilities/sanitise.mjs'
 import { isNonEmptyStr } from '../../utilities/validation.mjs'
+import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 export const repeatActions = {
   REGISTER_SINGLE_ACTION: 'REPEATABLE_REGISTER_SINGLE_ACTION',
@@ -7,10 +8,11 @@ export const repeatActions = {
   REGISTER_GROUP: 'REPEATABLE_REGISTER_GROUP',
   SET_ACTION: 'REPEATABLE_SET_ACTON',
   UPDATE_FIELD: 'REPEATABLE_UPDATE_FIELD',
+  UPDATE_OUTPUT: 'REPEATABLE_UPDATE_OUTPUT',
   MODIFY_INPUT: 'REPEATABLE_MODIFY_INPUT',
   RESET_ACTION: 'REPEATABLE_RESET_ACTION', // Only used by middleware
   TOGGLE_NAV: 'REPEATABLE_TOGGLE_NAV',
-  TOGGLE_DEBUG: 'REPEATABLE_TOGGLE_DEBUG',
+  // TOGGLE_DEBUG: 'REPEATABLE_TOGGLE_DEBUG',
   ERROR: 'REPEATABLE_ERROR',
   INIT: 'REPEATABLE_INIT'
 }
@@ -56,6 +58,7 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
 
 export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
+    console.log('inside getAutoDispatchValueAction()')
     const meta = getMeta(this.id)
     // let _type = ''
 
@@ -79,13 +82,10 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         break
 
       case 'primaryInput':
+        console.log('setting main input')
         _dispatch({
-          type: repeatActions.UPDATE_FIELD,
-          payload: {
-            id: 'input',
-            key: '',
-            value: this.value
-          }
+          type: mainAppActions.SET_INPUT,
+          payload: this.value
         })
         break
     }

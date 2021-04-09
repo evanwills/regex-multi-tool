@@ -82,7 +82,7 @@ export const repeatableUI = (props) => {
 
       ${renderDescription(props.activeAction.description)}
       <ul class="list-clean repeatable-field__wraper">
-        ${allExtraInputsView(props.activeAction, props.fields.inputExtra, props.events)}
+        ${allExtraInputsView(props.activeAction, props.extraInputs, props.events)}
       </ul>
       ${(hasAction)
         ? html`
@@ -92,7 +92,7 @@ export const repeatableUI = (props) => {
             ...props.activeAction,
             label: props.activeAction.inputLabel,
             change: props.events.valueEvent,
-            value: props.fields.inputPrimary,
+            value: props.input,
             class: 'repeat-input',
             id: props.activeAction.id + '-primaryInput'
           },
@@ -104,7 +104,7 @@ export const repeatableUI = (props) => {
               ...props.activeAction,
               label: props.activeAction.outputLabel,
               change: props.events.valueEvent,
-              value: props.fields.outputPrimary,
+              value: props.output,
               class: 'repeat-input',
               id: props.activeAction.id + '-primaryOutput'
             },

@@ -20,27 +20,16 @@ export const defaultRepeat = {
   allActions: {},
   // Action currently being used
   activeAction: {},
-  fields: {
-    // The primary input field for repeatable actions
-    // (Always plain text)
-    inputPrimary: 'The quick brown fox jumped over the lazy dog',
-    // Additional input fields (may be numbers or texts)
-    // NOTE: Extra inputs contain everything about the extra input,
-    //       not just it's current value
-    inputExtra: {},
-    // The primary output field
-    // (the modified version of inputPrimary)
-    outputPrimary: '',
-    // It's sometimes useful to output the results of a repeatable
-    // action into distinct blocks
-    // (e.g. when creating both a HTML for display to the user
-    //       and HTML for an email)
-    outputExtra: [],
-    //
-    groups: []
-  },
-  navOpen: false,
-  debug: false
+  // Additional input fields (may be numbers or texts)
+  // NOTE: Extra inputs contain everything about the extra input,
+  //       not just it's current value
+  extraInputs: {},
+  // It's sometimes useful to output the results of a repeatable
+  // action into distinct blocks
+  // (e.g. when creating both a HTML for display to the user
+  //       and HTML for an email)
+  extraOutputs: [],
+  navOpen: false
 }
 
 /**
@@ -104,23 +93,23 @@ const sortActionsList = (actionsList) => {
   return output
 }
 
-/**
- * Check whether an action matching the specified ID is regestered
- *
- * @param {array}  objectList List of registered actions
- * @param {string} id         ID of action to be matched
- *
- * @returns {boolean} TRUE if action matching supplied ID is
- *                    registered. FALSE otherwise
- */
-const objectExistsInList = (objectList, id) => {
-  for (let a = 0; a < objectList.length; a += 1) {
-    if (objectList[a].id === id) {
-      return true
-    }
-  }
-  return false
-}
+// /**
+//  * Check whether an action matching the specified ID is regestered
+//  *
+//  * @param {array}  objectList List of registered actions
+//  * @param {string} id         ID of action to be matched
+//  *
+//  * @returns {boolean} TRUE if action matching supplied ID is
+//  *                    registered. FALSE otherwise
+//  */
+// const objectExistsInList = (objectList, id) => {
+//   for (let a = 0; a < objectList.length; a += 1) {
+//     if (objectList[a].id === id) {
+//       return true
+//     }
+//   }
+//   return false
+// }
 
 /**
  * Get object whose keys match the list of extra IDs for extra input
@@ -191,75 +180,70 @@ const getExtraInputKeyValues = (extraInputs, get) => {
   return output
 }
 
-/**
- * Check whether a field should update.
- *
- * @param {array}         fields List of all fields that could be updated
- * @param {string}        id     ID of the specific field to be updated
- * @param {string,number} value  New value for that field
- *
- * @returns {boolean} TRUE if field exists and current field value
- *                    does NOT match supplied value. FALSE otherwise.
- */
-const fieldShouldUpdate = (fields, id, value) => {
-  for (let a = 0; a < fields.length; a += 1) {
-    if (fields[a].id === id && fields[a].value !== value) {
-      return true
-    }
-  }
-  return false
-}
+// /**
+//  * Check whether a field should update.
+//  *
+//  * @param {array}         fields List of all fields that could be updated
+//  * @param {string}        id     ID of the specific field to be updated
+//  * @param {string,number} value  New value for that field
+//  *
+//  * @returns {boolean} TRUE if field exists and current field value
+//  *                    does NOT match supplied value. FALSE otherwise.
+//  */
+// const fieldShouldUpdate = (fields, id, value) => {
+//   for (let a = 0; a < fields.length; a += 1) {
+//     if (fields[a].id === id && fields[a].value !== value) {
+//       return true
+//     }
+//   }
+//   return false
+// }
 
-const updateFields = (state, payload, debug) => {
+const updateFields = (state, payload) => {
   const { id, key, value } = payload
-  // console.group('updateFields()')
-  // console.log('id:', id)
-  // console.log('key:', key)
-  // console.log('value:', value)
-  // console.log('state.inputExtra[' + key + ']:', state.inputExtra[key])
-  // console.log('isNumeric(state.inputExtra[' + key + ']):', isNumeric(state.inputExtra[key]))
-  // console.log('isStr(state.inputExtra[' + key + ']):', isStr(state.inputExtra[key]))
-  // console.log('state.inputExtra[' + key + '] !== value', state.inputExtra[key] !== value)
-  // console.groupEnd()
+  console.group('updateFields()')
+  console.log('id:', id)
+  console.log('key:', key)
+  console.log('value:', value)
+  console.log('state[' + key + ']:', state[key])
+  console.log('isNumeric(state[' + key + ']):', isNumeric(state[key]))
+  console.log('isStr(state[' + key + ']):', isStr(state[key]))
+  console.log('state[' + key + '] !== value', state[key] !== value)
+  console.groupEnd()
+
   switch (id) {
     case 'extraInputs':
-      if ((isNumeric(state.inputExtra[key]) || isStr(state.inputExtra[key])) && state.inputExtra[key] !== value) {
-        const tmp = { ...state.inputExtra }
+      if ((isNumeric(state[key]) || isStr(state[key])) && state[key] !== value) {
+        const tmp = { ...state }
         tmp[key] = value
         // console.log('tmp:', tmp)
-        return {
-          ...state,
-          inputExtra: tmp
-        }
-      } else if (isBool(state.inputExtra[key][value])) {
-        const tmp1 = { ...state.inputExtra[key] }
+        return tmp
+      } else if (isBool(state[key][value])) {
+        const tmp1 = { ...state[key] }
         tmp1[value] = !tmp1[value]
-        const _inputExtra = { ...state.inputExtra }
+        const _inputExtra = { ...state }
         _inputExtra[key] = tmp1
-        return {
-          ...state,
-          inputExtra: _inputExtra
-        }
+        return _inputExtra
       }
       break
 
-    case 'input':
-      return {
-        ...state,
-        inputPrimary: value
-      }
+    // case 'input':
+    //   return {
+    //     ...state,
+    //     inputPrimary: value
+    //   }
 
-    case 'output':
+    // case 'output':
 
-      return (isBoolTrue(debug))
-        ? {
-            ...state,
-            outputPrimary: value
-          }
-        : {
-            ...state,
-            inputPrimary: value
-          }
+    //   return (isBoolTrue(debug))
+    //     ? {
+    //         ...state,
+    //         outputPrimary: value
+    //       }
+    //     : {
+    //         ...state,
+    //         inputPrimary: value
+    //       }
   }
   return state
 }
@@ -282,15 +266,11 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
         ? {
             ...state,
             activeAction: action.payload,
-            fields: {
-              inputLabel: action.payload.inputLabel,
-              inputPrimary: '',
-              inputExtra: getExtraInputKeyValues(action.payload.extraInputs, action.payload.get),
-              outputLabel: action.payload.outputLabel,
-              outputPrimary: '',
-              outputExtra: [],
-              groups: []
-            }
+            extraInputs: getExtraInputKeyValues(
+              action.payload.extraInputs,
+              action.payload.get
+            ),
+            extraOutputs: []
           }
         : state
 
@@ -305,29 +285,32 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       // console.log('payload:', action.payload)
       return {
         ...state,
-        fields: updateFields(state.fields, action.payload, state.debug)
+        extraInputs: updateFields(
+          state.extraInputs,
+          action.payload
+        )
       }
 
-    case repeatActions.MODIFY_INPUT:
-      if (typeof action.payload === 'string') {
-        return (state.fields.value !== action.payload)
-          ? { ...state, fields: { ...state.fields, value: action.payload } }
-          : state
-      } else if (fieldShouldUpdate(state.fields.outputs, action.payload.id, action.payload.value)) {
-        return {
-          ...state,
-          outputs: state.outputs.map((output) => {
-            return (output.id === action.payload.id) ? { ...output, value: action.payload.value } : output
-          })
-        }
-      } else {
-        return state
-      }
+      // case repeatActions.MODIFY_INPUT:
+      //   if (typeof action.payload === 'string') {
+      //     return (state.fields.value !== action.payload)
+      //       ? { ...state, fields: { ...state.fields, value: action.payload } }
+      //       : state
+      //   } else if (fieldShouldUpdate(state.fields.outputs, action.payload.id, action.payload.value)) {
+      //     return {
+      //       ...state,
+      //       outputs: state.outputs.map((output) => {
+      //         return (output.id === action.payload.id) ? { ...output, value: action.payload.value } : output
+      //       })
+      //     }
+      //   } else {
+      //     return state
+      //   }
 
-    case repeatActions.REGISTER_GROUP:
-      return (objectExistsInList(state.fields.groups, action.payload.id) === false)
-        ? { ...state, fields: { ...state.fields, groups: action.payload } }
-        : state
+      // case repeatActions.REGISTER_GROUP:
+      //   return (objectExistsInList(state.fields.groups, action.payload.id) === false)
+      //     ? { ...state, fields: { ...state.fields, groups: action.payload } }
+      //     : state
 
     case repeatActions.TOGGLE_NAV:
       return {
@@ -335,11 +318,11 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
         navOpen: !state.navOpen
       }
 
-    case repeatActions.TOGGLE_DEBUG:
-      return {
-        ...state,
-        debug: !state.debug
-      }
+      // case repeatActions.TOGGLE_DEBUG:
+      //   return {
+      //     ...state,
+      //     debug: !state.debug
+      //   }
 
     default:
       return state

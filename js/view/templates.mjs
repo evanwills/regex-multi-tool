@@ -169,7 +169,13 @@ export const getMainAppView = (domNode, store) => {
       ? props.oneOff
       : props.repeatable
 
-    const newProps = { ...state, events: { ...eventHandlers } }
+    const newProps = {
+      ...state,
+      events: { ...eventHandlers },
+      input: props.input,
+      output: props.output,
+      debug: props.debug
+    }
 
     if (!isSimple) {
       newProps.href = props.url.actionHref

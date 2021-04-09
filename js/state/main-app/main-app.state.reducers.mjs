@@ -17,14 +17,39 @@ export const modeReducer = (state = 'oneOff', action = { type: 'default' }) => {
   return state
 }
 
-export const groupsReducer = (state = '', action = { type: 'default' }) => {
-  if (action.type === mainAppActions.SET_GROUPS) {
-    if (isStr(action.payload) && state !== action.payload) {
-      return action.payload
-    } else {
-      throw Error('Cannot set mode to "' + action.payload + '"')
-    }
-  }
+const baseReducer = (state, action, target) => {
+  return (action.type === target && isStr(action.payload) && state !== action.payload)
+    ? action.payload
+    : state
+}
 
+export const groupsReducer = (state = '', action = { type: 'default' }) => {
+  return baseReducer(
+    state,
+    action,
+    mainAppActions.SET_GROUPS
+  )
+}
+
+export const inputReducer = (state = '', action = { type: 'default' }) => {
+  return baseReducer(
+    state,
+    action,
+    mainAppActions.SET_INPUT
+  )
+}
+
+export const outputReducer = (state = '', action = { type: 'default' }) => {
+  return baseReducer(
+    state,
+    action,
+    mainAppActions.SET_OUTPUT
+  )
+}
+
+export const debugReducer = (state = false, action = { type: 'default' }) => {
+  if (action.type === mainAppActions.TOGGLE_DEBUG) {
+    return !state
+  }
   return state
 }

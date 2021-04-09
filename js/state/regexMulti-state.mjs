@@ -13,7 +13,13 @@ import {
   // readyStatePromise,
   // vanillaPromise,
 } from '../redux/standard-middleware.mjs'
-import { modeReducer, groupsReducer } from './main-app/main-app.state.reducers.mjs'
+import {
+  debugReducer,
+  groupsReducer,
+  inputReducer,
+  modeReducer,
+  outputReducer
+} from './main-app/main-app.state.reducers.mjs'
 import { mainAppMW } from './main-app/main-app.state.middleware.mjs'
 import { oneOff } from './oneOff/oneOff.state.mjs'
 import { repeatable } from './repeatable/repeatable.state.mjs'
@@ -23,10 +29,13 @@ import { urlReducer } from './url/url.state.all.mjs'
 import { url } from '../url.mjs'
 
 const initialState = {
-  mode: 'repeatable',
+  debug: false,
   groups: '',
+  input: '',
+  mode: 'repeatable',
   oneOff: oneOff.state,
-  repeat: repeatable.state,
+  output: '',
+  repeatable: repeatable.state,
   url: url,
   userSettings: userSettings.state
 }
@@ -48,9 +57,12 @@ if (initialState.mode === 'oneOff' && url.hash !== '') {
 
 export const store = createStore(
   combineReducers({
-    mode: modeReducer,
+    debug: debugReducer,
     groups: groupsReducer,
+    input: inputReducer,
+    mode: modeReducer,
     oneOff: oneOff.reducers,
+    output: outputReducer,
     repeatable: repeatable.reducers,
     url: urlReducer,
     userSettings: userSettings.reducer

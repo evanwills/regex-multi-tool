@@ -1,5 +1,6 @@
 import { repeatActions } from './repeatable.state.actions.mjs'
 import { repeatable } from '../../repeatable/repeatable-init.mjs'
+import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 import {
   // isBool,
   // isFunction,
@@ -108,18 +109,17 @@ export const repeatableMW = store => next => action => {
         return next(action)
       } else {
         // console.log('about to run action')
-        return next({
-          type: repeatActions.UPDATE_FIELD,
-          payload: {
-            id: 'output',
-            key: '',
-            value: repeatable.run(
-              _state.repeatable.fields.inputPrimary,
-              _state.repeatable.fields.inputExtra,
-              _state.url.searchParams
-            )
-          }
+        console.log('input:', _state.input)
+        console.log('_state.repeatable.extraInputs:', _state.repeatable.extraInputs)
+        store.dispatch({
+          type: mainAppActions.SET_OUTPUT,
+          payload: repeatable.run(
+            _state.input,
+            _state.repeatable.extraInputs,
+            _state.url.searchParams
+          )
         })
+        break
       }
 
     default:

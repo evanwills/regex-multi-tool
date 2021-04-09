@@ -4,7 +4,8 @@
  * Logs all actions and states after they are dispatched.
  */
 export const logger = store => next => action => {
-  console.groupCollapsed(action.type)
+  console.group(action.type)
+  // console.groupCollapsed(action.type)
   console.info('dispatching', action)
 
   const result = next(action)
