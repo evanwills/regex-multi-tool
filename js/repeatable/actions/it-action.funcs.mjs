@@ -11,6 +11,8 @@ const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '
 const kssSamplePath = '[relative to \\ACU.Sitecore\\website\n *                    e.g. src\\Project\\ACUPublic\\ACU.Static\\components\\anchor_links.html]'
 const kssCommentEnd = '\n *\n * .modifiers - Description of Modifier\n *\n * StyleGuide: Molecule.[[COMPONENT_NAME]]\n */\n// {{modifier_class}} - use this in place of a modifier class name in the sample "Markup" block\n'
+const assetPathGlobal = '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic/'
+const assetPathRelative = '../'
 
 // ====================================================================
 // START: CEG course advice HTML
@@ -948,6 +950,64 @@ doStuff.register({
 // ====================================================================
 // START: Sitecore HTML to local HTML
 
+const localOrGlobalPath = (whole, fileType, fileName) => {
+  const _name = fileName.replace(/\?.*?$/i, '').trim()
+  const _type = fileType.substr(0, (fileType.length - 1))
+  const _localFiles = {
+    fonts: [],
+    css: [
+      'acu-style.css',
+      'owl.carousel.min.css',
+      'side-accordion.css',
+      'theme_purple.css'
+    ],
+    js: [
+      'acu-scripts.js',
+      'atc.min.js',
+      'axios.min.js',
+      'jquery-2.1.3.min.js',
+      'jquery-3.3.1.min.js',
+      'jquery.validate.min.js',
+      'jquery-ui.min.css',
+      'jquery.unobtrusive-ajax.js',
+      'jquery.validate.unobtrusive.min.js',
+      'owl.carousel.min.js',
+      'ryi-script.js',
+      'vue.min.js'
+    ],
+    img: [
+      'askacu.svg',
+      'acu-logo-white.svg',
+      'acu-logo-purple.svg',
+      'favicon.ico'
+    ]
+  }
+  console.group('localOrGlobalPath()')
+  console.log('whole:', whole)
+  console.log('fileType:', fileType)
+  console.log('_type:', _type)
+  console.log('fileName:', fileName)
+  console.log('_name:', _name)
+  console.log('_localFiles[' + _type + ']:', _localFiles[_type])
+  console.log('typeof _localFiles[' + _type + ']:', typeof _localFiles[_type])
+  console.log(
+    '_localFiles[' + _type + '].indexOf(' + _name + '):',
+    _localFiles[_type].indexOf(_name)
+  )
+  console.log(
+    '_localFiles[' + _type + '].indexOf(' + _name + ') > -1:',
+    _localFiles[_type].indexOf(_name) > -1
+  )
+  const _path = (typeof _localFiles[_type] !== 'undefined' && _localFiles[_type].indexOf(_name) > -1)
+    ? assetPathRelative
+    : assetPathGlobal
+
+  console.log('_path:', _path)
+  console.log('Output:', _path + fileType + _name)
+  console.groupEnd()
+  return _path + fileType + _name
+}
+
 /**
  * Action description goes here
  *
@@ -984,8 +1044,8 @@ const sitecore2local = (input, extraInputs, GETvars) => {
 
   const regex = [
     {
-      find: /\/assets\/acupublic\/(?:custom)?(?=(?:css|js|fonts)\/)/ig,
-      replace: '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic/'
+      find: /\/assets\/acupublic\/(?:custom)?((?:css|js|fonts)\/)([^'"]+)/ig,
+      replace: localOrGlobalPath
       // replace: '../'
     }, {
       find: /(<img src=")(?=\/-\/media\/feature\/)/ig,
@@ -1033,7 +1093,7 @@ const sitecore2local = (input, extraInputs, GETvars) => {
       find: /<script.*?src="[^"]+(?:bluebird|addevent)[^"]+".*?><\/script>/ig,
       replace: ''
     }, {
-      find: /(src=")[^"]+((?:acu-logo-white|acu_logo_purple|askacu).svg)[^"]*(?=")/ig,
+      find: /(src=")[^"]+((?:acu[-_]logo[-_]white|acu[-_]logo[-_]purple|askacu).svg)[^"]*(?=")/ig,
       replace: '$1../img/$2'
     }
   ]
