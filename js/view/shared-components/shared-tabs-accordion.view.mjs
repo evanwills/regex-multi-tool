@@ -24,7 +24,10 @@ const tabBlockInner = (groupID, activeID, block, tabEvent) => {
   return html`
   <section id="${block.id}" class="tab-block tab-block--${(isActive) ? '' : 'in'}active">
     <h3 class="tab-block__h">${tabNavItem(groupID, activeID, block, tabEvent, true)}</h3>
-    ${(isActive) ? html`${block.view(block.data, block.events)}` : ''}
+    ${(isActive)
+      ? html`${block.view(block.data, block.events)}`
+      : ''
+    }
   </section>
 `
 }

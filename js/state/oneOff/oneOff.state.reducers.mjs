@@ -561,21 +561,14 @@ const closePairSettings = (pairs) => {
  * @returns {array} list of regex pairs with the specified pair
  *                  disabled/enabled
  */
-const togglePairSettings = (pairs, id, open) => {
+const togglePairSettings = (pairs, id) => {
   // console.log('id:', id)
   // console.log('open:', open)
   return pairs.map(pair => {
-    if (pair.id === id) {
-      if (pair.settingsOpen !== open) {
-        return { ...pair, settingsOpen: open }
-      }
-    } else {
-      if (pair.settingsOpen === true) {
-        return { ...pair, settingsOpen: false }
-      }
-    }
-
-    return pair
+    const isOpen = (pair.id === id)
+      ? !pair.settingsOpen
+      : false
+    return { ...pair, settingsOpen: isOpen }
   })
 }
 
@@ -666,11 +659,8 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
     case regexPairActions.DISABLE:
       return disablePair(state, action.payload)
 
-    case regexPairActions.OPEN_SETTINGS:
-      return togglePairSettings(state, action.payload, true)
-
-    case regexPairActions.CLOSE_SETTINGS:
-      return togglePairSettings(state, action.payload, false)
+    case regexPairActions.TOGGLE_SETTINGS:
+      return togglePairSettings(state, action.payload)
 
     case regexPairActions.SET_FOCUSED_ID:
       // console.log('SET_FOCUSED_ID')

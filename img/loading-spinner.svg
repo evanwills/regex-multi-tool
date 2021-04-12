@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="wating-spinner" width="100mm" height="100mm" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <g id="spinner" stroke="none" fill="#106">
+    <circle cx="49.97" cy="10" r="9.949" fill-opacity="1">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="1;0.909;0.818;0.727;0.636;0.545;0.455;0.364;0.273;0.182;0.091;0;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="9.949;9.045;8.140;7.236;6.331;5.427;4.522;3.618;2.713;1.809;0.904;0;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="29.996" cy="15.413" r="9.045" fill-opacity="0.909">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.909;0.818;0.727;0.636;0.545;0.455;0.364;0.273;0.182;0.091;0;1;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="9.045;8.14;7.236;6.331;5.427;4.522;3.618;2.713;1.809;0.904;0;9.949;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15.406" cy="29.992" r="8.14" fill-opacity="0.818">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.818;0.727;0.636;0.545;0.455;0.364;0.273;0.182;0.091;0;1;0.909;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="8.14;7.236;6.331;5.427;4.522;3.618;2.713;1.809;0.904;0;9.949;9.045;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="9.9999" cy="49.98" r="7.236" fill-opacity="0.727">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.727;0.636;0.545;0.455;0.364;0.273;0.182;0.091;0;1;0.909;0.818;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="7.236;6.331;5.427;4.522;3.618;2.713;1.809;0.904;0;9.949;9.045;8.14;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15.351" cy="69.969" r="6.331" fill-opacity="0.636">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.636;0.545;0.455;0.364;0.273;0.182;0.091;0;1;0.909;0.818;0.727;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="6.331;5.427;4.522;3.618;2.713;1.809;0.904;0;9.949;9.045;8.14;7.236;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="29.987" cy="84.602" r="5.427" fill-opacity="0.545">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.545;0.455;0.364;0.273;0.182;0.091;0;1;0.909;0.818;0.727;0.636;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="5.427;4.522;3.618;2.713;1.809;0.904;0;9.949;9.045;8.14;7.236;6.331;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50.03" cy="89.95" r="4.522" fill-opacity="0.455">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.455;0.364;0.273;0.182;0.091;0;1;0.909;0.818;0.727;0.636;0.545;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="4.522;3.618;2.713;1.809;0.904;0;9.949;9.045;8.14;7.236;6.331;5.427;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="69.988" cy="84.68" r="3.618" fill-opacity="0.364">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.364;0.273;0.182;0.091;0;1;0.909;0.818;0.727;0.636;0.545;0.455;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="3.618;2.713;1.809;0.904;0;9.949;9.045;8.14;7.236;6.331;5.427;4.522;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="84.642" cy="69.965" r="2.713" fill-opacity="0.273">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.273;0.182;0.091;0;1;0.909;0.818;0.727;0.636;0.545;0.455;0.364;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="2.713;1.809;0.904;0;9.949;9.045;8.14;7.236;6.331;5.427;4.522;3.618;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90.006" cy="49.98" r="1.809" fill-opacity="0.182">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.182;0.091;0;1;0.909;0.818;0.727;0.636;0.545;0.455;0.364;0.273;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="1.809;0.904;0;9.949;9.045;8.14;7.236;6.331;5.427;4.522;3.618;2.713;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="84.644" cy="29.963" r="0.904" fill-opacity="0.091">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0.091;0;1;0.909;0.818;0.727;0.636;0.545;0.455;0.364;0.273;0.182;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="0.904;0;9.949;9.045;8.14;7.236;6.331;5.427;4.522;3.618;2.713;1.809;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="69.977" cy="15.338" r="0" fill-opacity="0">
+      <animate attributeName="fill-opacity" begin="0s" dur="3s" values="0;1;0.909;0.818;0.727;0.636;0.545;0.455;0.364;0.273;0.182;091;" calcMode="linear" repeatCount="indefinite"/>
+      <animate attributeName="r" begin="0s" dur="3s" values="0;9.949;9.045;8.14;7.236;6.331;5.427;4.522;3.618;2.713;1.809;0.904;" calcMode="linear" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

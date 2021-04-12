@@ -1,4 +1,5 @@
 import { getMeta } from '../../utilities/sanitise.mjs'
+import { isNonEmptyStr } from '../../utilities/validation.mjs'
 
 /**
  * List of actions that can be performed on individual regex pair
@@ -23,8 +24,7 @@ export const regexPairActions = {
   RESET: 'REGEX_PAIR_RESET',
   DISABLE: 'REGEX_PAIR_DISABLE',
   SET_AS_DEFAULT: 'REGEX_SET_AS_DEFAULT',
-  OPEN_SETTINGS: 'REGEX_OPEN_SETTINGS',
-  CLOSE_SETTINGS: 'REGEX_CLOSE_SETTINGS',
+  TOGGLE_SETTINGS: 'REGEX_TOGGLE_SETTINGS',
   SET_FOCUSED_ID: 'REGEX_SET_FOCUSED_ID'
 }
 
@@ -120,9 +120,11 @@ export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
         break
     }
 
-    _dispatch({
-      type: _type
-    })
+    if (isNonEmptyStr(_type)) {
+      _dispatch({
+        type: _type
+      })
+    }
   }
 }
 
@@ -220,9 +222,7 @@ export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
 
       case 'toggleSettings':
         if (_meta.extra === 'open' || _meta.extra === 'close') {
-          _type = (_meta.extra === 'open')
-            ? regexPairActions.OPEN_SETTINGS
-            : regexPairActions.CLOSE_SETTINGS
+          _type = regexPairActions.TOGGLE_SETTINGS
         } else {
           throw Error('Could not determin whether "Toggle settings" button click applies to "Open" or "Close" from "' + this.value + '"')
         }
@@ -249,10 +249,12 @@ export const getAutoDispatchOneOffPairSimpleEvent = (_dispatch) => {
         break
     }
 
-    _dispatch({
-      type: _type,
-      payload: _meta.id
-    })
+    if (isNonEmptyStr(_type)) {
+      _dispatch({
+        type: _type,
+        payload: _meta.id
+      })
+    }
   }
 }
 

@@ -7,6 +7,7 @@ import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
 export const oneOffInputView = (props, eventHandlers) => {
   const _isOpen = props.settingsOpen
   const _index = (_isOpen) ? 0 : -1
+
   return html`
   <!-- START: oneOffInputView() -->
   <section class="oneOff-input settings__wrap">

@@ -1,4 +1,5 @@
 import { html, render } from '../lit-html/lit-html.mjs'
+import { isBoolTrue } from '../utilities/validation.mjs'
 import { oneOffUI } from './oneOff/oneOff-whole.view.mjs'
 // import { regexPair } from './oneOff-pair.view.mjs'
 // import { regexPair } from './repeatable.view.mjs'
@@ -15,13 +16,13 @@ import { repeatableUI } from './repeatable/repeatable-whole.view.mjs'
 /**
  * Template for header block for Regex multi tool
  *
- * @param {boolean}  isSimple
+ * @param {boolean}  isOneOff
  * @param {function} changeHandler
  *
  * @returns {html} lit-html template function
  */
-export const header = (isSimple, changeHandler) => {
-  const _isFancy = (typeof isSimple === 'boolean' && isSimple === false)
+export const header = (isOneOff, changeHandler) => {
+  const _isOneOff = isBoolTrue(isOneOff)
 
   // NOTE: the empty HTML comments within the unordered list
   //       are there because the white space they omit causes
@@ -30,15 +31,15 @@ export const header = (isSimple, changeHandler) => {
   return html`
   <header class="regex-multi__header">
     <h1 class="header-1">Regex multi-tool</h1>
-    <!-- <h2 class="header1">${(_isFancy === true) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
+    <!-- <h2 class="header1">${(_isOneOff === false) ? 'Do regex stuff' : 'Regex tester'}</h2> -->
 
     <ul class="radio-grp list-clean list-clean--tight list-inline mode-control"><!--
       --><li><!--
-        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-grp__input" ?checked=${!_isFancy} @change=${changeHandler} accesskey="o" /><!--
+        --><input type="radio" id="mode-simple" name="mode" value="oneOff" class="radio-grp__input" ?checked=${_isOneOff} @change=${changeHandler} accesskey="o" /><!--
         --><label for="mode-simple" class="radio-grp__label">One-off</label><!--
       --></li>
       <li><!--
-        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-grp__input" ?checked=${_isFancy} @change=${changeHandler} accesskey="s" /><!--
+        --><input type="radio" id="mode-fancy" name="mode" value="repeatable" class="radio-grp__input" ?checked=${!_isOneOff} @change=${changeHandler} accesskey="s" /><!--
         --><label for="mode-fancy" class="radio-grp__label">Repeatable</label><!--
         --></li><!--
     --></ul>
@@ -159,38 +160,42 @@ export const getMainAppView = (domNode, store) => {
     const props = store.getState()
     const mainEvent = getAutoDispatchMainAppEvent(store.dispatch)
     const userSettingsEvent = getUIEventHandlers(store.dispatch)
-    const isSimple = (props.mode === 'oneOff')
+    const isOneOff = (props.mode === 'oneOff')
 
-    const eventHandlers = (isSimple)
+    const eventHandlers = (isOneOff)
       ? getOneOffEventHandlers(store.dispatch)
       : getRepeatableEventHandlers(store.dispatch)
 
-    const state = (isSimple)
+    const state = (isOneOff)
       ? props.oneOff
       : props.repeatable
+
 
     const newProps = {
       ...state,
       events: { ...eventHandlers },
-      input: props.input,
+      input: {
+        ...state.input,
+        raw: props.input
+      },
       output: props.output,
       debug: props.debug
     }
 
-    if (!isSimple) {
+    if (!isOneOff) {
       newProps.href = props.url.actionHref
       // newProps.get = props.url.searchParams
     }
 
-    const buttons = (isSimple)
+    const buttons = (isOneOff)
       ? ['Test', 'Replace', 'Reset']
       : ['Modify', 'Reset']
 
     const UI = html`
       <div class="regex-multi ui-${props.userSettings.uiMode} ${(props.mode === 'oneOff') ? 'oneOff' : 'repeatable'}-mode">
-        ${header(isSimple, mainEvent)}
+        ${header(isOneOff, mainEvent)}
         <main>
-          ${(isSimple) ? oneOffUI(newProps) : repeatableUI(newProps)}
+          ${(isOneOff) ? oneOffUI(newProps) : repeatableUI(newProps)}
         </main>
         ${footer(
           buttons,
@@ -199,7 +204,6 @@ export const getMainAppView = (domNode, store) => {
         )}
       </div>
     `
-    // console.log('UI:', UI)
     render(UI, domNode)
   }
 }

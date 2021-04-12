@@ -104,7 +104,7 @@
 }
 .rnd-btn--settings--open-is {
   /* opacity: 0; */
-  transform: scale(100);
+  transform: scale(250);
   color: transparent;
   background-color: var(--custom-over-colour-rev);
   border: none;
