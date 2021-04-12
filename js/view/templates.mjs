@@ -170,21 +170,22 @@ export const getMainAppView = (domNode, store) => {
       ? props.oneOff
       : props.repeatable
 
-
     const newProps = {
       ...state,
       events: { ...eventHandlers },
-      input: {
-        ...state.input,
-        raw: props.input
-      },
       output: props.output,
       debug: props.debug
     }
 
     if (!isOneOff) {
       newProps.href = props.url.actionHref
+      newProps.input = props.input
       // newProps.get = props.url.searchParams
+    } else {
+      newProps.input = {
+        ...state.input,
+        raw: props.input
+      }
     }
 
     const buttons = (isOneOff)
@@ -204,6 +205,12 @@ export const getMainAppView = (domNode, store) => {
         )}
       </div>
     `
+    // console.group('getMainAppView')
+    // console.log('props:', props)
+    // console.log('state:', state)
+    // console.log('newProps:', newProps)
+    // console.log('buttons:', buttons)
+    // console.groupEnd()
     render(UI, domNode)
   }
 }

@@ -66,6 +66,9 @@ export const repeatableUI = (props) => {
   } else {
     // blah
   }
+  // console.group('repeatableUI()')
+  // console.log('props:', props)
+  // console.groupEnd()
 
   return html`
     <section>
