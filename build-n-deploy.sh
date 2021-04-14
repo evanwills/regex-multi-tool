@@ -7,7 +7,20 @@ swVersionStore='swVersion'
 inputSW='regexMulti.sw.js';
 outputSW='dist/'$inputSW
 
-# npm run build
+# ==================================================
+# START: Enable ServiceWorker in PROD
+
+
+echo; echo; echo '==================================================';
+echo; echo; echo 'Enable ServiceWorker in PROD';
+echo; echo;
+
+sed -i 's/\/\/ \(navigator\.serviceWorker\.register\)/\1/' js/index.js
+
+#  END:  Enable ServiceWorker in PROD
+# ==================================================
+
+npm run build
 
 
 echo; echo; echo '==================================================';
@@ -125,3 +138,16 @@ fi
 
 rm dist/bilby*
 rm dist/test*
+
+# ==================================================
+# START: Disable Service worker in DEV
+
+echo; echo; echo '==================================================';
+echo; echo; echo 'Disable Service worker in DEV';
+echo; echo;
+
+
+sed -i 's/\(navigator\.serviceWorker\.register\)/\/\/ \1/' js/index.js
+
+#  END:  Disable Service worker in DEV
+# ==================================================

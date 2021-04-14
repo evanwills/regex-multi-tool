@@ -243,23 +243,23 @@ export const describedBy = (props) => {
 //   }
 // }
 
-/**
- * Get a string to be used as an HTML attribute value
- *
- * @param {any} input Value to be returned (hopefully) String or
- *                    number
- * @param {string, undefined} defaultStr default string if input is
- *                   not valid
- *
- * @returns {string} String to be used as an HTML attribute value
- */
-const propOrEmpty = (input, defaultStr) => {
-  return (isStrNum(input))
-    ? input
-    : isStr(defaultStr)
-      ? defaultStr
-      : ''
-}
+// /**
+//  * Get a string to be used as an HTML attribute value
+//  *
+//  * @param {any} input Value to be returned (hopefully) String or
+//  *                    number
+//  * @param {string, undefined} defaultStr default string if input is
+//  *                   not valid
+//  *
+//  * @returns {string} String to be used as an HTML attribute value
+//  */
+// const propOrEmpty = (input, defaultStr) => {
+//   return (isStrNum(input))
+//     ? input
+//     : isStr(defaultStr)
+//       ? defaultStr
+//       : ''
+// }
 
 /**
  * Get a string to be used as an HTML attribute value
