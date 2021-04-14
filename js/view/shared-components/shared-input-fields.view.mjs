@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import { ifDefined } from '../../lit-html/directives/if-defined.mjs'
 import {
   isBool,
   isBoolTrue,
@@ -167,7 +168,7 @@ export const getListAttr = (props) => {
 export const getDescbyAttr = (props) => {
   return (isNonEmptyStr(props.desc))
     ? props.id + '-describe'
-    : ''
+    : undefined
 }
 /**
  * Get a description block for a input field.
@@ -261,6 +262,24 @@ const propOrEmpty = (input, defaultStr) => {
 }
 
 /**
+ * Get a string to be used as an HTML attribute value
+ *
+ * @param {any} input Value to be returned (hopefully) String or
+ *                    number
+ * @param {string, undefined} defaultStr default string if input is
+ *                   not valid
+ *
+ * @returns {string} String to be used as an HTML attribute value
+ */
+const propOrUn = (input, defaultStr) => {
+  return (isStrNum(input))
+    ? input
+    : isStrNum(defaultStr)
+      ? defaultStr
+      : undefined
+}
+
+/**
  * Get an text input field (with label)
  *
  * @param {object}  props     All the properties required for an
@@ -279,27 +298,35 @@ export const textInputField = (props, multiLine) => {
   const _listAttr = getListAttr(props)
   const _descBy = getDescbyAttr(props)
 
-  const _pattern = propOrEmpty(props.pattern, '.*')
-  const _minLen = propOrEmpty(props.minlength, '0')
-  const _place = propOrEmpty(props.placeholder, props.label)
+  const _place = propOrUn(props.placeholder, props.label)
+  const _pattern = propOrUn(props.pattern)
+  const _maxLen = propOrUn(props.maxlength)
+  const _minLen = propOrUn(props.minlength)
   const _disabled = getBoolAttr('disabled', props)
   const _required = getBoolAttr('required', props)
   const _read = getBoolAttr('readonly', props)
 
   // console.group('textInputField()')
+  // console.log('props:', props)
+  // console.log('props.pattern:', props.pattern, (typeof props.pattern === 'undefined'))
+  // console.log('props.placeholder:', props.placeholder, (typeof props.placeholder === 'undefined'))
+  // console.log('props.maxLength:', props.maxLength, (typeof props.maxLength === 'undefined'))
+  // console.log('props.minLength:', props.minLength, (typeof props.minLength === 'undefined'))
   // console.log('props.value:', props.value)
+  // console.log('_descBy:', _descBy, (typeof _descBy === 'undefined'))
   // console.log('multiLine:', multiLine)
   // console.groupEnd()
 
   return (isBoolTrue(multiLine))
     ? html`
       ${getLabel(props)}
-      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${_required} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '1000000')}" minlength="${_minLen}" .value="${props.value}"></textarea>
+      <textarea id="${props.id}" class="${getClassName(props, 'input', 'multi-line')}" @change=${props.change} ?required=${_required} ?readonly=${_read} ?disabled=${_disabled} pattern="${ifDefined(_pattern)}" placeholder="${ifDefined(_place)}" maxlength="${ifDefined(_maxLen)}" minlength="${ifDefined(_minLen)}" aria-describedby="${ifDefined(_descBy)}" .value="${props.value}"></textarea>
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
     : html`
       ${getLabel(props)}
-      <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${_read} ?disabled=${_disabled} pattern="${_pattern}" placeholder="${_place}" maxlength="${propOrEmpty(props.maxlength, '1000')}" minlength="${_minLen}" />${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
+      <input type="text" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${_read} ?disabled=${_disabled} pattern="${ifDefined(_pattern)}" placeholder="${ifDefined(_place)}" maxlength="${ifDefined(_maxLen)}" minlength="${ifDefined(_minLen)}" aria-describedby="${ifDefined(_descBy)}" />
+      ${(_listAttr !== '') ? dataList(props.id, props.options) : ''}
       ${(_descBy !== '') ? describedBy(props) : ''}
     `
 }
@@ -321,17 +348,20 @@ export const numberInputField = (props) => {
 
   return html`
     ${getLabel(props)}
-    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${propOrEmpty(props.pattern, '.*')}" placeholder="${propOrEmpty(props.placeholder, props.label)}" min="${propOrEmpty(props.min)}" max="${propOrEmpty(props.max)}" step="${propOrEmpty(props.step)}" />
+    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${ifDefined(propOrUn(props.pattern))}" placeholder="${ifDefined(propOrUn(props.placeholder))}" min="${ifDefined(propOrUn(props.min))}" max="${ifDefined(propOrUn(props.max))}" step="${ifDefined(propOrUn(props.step))}" aria-describedby="${ifDefined(_descBy)}" />
     ${(_descBy !== '') ? describedBy(props) : ''}
   `
 }
 
 export const colourInput = (props) => {
+  const _descBy = getDescbyAttr(props)
+
   return html`
     <li class="input-pair">
       <label for="set-customMode-${props.id}" class="input-pair__label">Custom mode ${props.label} colour:</label>
-      <input type="color" id="set-customMode-${props.id}" class="input-pair__input" value="${props.value}" tabindex="${props.tabIndex}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} /><!--
+      <input type="color" id="set-customMode-${props.id}" class="input-pair__input" value="${props.value}" tabindex="${props.tabIndex}" @change=${props.eventHandler} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} aria-describedby="${ifDefined(_descBy)}" /><!--
       --><span class="input-pair__suffix" style="background-color: ${props.value};">&nbsp;</span>
+      ${(_descBy !== '') ? describedBy(props) : ''}
     </li>
   `
 }
@@ -394,7 +424,7 @@ export const selectField = (props) => {
   // console.log('props:', props)
   return html`
     ${getLabel(props)}
-    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.eventHandler}>
+    <select id=${props.id} class="${getClassName(props, 'select')}" ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} @change=${props.eventHandler} aria-describedby="${ifDefined(_descBy)}" />
       ${props.options.map(selectOption)}
     </select>
     ${(_descBy !== '') ? describedBy(props) : ''}
@@ -426,7 +456,7 @@ const checkableInput = (props, fieldType, descBy) => {
           ?required=${getBoolAttr('required', props)}
           ?readonly=${getBoolAttr('readonly', props)}
           ?disabled=${getBoolAttr('disabled', props)}
-          ${descBy}
+          aria-describedby="${ifDefined(descBy)}"
           @change=${props.change} />`
 }
 
