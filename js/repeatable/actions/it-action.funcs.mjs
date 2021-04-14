@@ -6,6 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
+import { isNonEmptyStr } from '../../utilities/validation.mjs'
 
 const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '
@@ -950,7 +951,7 @@ doStuff.register({
 // ====================================================================
 // START: Sitecore HTML to local HTML
 
-const localOrGlobalPath = (whole, fileType, fileName) => {
+const sitecore2localLocalOrGlobalPath = (whole, fileType, fileName) => {
   const _name = fileName.replace(/\?.*?$/i, '').trim()
   const _type = fileType.substr(0, (fileType.length - 1))
   const _localFiles = {
@@ -982,30 +983,61 @@ const localOrGlobalPath = (whole, fileType, fileName) => {
       'favicon.ico'
     ]
   }
-  console.group('localOrGlobalPath()')
-  console.log('whole:', whole)
-  console.log('fileType:', fileType)
-  console.log('_type:', _type)
-  console.log('fileName:', fileName)
-  console.log('_name:', _name)
-  console.log('_localFiles[' + _type + ']:', _localFiles[_type])
-  console.log('typeof _localFiles[' + _type + ']:', typeof _localFiles[_type])
-  console.log(
-    '_localFiles[' + _type + '].indexOf(' + _name + '):',
-    _localFiles[_type].indexOf(_name)
-  )
-  console.log(
-    '_localFiles[' + _type + '].indexOf(' + _name + ') > -1:',
-    _localFiles[_type].indexOf(_name) > -1
-  )
+  // console.group('sitecore2localLocalOrGlobalPath()')
+  // console.log('whole:', whole)
+  // console.log('fileType:', fileType)
+  // console.log('_type:', _type)
+  // console.log('fileName:', fileName)
+  // console.log('_name:', _name)
+  // console.log('_localFiles[' + _type + ']:', _localFiles[_type])
+  // console.log('typeof _localFiles[' + _type + ']:', typeof _localFiles[_type])
+  // console.log(
+  //   '_localFiles[' + _type + '].indexOf(' + _name + '):',
+  //   _localFiles[_type].indexOf(_name)
+  // )
+  // console.log(
+  //   '_localFiles[' + _type + '].indexOf(' + _name + ') > -1:',
+  //   _localFiles[_type].indexOf(_name) > -1
+  // )
   const _path = (typeof _localFiles[_type] !== 'undefined' && _localFiles[_type].indexOf(_name) > -1)
     ? assetPathRelative
     : assetPathGlobal
 
-  console.log('_path:', _path)
-  console.log('Output:', _path + fileType + _name)
-  console.groupEnd()
+  // console.log('_path:', _path)
+  // console.log('Output:', _path + fileType + _name)
+  // console.groupEnd()
   return _path + fileType + _name
+}
+
+const sitecore2localGetTitle = (input) => {
+  const getTitle = /<title>([^<]+)<\/title>/igs
+  let titleBits
+  let _title = ''
+
+  if ((titleBits = getTitle.exec(input)) !== null) {
+    _title = titleBits[1]
+    _title = _title.trim()
+    _title = _title.replace(/[^a-z0-9]+/ig, '-')
+    _title = _title.toLowerCase()
+    if (_title !== '') {
+      return _title
+    }
+  }
+  return ''
+}
+
+const sitecore2localGeCanonical = (input, base) => {
+  const getCanoical = /<link rel="canonical" href="([^"]*)" ?\/?>/i
+  let canonicalBits = []
+
+  if ((canonicalBits = getCanoical.exec(input)) !== null) {
+    const canonical = canonicalBits[1].trim()
+    if (canonical !== '') {
+      return base + canonical
+    }
+  }
+
+  return ''
 }
 
 /**
@@ -1028,28 +1060,33 @@ const sitecore2local = (input, extraInputs, GETvars) => {
   const idClean = (_whole, _start, _id) => {
     return _start + _id.replace(/[^a-z0-9]+/ig, '-')
   }
-  const getTitle = /<title>([^<]+)<\/title>/igs
-  let titleBits
-  let _title = ''
 
-  if ((titleBits = getTitle.exec(input)) !== null) {
-    _title = titleBits[1]
-    _title = _title.trim()
-    _title = _title.replace(/[^a-z0-9]+/ig, '-')
-    _title = _title.toLowerCase()
-    if (_title !== '') {
-      input += '\n\n\n<!-- file-name: ' + _title + '.html -->'
-    }
+  const domain = (isNonEmptyStr(extraInputs.domain()))
+    ? extraInputs.domain()
+    : 'www'
+  const baseURL = 'https://' + domain + '.acu.edu.au'
+
+  const title = sitecore2localGetTitle(input)
+  const canonical = sitecore2localGeCanonical(input, baseURL)
+
+  let sep = '\n\n\n'
+
+  if (canonical !== '') {
+    input += sep + '<!-- canoncial: ' + canonical + ' -->'
+    sep = '\n'
+  }
+  if (title !== '') {
+    input += sep + '<!-- file-name: ' + title + '.html -->'
   }
 
   const regex = [
     {
       find: /\/assets\/acupublic\/(?:custom)?((?:css|js|fonts)\/)([^'"]+)/ig,
-      replace: localOrGlobalPath
+      replace: sitecore2localLocalOrGlobalPath
       // replace: '../'
     }, {
       find: /(<img src=")(?=\/-\/media\/feature\/)/ig,
-      replace: '$1https://' + extraInputs.domain() + '.acu.edu.au'
+      replace: '$1' + baseURL
     // }, {
     //   find: '\\.\\.(?=\\/js\\/(?:cta-bar|sticky|side-accordion)\\.js)',
     //   replace: '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic'
@@ -1062,6 +1099,9 @@ const sitecore2local = (input, extraInputs, GETvars) => {
     }, {
       find: /(\s+id=")([^"]+)(?=")/ig,
       replace: idClean
+    }, {
+      find: /<!--\s*<(?:link|meta)\s+[^>]*>\s*-->\s*/ig,
+      replace: ''
     }, {
       find: /\s*<meta (?:name|property)="[^"]+"(?:\s*\/)?>/ig,
       replace: ''
