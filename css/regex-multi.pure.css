@@ -15,6 +15,7 @@
 @import 'molecules/alert.css';
 
 @import 'atoms/typeography.css';
+@import 'atoms/animations.css';
 @import 'atoms/screen-reader.css';
 @import 'atoms/lists.css';
 @import 'atoms/links.css';

@@ -1181,3 +1181,66 @@ doStuff.register({
 
 //  END: Sitecore HTML to local HTML
 // ====================================================================
+// START: Action name
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const acuElection2Local = (input, extraInputs, GETvars) => {
+  const regex = [
+    {
+      find: /<!--\s*(Google Tag Manager(?:\s*\(noscript\))?)\s*-->.*?<!--\s*End:?\s*\1\s*-->/igs,
+      replace: ''
+    }, {
+      find: /(<meta http-equiv="X-UA-Compatible" content="IE=edge" \/>).*?(?=\s*<meta name="viewport")/is,
+      replace: '$1'
+    }, {
+      find: /<script type="text\/javascript">window\.NREUM\|\|\(NREUM=\{\}\).*?<\/script>/ig,
+      replace: ''
+    }, {
+      find: /\/\/forms\.acu\.edu\.au\/__data\/assets\/file\/[0-9]+\/[0-9]+\/(favicon.ico)[^"]*(?=")/i,
+      replace: '$1'
+    }, {
+      find: /\/\/(?:maxcdn\.bootstrapcdn\.com\/bootstrap\/[0-9.]+\/(?:j|cs)s|ajax\.googleapis\.com\/ajax\/libs\/jquery(?:ui)?\/[0-9.]+|forms\.acu\.edu\.au\/__data\/assets\/js_file\/[0-9]+\/[0-9]+)\//ig,
+      replace: './'
+    }, {
+      find: /\/\/forms\.acu\.edu\.au\/__data\/assets\/image\/[0-9]+\/[0-9]+\/ACU-logo_32bit_2013-05-28_196x70.png[^"]*(?=")/i,
+      replace: './acu-logo-white.svg'
+    }, {
+      find: /((?:href|src)=")(?=styles\/)/i,
+      replace: '$1../Application/public_html/'
+    }
+  ]
+  return multiLitRegexReplace(input, regex)
+}
+
+doStuff.register({
+  id: 'acuElection2Local',
+  func: acuElection2Local,
+  description: 'Make ACU Election Ballot screen HTML work on local file system',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'it',
+  ignore: false,
+  // inputLabel: '',
+  name: 'ACU Election to lcoal HTML'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+
