@@ -71,7 +71,7 @@ self.addEventListener('fetch', event => {
         console.error('Fetch failed with error: ', e)
       })
     })
-  ).catch(e => {
+  ).error(e => {
     console.error('respondWith() failed with error: ', e)
   })
 })

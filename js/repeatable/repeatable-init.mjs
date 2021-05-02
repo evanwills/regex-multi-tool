@@ -8,7 +8,7 @@
  */
 
 import {
-  // invalidBool,
+  invalidBool,
   // invalidNum,
   invalidString,
   isBool,
@@ -281,13 +281,19 @@ function Repeatable (url, _remote, docs, api) {
    * @returns {boolean}
    */
   const getOptionDefault = (value, label, get, local) => {
-    if (isBool(get[value])) {
+    // console.group('getOptionDefault()')
+    // console.log('value:', value)
+    // console.log('label:', label)
+    // console.log('get:', get)
+    // console.log('local:', local)
+    // console.groupEnd()
+    if (!invalidBool(value, get)) {
       return get[value]
-    } else if (isBool(get[label])) {
+    } else if (!invalidBool(label, get)) {
       return get[label]
-    } else if (isBool(local[value])) {
+    } else if (!invalidBool(value, local)) {
       return local[value]
-    } else if (isBool(local[label])) {
+    } else if (!invalidBool(label, local)) {
       return local[label]
     }
     return false
@@ -308,19 +314,26 @@ function Repeatable (url, _remote, docs, api) {
   function presetDefaults (extraInputs, getParams, localParams) {
     // getParams
     const output = []
-    let options
+    const _local = (typeof localParams !== 'undefined') ? localParams : {}
+    let options = []
     let hasChanged = false
+    // console.group('presetDefaults()')
+    // console.log('extraInputs:', extraInputs)
+    // console.log('getParams:', getParams)
+    // console.log('_local:', _local)
 
     for (let a = 0; a < extraInputs.length; a += 1) {
       if (extraInputs[a].type === 'checkbox') {
         options = extraInputs[a].options.map(option => {
+          // console.log('option:', option)
+          // console.log('_local[extraInputs[a].id]:', _local[extraInputs[a].id])
           return {
             ...option,
             default: getOptionDefault(
               option.value,
               option.label,
               getParams,
-              localParams[extraInputs[a].id]
+              (typeof _local[extraInputs[a].id] !== 'undefined') ? _local[extraInputs[a].id] : {}
             )
           }
         })
@@ -360,6 +373,7 @@ function Repeatable (url, _remote, docs, api) {
         }
       }
     }
+    // console.groupEnd()
     return {
       options: output,
       hasChanged: hasChanged
