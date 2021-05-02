@@ -694,6 +694,10 @@ doStuff.register({
 // ====================================================================
 // START: KSS comment block
 
+const prefixHTMLline = (input) => {
+  return input.replace(/(^|[\r\n])+(?=[\t ]*<)/ig, '$1 *')
+}
+
 /**
  * Action description goes here
  *
@@ -717,10 +721,10 @@ const kssCommentBlock = (input, extraInputs, GETvars) => {
     return makeKssComment(
       extraInputs.componentName(),
       extraInputs.samplePath(),
-      input
+      prefixHTMLline(input)
     )
   } else {
-    return input.replace(/(^|[\r\n])+(?=[\t ]*<)/ig, '$1 *')
+    return prefixHTMLline(input)
   }
 }
 
@@ -1243,4 +1247,3 @@ doStuff.register({
 
 //  END:  Action name
 // ====================================================================
-
