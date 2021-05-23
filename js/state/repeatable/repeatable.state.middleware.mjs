@@ -109,8 +109,8 @@ export const repeatableMW = store => next => action => {
         return next(action)
       } else {
         // console.log('about to run action')
-        console.log('input:', _state.input)
-        console.log('_state.repeatable.extraInputs:', _state.repeatable.extraInputs)
+        // console.log('input:', _state.input)
+        // console.log('_state.repeatable.extraInputs:', _state.repeatable.extraInputs)
         store.dispatch({
           type: mainAppActions.SET_OUTPUT,
           payload: repeatable.run(

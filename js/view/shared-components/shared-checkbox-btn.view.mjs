@@ -72,7 +72,7 @@ export const checkboxBtnGroup = (id, label, value, btns, eventHandler, tabIndex,
     _describedBy = id + '-desc'
     // _describe = getFieldDesc(id, description)
   }
-  console.log('value:', value)
+  // console.log('value:', value)
 
   const isChecked = (_isRadio) ? radioIsChecked : cbIsChecked
 

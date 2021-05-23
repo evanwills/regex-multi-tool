@@ -11,7 +11,7 @@ import { isNonEmptyStr } from '../../utilities/validation.mjs'
 const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '
 const kssSamplePath = '[relative to \\ACU.Sitecore\\website\n *                    e.g. src\\Project\\ACUPublic\\ACU.Static\\components\\anchor_links.html]'
-const kssCommentEnd = '\n *\n * .modifiers - Description of Modifier\n *\n * StyleGuide: Molecule.[[COMPONENT_NAME]]\n */\n// {{modifier_class}} - use this in place of a modifier class name in the sample "Markup" block\n'
+const kssCommentEnd = '\n *\n * .modifiers - Description of Modifier\n *\n * StyleGuide: [[COMPONENT_TYPE]].[[COMPONENT_NAME]]\n */\n// {{modifier_class}} - use this in place of a modifier class name in the sample "Markup" block\n'
 const assetPathGlobal = '../../../../Foundation/ACUPublic/Theming/code/assets/ACUPublic/'
 const assetPathRelative = '../'
 
@@ -165,7 +165,7 @@ doStuff.register({
  *
  * @returns {string}
  */
-const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentName, samplePath, html) => {
+const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentName, samplePath, componentType, html) => {
   const pathClean = [
     {
       find: /\//gi,
@@ -181,6 +181,9 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
       find: /\[\[COMPONENT_NAME\]\]/ig,
       replace: (componentName === '') ? kssCompName : componentName
     }, {
+      find: /\[\[COMPONENT_TYPE\]\]/ig,
+      replace: (componentType === '') ? kssCompName : componentType
+    }, {
       find: /\[\[SAMPLE_PATH\]\]/ig,
       replace: (samplePath === '')
         ? kssSamplePath
@@ -195,8 +198,18 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
     // console.log('after:', after)
     return '\n *' + after.replace(/\t/g, '  ')
   }
+  console.group('getMakeKssComment()')
+  console.log('componentName:', componentName)
+  console.log('samplePath:', samplePath)
+  console.log('componentType:', componentType)
+  console.log('html:', html)
+  console.log('_kssCommentStart:', _kssCommentStart)
+  console.log('_kssCommentEnd:', _kssCommentEnd)
+  console.log('pathClean:', pathClean)
+  console.log('_kssReplace:', _kssReplace)
 
   if (html === '') {
+    console.groupEnd()
     return _kssCommentStart + '*' + _kssCommentEnd
   } else {
     const findReplace = {
@@ -213,6 +226,8 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
         replace: _kssCommentEnd
       }
     }
+    console.log('findReplace:', findReplace)
+    console.groupEnd()
 
     return multiLitRegexReplace(html, findReplace, 'ig')
   }
@@ -721,6 +736,7 @@ const kssCommentBlock = (input, extraInputs, GETvars) => {
     return makeKssComment(
       extraInputs.componentName(),
       extraInputs.samplePath(),
+      extraInputs.type(),
       prefixHTMLline(input)
     )
   } else {
@@ -750,6 +766,18 @@ doStuff.register({
     label: 'Path to Sample HTML',
     default: '',
     type: 'text'
+  }, {
+    id: 'type',
+    label: 'Component type',
+    type: 'select',
+    options: [
+      { value: 'Partilces', label: 'Partilces' },
+      { value: 'Atoms', label: 'Atoms' },
+      { value: 'Molecules', label: 'Molecules', default: true },
+      { value: 'Organisms', label: 'Organisms' },
+      { value: 'Templates', label: 'Templates' },
+      { value: 'Pages', label: 'Pages' }
+    ]
   }],
   group: 'it',
   ignore: false,

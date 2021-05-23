@@ -9,12 +9,14 @@
   animation-play-state: paused;
   animation-timing-function: linear;
   fill: var(--over-colour, #fff);
-  stroke-width: 3px;
+  stroke-width: 1.87rem;
   stroke: var(--txt-colour, #000);
   transform-origin: center;
   transition: fill ease-in-out 0.3s;
 }
-.rotating-cog:hover, .rotating-cog.move {
+.rotating-cog:hover,
+.rotating-cog:focus,
+.rotating-cog.move {
   animation-play-state: running;
   fill: var(--txt-colour, #000);
 }

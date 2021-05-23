@@ -417,6 +417,8 @@ function Repeatable (url, _remote, docs, api) {
    * @returns {object}
    */
   function convertInputsToFunctions (extraInputs) {
+    // console.group('convertInputsToFunctions()')
+    // console.log('extraInputs:', extraInputs)
     const output = {}
     for (const key in extraInputs) {
       const val = extraInputs[key]
@@ -432,6 +434,7 @@ function Repeatable (url, _remote, docs, api) {
         }
       }
     }
+    // console.log('output:', output)
     return output
   }
 
@@ -652,6 +655,10 @@ function Repeatable (url, _remote, docs, api) {
    */
   this.run = function (input, extraInputs, searchParams, chained) {
     const _extraInputs = convertInputsToFunctions(extraInputs)
+    // console.group('this.run()')
+    // console.log('extraInputs:', extraInputs)
+    // console.log('_extraInputs:', _extraInputs)
+    // console.groupEnd()
 
     // console.log('Array.isArray(currentAction.chained):', Array.isArray(currentAction.chained))
     // console.log('currentAction.chained.length:', currentAction.chained.length)

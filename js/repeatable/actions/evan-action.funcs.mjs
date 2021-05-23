@@ -1799,3 +1799,66 @@ doStuff.register({
 
 //  END:  Tab delimited to Markdown table
 // ====================================================================
+// START: Rewrite for PHPCS
+
+
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const rewritePHP = (input, extraInputs, GETvars) => {
+  let coun = 0
+  let max = 20
+  let output = input
+
+  const fixVarNames = (whole, prefix, letter) => {
+    coun += 1
+    return prefix + letter.toUpperCase()
+  }
+
+  while (coun > 0 && max > 0) {
+    output = output.replace(/(\$[a-z]+)_([a-z])/ig, fixVarNames)
+    output = output.replace(/([a-z])_([a-z])(?=[a-z]+ ?\()/ig, fixVarNames)
+    max -= 1
+  }
+
+  const regex = [
+    {
+      find: /(if|switch|while|for)\s*(?=\()/ig,
+      replace: '$1 '
+    }
+  ]
+
+  return multiLitRegexReplace(input, regex)
+}
+
+doStuff.register({
+  id: 'phpcs',
+  func: rewritePHP,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Rewrite for PHPCS'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Rewrite for PHPCS
+// ====================================================================
+
