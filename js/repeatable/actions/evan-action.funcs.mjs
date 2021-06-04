@@ -1,5 +1,5 @@
 /* jslint browser: true */
-/* global */
+/* global btoa*/
 
 // other global functions available:
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction
@@ -1802,7 +1802,6 @@ doStuff.register({
 // START: Rewrite for PHPCS
 
 
-
 /**
  * Action description goes here
  *
@@ -1861,4 +1860,228 @@ doStuff.register({
 
 //  END:  Rewrite for PHPCS
 // ====================================================================
+// START: Loading spinner generator
 
+const getRad = (deg) => (deg * Math.PI / 180)
+
+const rotateArr = (arr, pos, count) => {
+  const next = pos + 1
+  const arrFirst = arr.slice(0, next)
+  const arrNext = arr.slice(next)
+  const newArr = [...arrNext, ...arrFirst]
+  const tmp = newArr.join(';')
+  let output = tmp
+  while (count > 1) {
+    output += ';' + tmp
+    count -= 1
+  }
+  return output
+}
+
+/**
+ * Round a input number to a specified number of decimal places
+ *
+ * @param {number} input  Number to be rounded
+ * @param {number} places number of decimal places to round the input
+ *
+ * @returns {number}
+ */
+export const round = (input, places) => {
+  const p = (typeof input === 'number') ? Math.round(places) : 0
+  const x = Math.pow(10, p)
+
+  return Math.round(input * x) / x
+}
+
+/**
+ * Generate SVG code for loading spinner
+ *
+ * created by: Evan Wills
+ * created: 2021-05-31
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const loadingSpinnerGenerator = (input, extraInputs, GETvars) => {
+  const rev = -1
+  const dotCount = extraInputs.count()
+  const mainRadius = extraInputs.radius()
+  const duration = extraInputs.duration()
+  const loops = extraInputs.loops()
+  const dotCountSub = dotCount - 1
+  const step = (360 / dotCount)
+  const radius = mainRadius * 0.25
+  const side = mainRadius * 2.5
+  const offset = mainRadius * 1.25
+  const xy = []
+  let radii = []
+  let opacity = []
+  let output = '<?xml version="1.0" encoding="UTF-8"?>\n<svg id="wating-spinner" width="' + side + 'mm" height="' + side + 'mm" version="1.1" viewBox="0 0 ' + side + ' ' + side + '" xmlns="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n\t<g id="spinner" stroke="none" fill="#106">'
+
+  console.group('loadingSpinnerGenerator()')
+
+  for (let a = 0; a < dotCount; a += 1) {
+    const dotOpacity = round(((1 * a) / dotCountSub), 3)
+    const deg = (a * step * rev) - 90
+
+    xy.push({
+      x: round((mainRadius * Math.cos(getRad(deg)) + offset), 3),
+      y: round((mainRadius * Math.sin(getRad(deg)) + offset), 3)
+    })
+
+    radii = [round((radius * dotOpacity), 3), ...radii]
+
+    opacity = [dotOpacity, ...opacity]
+  }
+
+  for (let b = 0; b < dotCount; b += 1) {
+    const id = (b < 10) ? '0' + b.toString() : b.toString()
+    const c = b - 1
+
+    output += '\n\t\t<circle id="c-' + id + '" cx="' + xy[b].x + '" cy="' + xy[b].y + '" r="' + radius + '" fill-opacity="' + opacity[b] + '">\n'
+    output += '\t\t\t<animate begin="0s" dur="' + duration + 's" calcMode="linear" repeatCount="indefinite" values="' + rotateArr(opacity, c, loops) + '" attributeName="fill-opacity" />\n'
+    output += '\t\t\t<animate begin="0s" dur="' + duration + 's" calcMode="linear" repeatCount="indefinite" values="' + rotateArr(radii, c, loops) + '" attributeName="r" />\n'
+    output += '\t\t</circle>\n'
+  }
+
+  return output + '\t</g>\n</svg>'
+}
+
+doStuff.register({
+  id: 'loadingSpinnerGenerator',
+  func: loadingSpinnerGenerator,
+  description: '',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'count',
+      label: 'Count',
+      type: 'number',
+      value: 12,
+      default: 12,
+      min: 1,
+      max: 36,
+      step: 1
+    },
+    {
+      id: 'radius',
+      label: 'Radius',
+      type: 'number',
+      value: 40,
+      default: 40,
+      min: 1,
+      max: 100,
+      step: 1
+    },
+    {
+      id: 'duration',
+      label: 'Animation duration',
+      type: 'number',
+      value: 11,
+      default: 11,
+      min: 1,
+      max: 100,
+      step: 1
+    },
+    {
+      id: 'loops',
+      label: 'Animation loops',
+      type: 'number',
+      value: 3,
+      default: 3,
+      min: 1,
+      max: 100,
+      step: 1
+    }
+  ],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Loading spinner generator'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Loading spinner generator
+// ====================================================================
+// START: timestampID
+
+/**
+ * Time stamp as base 64 encoded string (used for creating UIDs)
+ *
+ * created by: Evan Wills
+ * created: 2021-06-01
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const timestampID = (input, extraInputs, GETvars) => btoa(Date.now().toString()).replace(/=+$/, '')
+
+doStuff.register({
+  id: 'timestampID',
+  func: timestampID,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Timestamp ID'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+// START: Linux to Windows file path
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const linux2winPath = (input, extraInputs, GETvars) => {
+  return input.replace(/\//g, '\\').replace(/[^a-z0-9.-_]+/g, '')
+}
+
+doStuff.register({
+  id: 'linux2winPath',
+  func: linux2winPath,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Linux to Windows file path'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
