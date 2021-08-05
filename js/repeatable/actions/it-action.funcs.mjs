@@ -1213,13 +1213,13 @@ doStuff.register({
 
 //  END: Sitecore HTML to local HTML
 // ====================================================================
-// START: Action name
+// START: ACU Election to lcoal HTML
 
 /**
  * Action description goes here
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2021-04-27
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -1273,5 +1273,94 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  ACU Election to lcoal HTML
+// ====================================================================
+// START: SecurePay URL
+
+/**
+ * Action SecurePay response URL to JSON
+ *
+ * created by: Evan Wills
+ * created: 2021-08-05
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const securePayURL = (input, extraInputs, GETvars) => {
+  const _tmp = input.trim()
+  const _regex = /[?&]([a-z]+)=([^&]+)(?=\&|$)/ig
+  const _matches = [..._tmp.matchAll(_regex)];
+
+  const _exclude = [
+    'expirydate',
+    'pan',
+    'suramount',
+    'merchant',
+    'baseamount',
+    'surfee',
+    'currency',
+    'surrate'
+  ]
+  const _map = {
+    settdate: 'settlementDate',
+    restext: 'status',
+    rescode: 'statusCode',
+    fingerprint: 'fingerprint',
+    amount: 'amount',
+    refid: 'paymentID',
+    summarycode: 'summaryCode',
+    timestamp: 'timestamp',
+    fingerprint: 'fingerprint',
+    txnid: 'transactionID',
+    cardtype: 'cardType'
+  }
+
+  const output = {}
+  const tmp = {}
+  for (let a = 0; a < _matches.length; a += 1) {
+    const key = _matches[a][1]
+    const value = _matches[a][2]
+
+    tmp[key] = value;
+
+    if (_exclude.indexOf(key) === -1) {
+      // const _key = _map[key]
+      output[key] = value;
+      console.log('key:', key)
+      // console.log('_key:', _key)
+      console.log('value:', value)
+    }
+  }
+  output.timestamp = output.timestamp.replace(
+    /^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/,
+    '$1-$2-$3 $4:$5:$6'
+  )
+
+  console.log('output:', output)
+  console.log('tmp:', tmp)
+  return JSON.stringify(output)
+}
+
+doStuff.register({
+  id: 'securePayURL',
+  func: securePayURL,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'SecurePay URL'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  SecurePay URL
 // ====================================================================

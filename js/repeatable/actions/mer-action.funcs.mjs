@@ -215,8 +215,8 @@ const makeURLok = (url) => {
 /**
  * Image gallery HTML
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2021-03-31
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form

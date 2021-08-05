@@ -6,6 +6,9 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
+import { isStr } from '../../utilities/validation.mjs'
+import { isNumber } from '../../utilities/validation.mjs'
+import { padStr } from '../../utilities/sanitise.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -1247,7 +1250,7 @@ doStuff.register({
   name: 'Format handbook policy'
 })
 
-//  END: Format handbook policy
+//  END:  Format handbook policy
 // ====================================================================
 // START: HTML Enchode special chars
 
@@ -2213,5 +2216,111 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END: Action name
+//  END:  HTML Enchode special chars
+// ====================================================================
+// START: TSV to markdown table
+
+
+/**
+ * Convert TSV data (with headers) to markdown formatted table
+ *
+ * created by: Evan Wills
+ * created: 2021-08-05
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const tsv2Markdown = (input, extraInputs, GETvars) => {
+  const delimChars = {
+    '\\n': '\n',
+    '\\t': '\t',
+    '\\r': '\r'
+  }
+  const lengths = []
+  const colDelim = (typeof delimChars[extraInputs.column()] === 'string')
+    ? delimChars[extraInputs.column()]
+    : extraInputs.column()
+  const rowDelim = (typeof delimChars[extraInputs.row()] === 'string')
+    ? delimChars[extraInputs.row()]
+    : extraInputs.row()
+  let tmp = input.trim()
+  let output = ''
+  let sep = ''
+
+  tmp = input.split(rowDelim)
+
+  for (let a = 0; a < tmp.length; a += 1) {
+    tmp[a] = tmp[a].trim()
+
+    if (tmp[a] === '') {
+      tmp.pop();
+    } else {
+      tmp[a] = tmp[a].split(colDelim)
+
+      for (let b = 0; b < tmp[a].length; b += 1) {
+        tmp[a][b] = tmp[a][b].trim()
+
+        const len = tmp[a][b].length
+        if (typeof lengths[b] === 'undefined' || len > lengths[b]) {
+          lengths[b] = len
+        }
+      }
+    }
+  }
+
+  const c = tmp[0].length
+
+  for (let a = 0; a < c; a += 1) {
+    output += '|' + padStr(tmp[0][a], lengths[a], ' ', true)
+    sep += '|' + padStr('', lengths[a], '-')
+  }
+
+  output += '|\n' + sep + '|\n'
+
+  for (let a = 1; a < tmp.length; a += 1) {
+    for (let b = 0; b < c; b += 1) {
+      console.log('sdflier: tmp[' + a + '][' + b + ']:', tmp[a][b])
+      output += '|' + padStr(tmp[a][b], lengths[b])
+    }
+    output += '|\n'
+  }
+
+  return output
+}
+
+
+doStuff.register({
+  id: 'tsv2Markdown',
+  func: tsv2Markdown,
+  description: 'Convert delimited text block (with headers) (e.g. CSV or TSV) to markdown formatted table',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'column',
+    type: 'text',
+    label: 'Column delimiter',
+    default: '\\t',
+    maxlength: 2
+  }, {
+    id: 'row',
+    type: 'text',
+    label: 'Row delimiter',
+    default: '\\n',
+    maxlength: 2
+  }],
+  // group: '',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Delimited text to markdown table'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  TSV to markdown table
 // ====================================================================

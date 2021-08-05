@@ -253,3 +253,42 @@ export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
 
   return _output
 }
+
+
+/**
+ * Add padding characters to a string to ensure it's the right
+ * length
+ *
+ * @param {string,number} input  Input to be padded
+ * @param {number}        len    Final length of output
+ * @param {string}        char   Character to use as padding
+ *                               [Default: ' ']
+ * @param {bool}          centre Centre the text within the padding
+ *
+ * @returns {string}
+ */
+export const padStr = (input, len, char, centre) => {
+  let strL = ''
+  let strR = ''
+  const _char = (!isStr(char)) ? ' ' : char
+  const _centre = (isBoolTrue(centre) || input.toLowerCase() === 'null')
+
+  const _input = input.toString()
+  const _iLen = _input.length
+
+  for (let a = _iLen; a < len; a += 2) {
+    strR += _char
+    if ((strL.length + strR.length + _iLen) < len) {
+      strL += _char
+    }
+  }
+
+  const output = (isNumeric(input))
+    ? strL + strR + _input
+    : (_centre)
+      ? strL + _input + strR
+      : _input + strL + strR
+
+
+  return _char + output + _char
+}

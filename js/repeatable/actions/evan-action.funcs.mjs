@@ -363,7 +363,7 @@ doStuff.register({
 
 //  END: Clean CSS
 // ====================================================================
-// START: Action name
+// START: Calculate Artbot Motor Speeds
 
 /**
  * Action description goes here
@@ -1628,7 +1628,7 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END: Action name
+//  END:  Fix handbook URLs
 // ====================================================================
 // START: extract unicode chars
 
@@ -1805,8 +1805,8 @@ doStuff.register({
 /**
  * Action description goes here
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2021-05-23
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -2011,7 +2011,7 @@ doStuff.register({
 
 //  END:  Loading spinner generator
 // ====================================================================
-// START: timestampID
+// START: Timestamp ID
 
 /**
  * Time stamp as base 64 encoded string (used for creating UIDs)
@@ -2045,15 +2045,15 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Timestamp ID
 // ====================================================================
 // START: Linux to Windows file path
 
 /**
  * Action description goes here
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2021-06-04
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -2066,7 +2066,8 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const linux2winPath = (input, extraInputs, GETvars) => {
-  return input.replace(/\//g, '\\').replace(/[^a-z0-9.-_]+/g, '')
+  const prefix = extraInputs.prefix()
+  return prefix + input.replace(/\//g, '\\').replace(/[^a-z0-9.-_]+/g, '')
 }
 
 doStuff.register({
@@ -2074,7 +2075,12 @@ doStuff.register({
   func: linux2winPath,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  extraInputs: [{
+    id: 'prefix',
+    label: 'Prefix path',
+    type: 'text',
+    default: 'C:\\Users\\evwills\\Documents\\ACU\\coldFusion\\'
+  }],
   group: 'evan',
   ignore: false,
   // inputLabel: '',
@@ -2083,5 +2089,118 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Linux to Windows file path
 // ====================================================================
+// START: De-Google URL
+
+/**
+ * Remove Google search data from URL
+ *
+ * created by: Evan Wills
+ * created: 2021-06-30
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const degoogle = (input, extraInputs, GETvars) => {
+  return decodeURI(input.replace(/^.*?url=(http.*?)\&.*$/g, '$1'))
+}
+
+doStuff.register({
+  id: 'degoogle',
+  func: degoogle,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'De-Google URL'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  De-Google URL
+// ====================================================================
+// START: Quick SQL generator
+
+/**
+ * Action description goes here
+ *
+ * created by: Evan Wills
+ * created: 2021-07-19
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const quickSQL = (input, extraInputs, GETvars) => {
+  const userStr = extraInputs.usrStr()
+
+  const sql = 'SELECT `first_name` AS `firstName`, `last_name` AS `lastName`, `email` FROM `basic_user` WHERE `first_name` LIKE "%:STR1%" :AND_OR `last_name` LIKE "%:STR2%" ORDER BY `first_name`, `last_name` LIMIT 0, 20;\n'
+
+  const parts = userStr.split(' ')
+  console.log('parts:', parts)
+  const firstName = parts[0]
+
+  let lastName = '';
+  let andOr = 'OR '
+  if (parts.length > 1) {
+    andOr = 'AND'
+    let sep = ''
+    for (let a = 1; a < parts.length; a += 1) {
+      parts[a] = parts[a].trim()
+      if (parts[a] !== '') {
+        lastName += sep + parts[a]
+        sep = ' '
+      }
+    }
+  } else {
+    lastName = firstName
+  }
+
+  let output = sql.replace(':STR1', firstName).replace(':STR2', firstName).replace(':AND_OR', 'OR ')
+
+  if (andOr === 'AND') {
+    output += sql.replace(':STR1', lastName).replace(':STR2', lastName).replace(':AND_OR', 'OR ')
+    output += sql.replace(':STR1', firstName).replace(':STR2', lastName).replace(':AND_OR', 'AND')
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'quickSQL',
+  func: quickSQL,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'usrStr',
+    label: 'Partial string for user',
+    type: 'text',
+    default: 'robin shi is awesome'
+  }],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Quick SQL generator'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Quick SQL generator
+// ====================================================================
+
