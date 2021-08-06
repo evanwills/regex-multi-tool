@@ -2317,7 +2317,87 @@ doStuff.register({
   // group: '',
   ignore: false,
   // inputLabel: '',
-  name: 'Delimited text to markdown table'
+  name: 'Convert delimited text to markdown table'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  TSV to markdown table
+// ====================================================================
+// START: Markdown table to TSV
+
+
+/**
+ * Convert Markdown formatted table to TSV data
+ *
+ * created by: Evan Wills
+ * created: 2021-08-05
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const markdown2tsv = (input, extraInputs, GETvars) => {
+  const rows = []
+  let output = ''
+  let colSep = ''
+  let rowSep = ''
+
+  // Convert MySQL/MariaDB CLI SQL results to markdown format
+  // before doing the main body of the conversion
+  let tmp = input.replace(/\s*([+|])(?:---+\1)+\s*/g, '')
+  tmp = tmp.trim()
+  tmp = tmp.split('\n')
+
+  for (let a = 0; a < tmp.length; a += 1) {
+    tmp[a] = tmp[a].trim()
+
+    if (tmp[a] !== '') {
+      // Strip out the leading and trailing pipes to
+      // prevent empty cells
+      tmp[a] = tmp[a].replace(/^\s*\||\|\s*$/g, '')
+      tmp[a] = tmp[a].trim()
+      tmp[a] = tmp[a].split('|')
+
+      rows.push([])
+      let c = rows.length - 1
+
+      for (let b = 0; b < tmp[a].length; b += 1) {
+        rows[c][b] = tmp[a][b].trim()
+      }
+    }
+  }
+
+  for (let a = 0; a < rows.length; a += 1) {
+    colSep = '';
+    output += rowSep
+    for (let b = 0; b < rows[a].length; b += 1) {
+      output += colSep + rows[a][b]
+      colSep = '\t'
+    }
+    rowSep = '\n'
+  }
+
+  return output
+}
+
+
+doStuff.register({
+  id: 'markdown2tsv',
+  func: markdown2tsv,
+  description: 'Convert Markdown formatted table to TSV data that can be pasted directly into Excel.<br />(Also works for terminal/CLI SQL query results)',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Convert markdown table to TSV'
   // remote: false,
   // rawGet: false,
 })
