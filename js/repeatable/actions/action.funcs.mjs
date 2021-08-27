@@ -2404,3 +2404,89 @@ doStuff.register({
 
 //  END:  TSV to markdown table
 // ====================================================================
+// START: De-Google URL
+/**
+ * URI decode a string
+ *
+ * @param {string} input String to be decoded
+ *
+ * @returns {string} decoded string
+ */
+const encodeMap = (input) => {
+  const map = [
+    ['20', ' '], ['21', '!'], ['22', '"'], ['23', '#'], ['24', '$'],
+    ['25', '%'], ['26', '&'], ['27', '\''], ['28', '('], ['29', ')'],
+    ['2A', '*'], ['2B', '+'], ['2C', ','], ['2D', '-'], ['2E', '.'],
+    ['2F', '/'], ['30', '0'], ['31', '1'], ['32', '2'], ['33', '3'],
+    ['34', '4'], ['35', '5'], ['36', '6'], ['37', '7'], ['38', '8'],
+    ['39', '9'], ['3A', ':'], ['3B', ';'], ['3C', '<'], ['3D', '='],
+    ['3E', '>'], ['3F', '?'], ['40', '@'], ['41', 'A'], ['42', 'B'],
+    ['43', 'C'], ['44', 'D'], ['45', 'E'], ['46', 'F'], ['47', 'G'],
+    ['48', 'H'], ['49', 'I'], ['4A', 'J'], ['4B', 'K'], ['4C', 'L'],
+    ['4D', 'M'], ['4E', 'N'], ['4F', 'O'], ['50', 'P'], ['51', 'Q'],
+    ['52', 'R'], ['53', 'S'], ['54', 'T'], ['55', 'U'], ['56', 'V'],
+    ['57', 'W'], ['58', 'X'], ['59', 'Y'], ['5A', 'Z'], ['5B', '['],
+    ['5C', '\\'], ['5D', ']'], ['5E', '^'], ['5F', '_'], ['60', '`'],
+    ['61', 'a'], ['62', 'b'], ['63', 'c'], ['64', 'd'], ['65', 'e'],
+    ['66', 'f'], ['67', 'g'], ['68', 'h'], ['69', 'i'], ['6A', 'j'],
+    ['6B', 'k'], ['6C', 'l'], ['6D', 'm'], ['6E', 'n'], ['6F', 'o'],
+    ['70', 'p'], ['71', 'q'], ['72', 'r'], ['73', 's'], ['74', 't'],
+    ['75', 'u'], ['76', 'v'], ['77', 'w'], ['78', 'x'], ['79', 'y'],
+    ['7A', 'z'], ['7B', '{'], ['7C', '|'], ['7D', '}'], ['7E', '~'],
+    ['7F', ' ']
+  ]
+  let output = input
+  for (let a = 0; a < map.length; a += 1) {
+    output = output.replaceAll('%' + map[a][0], map[a][1])
+  }
+  return output
+}
+
+/**
+ * Remove Google search data from URL
+ *
+ * created by: Evan Wills
+ * created: 2021-06-30
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const degoogle = (input, extraInputs, GETvars) => {
+  let encodedURL = input.trim()
+  encodedURL = encodedURL.replace(/^.*?url=(http.*?)\&.*$/g, '$1')
+
+  // for some reason the built-in decodeURI function isn't working
+  // so I've created my own
+  // try {
+  //   encodedURL = decodeURI(encodedURL);
+  // } catch (e) {
+  //   console.error(e)
+  // }
+  // console.log('encodedURL (3):', encodedURL)
+
+  return encodeMap(encodedURL)
+}
+
+doStuff.register({
+  id: 'degoogle',
+  func: degoogle,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'De-Google URL'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  De-Google URL
+// ====================================================================

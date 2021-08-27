@@ -2091,45 +2091,7 @@ doStuff.register({
 
 //  END:  Linux to Windows file path
 // ====================================================================
-// START: De-Google URL
-
-/**
- * Remove Google search data from URL
- *
- * created by: Evan Wills
- * created: 2021-06-30
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const degoogle = (input, extraInputs, GETvars) => {
-  return decodeURI(input.replace(/^.*?url=(http.*?)\&.*$/g, '$1'))
-}
-
-doStuff.register({
-  id: 'degoogle',
-  func: degoogle,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  // group: 'evan',
-  ignore: false,
-  // inputLabel: '',
-  name: 'De-Google URL'
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  De-Google URL
-// ====================================================================
-// START: Quick SQL generator
+// START: Quick Staff Directory SQL generator
 
 /**
  * Action description goes here
@@ -2196,11 +2158,63 @@ doStuff.register({
   group: 'evan',
   ignore: false,
   // inputLabel: '',
-  name: 'Quick SQL generator'
+  name: 'Quick Staff Directory SQL generator'
   // remote: false,
   // rawGet: false,
 })
 
-//  END:  Quick SQL generator
+//  END:  Quick Staff Directory SQL generator
+// ====================================================================
+// START: Collapse SQL
+
+/**
+ * Convert nicely formatted SQL into single line Plus replace query parameter tokens with supplied values
+ *
+ * created by: Evan Wills
+ * created: 2021-07-19
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const collapseSQL = (input, extraInputs, GETvars) => {
+  const tokens = extraInputs.tokens().split(';')
+
+  let output = input
+  for (let a = 0; a < tokens.length; a += 1) {
+    tokens[a] = tokens[a].split(':')
+    output = output.replace(':' + tokens[a][0].trim(), tokens[a][1].trim())
+  }
+
+  return output.replace(/\s+/g, ' ').trim() + "\n"
+}
+
+doStuff.register({
+  id: 'collapseSQL',
+  func: collapseSQL,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'tokens',
+    label: 'Query parameters (e.g. PARAM1: value1; PARAM2: value2)',
+    type: 'text',
+    default: '',
+    description: 'semi-colon separated string (colons separate token/value pairs)'
+  }],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Collapse SQL'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Collapse SQL
 // ====================================================================
 
