@@ -2490,3 +2490,41 @@ doStuff.register({
 
 //  END:  De-Google URL
 // ====================================================================
+// START: Strip lines
+
+/**
+ * Strip lines breaks from text so it can be used in CSV/TSV
+ *
+ * created by: Evan Wills
+ * created: 2021-10-28
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const stripLines = (input, extraInputs, GETvars) => {
+  return input.replace(/\s+/g, '')
+}
+
+doStuff.register({
+  id: 'stripLines',
+  func: stripLines,
+  description: 'Strip lines breaks from text so it can be used in CSV/TSV',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Strip line breaks'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
