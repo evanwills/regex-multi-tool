@@ -34,14 +34,14 @@ export const oneOffUI = (props) => {
   switch (props.screen) {
     case 'regex':
       blocks[1].data = props[props.screen]
-      blocks[1].view = oneOffRegexView
       blocks[1].events = props.events
+      blocks[1].view = oneOffRegexView
       break
 
     case 'matches':
       if (typeof blocks[2] !== 'undefined') {
-        blocks[2].view = oneOffMatchesView
         blocks[2].data = props[props.screen]
+        blocks[2].view = oneOffMatchesView
         break
       } else {
         props.screen = 'input'
@@ -49,8 +49,8 @@ export const oneOffUI = (props) => {
 
     case 'output': // eslint-disable-line
       if (typeof blocks[3] !== 'undefined') {
-        blocks[3].view = oneOffOutputView
         blocks[3].data = props[props.screen]
+        blocks[3].view = oneOffOutputView
         break
       } else {
         props.screen = 'input'
@@ -58,12 +58,12 @@ export const oneOffUI = (props) => {
 
     default: // eslint-disable-line
       props.screen = 'input'
-      blocks[0].view = oneOffInputView
       blocks[0].data = props[props.screen]
       blocks[0].events = {
         simpleGeneral: props.events.simpleGeneral,
         generalValue: props.events.generalValue
       }
+      blocks[0].view = oneOffInputView
   }
 
   return html`

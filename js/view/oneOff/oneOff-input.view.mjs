@@ -13,7 +13,7 @@ export const oneOffInputView = (props, eventHandlers) => {
   <section class="oneOff-input settings__wrap">
     <p>
       <label for="oneOff-input__text" class="sr-only">Input</label>
-      <textarea id="input" name="input" class="oneOff-input__input block xl" placeholder="input/sample(s)">${makeHTMLsafe(props.raw)}</textarea>
+      <textarea id="setInput" name="input" class="oneOff-input__input block xl" placeholder="input/sample(s)" @change=${eventHandlers.generalValue}>${makeHTMLsafe(props.raw)}</textarea>
     </p>
     ${openCloseBtn('input', 'Open', 'input', _isOpen, eventHandlers.simpleGeneral, 0, 'sm')}
     <section class="oneOff-input__settings settings settings--${(_isOpen) ? 'opened' : 'closed'}">
