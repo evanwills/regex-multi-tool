@@ -9,7 +9,7 @@ export const mainAppMW = store => next => action => {
       if (loop === 0) {
         const tmpMode = action.payload.toLowerCase()
 
-        const mode = (tmpMode === 'onoff')
+        const mode = (tmpMode === 'oneoff')
           ? 'oneOff'
           : (tmpMode.substr(0, 6) === 'repeat')
               ? 'repeatable'
