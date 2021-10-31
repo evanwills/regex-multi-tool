@@ -2509,7 +2509,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const stripLines = (input, extraInputs, GETvars) => {
-  return input.replace(/\s+/g, '')
+  return input.replace(/\s+/g, ' ')
 }
 
 doStuff.register({

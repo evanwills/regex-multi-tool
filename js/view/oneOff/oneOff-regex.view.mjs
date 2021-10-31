@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import {repeat} from '../../lit-html/directives/repeat.mjs';
 import {
   isBool,
   isStr,
@@ -403,9 +404,9 @@ export const regexPair = (props) => {
 }
 
 export const oneOffRegexView = (props, eventHandlers) => {
-  return html`<section>
+  return html`<section id="regex-pairs-list">
     <ul class="list-clean">
-      ${props.pairs.map(pair => regexPair({ ...pair, events: eventHandlers }))}
+      ${repeat(props.pairs, (pair) => pair.id, (pair) => regexPair({ ...pair, events: eventHandlers }))}
     </ul>
   </section>`
 }
