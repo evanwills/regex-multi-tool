@@ -181,11 +181,11 @@ export const getMainAppView = (domNode, store) => {
       newProps.href = props.url.actionHref
       newProps.input = props.input
       // newProps.get = props.url.searchParams
-    } else {
-      newProps.input = {
-        ...state.input,
-        raw: props.input
-      }
+      // } else {
+      //   newProps.input = {
+      //     ...state.input
+      //     raw: props.input
+      //   }
     }
 
     const buttons = (isOneOff)

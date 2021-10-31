@@ -38,7 +38,7 @@ export const repeatableActionNav = (_open, _baseURL, _actions, events, currentAc
       <button id="action-toggle" value="toggle-nav" class="action-nav__toggle action-nav__toggle--open action-nav__toggle--${navClass}" @click=${events.simpleEvent}>${(_open === false) ? 'Open' : 'Close'}</button>
       <nav id="action-nav" class="action-nav">
         <ul class="list-clean list-clean--tight">
-          ${_actions.map((actionGroup) => navGroup(actionGroup, _href.join(''), events.hrefEvent, currentActionID))}
+          ${_actions.map((actionGroup) => navGroup(actionGroup, _href[0], events.hrefEvent, currentActionID))}
         </ul>
       </nav>
     </div>
