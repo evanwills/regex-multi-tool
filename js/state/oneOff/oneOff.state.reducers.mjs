@@ -118,14 +118,13 @@ export const getDefaultPair = () => {
 const defaultPair = getDefaultPair()
 
 export const engineDefaults = {
+  id: 'vanillaJS',
   engine: 'vanillaJS',
   flags: 'ig',
   delimiters: {
     open: '',
     close: ''
-  },
-  multiLine: false,
-  transformEscaped: true
+  }
 }
 
 export const defaultInput = {
@@ -731,6 +730,13 @@ export const regexRegisterEngineReducer = (state = [], action = { type: 'default
   }
 }
 
+export const regexToggleEngineSettings = (state = false, action = { type: 'default' }) => {
+  return (action.type === oneOffActions.TOGGLE_ENGINE_SETTINGS)
+    ? !state
+    : state
+}
+
+
 export const regexSetMatchesReducer = (state = [], action = { type: 'default' }) => {
   if (action.type === oneOffActions.SET_MATCHES) {
     return action.payload
@@ -822,7 +828,7 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
         }
       }
 
-    case oneOffActions.TOGGLE_SETTINGS:
+    case oneOffActions.TOGGLE_INPUT_SETTINGS:
       return {
         ...state,
         settingsOpen: !state.settingsOpen
@@ -841,7 +847,8 @@ export const oneOffReducer = combineReducers({
     engine: regexSetEngineReducer,
     defaults: regexUpdateDefaultsReducer,
     engines: regexRegisterEngineReducer,
-    focusedID: regexUpdateFocusedID
+    focusedID: regexUpdateFocusedID,
+    settingsOpen: regexToggleEngineSettings
   }),
   matches: regexSetMatchesReducer,
   output: regexSetOutputReducer,

@@ -93,7 +93,95 @@ function OneOff (url, remote, docs, api) {
    */
   const updateRegistry = function (config) {
     let tmp = false
-    const errorMsg = 'OneOff.register() expects '
+    const errorMsg = 'OneOff.register() expects config to contain '
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // START: Validating fields
+
+    if (typeof config.ignore === 'boolean' && config.ignore === true) {
+      // This action has been set to IGNORE
+      if (noIgnore !== config.action) {
+        // The user has not overridden the IGNORE directive via the URL
+        return false
+      }
+    }
+
+    tmp = invalidString('id', config)
+    if (tmp !== false) {
+      throw Error(
+        errorMsg + 'an "id" property that is a non-empty string. ' +
+        tmp + ' given.'
+      )
+    }
+
+    tmp = invalidString('name', config)
+    if (tmp !== false) {
+      throw Error(
+        errorMsg + 'a "name" property that is a non-empty string. ' +
+        tmp + ' given.'
+      )
+    }
+
+    config.remote = (isBoolTrue(config.remote))
+    config.allowMultiLine = (isBoolTrue(config.allowMultiLine))
+    config.allowChaining = (isBoolTrue(config.allowChaining))
+
+    if (config.remote === true) {
+      // This is a remote action so it doesn't need to have an action function
+      if (allowRemote === false) {
+        console.warn(
+          'All remote Regex Engines are blocked from this host. ' +
+          'Engine: "' + config.name + '" will not be available'
+        )
+        return false
+      } else if (isHTTPS === true) {
+        console.warn(
+          '"Regex Multi-tool" is not being served via HTTPS so ' +
+          'engine: "' + config.name + '" is likely to be blocked ' +
+          'by the browser.'
+        )
+      }
+    }
+
+    // This is a local action so it MUST have an action function
+    if (typeof config.engine !== 'object') {
+      throw Error(
+        errorMsg + 'an "engine" property that is a plain javascript ' +
+        'function. ' + tmp + ' given.'
+      )
+    } else {
+      const requiredMethods = [
+        'validateRegex', 'validateFlags', 'validateDelims',
+        'match', 'replace'
+      ]
+      for (let a = 0; a < requiredMethods.length; a += 1) {
+        if (typeof config.engine[requiredMethods[a]] !== 'undefined' &&
+            !isFunction(config.engine[requiredMethods[a]])
+        )  {
+          throw Error(
+            errorMsg + 'an "engine" property that an object ' +
+            'containing the method: ' + requiredMethods[a]
+          )
+        }
+      }
+    }
+
+    // This is a local action so it MUST have an action function
+    if (typeof config.delimiters !== 'object') {
+      throw Error(
+        errorMsg + 'an "delimiters" property that is a plain javascript ' +
+        'object.'
+      )
+    }
+    if (typeof config.delimiters.allow !== 'boolean') {
+      throw Error(
+        errorMsg + 'an "delimiters" property that contains a ' +
+        'boolean "allow" child property'
+      )
+    }
+    if (config.delimiters.allow) {
+
+    }
   }
 
   /**
@@ -106,9 +194,8 @@ function OneOff (url, remote, docs, api) {
   function filterNonProps (config) {
     const output = {}
     const okKeys = [
-      'id', 'action', 'func', 'remote', 'name', 'description',
-      'group', 'docsURL', 'extraInputs', 'extraOutputs',
-      'chained', 'rawGet', 'inputLabel', 'outputLabel'
+      'id', 'engine', 'remote', 'name', 'description',
+      'docsURL', 'flags', 'delimiters'
     ]
     const lOkKeys = okKeys.map(item => item.toLowerCase())
 
@@ -163,6 +250,42 @@ function OneOff (url, remote, docs, api) {
       return output
     }
     return false
+  }
+
+  //  END:  private method declaration
+  // ============================================
+  // START: public method declaration
+
+
+  /**
+   * Register an action, making it available for use and creating
+   * a link in the navigation.
+   *
+   * @param {object} config all the metadata for a given Regex Engine
+   *             Object has five required properties:
+   *             1. 'id'   - Identifier for the action
+   *                           (used in the URL)
+   *             2. 'name' - Human readable name of the action
+   *                           (used in the heading and link)
+   *             3. 'engine' - function/class that does the actual
+   *                           work of the action
+   *                           (used when a regex or flags are
+   *                           modified and when either "TEST" or
+   *                           "REPLACE" are clicked)
+   *
+   * @returns {boolean} TRUE if engine was regisered, FALSE otherwise
+   */
+  this.register = function (config) {
+    let registerOk = false
+
+    try {
+      registerOk = updateRegistry(config)
+    } catch (error) {
+      console.error('OneOff.register() expects config to contain ' + error)
+      return false
+    }
+
+    return registerOk
   }
 
   /**

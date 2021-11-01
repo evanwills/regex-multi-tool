@@ -1,0 +1,15 @@
+.regex-engine {
+  position: relative;
+}
+
+.regex-engine > .rnd-btn--settings {
+  margin-left: 0.3rem;
+  margin-top: 1.5rem;
+}
+
+
+.regex-engine > .regex-engine__settings {
+  bottom: -0.6rem;
+  left: -0.2rem;
+  right: -0.2rem;
+}

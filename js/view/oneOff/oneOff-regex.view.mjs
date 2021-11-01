@@ -103,6 +103,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
   }
 
   return html`
+    <!-- START: moveTo() -->
     <span class="r-pair__move-to__wrap"><!--
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
       --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${getTabI(tabIndex)}">
@@ -112,6 +113,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
         )}
       </select><!--
     --></span>
+    <!--  END:  moveTo() -->
   `
 }
 
@@ -141,9 +143,11 @@ const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
 
   return (count > 1)
     ? html`
+      <!-- START: disableBtn() -->
       <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair" tabindex="${getTabI(tabIndex)}">
         ${_mode} ${hiddenPos(pos)}
-      </button>`
+      </button>
+      <!--  END:  disableBtn() -->`
     : ''
 }
 
@@ -169,9 +173,11 @@ const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
 const deleteBtn = (id, count, pos, _click, tabIndex) => {
   return (count > 1)
     ? html`
+      <!-- START: deleteBtn() -->
       <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair" tabindex="${getTabI(tabIndex)}">
         Delete ${hiddenPos(pos)}
-      </button>`
+      </button>
+      <!-- START: deleteBtn() -->`
     : ''
 }
 
@@ -223,9 +229,11 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
   }
 
   return html`
+      <!-- START: movePair() -->
     <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}" tabindex="${getTabI(tabIndex)}">
       Move ${pos} ${_dir}
-    </button>`
+    </button>
+    <!--  END:  movePair() -->`
 }
 
 /**
@@ -259,9 +267,12 @@ const addPair = (id, pos, _dir, clickHandler, tabIndex) => {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
-  return html`<button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${getTabI(tabIndex)}">
-    Add pair ${_dir} ${pos}
-  </button>`
+  return html`
+    <!-- START: addPair() -->
+    <button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${getTabI(tabIndex)}">
+      Add pair ${_dir} ${pos}
+    </button>
+    <!--  END:  addPair() -->`
 }
 //  END:  sub views
 // ============================================
@@ -317,6 +328,7 @@ export const regexPair = (props) => {
   const tabIndex = (props.settingsOpen) ? 0 : -1
 
   return html`
+  <!-- START: regexPair() -->
   <li>
     <article id="${props.id}" class="r-pair r-pair--${props.pos} settings_wrap">
       <header class="r-pair__header sr-only"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
@@ -400,13 +412,52 @@ export const regexPair = (props) => {
       </footer>
     </article>
   </li>
+  <!--  END:  regexPair() -->
   `
 }
 
 export const oneOffRegexView = (props, eventHandlers) => {
-  return html`<section id="regex-pairs-list">
+  console.log('props', props)
+  console.log('eventHandlers', eventHandlers)
+  const _isOpen = props.settingsOpen
+  return html`
+  <!-- START: oneOffRegexView() -->
+  <section id="regex-pairs-list" class="regex-engine">
     <ul class="list-clean">
       ${repeat(props.pairs, (pair) => pair.id, (pair) => regexPair({ ...pair, events: eventHandlers }))}
     </ul>
-  </section>`
+
+    ${openCloseBtn('engine', 'Open', 'regex engine', _isOpen, eventHandlers.simpleGeneral, 0, 'xs')}
+    <footer class="regex-engine__settings settings settings--${(_isOpen) ? 'opened' : 'closed'}">
+      <h2 id="sample-settings">Regex engine settings</h2>
+      <ul class="r-pair__control list-clean">
+        ${(props.engines.length > 1)
+          ? html`<li>${checkboxBtnGroup(
+              'setEngine',
+              'Set regex engines',
+              props.engine,
+              eventHandlers.simpleGeneral,
+              1,
+              '',
+              true,
+              'Select the regex engine you wish to use'
+            )}</li>`
+          : ''
+        }
+        ${(props.allowChaining)
+          ? html`<li>${checkboxBtn(
+              props.id,
+              'Chain regexes when ',
+              'true',
+              props.chain,
+              eventHandlers.simpleGeneral,
+              2
+            )}</li>`
+          : ''
+        }
+      </ul>
+      ${openCloseBtn('engine', 'Close', 'regex engine', _isOpen, eventHandlers.simpleGeneral, 0, 'xs')}
+    </footer>
+  </section>
+  <!--  END:  oneOffRegexView() -->`
 }

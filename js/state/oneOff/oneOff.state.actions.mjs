@@ -43,7 +43,8 @@ export const oneOffActions = {
   SET_SPLITTER: 'ONEOFF_INPUT_SET_SPLITTER',
   SET_STRIP_BEFORE: 'ONEOFF_INPUT_SET_STRIP_BEFORE',
   SET_STRIP_AFTER: 'ONEOFF_INPUT_SET_STRIP_AFTER',
-  TOGGLE_SETTINGS: 'ONEOFF_INPUT_TOGGLE_SETTINGS'
+  TOGGLE_INPUT_SETTINGS: 'ONEOFF_INPUT_TOGGLE_SETTINGS',
+  TOGGLE_ENGINE_SETTINGS: 'ONEOFF_ENGINE_TOGGLE_SETTINGS'
 
 }
 
@@ -116,7 +117,12 @@ export const getAutoDipatchOneOffSimpleEvent = (_dispatch) => {
 
       case 'input-toggleSettings-open':
       case 'input-toggleSettings-close':
-        _type = oneOffActions.TOGGLE_SETTINGS
+        _type = oneOffActions.TOGGLE_INPUT_SETTINGS
+        break
+
+      case 'engine-toggleSettings-open':
+      case 'engine-toggleSettings-close':
+        _type = oneOffActions.TOGGLE_ENGINE_SETTINGS
         break
     }
 

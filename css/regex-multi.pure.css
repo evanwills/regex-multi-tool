@@ -9,6 +9,7 @@
 @import 'organisms/settings-block.css';
 @import 'organisms/repeatable-description.css';
 @import 'organisms/repeatable-extraInputs.css';
+@import 'organisms/oneOff-regex.css';
 
 @import 'molecules/repeatable-nav.css';
 @import 'molecules/tab-nav.css';

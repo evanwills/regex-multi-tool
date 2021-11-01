@@ -152,7 +152,7 @@ function Repeatable (url, _remote, docs, api) {
     let tmp = false
     const errorMsg = 'Repeatable.register() expects '
 
-    // ====================================================
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // START: Validating fields
 
     if (typeof config.ignore === 'boolean' && config.ignore === true) {
@@ -176,7 +176,7 @@ function Repeatable (url, _remote, docs, api) {
     config.remote = (isBoolTrue(config.remote))
 
     if (config.remote === true) {
-      // This is a remote action so it doesn't need to have an action funciton
+      // This is a remote action so it doesn't need to have an action function
       if (allowRemote === false) {
         console.warn('All remote actions are blocked from this host. Action: "' + config.name + '" will not be available')
         return false
@@ -208,7 +208,7 @@ function Repeatable (url, _remote, docs, api) {
     }
 
     //  END:  Validating fields
-    // ====================================================
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // START: setting defaults for optional fields
 
     config.inputLabel = (isNonEmptyStr(config.inputLabel))
@@ -238,7 +238,7 @@ function Repeatable (url, _remote, docs, api) {
       : ''
 
     //  END:  setting defaults for optional fields
-    // ====================================================
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // console.log('registry:', registry)
 
     registry = [...registry, filterNonProps(config)]
