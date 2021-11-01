@@ -167,12 +167,14 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
   switch (action.type) {
     case mainAppActions.MODIFY:
+      // pass current `oneOff` state to regex engine
       dispatch({
         type: oneOffActions.SET_OUTPUT
       })
       break
 
     case mainAppActions.TEST:
+      // pass current `oneOff` state to regex engine
       dispatch({
         type: oneOffActions.SET_MATCHES
       })

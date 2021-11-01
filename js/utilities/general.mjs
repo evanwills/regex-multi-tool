@@ -14,7 +14,9 @@ export const getFromLocalStorage = (prop) => {
     try {
       return JSON.parse(tmp)
     } catch (e) {
-      console.warn('Could not convert "' + prop + '" to JSON')
+      console.warn(
+        'Could not convert "' + prop + '" to JSON. (' + e.message + ')'
+      )
     }
     return tmp
   }
