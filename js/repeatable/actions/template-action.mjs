@@ -20,7 +20,7 @@
  *
  * @returns {string} modified version user input
  */
- const myFunction = (input, extraInputs, GETvars) => {
+const myFunction = (input, extraInputs, GETvars) => {
 }
 
 doStuff.register({

@@ -2217,4 +2217,111 @@ doStuff.register({
 
 //  END:  Collapse SQL
 // ====================================================================
+// START: Count number of uploaded files
+
+/**
+ * Count number of uploaded files
+ *
+ * created by: Evan Wills
+ * created: 2021-11-02
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const countLines = (input, extraInputs, GETvars) => {
+  // let output = input.replace(/\s+[0-9]+%\s+[0-9.]+/ig, '')
+  let output = input.trim();
+  output.replace(/\s+[0-9]+%\s+[0-9.]+[A-Z]*\s+[0-9.]+[A-Z]+\/s\s+(?:[0-9]+:)+[0-9]+/ig, '')
+  output = output.replace(/\s+Pausing for [0-9]+ seconds? to prevent timeouts\s+/ig, '\n')
+  output = output.trim();
+  output = output.split('\n')
+  return output.length + ''
+  // return output
+}
+
+doStuff.register({
+  id: 'countLines',
+  func: countLines,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: true,
+  // inputLabel: '',
+  name: 'Count number of uploaded files'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Count number of uploaded files
+// ====================================================================
+// START: Snake case to camel case
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const snake2camel = (input, extraInputs, GETvars) => {
+  const tmp = input.split('\n')
+  let output = ''
+  for (let a = 0; a < tmp.length; a += 1) {
+    tmp[a] = tmp[a].trim()
+    tmp[a] = tmp[a].split('_')
+    let model = '';
+    for (let b = 0; b < tmp[a].length; b += 1) {
+      tmp[a][b] = tmp[a][b].toLowerCase()
+
+      if (b > 0) {
+        let first = tmp[a][b].substr(0, 1)
+        const after = tmp[a][b].substr(1)
+        tmp[a][b] = first.toUpperCase() + after
+      }
+      model += tmp[a][b]
+    }
+    output +=  'php artisan make:model ' + model + ' -ms'
+    if (tmp[a][0] !== 'enum') {
+      output += 'c'
+    }
+    output += ';\n'
+  }
+  console.log('output:', output)
+  return output
+}
+
+doStuff.register({
+  id: 'snake2camel',
+  func: snake2camel,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: true,
+  // inputLabel: '',
+  name: 'Snake case to camel case'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+
 
