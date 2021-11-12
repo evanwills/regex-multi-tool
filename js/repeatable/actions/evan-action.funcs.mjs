@@ -2290,16 +2290,16 @@ const snake2camel = (input, extraInputs, GETvars) => {
     for (let b = 0; b < tmp[a].length; b += 1) {
       tmp[a][b] = tmp[a][b].toLowerCase()
 
-      if (b > 0) {
-        let first = tmp[a][b].substr(0, 1)
-        const after = tmp[a][b].substr(1)
-        tmp[a][b] = first.toUpperCase() + after
-      }
+      const first = tmp[a][b].substr(0, 1)
+      const after = tmp[a][b].substr(1)
+      tmp[a][b] = first.toUpperCase() + after
       model += tmp[a][b]
     }
-    output +=  'php artisan make:model ' + model + ' -ms'
-    if (tmp[a][0] !== 'enum') {
+    output +=  'php artisan make:model ' + model + ' -m'
+    if (tmp[a][0] !== 'Enum') {
       output += 'c'
+    } else {
+      output += 's'
     }
     output += ';\n'
   }
@@ -2317,6 +2317,103 @@ doStuff.register({
   ignore: true,
   // inputLabel: '',
   name: 'Snake case to camel case'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Snake case to camel case
+// ====================================================================
+// START: fastest turn
+
+/**
+ * Make a number fit within 360
+ *
+ * @param {number} input Number that may be greater than 360 or less
+ *                       than -360
+ *
+ * @returns {number} Number that is greater than -360 and less than 360
+ */
+const true360 = (input) => {
+  let output = input * 1;
+  if (output > 0) {
+    while (output > 360) {
+      output -= 360
+    }
+  } else {
+    while (output < -360) {
+      output += 360
+    }
+  }
+  if (output < 0) {
+    output += 360
+  }
+  return output
+}
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const fastestTurn = (input, extraInputs, GETvars) => {
+  const dest = true360(extraInputs.destinationDeg() * 1)
+  const origin = true360(extraInputs.originDeg() * 1)
+
+  let tmp = dest - origin
+
+  if (tmp > 180 || tmp < -180) {
+    tmp *= -1
+  }
+  const output = (tmp < 0)
+    ? 'left'
+    : 'right'
+
+  if (tmp > 180) {
+    output = (output === 'left')
+      ? 'right'
+      : 'left'
+  }
+
+  return output.toString()
+}
+
+doStuff.register({
+  id: 'fastestTurn',
+  func: fastestTurn,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'originDeg',
+    type: 'number',
+    label: 'Angle we start at',
+    default: '86',
+    min: -360,
+    max: 360,
+    step: 1
+  }, {
+    id: 'destinationDeg',
+    type: 'number',
+    label: 'Angle we want to end up at',
+    default: '-90',
+    min: -360,
+    max: 360,
+    step: 1
+  }],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'Fastest turn'
   // remote: false,
   // rawGet: false,
 })

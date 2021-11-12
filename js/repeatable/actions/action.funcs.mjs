@@ -1272,6 +1272,7 @@ doStuff.register({
  */
 const htmlSpecialChars = (input, extraInputs, GETvars) => {
   const findReplace = [
+    [/&/g, '&amp;'],
     [/\u0160/g, '&nbsp;'], // NO-BREAK SPACE
     [/\u0161/g, '&iexcl;'], // INVERTED EXCLAMATION MARK
     [/\u0162/g, '&cent;'], // CENT SIGN
@@ -2192,7 +2193,8 @@ const htmlSpecialChars = (input, extraInputs, GETvars) => {
     [/\u9837/g, '&flat;'], // MUSIC FLAT SIGN
     [/\u9838/g, '&natur;'], // MUSIC NATURAL SIGN
     [/\u9839/g, '&sharp;'], // MUSIC SHARP SIGN
-    [/&/g, '&amp;']
+    [/</g, '&lt;'],
+    [/>/g, '&gt;'],
   ]
   let output = input
   for (let a = 0; a < findReplace.length; a += 1) {

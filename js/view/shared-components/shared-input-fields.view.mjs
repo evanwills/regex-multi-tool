@@ -66,6 +66,21 @@ export const getAttrs = (attrArr, props, prefix) => {
 }
 
 /**
+ * Get something to use as a value
+ *
+ * @param {object} props Object to get attribute values from
+ *
+ * @returns {string}
+ */
+const getValue = (props) => {
+  return (props.value !== '')
+    ? props.value
+    : typeof (props.default !== 'undefined')
+      ? props.default
+      : ''
+}
+
+/**
  * Get the bolean attribute string for an HTML input/select/textarea
  * field
  *
@@ -305,6 +320,7 @@ export const textInputField = (props, multiLine) => {
   const _disabled = getBoolAttr('disabled', props)
   const _required = getBoolAttr('required', props)
   const _read = getBoolAttr('readonly', props)
+  const _value = getValue(props)
 
   // console.group('textInputField()')
   // console.log('props:', props)
@@ -349,7 +365,7 @@ export const numberInputField = (props) => {
 
   return html`
     ${getLabel(props)}
-    <input type="number" id="${props.id}" .value=${props.value} class="${getClassName(props, 'input', 'number')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${ifDefined(propOrUn(props.pattern))}" placeholder="${ifDefined(propOrUn(props.placeholder))}" min="${ifDefined(propOrUn(props.min))}" max="${ifDefined(propOrUn(props.max))}" step="${ifDefined(propOrUn(props.step))}" aria-describedby="${ifDefined(_descBy)}" />
+    <input type="number" id="${props.id}" .value=${getValue(props)} class="${getClassName(props, 'input', 'number')}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} pattern="${ifDefined(propOrUn(props.pattern))}" placeholder="${ifDefined(propOrUn(props.placeholder))}" min="${ifDefined(propOrUn(props.min))}" max="${ifDefined(propOrUn(props.max))}" step="${ifDefined(propOrUn(props.step))}" aria-describedby="${ifDefined(_descBy)}" />
     ${(_descBy !== '') ? describedBy(props) : ''}
   `
 }
@@ -360,8 +376,8 @@ export const colourInput = (props) => {
   return html`
     <li class="input-pair">
       <label for="set-customMode-${props.id}" class="input-pair__label">Custom mode ${props.label} colour:</label>
-      <input type="color" id="set-customMode-${props.id}" class="input-pair__input" value="${props.value}" tabindex="${props.tabIndex}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} aria-describedby="${ifDefined(_descBy)}" /><!--
-      --><span class="input-pair__suffix" style="background-color: ${props.value};">&nbsp;</span>
+      <input type="color" id="set-customMode-${props.id}" class="input-pair__input" value="${getValue(props)}" tabindex="${props.tabIndex}" @change=${props.change} ?required=${getBoolAttr('required', props)} ?readonly=${getBoolAttr('readonly', props)} ?disabled=${getBoolAttr('disabled', props)} aria-describedby="${ifDefined(_descBy)}" /><!--
+      --><span class="input-pair__suffix" style="background-color: ${getValue(props)};">&nbsp;</span>
       ${(_descBy !== '') ? describedBy(props) : ''}
     </li>
   `
