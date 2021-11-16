@@ -7,6 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
+import { snakeToCamelCase } from '../../utilities/sanitise.mjs'
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name
@@ -2414,6 +2415,72 @@ doStuff.register({
   ignore: false,
   // inputLabel: '',
   name: 'Fastest turn'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  fastest turn
+// ====================================================================
+// START: PHP associative array to javascript ojbect
+
+/**
+ * Convert PHP associative array to javascript object
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const php2js = (input, extraInputs, GETvars) => {
+  const regex = /id: ##/
+  console.log('extraInputs.index()', extraInputs.index())
+  let index = extraInputs.index() === 0 ? 0 : 1
+  let constName = snakeToCamelCase(extraInputs.name(), 1)
+  let output = input.trim()
+  output = output.replace(/\s*\[/g, '\n  {')
+  output = output.replace(/\s*\]/g, '\n  }')
+  output = output.replace(/\'.*?_([a-z]+)\'\s*=>\s*/ig, '$1: ')
+  output = output.replace(/((?:name|description): \'[^\']+)\'\.[\r\n]+\s+\'([^\']+)\'(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?/ig, '$1$2$3$4\'')
+  output = output.replace(/((\s+)name:)/ig, '$2id: ##,$1')
+  output = output.replace(/\s+([a-z]+: )/ig, '\n    $1')
+
+  while (output.match(regex)) {
+    output = output.replace(regex, 'id: '+ index)
+    index += 1
+  }
+  return 'export const ' + constName.replace() + ' = ['  + output + '\n]\n\n'
+}
+
+doStuff.register({
+  id: 'php2js',
+  func: php2js,
+  description: 'Convert PHP associative array to a javascript object in an array',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'index',
+    type: 'number',
+    label: 'Starting index',
+    default: '1',
+    min: 0,
+    max: 2,
+    step: 1
+  }, {
+    id: 'name',
+    type: 'text',
+    label: 'Constant name',
+  }],
+  group: 'evan',
+  ignore: false,
+  // inputLabel: '',
+  name: 'PHP array to JS object[]'
   // remote: false,
   // rawGet: false,
 })
