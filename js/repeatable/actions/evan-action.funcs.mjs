@@ -2448,15 +2448,17 @@ const php2js = (input, extraInputs, GETvars) => {
   output = output.replace(/\s*\[/g, '\n  {')
   output = output.replace(/\s*\]/g, '\n  }')
   output = output.replace(/\'.*?_([a-z]+)\'\s*=>\s*/ig, '$1: ')
-  output = output.replace(/((?:name|description): \'[^\']+)\'\.[\r\n]+\s+\'([^\']+)\'(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?/ig, '$1$2$3$4\'')
+  output = output.replace(/((?:name|description):)[\r\n]*\s+\'([^\']+)\'(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?/ig, '$1 \'$2$3$4$5$6$7$8$9\'')
   output = output.replace(/((\s+)name:)/ig, '$2id: ##,$1')
-  output = output.replace(/\s+([a-z]+: )/ig, '\n    $1')
+  output = output.replace(/[\r\n]+\s+([a-z]+: )/ig, '\n    $1')
 
   while (output.match(regex)) {
     output = output.replace(regex, 'id: '+ index)
     index += 1
   }
-  return 'export const ' + constName.replace() + ' = ['  + output + '\n]\n\n'
+  output = output.replace(/\s+id: [0-9]+,(\s+id: [0-9]+,)/gs, '$1')
+
+  return '\nexport const ' + constName + ' = ['  + output + '\n]\n\n'
 }
 
 doStuff.register({

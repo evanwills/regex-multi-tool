@@ -1113,7 +1113,7 @@ const sitecore2local = (input, extraInputs, GETvars) => {
 
   const regex = [
     {
-      find: /\/assets\/acupublic\/(?:custom)?((?:css|js|fonts)\/)([^'"]+)/ig,
+      find: /\/assets\/(?:acupublic|microsites|ACUOnline)\/(?:custom)?((?:css|js|fonts|img)\/)([^'"]+)/ig,
       replace: sitecore2localLocalOrGlobalPath
       // replace: '../'
     }, {
@@ -1167,6 +1167,13 @@ const sitecore2local = (input, extraInputs, GETvars) => {
     }, {
       find: /(src=")[^"]+((?:acu[-_]logo[-_]white|acu[-_]logo[-_]purple|askacu).svg)[^"]*(?=")/ig,
       replace: '$1../img/$2'
+    }, {
+      find: /<!--\s+Google\s+Tag\s+Manager(?:\s+\(noscript\))?\s+-->.*?<!--\s+End\s+Google\s+Tag\s+Manager(?:\s+\(noscript\))?\s+-->/isg,
+      replace: ''
+    },
+    {
+      find: /https:\/\/static\.searchstax\.com\/studio-js\/v2(?=\/css)/ig,
+      replace: '..'
     }
   ]
 

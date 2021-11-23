@@ -294,11 +294,14 @@ export const padStr = (input, len, char, centre) => {
 }
 
 export const snakeToCamelCase = (input, start = 0) => {
-  const tmp = input.split('_')
+  const splitter = (input.indexOf('-') > -1)
+    ? '-'
+    : '_'
+  const tmp = input.split(splitter)
   let output = tmp[start]
 
   for (let a = start + 1; a < tmp.length; a += 1) {
-    output += tmp[a].substr(0, 1).toUpperCase() + tmp[a].substr(1).toLowerCase()
+    output += ucFirst(tmp[a])
   }
 
   return output

@@ -2528,5 +2528,80 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Strip line breaks
+// ====================================================================
+// START: POSIX to PCRE
+
+/**
+ * Convert from POSIX style regular expresson to PCRE and back
+ *
+ * If input is PCRE style regex, then output will be POSIX.
+ * If input is POSIX style regex, then output will be PCRE.
+ *
+ * created by: Evan Wills
+ * created: 2021-11-23
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const posix2pcre = (input, extraInputs, GETvars) => {
+  const find = [
+    /\\\(/g, /\(/g, /~~~~/g,
+    /\\\)/g, /\)/g, /~~~~/g,
+    /\\\{/g, /\{/g, /~~~~/g,
+    /\\\}/g, /\}/g, /~~~~/g,
+    /\\\?/g, /\?/g, /~~~~/g,
+    /\\\+/g, /\+/g, /~~~~/g,
+    /\\\|/g, /\|/g, /~~~~/g
+  ]
+  const replace = [
+    '~~~~', '\\(', '(',
+    '~~~~', '\\)', ')',
+    '~~~~', '\\{', '{',
+    '~~~~', '\\}', '}',
+    '~~~~', '\\?', '?',
+    '~~~~', '\\+', '+',
+    '~~~~', '\\|', '|',
+  ]
+  let output = input
+
+  for (let a = 0; a < find.length; a += 1) {
+    output = output.replace(find[a], replace[a])
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'posix2pcre',
+  func: posix2pcre,
+  description: 'Convert a PCRE regular expression to POSIX and vice versa',
+  // docsURL: '',
+  extraInputs: [
+    // {
+    //   id: 'direction',
+    //   label: 'Conversion direction',
+    //   type: 'radio',
+    //   options: [
+    //     { value: 'posx2pcre', label: 'POSIX to PCRE' },
+    //     { value: 'pcre2posx', label: 'PCRE TO POSIX', default: true }
+    //   ]
+    // }
+  ],
+  // group: '',
+  ignore: false,
+  // inputLabel: '',
+  name: 'POSIX to PCRE'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  POSIX to PCRE
 // ====================================================================
