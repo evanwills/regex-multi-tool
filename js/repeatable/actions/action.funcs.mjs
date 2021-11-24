@@ -7,7 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isStr } from '../../utilities/validation.mjs'
-import { isNumber } from '../../utilities/validation.mjs'
+import { isNumber, isNonEmptyStr } from '../../utilities/validation.mjs'
 import { padStr } from '../../utilities/sanitise.mjs'
 
 /**
@@ -2604,4 +2604,154 @@ doStuff.register({
 })
 
 //  END:  POSIX to PCRE
+// ====================================================================
+// START: Truncate text
+
+/**
+ * Truncate string based on the word count
+ *
+ * @param {string} input Raw text to be truncated
+ * @param {number} count Maximum number of allowed allowed
+ *
+ * @returns {string}
+ */
+const limitWordCount = (input, count) => {
+  const regex = new RegExp()
+  console.log('regex:', regex)
+  const output = input.replace(regex, '$1')
+  return output.trim()
+}
+
+/**
+ * Truncate string based on the sentence count
+ *
+ * @param {string} input Raw text to be truncated
+ * @param {number} count Maximum number of sentences allowed
+ *
+ * @returns {string}
+ */
+const limitSentenceCount = (input, count) => {
+  const regex =
+  console.log('regex:', regex)
+  const output = input.replace(regex, )
+  return output.trim()
+}
+
+/**
+ * Truncate text by character count then trim incomplete tail
+ *
+ * created by: Evan Wills
+ * created: 2021-11-24
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const truncateText = (input, extraInputs, GETvars) => {
+  const count = (isNumber(extraInputs.count()))
+    ? extraInputs.count()
+    : 250
+
+  const mode1 = (isNonEmptyStr(extraInputs.mode1()))
+    ? extraInputs.mode1()
+    : 'char'
+
+  const mode2 = (isNonEmptyStr(extraInputs.mode2()))
+    ? extraInputs.mode2()
+    : 'sentence'
+
+  // Convert multiple consecutive white-space characters into a
+  // single "space" character
+  let output = input.replace(/\s+/g, ' ')
+
+  switch (mode1) {
+    case 'sentence':
+      // Strip excess sentences
+      output = output.replace(
+        new RegExp('^((?:[^.?!]+[.?!]+){0,' + count + '}).*$'),
+        '$1'
+      )
+      break;
+    case 'word':
+      // Strip excess words
+      output = output.replace(
+        new RegExp('^((?:[\\w]+[^\\w]+){0,' + count + '}).*$'),
+        '$1'
+      )
+      break;
+    default:
+      // Truncate by character count
+      output = output.substr(0, count)
+  }
+
+  // Strip excess leading & trailing whitespace
+  output = output.trim()
+
+
+  switch (mode2) {
+    case 'word':
+      // removing possible partial word
+      output = output.replace(/\s[^\s]+$/, '')
+      break;
+
+    case 'sentence':
+      // remove possible partial sentences
+      output = output.replace(/([.?!])[^.?!]+$/, '$1')
+      break;
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'truncateText',
+  func: truncateText,
+  description: 'Truncate text by character count then trim incomplete tail',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'mode1',
+      label: 'Truncation mode',
+      type: 'radio',
+      options: [
+        { value: 'char', label: 'Truncate by character count', default: true },
+        { value: 'word', label: 'Truncate by word count' },
+        { value: 'sentence', label: 'Truncate by sentence count' }
+      ]
+    },
+    {
+      id: 'count',
+      label: 'Count',
+      type: 'number',
+      min: 1,
+      max: 1000,
+      step: 1,
+      default: 250
+    },
+    {
+      id: 'mode2',
+      label: 'Clean up mode',
+      type: 'radio',
+      options: [
+        { value: 'raw', label: 'No cleanup', default: true },
+        { value: 'word', label: 'Remove partial words' },
+        { value: 'sentence', label: 'Remove partial sentences' }
+      ]
+    }
+  ],
+  // group: '',
+  ignore: false,
+  // inputLabel: 'Text to be truncated',
+  name: 'Truncate text'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
 // ====================================================================
