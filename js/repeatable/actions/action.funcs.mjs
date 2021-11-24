@@ -2678,6 +2678,7 @@ const truncateText = (input, extraInputs, GETvars) => {
         '$1'
       )
       break;
+
     case 'word':
       // Strip excess words
       output = output.replace(
@@ -2685,6 +2686,7 @@ const truncateText = (input, extraInputs, GETvars) => {
         '$1'
       )
       break;
+
     default:
       // Truncate by character count
       output = output.substr(0, count)
