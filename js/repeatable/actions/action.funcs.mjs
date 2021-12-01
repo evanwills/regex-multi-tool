@@ -2719,12 +2719,12 @@ doStuff.register({
   extraInputs: [
     {
       id: 'mode1',
-      label: 'Truncation mode',
+      label: 'Truncation by',
       type: 'radio',
       options: [
-        { value: 'char', label: 'Truncate by character count', default: true },
-        { value: 'word', label: 'Truncate by word count' },
-        { value: 'sentence', label: 'Truncate by sentence count' }
+        { value: 'char', label: 'Character count', default: true },
+        { value: 'word', label: 'Word count' },
+        { value: 'sentence', label: 'Sentence count' }
       ]
     },
     {
@@ -2741,9 +2741,9 @@ doStuff.register({
       label: 'Clean up mode',
       type: 'radio',
       options: [
-        { value: 'raw', label: 'No cleanup', default: true },
-        { value: 'word', label: 'Remove partial words' },
-        { value: 'sentence', label: 'Remove partial sentences' }
+        { value: 'raw', label: 'None', default: true },
+        { value: 'word', label: 'Partial words' },
+        { value: 'sentence', label: 'Partial sentences' }
       ]
     }
   ],

@@ -7,7 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
-import { snakeToCamelCase } from '../../utilities/sanitise.mjs'
+import { snakeToCamelCase, ucFirst } from '../../utilities/sanitise.mjs'
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name
@@ -2263,67 +2263,6 @@ doStuff.register({
 
 //  END:  Count number of uploaded files
 // ====================================================================
-// START: Snake case to camel case
-
-/**
- * Action description goes here
- *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const snake2camel = (input, extraInputs, GETvars) => {
-  const tmp = input.split('\n')
-  let output = ''
-  for (let a = 0; a < tmp.length; a += 1) {
-    tmp[a] = tmp[a].trim()
-    tmp[a] = tmp[a].split('_')
-    let model = '';
-    for (let b = 0; b < tmp[a].length; b += 1) {
-      tmp[a][b] = tmp[a][b].toLowerCase()
-
-      const first = tmp[a][b].substr(0, 1)
-      const after = tmp[a][b].substr(1)
-      tmp[a][b] = first.toUpperCase() + after
-      model += tmp[a][b]
-    }
-    output +=  'php artisan make:model ' + model + ' -m'
-    if (tmp[a][0] !== 'Enum') {
-      output += 'c'
-    } else {
-      output += 's'
-    }
-    output += ';\n'
-  }
-  console.log('output:', output)
-  return output
-}
-
-doStuff.register({
-  id: 'snake2camel',
-  func: snake2camel,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: true,
-  // inputLabel: '',
-  name: 'Snake case to camel case'
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Snake case to camel case
-// ====================================================================
 // START: fastest turn
 
 /**
@@ -2421,13 +2360,13 @@ doStuff.register({
 
 //  END:  fastest turn
 // ====================================================================
-// START: PHP associative array to javascript ojbect
+// START: PHP associative array to javascript object
 
 /**
  * Convert PHP associative array to javascript object
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2021-11-16
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -2445,9 +2384,9 @@ const php2js = (input, extraInputs, GETvars) => {
   let index = extraInputs.index() === 0 ? 0 : 1
   let constName = snakeToCamelCase(extraInputs.name(), 1)
   let output = input.trim()
-  output = output.replace(/\s*\[/g, '\n  {')
-  output = output.replace(/\s*\]/g, '\n  }')
-  output = output.replace(/\'.*?_([a-z]+)\'\s*=>\s*/ig, '$1: ')
+  output = output.replace(/\s*(?:\[|array\()/g, '\n  {')
+  output = output.replace(/\s*(?:\]|\))/g, '\n  }')
+  output = output.replace(/\'(?:.*?_)?([a-z]+)\'\s*=>\s*/ig, '$1: ')
   output = output.replace(/((?:name|description):)[\r\n]*\s+\'([^\']+)\'(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?/ig, '$1 \'$2$3$4$5$6$7$8$9\'')
   output = output.replace(/((\s+)name:)/ig, '$2id: ##,$1')
   output = output.replace(/[\r\n]+\s+([a-z]+: )/ig, '\n    $1')
@@ -2487,7 +2426,198 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  PHP associative array to javascript object
+// ====================================================================
+// START: Convert laravel int fields to unsigned
+
+const int2unsignedInner = (whole, part) => {
+  return '->unsigned' + ucFirst(part) + ')'
+}
+
+/**
+ * Convert laravel migration integer fields to unsigned
+ * integer fields
+ *
+ * created by: Evan Wills
+ * created: 2021-11-16
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const int2unsigned = (input, extraInputs, GETvars) => {
+  const regex = /->((?:tiny|small|medium|big)?Integer\('[^']+'), false, true\)/ig
+
+  return input.replace(regex, int2unsignedInner)
+}
+
+doStuff.register({
+  id: 'int2unsigned',
+  func: int2unsigned,
+  description: 'Convert laravel migration integer fields to unsigned integer fields',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: true,
+  // inputLabel: '',
+  name: 'Larvel ints to unsigned'
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Convert laravel int fields to unsigned
+// ====================================================================
+// START: Change variable style
+
+const snakeToArray = (input) => {
+  return input.split(/[- _]/)
+}
+
+const camelToArray = (input) => {
+  return input.split(/(?<=[a-z])(?=[A-Z])/)
+}
+
+/**
+ * Change variable style
+ *
+ * created by: Evan Wills
+ * created: 2021-12-01
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const changeVarStyle = (input, extraInputs, GETvars) => {
+  const start = extraInputs.startStyle()
+  const end = extraInputs.endStyle()
+  const strip = extraInputs.strip()
+  const ucAll = extraInputs.allupper('true')
+  let tmp = []
+  let output = ''
+  let sep = ''
+
+  tmp = (start === 'snake' || start === 'kebab')
+    ? snakeToArray(input)
+    : camelToArray(input)
+
+  if (strip > 0) {
+    tmp = tmp.slice(strip, tmp.length)
+  }
+
+  for (let a = 0; a < tmp.length; a += 1) {
+    tmp[a] = tmp[a].toLowerCase()
+  }
+
+  if (end === 'snake') {
+    sep = '_'
+  } else if (end === 'kebab') {
+    sep = '-'
+  }
+
+  if (sep === '') {
+    output = (end === 'pascal')
+      ? ucFirst(tmp[0])
+      : tmp[0]
+
+    for (let a = 1; a < tmp.length; a += 1) {
+      output += ucFirst(tmp[a])
+    }
+  } else {
+    output = tmp[0]
+    for (let a = 1; a < tmp.length; a += 1) {
+      output += sep + tmp[a]
+    }
+  }
+
+  if (ucAll === true) {
+    output = output.toUpperCase()
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'changeVarStyle',
+  name: 'Change variable style',
+  func: changeVarStyle,
+  description: '',
+  // docsURL: '',
+  extraInputs: [
+  {
+    id: 'startStyle',
+    label: 'Starting style',
+    type: 'radio',
+    options: [{
+      value: 'snake',
+      label: 'Snake',
+      default: true
+    }, {
+      value: 'camel',
+      label: 'Camel'
+    }, {
+      value: 'kebab',
+      label: 'Kebab'
+    }, {
+      value: 'pascal',
+      label: 'Upper Camel'
+    }]
+  },
+  {
+    id: 'endStyle',
+    label: 'End style',
+    type: 'radio',
+    options: [{
+      value: 'snake',
+      label: 'Snake'
+    }, {
+      value: 'camel',
+      label: 'Camel',
+      default: true
+    }, {
+      value: 'kebab',
+      label: 'Kebab'
+    }, {
+      value: 'pascal',
+      label: 'Upper Camel'
+    }]
+  },
+  {
+    id: 'strip',
+    label: 'Strip first x items',
+    type: 'number',
+    min: 0,
+    max: 10,
+    step: 1,
+    default: 0
+  },
+  {
+    id: 'allupper',
+    label: 'Output style',
+    type: 'checkbox',
+    options: [
+      { value: 'true', label: 'UPPER CASE' }
+    ]
+  }],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Change variable style
 // ====================================================================
 
 

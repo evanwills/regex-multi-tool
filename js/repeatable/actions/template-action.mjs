@@ -25,14 +25,14 @@ const myFunction = (input, extraInputs, GETvars) => {
 
 doStuff.register({
   id: '',
+  name: '',
   func: myFunction,
   description: '',
   // docsURL: '',
   extraInputs: [],
   // group: '',
-  ignore: false,
+  ignore: false
   // inputLabel: '',
-  name: ''
   // remote: false,
   // rawGet: false,
 })
