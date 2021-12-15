@@ -985,7 +985,7 @@ doStuff.register({
 
 const sitecore2localLocalOrGlobalPath = (whole, fileType, fileName) => {
   const _name = fileName.replace(/\?.*?$/i, '').trim()
-  const _type = fileType.substr(0, (fileType.length - 1))
+  const _type = fileType.substring(0, (fileType.length - 1))
   const _localFiles = {
     fonts: [],
     css: [

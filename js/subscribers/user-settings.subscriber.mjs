@@ -20,7 +20,7 @@ const doubleHex2Dec = (a, b) => {
 }
 
 const makeRGBA = (hex) => {
-  const _hex = hex.substr(1).split('')
+  const _hex = hex.substring(1).split('')
   const _inc = (_hex.length === 6) ? 2 : 1
   let output = ''
   let c = 0

@@ -41,14 +41,14 @@ const initialState = {
 }
 
 if (isStr(url.searchParams.mode)) {
-  const mode = url.searchParams.mode.trim().substr(0, 6)
+  const mode = url.searchParams.mode.trim().substring(0, 6)
   if (mode === 'oneOff' || mode === 'repeat') {
     initialState.mode = mode
   }
 }
 
 if (initialState.mode === 'oneOff' && url.hash !== '') {
-  const hash = url.hash.substr(1).toLowerCase()
+  const hash = url.hash.substring(1).toLowerCase()
   const screens = ['input', 'regex', 'matches', 'output']
   if (screens.indexOf(hash) > -1) {
     initialState.oneOff.screen = hash

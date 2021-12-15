@@ -161,7 +161,7 @@ export const makeHTMLsafe = (input, doubleEncode, inputField) => {
 }
 
 export const ucFirst = (input) => {
-  return input.substr(0, 1).toUpperCase() + input.substr(1)
+  return input.substring(0, 1).toUpperCase() + input.substring(1)
 }
 
 /**
@@ -303,6 +303,36 @@ export const snakeToCamelCase = (input, start = 0) => {
   for (let a = start + 1; a < tmp.length; a += 1) {
     output += ucFirst(tmp[a])
   }
+
+  return output
+}
+
+/**
+ * Strip trailing "s" from pluralised words
+ *
+ * (may not be gramatically correct)
+ *
+ * @param {string} input
+ * @returns {string}
+ */
+export const makeSingle = (input) => {
+  // const output = input.trim()
+  const l = input.length
+  let output = input
+  console.group('makeSingle()')
+  console.log('input:', input)
+  console.log('input.substring(' + (l - 1) + '):', input.substring(l - 1))
+  console.log('input.substring(' + (l - 3) + '):', input.substring(l - 3))
+  console.log('input.substring(0, ' + (l - 4) + '):', input.substring(0, l - 4))
+
+  if (input.substring(l - 1) === 's') {
+    output = (output.substring(l - 4) === 'ies')
+    ? output.substring(0, l - 5) + 'y'
+    : output.substring(0, l - 1)
+  }
+
+  console.log('output:', output)
+  console.groupEnd()
 
   return output
 }

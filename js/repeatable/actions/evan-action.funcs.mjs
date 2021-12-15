@@ -6,8 +6,13 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
-import { snakeToCamelCase, ucFirst } from '../../utilities/sanitise.mjs'
+import { isBoolTrue, isNonEmptyStr, isNumeric } from '../../utilities/validation.mjs'
+import {
+  makeSingle,
+  snakeToCamelCase,
+  ucFirst
+} from '../../utilities/sanitise.mjs'
+
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name
@@ -677,7 +682,7 @@ doStuff.register({
     max: 100
   }],
   group: 'evan',
-  ignore: false,
+  ignore: true,
   name: 'Calculate Artbot Motor Speeds'
 })
 
@@ -874,7 +879,7 @@ const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
   for (let a = 0; a < lines.length; a += 1) {
     line = lines[a].trim()
 
-    if (line === '' || line.substring(line.length - 3) === '.sh' || line.substr(0, 9) === 'On branch' || line.substr(0, 1) === '(' || line.substr(0, 10) === 'no changes' || line.substr(0, 33) === 'src/Project/ACUPublic/ACU.Static/') {
+    if (line === '' || line.substring(line.length - 3) === '.sh' || line.substring(0, 9) === 'On branch' || line.substring(0, 1) === '(' || line.substring(0, 10) === 'no changes' || line.substring(0, 33) === 'src/Project/ACUPublic/ACU.Static/') {
       console.log('Skipping line:', line)
       continue
     }
@@ -902,7 +907,7 @@ const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
         sepCO = '\\\n\t'
       }
     } else if (untracked === true) {
-      if (line.substr(line.length - 1) === '/') {
+      if (line.substring(line.length - 1) === '/') {
         rmDirs += sepRMD + '"' + line + '"'
         sepRMD = '\\\n\t'
       } else {
@@ -980,7 +985,7 @@ const acceptChanges = (input, extraInputs, GETvars) => {
     // console.log('lines[' + a + ']:', lines[a])
     line = lines[a].trim()
     // console.log('line:', line)
-    if (line.substr(0, 14) === 'both modified:') {
+    if (line.substring(0, 14) === 'both modified:') {
       line = line.replace(/^both modified:\s+/, '')
       // console.log('line:', line)
 
@@ -1148,13 +1153,13 @@ const bash2windows = (input, extraInputs, GETvars) => {
   if (whichWay === 'win2bash') {
     output = backForward(input)
     // console.log('input:', input)
-    // console.log('input.substr(1, 1):', input.substr(1, 1))
-    if (input.substr(1, 1) === ':') {
+    // console.log('input.substring(1, 2):', input.substring(1, 2))
+    if (input.substring(1, 2) === ':') {
       output = prefix.bash + output
     }
   } else {
     output = forwardBack(input)
-    if (input.substr(0, 1) === '/') {
+    if (input.substring(0, 1) === '/') {
       output = prefix.win + output
     }
   }
@@ -1579,7 +1584,7 @@ doStuff.register({
     }]
   }],
   group: 'evan',
-  ignore: false,
+  ignore: true,
   name: 'Transform RYI Suburb/Schools JSON'
 })
 
@@ -2351,7 +2356,7 @@ doStuff.register({
     step: 1
   }],
   group: 'evan',
-  ignore: false,
+  ignore: true,
   // inputLabel: '',
   name: 'Fastest turn'
   // remote: false,
@@ -2618,4 +2623,184 @@ doStuff.register({
 })
 
 //  END:  Change variable style
+// ====================================================================
+// START: Routes to Enums
+
+/**
+ * Routes to Enums
+ *
+ * created by: Evan Wills
+ * created: 2021-12-10 12:19:00
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const routes2enums = (input, extraInputs, GETvars) => {
+  const fieldName = extraInputs.fieldName()
+  const routes = input.split('\n')
+  const enums = []
+  let output = ''
+
+  for (let a = 0; a < routes.length; a += 1) {
+    routes[a] = routes[a].trim()
+    routes[a] = routes[a].split('\t')
+    for (let b = 0; b < routes[a].length; b += 1) {
+      routes[a][b] = routes[a][b].trim()
+
+      if (Array.isArray(enums[b])) {
+        if (enums[b].indexOf(routes[a][b]) === -1) {
+          enums[b].push(routes[a][b])
+        }
+      } else {
+        enums.push([routes[a][b]])
+      }
+    }
+  }
+  console.log('routes:', routes)
+  console.log('enums:', enums)
+
+  for (let a = 0; a < enums.length; a += 1) {
+    enums[a].sort()
+    output += '                $table->enum(\n' +
+              '                    \'' + fieldName + (a + 1) + '\',\n' +
+              '                    ['
+    let line = '';
+    const sep = '\n                     '
+    for (let b = 0; b < enums[a].length; b += 1) {
+      enums[a][b] = enums[a][b].trim()
+
+      if (enums[a][b] !== '') {
+        if ((line.length + enums[a][b].length + 4) > 48) {
+          output += sep + line
+          line = ''
+        }
+        line += ' \'' + enums[a][b] + '\','
+      }
+    }
+    if (line !== '') {
+      output += sep + line
+    }
+
+    output += '\n' +
+              '                    ]\n' +
+              '                )->nullable();\n'
+  }
+  output = output.replace(/(?<='')(?=\n)/ig, ',')
+
+  return output
+}
+
+doStuff.register({
+  id: 'routes2enums',
+  name: 'Routes to Enums',
+  func: routes2enums,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'fieldName',
+    label: 'Field Name',
+    type: 'text',
+    default: 'admin_activity_route_level_'
+  }],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+// START: Insert routes
+
+/**
+ * Routes to Enums
+ *
+ * created by: Evan Wills
+ * created: 2021-12-10 12:19:00
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const insertRoutes = (input, extraInputs, GETvars) => {
+  const fieldName = extraInputs.fieldName()
+  const routes = input.split('\n')
+  const formSubs = [
+    'items', 'packages', 'fields', 'emails', 'email-rules',
+    'text-blocks', 'payments'
+  ]
+  const settingSubs = [
+    'config', 'text-blocks', 'field-types'
+  ]
+  const enums = []
+  let output = ''
+  let sep1 = ''
+
+  for (let a = 0; a < routes.length; a += 1) {
+    // routes[a] = routes[a].trim()
+    routes[a] = routes[a].split('\t')
+    let sep2 = ''
+    let top = makeSingle(routes[a][0].trim())
+    if (top === 'form') {
+      if (typeof routes[a][2] === 'string' && formSubs.indexOf(routes[a][2]) > -1) {
+        top += ' - ' + makeSingle(routes[a][2].trim())
+      }
+    } else if (top === 'setting') {
+      top += 's'
+      if (typeof routes[a][1] === 'string' && settingSubs.indexOf(routes[a][1]) > -1) {
+        top += ' - ' + makeSingle(routes[a][1].trim())
+      }
+    }
+    output += sep1 + '\n                [ // ' + a + ' (' + top + ')'
+    for (let b = 0; b < routes[a].length; b += 1) {
+      routes[a][b] = routes[a][b].trim()
+
+      const value = (routes[a][b] === '')
+        ? 'null'
+        : "'" + routes[a][b] + "'"
+
+      output += sep2 + '\n                    \'' + fieldName + (b + 1) + '\' => ' + value
+      sep2 = ','
+    }
+    output += '\n                ]'
+    sep1 = ','
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'insertRoutes',
+  name: 'Routes Insert',
+  func: insertRoutes,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'fieldName',
+    label: 'Field Name',
+    type: 'text',
+    default: 'admin_activity_route_level_'
+  }],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Insert routes
 // ====================================================================

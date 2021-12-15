@@ -51,7 +51,7 @@ const updateHref = (url) => {
 export const urlReducer = (state = initialState, action) => {
   switch (action.type) {
     case urlActions.UPDATE_HASH:
-      if (state.hash.substr(1) !== action.payload) {
+      if (state.hash.substring(1) !== action.payload) {
         return updateHref({
           ...state,
           hash: '#' + action.payload

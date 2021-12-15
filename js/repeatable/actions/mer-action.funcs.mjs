@@ -203,9 +203,9 @@ doStuff.register({
 
 const makeURLok = (url) => {
   const _url = url.trim()
-  const tmp = _url.subStr(0, 8).toLowerCase()
+  const tmp = _url.substring(0, 8).toLowerCase()
 
-  if (tmp === 'https://' || tmp.subStr(0, 1) === '/') {
+  if (tmp === 'https://' || tmp.substring(0, 1) === '/') {
     return _url
   } else {
     return '../img/gallery/' + _url

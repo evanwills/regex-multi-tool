@@ -11,7 +11,7 @@ export const mainAppMW = store => next => action => {
 
         const mode = (tmpMode === 'oneoff')
           ? 'oneOff'
-          : (tmpMode.substr(0, 6) === 'repeat')
+          : (tmpMode.substring(0, 6) === 'repeat')
               ? 'repeatable'
               : false
 

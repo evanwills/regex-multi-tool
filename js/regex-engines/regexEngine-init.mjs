@@ -58,7 +58,7 @@ function OneOff (url, remote, docs, api) {
    *
    * @var {boolean} isHTTPS
    */
-  const isHTTPS = (url.protocol.substr(0, 5) === 'https')
+  const isHTTPS = (url.protocol.substring(0, 5) === 'https')
 
   /**
    * The name of an engine set to NOT be ignored

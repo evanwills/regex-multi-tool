@@ -2689,7 +2689,7 @@ const truncateText = (input, extraInputs, GETvars) => {
 
     default:
       // Truncate by character count
-      output = output.substr(0, count)
+      output = output.substring(0, count)
   }
 
   // Strip excess leading & trailing whitespace
@@ -2887,7 +2887,7 @@ const convert2kwds = (input, extraInputs, GETvars) => {
     sep = ', '
   }
 
-  return
+  return outputStr
 }
 
 doStuff.register({
