@@ -8,7 +8,9 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isBoolTrue, isNonEmptyStr, isNumeric } from '../../utilities/validation.mjs'
 import {
+  camel2human,
   makeSingle,
+  padStrLeft,
   snakeToCamelCase,
   ucFirst
 } from '../../utilities/sanitise.mjs'
@@ -2627,6 +2629,49 @@ doStuff.register({
 // START: Routes to Enums
 
 /**
+ * Split list of routes into 2D array
+ *
+ * @param {string} input Copy/Paste from Excel
+ *
+ * @returns array
+ */
+const splitRoutes = (input) => {
+  let routes = input.trim()
+  routes = routes.split('\n')
+  const _route = []
+  const _description = []
+  const _label = []
+
+  for (let a = 0; a < routes.length; a += 1) {
+    routes[a] = routes[a].trim()
+    if (routes[a] !== '') {
+      routes[a] = routes[a].split('\t')
+      for (let b = 0; b < routes[a].length; b += 1) {
+        routes[a][b] = routes[a][b].trim()
+        if (routes[a][b] !== '') {
+          if (b < 5) {
+            if (typeof _route[a] === 'undefined') {
+              _route[a] = []
+            }
+            _route[a].push(routes[a][b])
+          } else if (b === 5) {
+            _description[a] = routes[a][b]
+          } else {
+            _label[a] = routes[a][b]
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    route: _route,
+    description: _description,
+    label: _label
+  };
+}
+
+/**
  * Routes to Enums
  *
  * created by: Evan Wills
@@ -2644,16 +2689,16 @@ doStuff.register({
  */
 const routes2enums = (input, extraInputs, GETvars) => {
   const fieldName = extraInputs.fieldName()
-  const routes = input.split('\n')
+  const routes = splitRoutes(input).route
   const enums = []
   let output = ''
+  console.log('routes:', routes)
 
   for (let a = 0; a < routes.length; a += 1) {
-    routes[a] = routes[a].trim()
-    routes[a] = routes[a].split('\t')
+    if (typeof routes[a] === 'undefined') {
+      continue;
+    }
     for (let b = 0; b < routes[a].length; b += 1) {
-      routes[a][b] = routes[a][b].trim()
-
       if (Array.isArray(enums[b])) {
         if (enums[b].indexOf(routes[a][b]) === -1) {
           enums[b].push(routes[a][b])
@@ -2716,12 +2761,34 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Routes to Enums
 // ====================================================================
-// START: Insert routes
+// START: Routes insert statements
+
+const _getRoutAction = (route, level) => {
+  let output = ''
+  let _level = level
+
+  if (route[_level] !== '') {
+    output = route[_level].replace(/-/g, ' ')
+  } else {
+    _level -= 1
+    if (route[_level].substr(-3) === 'ID}') {
+      output = 'show'
+    } else if (route[_level] !== '') {
+      output = route[_level]
+    } else {
+      return 's -> listing'
+    }
+  }
+
+  return (output !== '')
+    ? ' -> ' + output
+    : ''
+}
 
 /**
- * Routes to Enums
+ * Routes insert statements
  *
  * created by: Evan Wills
  * created: 2021-12-10 12:19:00
@@ -2738,9 +2805,10 @@ doStuff.register({
  */
 const insertRoutes = (input, extraInputs, GETvars) => {
   const fieldName = extraInputs.fieldName()
-  const routes = input.split('\n')
+  const routes = splitRoutes(input).route
   const formSubs = [
     'items', 'packages', 'fields', 'emails', 'email-rules',
+    'earlybird-discounts', 'group-discounts',
     'text-blocks', 'payments'
   ]
   const settingSubs = [
@@ -2751,23 +2819,38 @@ const insertRoutes = (input, extraInputs, GETvars) => {
   let sep1 = ''
 
   for (let a = 0; a < routes.length; a += 1) {
-    // routes[a] = routes[a].trim()
-    routes[a] = routes[a].split('\t')
+    if (typeof routes[a] === 'undefined') {
+      routes[a] = []
+    }
+
+    for (let b = 0; b < 5; b += 1) {
+      if (typeof routes[a][b] !== 'string') {
+        routes[a][b] = ''
+      }
+    }
+
     let sep2 = ''
-    let top = makeSingle(routes[a][0].trim())
+    let top = makeSingle(routes[a][0])
+
     if (top === 'form') {
-      if (typeof routes[a][2] === 'string' && formSubs.indexOf(routes[a][2]) > -1) {
-        top += ' - ' + makeSingle(routes[a][2].trim())
+      if (formSubs.indexOf(routes[a][2]) > -1) {
+        top += ': ' + makeSingle(routes[a][2]) + _getRoutAction(routes[a], 4)
+      } else {
+        top += _getRoutAction(routes[a], 2)
       }
     } else if (top === 'setting') {
       top += 's'
-      if (typeof routes[a][1] === 'string' && settingSubs.indexOf(routes[a][1]) > -1) {
-        top += ' - ' + makeSingle(routes[a][1].trim())
+      if (settingSubs.indexOf(routes[a][1]) > -1) {
+        top += ': ' + makeSingle(routes[a][1]) + _getRoutAction(routes[a], 3)
       }
+    } else if (['acronym', 'user'].indexOf(top) > -1) {
+      top += _getRoutAction(routes[a], 2)
     }
+
     output += sep1 + '\n                [ // ' + a + ' (' + top + ')'
+
     for (let b = 0; b < routes[a].length; b += 1) {
-      routes[a][b] = routes[a][b].trim()
+      routes[a][b] = routes[a][b]
 
       const value = (routes[a][b] === '')
         ? 'null'
@@ -2776,9 +2859,12 @@ const insertRoutes = (input, extraInputs, GETvars) => {
       output += sep2 + '\n                    \'' + fieldName + (b + 1) + '\' => ' + value
       sep2 = ','
     }
+
     output += '\n                ]'
     sep1 = ','
   }
+
+  output = output.replace(/(?<=\/\/ 1 \()(?=\))/, 'home')
 
   return output
 }
@@ -2802,5 +2888,93 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Insert routes
+//  END:  Routes insert statements
+// ====================================================================
+// START: Routes MD format
+
+/**
+ * Routes to Markdown format
+ *
+ * created by: Evan Wills
+ * created: 2022-01-06 10:00:00
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const routes2md = (input, extraInputs, GETvars) => {
+  const routes = splitRoutes(input)
+  const isID = (input) => {
+    return /^\{[a-zA-Z]+\}$/.test(input)
+  }
+  console.log('routes:', routes)
+  // return input
+
+  let output = ''
+
+  for (let a = 0 ; a < routes.route.length; a += 1) {
+    if (!Array.isArray(routes.route[a])) {
+      continue
+    }
+    const c = routes.route[a].length - 1
+    const key = routes.route[a][c]
+    const preSep = padStrLeft('', (c * 2))
+    const sep = '\n  ' + preSep
+
+    if (key !== '') {
+      if (c === 0) {
+        output += '\n\n## ' + ucFirst(key) + '\n'
+      }
+
+      output += '\n' + preSep + '* '
+      output += isID(key)
+        ? key.replace(/\{([^}]+)\}/, (match, token) => '__*`[' + ucFirst(camel2human(token)) + ']`*__')
+        : '__`' + key + '`__'
+      output += (typeof routes.label[a] === 'string')
+        ? ' (' + routes.label[a] + ')'
+        : ''
+      output += sep + '> __Route:__ '
+
+      // Generate the full route string
+      let route = ''
+      let subSep = ''
+      for (let b = 0; b <= c; b += 1) {
+        route += subSep + '`'
+        route += isID(routes.route[a][b])
+          ? '_`' + routes.route[a][b] + '`_'
+          : routes.route[a][b]
+        route += '`'
+        subSep = '/'
+      }
+      output += route.replace(/`(\/`_`)|(`_`\/)`|`(\/)`|(?<=_)`$/g, '$1$2$3')
+      output += (typeof routes.description[a] === 'string')
+        ? '\n' + sep + routes.description[a]
+        : ''
+
+    }
+  }
+  return output
+}
+
+doStuff.register({
+  id: 'routes2md',
+  name: 'Routes to Markdown format',
+  func: routes2md,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Routes MD format
 // ====================================================================

@@ -161,7 +161,11 @@ export const makeHTMLsafe = (input, doubleEncode, inputField) => {
 }
 
 export const ucFirst = (input) => {
-  return input.substring(0, 1).toUpperCase() + input.substring(1)
+  const replacer = (match, prefix, char) => {
+    return prefix + char.toUpperCase()
+  }
+
+  return input.replace(/^([^a-z]*)([a-z])/i, replacer)
 }
 
 /**
@@ -293,6 +297,30 @@ export const padStr = (input, len, char, centre) => {
   return _char + output + _char
 }
 
+/**
+ * Add padding characters to a the left side of a string to ensure
+ * it's the right length
+ *
+ * @param {string,number} input  Input to be padded
+ * @param {number}        len    Final length of output
+ * @param {string}        char   Character to use as padding
+ *                               [Default: ' ']
+ *
+ * @returns {string}
+ */
+export const padStrLeft = (input, len, char) => {
+  const _char = (!isStr(char)) ? ' ' : char
+  const _iLen = input.length
+
+  let output = input.toString()
+
+  for (let a = _iLen; a < len; a += 1) {
+    output = _char + output
+  }
+
+  return output
+}
+
 export const snakeToCamelCase = (input, start = 0) => {
   const splitter = (input.indexOf('-') > -1)
     ? '-'
@@ -307,6 +335,10 @@ export const snakeToCamelCase = (input, start = 0) => {
   return output
 }
 
+export const camel2human = (input) => {
+  return input.replace(/(?<=[a-z0-9])(?=[A-Z])/g, ' ')
+}
+
 /**
  * Strip trailing "s" from pluralised words
  *
@@ -319,11 +351,6 @@ export const makeSingle = (input) => {
   // const output = input.trim()
   const l = input.length
   let output = input
-  console.group('makeSingle()')
-  console.log('input:', input)
-  console.log('input.substring(' + (l - 1) + '):', input.substring(l - 1))
-  console.log('input.substring(' + (l - 3) + '):', input.substring(l - 3))
-  console.log('input.substring(0, ' + (l - 4) + '):', input.substring(0, l - 4))
 
   if (input.substring(l - 1) === 's') {
     output = (output.substring(l - 4) === 'ies')
