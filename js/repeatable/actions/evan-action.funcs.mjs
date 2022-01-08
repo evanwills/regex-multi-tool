@@ -2322,7 +2322,7 @@ const fastestTurn = (input, extraInputs, GETvars) => {
   if (tmp > 180 || tmp < -180) {
     tmp *= -1
   }
-  const output = (tmp < 0)
+  let output = (tmp < 0)
     ? 'left'
     : 'right'
 
