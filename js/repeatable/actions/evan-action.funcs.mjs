@@ -2978,3 +2978,214 @@ doStuff.register({
 
 //  END:  Routes MD format
 // ====================================================================
+// START: Laravel insert SQL to JS
+
+
+/**
+ * Routes to Markdown format
+ *
+ * created by: Evan Wills
+ * created: 2022-01-06 10:00:00
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const sql2json = (input, extraInputs, GETvars) => {
+  const tableName = extraInputs.table()
+  const colName = extraInputs.idProp()
+  let id = 0;
+  /**
+   * Do the actual heavy lifting of wrapping long value strings so
+   * the total length of line is less than 70 characters
+   *
+   * @param {number} base1 Length of white space to prefix wrapped
+   *                       lines
+   * @param {string} input String to wrap
+   *
+   * @returns {string} wrapped output
+   */
+  const wrapLongLineInner = (base1, input) => {
+    const maxLen = 70 - (base1 + 4)
+    const headReg = /[^ ]+$/s
+    const tailReg = /^.+? (?=[^ ]+$)/s
+    const sep = "' +\n" + ''.padStart(base1, ' ') + "'"
+    let _sep = ''
+    let head = ''
+    let tail = input
+
+    let a = 0;
+    while (tail.length > maxLen) {
+      head += _sep + tail.substring(0, maxLen)
+      tail = tail.substring(maxLen)
+
+      if (head.substring(head.length - 1) !== ' ') {
+        tail = head.replace(tailReg, '') + tail
+        head = head.replace(headReg, '')
+      }
+
+      _sep = sep
+    }
+
+    return head + _sep + tail
+  }
+
+  /**
+   * Handle makeing long value strings wrap at 70 characters
+   *
+   * @param {string} match whole pattern match
+   * @param {string} field field part of match
+   * @param {string} value value part of match
+   *
+   * @returns {string} wrapped version of whole match
+   */
+  const wrapLongLine = (match, field, value) => {
+    const baseLen = 6 + field.length
+    let output = value
+
+    if ((baseLen + 3 + output.length) > 70) {
+      output = wrapLongLineInner(baseLen, output)
+    }
+
+    return field + ": '" + output + "'"
+  }
+
+  /**
+   * Convert SQL table name into JS property name
+   *
+   * @param {string} match
+   * @param {string} key
+   *
+   * @returns {string}
+   */
+  const camelKey = (match, key) => '    ' + snakeToCamelCase(key)
+
+  const standardClean = (input) => {
+    let output = input.replace(/'\.[\r\n]+\s+'/g, '')
+    // output = output.replace(/'/g, '"')
+    output = output.replace(/ +\[/g, (match) => {
+      id += 1;
+      return '  {\n    ' + colName + ': ' + id + ',';
+    })
+    // console.log('output:', output)
+    output = output.replace(/ +\]/g, '  }')
+    // console.log('output:', output)
+    output = output.replace(/ *=> +/g, ': ')
+    // console.log('output:', output)
+    output = output.replace(/ +'([a-z_]+)'(?=: )/ig, camelKey)
+    output = output.replace(/\s*,\s*$/s, '')
+    // console.log('output:', output)
+    output = output.replace(/^/, '[')
+    // console.log('output:', output)
+    output = output.replace(/$/, '\n]')
+    // console.log('output:', output)
+
+    return output.replace(/(?<=    )([a-z]+): '(.*?)'(?=,|[\r\n])/ig, wrapLongLine)
+  }
+
+  console.log('tableName:', tableName)
+  console.log('tableName:', tableName)
+
+  return 'export const ' + snakeToCamelCase(
+            tableName.replace('data_', '')
+          ) + 'State = ' + standardClean(input)
+}
+
+doStuff.register({
+  id: 'sql2json',
+  name: 'Laravel insert SQL to JS',
+  func: sql2json,
+  description: 'Convert Laravel insert SQL to Redux state constant',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'table',
+    label: 'Table name',
+    type: 'text'
+  }, {
+    id: 'idProp',
+    label: 'ID column name',
+    type: 'text'
+  }],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Laravel insert SQL to JS
+// ====================================================================
+// START: Laravel to JS post conversion cleanup
+
+
+/**
+ * Routes to Markdown format
+ *
+ * created by: Evan Wills
+ * created: 2022-01-06 10:00:00
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const postConvertClean = (input, extraInputs, GETvars) => {
+  const steps = [
+    {
+      find: /,(?=\s+(\]|\}))/sg,
+      replace: ''
+    },
+    {
+      find: /"([^"'\r\n]*)"/g,
+      replace: '\'$1\''
+    },
+    {
+      find: /;\s*$/sg,
+      replace: ''
+    // },
+    // {
+    //   find: /((?:title|href)=)'([^']+)'/g,
+    //   replace: '$1"$2"'
+    }
+  ]
+  let output = input
+  // console.log('output:', output)
+  let a = 1;
+
+  for (let a = 0; a < steps.length; a += 1) {
+    output = output.replace(steps[a].find, steps[a].replace)
+    // console.log('output:', output)
+    // console.log('steps[' + a + '].find:', steps[a].find)
+    // console.log('steps[' + a + '].replace:', steps[a].replace)
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'postConvertClean',
+  name: 'Laravel to JS clean-up',
+  func: postConvertClean,
+  description: 'Laravel to JS post conversion clean-up',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Laravel to JS post conversion clean-up
+// ====================================================================
