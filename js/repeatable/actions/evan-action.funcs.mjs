@@ -1,12 +1,12 @@
 /* jslint browser: true */
-/* global btoa*/
+/* global btoa */
 
 // other global functions available:
 //   invalidString, invalidStrNum, invalidNum, invalidArray, makeAttributeSafe, isFunction
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isNonEmptyStr, isNumeric } from '../../utilities/validation.mjs'
+import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
 import {
   camel2human,
   makeSingle,
@@ -1809,7 +1809,6 @@ doStuff.register({
 // ====================================================================
 // START: Rewrite for PHPCS
 
-
 /**
  * Action description goes here
  *
@@ -2126,7 +2125,7 @@ const quickSQL = (input, extraInputs, GETvars) => {
   console.log('parts:', parts)
   const firstName = parts[0]
 
-  let lastName = '';
+  let lastName = ''
   let andOr = 'OR '
   if (parts.length > 1) {
     andOr = 'AND'
@@ -2200,7 +2199,7 @@ const collapseSQL = (input, extraInputs, GETvars) => {
     output = output.replace(':' + tokens[a][0].trim(), tokens[a][1].trim())
   }
 
-  return output.replace(/\s+/g, ' ').trim() + "\n"
+  return output.replace(/\s+/g, ' ').trim() + '\n'
 }
 
 doStuff.register({
@@ -2245,10 +2244,10 @@ doStuff.register({
  */
 const countLines = (input, extraInputs, GETvars) => {
   // let output = input.replace(/\s+[0-9]+%\s+[0-9.]+/ig, '')
-  let output = input.trim();
+  let output = input.trim()
   output.replace(/\s+[0-9]+%\s+[0-9.]+[A-Z]*\s+[0-9.]+[A-Z]+\/s\s+(?:[0-9]+:)+[0-9]+/ig, '')
   output = output.replace(/\s+Pausing for [0-9]+ seconds? to prevent timeouts\s+/ig, '\n')
-  output = output.trim();
+  output = output.trim()
   output = output.split('\n')
   return output.length + ''
   // return output
@@ -2281,7 +2280,8 @@ doStuff.register({
  * @returns {number} Number that is greater than -360 and less than 360
  */
 const true360 = (input) => {
-  let output = input * 1;
+  let output = input * 1
+
   if (output > 0) {
     while (output > 360) {
       output -= 360
@@ -2389,22 +2389,22 @@ const php2js = (input, extraInputs, GETvars) => {
   const regex = /id: ##/
   console.log('extraInputs.index()', extraInputs.index())
   let index = extraInputs.index() === 0 ? 0 : 1
-  let constName = snakeToCamelCase(extraInputs.name(), 1)
+  const constName = snakeToCamelCase(extraInputs.name(), 1)
   let output = input.trim()
   output = output.replace(/\s*(?:\[|array\()/g, '\n  {')
   output = output.replace(/\s*(?:\]|\))/g, '\n  }')
-  output = output.replace(/\'(?:.*?_)?([a-z]+)\'\s*=>\s*/ig, '$1: ')
-  output = output.replace(/((?:name|description):)[\r\n]*\s+\'([^\']+)\'(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?(?:\.[\r\n]+\s+\'([^\']+)\')?/ig, '$1 \'$2$3$4$5$6$7$8$9\'')
+  output = output.replace(/'(?:.*?_)?([a-z]+)'\s*=>\s*/ig, '$1: ')
+  output = output.replace(/((?:name|description):)[\r\n]*\s+'([^']+)'(?:\.[\r\n]+\s+'([^']+)')?(?:\.\s+'([^']+)')?(?:\.[\r\n]+\s+'([^']+)')?(?:\.[\r\n]+\s+'([^']+)')?(?:\.[\r\n]+\s+'([^']+)')?(?:\.[\r\n]+\s+'([^']+)')?(?:\.[\r\n]+\s+'([^']+)')?/ig, '$1 \'$2$3$4$5$6$7$8$9\'')
   output = output.replace(/((\s+)name:)/ig, '$2id: ##,$1')
   output = output.replace(/[\r\n]+\s+([a-z]+: )/ig, '\n    $1')
 
   while (output.match(regex)) {
-    output = output.replace(regex, 'id: '+ index)
+    output = output.replace(regex, 'id: ' + index)
     index += 1
   }
   output = output.replace(/\s+id: [0-9]+,(\s+id: [0-9]+,)/gs, '$1')
 
-  return '\nexport const ' + constName + ' = ['  + output + '\n]\n\n'
+  return '\nexport const ' + constName + ' = [' + output + '\n]\n\n'
 }
 
 doStuff.register({
@@ -2423,7 +2423,7 @@ doStuff.register({
   }, {
     id: 'name',
     type: 'text',
-    label: 'Constant name',
+    label: 'Constant name'
   }],
   group: 'evan',
   ignore: false,
@@ -2562,61 +2562,62 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [
-  {
-    id: 'startStyle',
-    label: 'Starting style',
-    type: 'radio',
-    options: [{
-      value: 'snake',
-      label: 'Snake',
-      default: true
-    }, {
-      value: 'camel',
-      label: 'Camel'
-    }, {
-      value: 'kebab',
-      label: 'Kebab'
-    }, {
-      value: 'pascal',
-      label: 'Upper Camel'
-    }]
-  },
-  {
-    id: 'endStyle',
-    label: 'End style',
-    type: 'radio',
-    options: [{
-      value: 'snake',
-      label: 'Snake'
-    }, {
-      value: 'camel',
-      label: 'Camel',
-      default: true
-    }, {
-      value: 'kebab',
-      label: 'Kebab'
-    }, {
-      value: 'pascal',
-      label: 'Upper Camel'
-    }]
-  },
-  {
-    id: 'strip',
-    label: 'Strip first x items',
-    type: 'number',
-    min: 0,
-    max: 10,
-    step: 1,
-    default: 0
-  },
-  {
-    id: 'allupper',
-    label: 'Output style',
-    type: 'checkbox',
-    options: [
-      { value: 'true', label: 'UPPER CASE' }
-    ]
-  }],
+    {
+      id: 'startStyle',
+      label: 'Starting style',
+      type: 'radio',
+      options: [{
+        value: 'snake',
+        label: 'Snake',
+        default: true
+      }, {
+        value: 'camel',
+        label: 'Camel'
+      }, {
+        value: 'kebab',
+        label: 'Kebab'
+      }, {
+        value: 'pascal',
+        label: 'Upper Camel'
+      }]
+    },
+    {
+      id: 'endStyle',
+      label: 'End style',
+      type: 'radio',
+      options: [{
+        value: 'snake',
+        label: 'Snake'
+      }, {
+        value: 'camel',
+        label: 'Camel',
+        default: true
+      }, {
+        value: 'kebab',
+        label: 'Kebab'
+      }, {
+        value: 'pascal',
+        label: 'Upper Camel'
+      }]
+    },
+    {
+      id: 'strip',
+      label: 'Strip first x items',
+      type: 'number',
+      min: 0,
+      max: 10,
+      step: 1,
+      default: 0
+    },
+    {
+      id: 'allupper',
+      label: 'Output style',
+      type: 'checkbox',
+      options: [
+        { value: 'true', label: 'UPPER CASE' }
+      ]
+    }
+  ],
   // group: '',
   ignore: false
   // inputLabel: '',
@@ -2668,7 +2669,7 @@ const splitRoutes = (input) => {
     route: _route,
     description: _description,
     label: _label
-  };
+  }
 }
 
 /**
@@ -2696,7 +2697,7 @@ const routes2enums = (input, extraInputs, GETvars) => {
 
   for (let a = 0; a < routes.length; a += 1) {
     if (typeof routes[a] === 'undefined') {
-      continue;
+      continue
     }
     for (let b = 0; b < routes[a].length; b += 1) {
       if (Array.isArray(enums[b])) {
@@ -2716,7 +2717,7 @@ const routes2enums = (input, extraInputs, GETvars) => {
     output += '                $table->enum(\n' +
               '                    \'' + fieldName + (a + 1) + '\',\n' +
               '                    ['
-    let line = '';
+    let line = ''
     const sep = '\n                     '
     for (let b = 0; b < enums[a].length; b += 1) {
       enums[a][b] = enums[a][b].trim()
@@ -2814,7 +2815,7 @@ const insertRoutes = (input, extraInputs, GETvars) => {
   const settingSubs = [
     'config', 'text-blocks', 'field-types'
   ]
-  const enums = []
+  // const enums = []
   let output = ''
   let sep1 = ''
 
@@ -2850,7 +2851,7 @@ const insertRoutes = (input, extraInputs, GETvars) => {
     output += sep1 + '\n                [ // ' + a + ' (' + top + ')'
 
     for (let b = 0; b < routes[a].length; b += 1) {
-      routes[a][b] = routes[a][b]
+      // routes[a][b] = routes[a][b]
 
       const value = (routes[a][b] === '')
         ? 'null'
@@ -2918,7 +2919,7 @@ const routes2md = (input, extraInputs, GETvars) => {
 
   let output = ''
 
-  for (let a = 0 ; a < routes.route.length; a += 1) {
+  for (let a = 0; a < routes.route.length; a += 1) {
     if (!Array.isArray(routes.route[a])) {
       continue
     }
@@ -2956,7 +2957,6 @@ const routes2md = (input, extraInputs, GETvars) => {
       output += (typeof routes.description[a] === 'string')
         ? '\n' + sep + routes.description[a]
         : ''
-
     }
   }
   return output
@@ -2980,7 +2980,6 @@ doStuff.register({
 // ====================================================================
 // START: Laravel insert SQL to JS
 
-
 /**
  * Routes to Markdown format
  *
@@ -3000,7 +2999,7 @@ doStuff.register({
 const sql2json = (input, extraInputs, GETvars) => {
   const tableName = extraInputs.table()
   const colName = extraInputs.idProp()
-  let id = 0;
+  let id = 0
   /**
    * Do the actual heavy lifting of wrapping long value strings so
    * the total length of line is less than 70 characters
@@ -3020,7 +3019,7 @@ const sql2json = (input, extraInputs, GETvars) => {
     let head = ''
     let tail = input
 
-    let a = 0;
+    // let a = 0;
     while (tail.length > maxLen) {
       head += _sep + tail.substring(0, maxLen)
       tail = tail.substring(maxLen)
@@ -3068,11 +3067,13 @@ const sql2json = (input, extraInputs, GETvars) => {
 
   const standardClean = (input) => {
     let output = input.replace(/'\.[\r\n]+\s+'/g, '')
+
     // output = output.replace(/'/g, '"')
     output = output.replace(/ +\[/g, (match) => {
-      id += 1;
-      return '  {\n    ' + colName + ': ' + id + ',';
+      id += 1
+      return '  {\n    ' + colName + ': ' + id + ','
     })
+
     // console.log('output:', output)
     output = output.replace(/ +\]/g, '  }')
     // console.log('output:', output)
@@ -3086,15 +3087,15 @@ const sql2json = (input, extraInputs, GETvars) => {
     output = output.replace(/$/, '\n]')
     // console.log('output:', output)
 
-    return output.replace(/(?<=    )([a-z]+): '(.*?)'(?=,|[\r\n])/ig, wrapLongLine)
+    return output.replace(/(?<= {4})([a-z]+): '(.*?)'(?=,|[\r\n])/ig, wrapLongLine)
   }
 
   console.log('tableName:', tableName)
   console.log('tableName:', tableName)
 
   return 'export const ' + snakeToCamelCase(
-            tableName.replace('data_', '')
-          ) + 'State = ' + standardClean(input)
+    tableName.replace('data_', '')
+  ) + 'State = ' + standardClean(input)
 }
 
 doStuff.register({
@@ -3122,7 +3123,6 @@ doStuff.register({
 //  END:  Laravel insert SQL to JS
 // ====================================================================
 // START: Laravel to JS post conversion cleanup
-
 
 /**
  * Routes to Markdown format
@@ -3161,7 +3161,6 @@ const postConvertClean = (input, extraInputs, GETvars) => {
   ]
   let output = input
   // console.log('output:', output)
-  let a = 1;
 
   for (let a = 0; a < steps.length; a += 1) {
     output = output.replace(steps[a].find, steps[a].replace)

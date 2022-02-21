@@ -6,7 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isStr } from '../../utilities/validation.mjs'
+// import { isStr } from '../../utilities/validation.mjs'
 import { isNumber, isNonEmptyStr } from '../../utilities/validation.mjs'
 import { padStr } from '../../utilities/sanitise.mjs'
 
@@ -2194,7 +2194,7 @@ const htmlSpecialChars = (input, extraInputs, GETvars) => {
     [/\u9838/g, '&natur;'], // MUSIC NATURAL SIGN
     [/\u9839/g, '&sharp;'], // MUSIC SHARP SIGN
     [/</g, '&lt;'],
-    [/>/g, '&gt;'],
+    [/>/g, '&gt;']
   ]
   let output = input
   for (let a = 0; a < findReplace.length; a += 1) {
@@ -2221,7 +2221,6 @@ doStuff.register({
 //  END:  HTML Enchode special chars
 // ====================================================================
 // START: TSV to markdown table
-
 
 /**
  * Convert TSV data (with headers) to markdown formatted table
@@ -2262,7 +2261,7 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
     tmp[a] = tmp[a].trim()
 
     if (tmp[a] === '') {
-      tmp.pop();
+      tmp.pop()
     } else {
       tmp[a] = tmp[a].split(colDelim)
 
@@ -2297,7 +2296,6 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
   return output
 }
 
-
 doStuff.register({
   id: 'tsv2Markdown',
   func: tsv2Markdown,
@@ -2327,7 +2325,6 @@ doStuff.register({
 //  END:  TSV to markdown table
 // ====================================================================
 // START: Markdown table to TSV
-
 
 /**
  * Convert Markdown formatted table to TSV data
@@ -2368,7 +2365,7 @@ const markdown2tsv = (input, extraInputs, GETvars) => {
       tmp[a] = tmp[a].split('|')
 
       rows.push([])
-      let c = rows.length - 1
+      const c = rows.length - 1
 
       for (let b = 0; b < tmp[a].length; b += 1) {
         rows[c][b] = tmp[a][b].trim()
@@ -2377,7 +2374,7 @@ const markdown2tsv = (input, extraInputs, GETvars) => {
   }
 
   for (let a = 0; a < rows.length; a += 1) {
-    colSep = '';
+    colSep = ''
     output += rowSep
     for (let b = 0; b < rows[a].length; b += 1) {
       output += colSep + rows[a][b]
@@ -2388,7 +2385,6 @@ const markdown2tsv = (input, extraInputs, GETvars) => {
 
   return output
 }
-
 
 doStuff.register({
   id: 'markdown2tsv',
@@ -2462,7 +2458,7 @@ const encodeMap = (input) => {
  */
 const degoogle = (input, extraInputs, GETvars) => {
   let encodedURL = input.trim()
-  encodedURL = encodedURL.replace(/^.*?url=(http.*?)\&.*$/g, '$1')
+  encodedURL = encodedURL.replace(/^.*?url=(http.*?)&.*$/g, '$1')
 
   // for some reason the built-in decodeURI function isn't working
   // so I've created my own
@@ -2568,7 +2564,7 @@ const posix2pcre = (input, extraInputs, GETvars) => {
     '~~~~', '\\}', '}',
     '~~~~', '\\?', '?',
     '~~~~', '\\+', '+',
-    '~~~~', '\\|', '|',
+    '~~~~', '\\|', '|'
   ]
   let output = input
 
@@ -2606,36 +2602,6 @@ doStuff.register({
 //  END:  POSIX to PCRE
 // ====================================================================
 // START: Truncate text
-
-/**
- * Truncate string based on the word count
- *
- * @param {string} input Raw text to be truncated
- * @param {number} count Maximum number of allowed allowed
- *
- * @returns {string}
- */
-const limitWordCount = (input, count) => {
-  const regex = new RegExp()
-  console.log('regex:', regex)
-  const output = input.replace(regex, '$1')
-  return output.trim()
-}
-
-/**
- * Truncate string based on the sentence count
- *
- * @param {string} input Raw text to be truncated
- * @param {number} count Maximum number of sentences allowed
- *
- * @returns {string}
- */
-const limitSentenceCount = (input, count) => {
-  const regex =
-  console.log('regex:', regex)
-  const output = input.replace(regex, )
-  return output.trim()
-}
 
 /**
  * Truncate text by character count then trim incomplete tail
@@ -2677,7 +2643,7 @@ const truncateText = (input, extraInputs, GETvars) => {
         new RegExp('^((?:[^.?!]+[.?!]+){0,' + count + '}).*$'),
         '$1'
       )
-      break;
+      break
 
     case 'word':
       // Strip excess words
@@ -2685,7 +2651,7 @@ const truncateText = (input, extraInputs, GETvars) => {
         new RegExp('^((?:[\\w]+[^\\w]+){0,' + count + '}).*$'),
         '$1'
       )
-      break;
+      break
 
     default:
       // Truncate by character count
@@ -2695,17 +2661,16 @@ const truncateText = (input, extraInputs, GETvars) => {
   // Strip excess leading & trailing whitespace
   output = output.trim()
 
-
   switch (mode2) {
     case 'word':
       // removing possible partial word
       output = output.replace(/\s[^\s]+$/, '')
-      break;
+      break
 
     case 'sentence':
       // remove possible partial sentences
       output = output.replace(/([.?!])[^.?!]+$/, '$1')
-      break;
+      break
   }
 
   return output
@@ -2778,59 +2743,59 @@ doStuff.register({
 const convert2kwds = (input, extraInputs, GETvars) => {
   // Non-English characters
   const find = [
-      /À/g, /Á/g, /Â/g, /Ã/g, /Ä/g, /Å/g, /Ā/g, /Ă/g, /Ą/g, /Æ/g, /Ć/g,
-      /Ċ/g, /Č/g, /Ĉ/g, /Ç/g, /Ď/g, /Ð/g, /È/g, /É/g, /Ê/g, /Ě/g, /Ë/g,
-      /Ē/g, /Ę/g, /Ğ/g, /Ġ/g, /Ĝ/g, /Ģ/g, /Ĥ/g, /Ħ/g, /Ì/g, /Í/g, /Î/g,
-      /Ï/g, /İ/g, /Ĩ/g, /Ī/g, /Į/g, /Ĳ/g, /Ĵ/g, /Ķ/g, /ĸ/g, /Ĺ/g, /Ļ/g,
-      /Ľ/g, /Ŀ/g, /Ł/g, /Ñ/g, /Ń/g, /Ň/g, /Ŋ/g, /Ò/g, /Ó/g, /Ô/g, /Õ/g,
-      /Ö/g, /Ō/g, /Ő/g, /Ø/g, /Œ/g, /Ŕ/g, /Ŗ/g, /Ś/g, /Š/g, /š/g, /Ş/g,
-      /Ţ/g, /Ť/g, /Ŧ/g, /Ù/g, /Ú/g, /Û/g, /Ü/g, /Ũ/g, /Ū/g, /Ŭ/g, /Ů/g,
-      /Ű/g, /Ų/g, /Ý/g, /Ŷ/g, /Ÿ/g, /Ƶ/g, /Þ/g, /ß/g, /Ž/g, /ž/g, /à/g,
-      /á/g, /â/g, /ã/g, /ä/g, /å/g, /ā/g, /ă/g, /ą/g, /æ/g, /þ/g, /ç/g,
-      /ć/g, /ĉ/g, /ċ/g, /č/g, /ď/g, /è/g, /é/g, /ê/g, /ë/g, /ē/g, /ė/g,
-      /ę/g, /ě/g, /ğ/g, /ġ/g, /ǵ/g, /ĥ/g, /ħ/g, /ì/g, /í/g, /î/g, /ï/g,
-      /ı/g, /ĩ/g, /ī/g, /į/g, /ĳ/g, /ĵ/g, /ķ/g, /ĺ/g, /ļ/g, /ľ/g, /ŀ/g,
-      /ł/g, /ñ/g, /ń/g, /ņ/g, /ň/g, /ŉ/g, /ŋ/g, /ð/g, /ò/g, /ó/g, /ô/g,
-      /õ/g, /ö/g, /ō/g, /ő/g, /ø/g, /œ/g, /ŕ/g, /ŗ/g, /ř/g, /ş/g, /ś/g,
-      /ŝ/g, /ţ/g, /ť/g, /ŧ/g, /ù/g, /ú/g, /û/g, /ü/g, /ũ/g, /ū/g, /ŭ/g,
-      /ů/g, /ű/g, /ų/g, /ŵ/g, /ý/g, /ÿ/g, /ŷ/g, /ź/g, /ż/g
+    /À/g, /Á/g, /Â/g, /Ã/g, /Ä/g, /Å/g, /Ā/g, /Ă/g, /Ą/g, /Æ/g, /Ć/g,
+    /Ċ/g, /Č/g, /Ĉ/g, /Ç/g, /Ď/g, /Ð/g, /È/g, /É/g, /Ê/g, /Ě/g, /Ë/g,
+    /Ē/g, /Ę/g, /Ğ/g, /Ġ/g, /Ĝ/g, /Ģ/g, /Ĥ/g, /Ħ/g, /Ì/g, /Í/g, /Î/g,
+    /Ï/g, /İ/g, /Ĩ/g, /Ī/g, /Į/g, /Ĳ/g, /Ĵ/g, /Ķ/g, /ĸ/g, /Ĺ/g, /Ļ/g,
+    /Ľ/g, /Ŀ/g, /Ł/g, /Ñ/g, /Ń/g, /Ň/g, /Ŋ/g, /Ò/g, /Ó/g, /Ô/g, /Õ/g,
+    /Ö/g, /Ō/g, /Ő/g, /Ø/g, /Œ/g, /Ŕ/g, /Ŗ/g, /Ś/g, /Š/g, /š/g, /Ş/g,
+    /Ţ/g, /Ť/g, /Ŧ/g, /Ù/g, /Ú/g, /Û/g, /Ü/g, /Ũ/g, /Ū/g, /Ŭ/g, /Ů/g,
+    /Ű/g, /Ų/g, /Ý/g, /Ŷ/g, /Ÿ/g, /Ƶ/g, /Þ/g, /ß/g, /Ž/g, /ž/g, /à/g,
+    /á/g, /â/g, /ã/g, /ä/g, /å/g, /ā/g, /ă/g, /ą/g, /æ/g, /þ/g, /ç/g,
+    /ć/g, /ĉ/g, /ċ/g, /č/g, /ď/g, /è/g, /é/g, /ê/g, /ë/g, /ē/g, /ė/g,
+    /ę/g, /ě/g, /ğ/g, /ġ/g, /ǵ/g, /ĥ/g, /ħ/g, /ì/g, /í/g, /î/g, /ï/g,
+    /ı/g, /ĩ/g, /ī/g, /į/g, /ĳ/g, /ĵ/g, /ķ/g, /ĺ/g, /ļ/g, /ľ/g, /ŀ/g,
+    /ł/g, /ñ/g, /ń/g, /ņ/g, /ň/g, /ŉ/g, /ŋ/g, /ð/g, /ò/g, /ó/g, /ô/g,
+    /õ/g, /ö/g, /ō/g, /ő/g, /ø/g, /œ/g, /ŕ/g, /ŗ/g, /ř/g, /ş/g, /ś/g,
+    /ŝ/g, /ţ/g, /ť/g, /ŧ/g, /ù/g, /ú/g, /û/g, /ü/g, /ũ/g, /ū/g, /ŭ/g,
+    /ů/g, /ű/g, /ų/g, /ŵ/g, /ý/g, /ÿ/g, /ŷ/g, /ź/g, /ż/g
   ]
   const replace = [
-      'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'C',
-      'C', 'C', 'C', 'C', 'D', 'D', 'E', 'E', 'E', 'E', 'E',
-      'E', 'E', 'G', 'G', 'G', 'G', 'H', 'H', 'I', 'I', 'I',
-      'I', 'I', 'I', 'I', 'I', 'IJ', 'J', 'Ķ', 'Ķ', 'L', 'L',
-      'L', 'L', 'L', 'N', 'N', 'N', 'N', 'O', 'O', 'O', 'O',
-      'O', 'O', 'O', 'O', 'O', 'OE', 'R', 'R', 'S', 'S', 's',
-      'S', 'T', 'T', 'T', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
-      'U', 'U', 'U', 'Y', 'Y', 'Y', 'Z', 'B', 'Ss', 'Z', 'z',
-      'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b',
-      'c', 'c', 'c', 'c', 'c', 'd', 'e', 'e', 'e', 'e', 'e',
-      'e', 'e', 'e', 'g', 'g', 'g', 'H', 'H', 'i', 'i', 'i',
-      'i', 'i', 'i', 'i', 'i', 'ij', 'j', 'k', 'l', 'l', 'l',
-      'l', 'l', 'n', 'n', 'n', 'n', 'n', 'n', 'o', 'o', 'o',
-      'o', 'o', 'o', 'o', 'o', 'o', 'oe', 'r', 'r', 'r', 's',
-      's', 's', 't', 't', 't', 'u', 'u', 'u', 'u', 'u', 'u',
-      'u', 'u', 'u', 'u', 'w', 'y', 'y', 'y', 'z', 'z'
+    'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'C',
+    'C', 'C', 'C', 'C', 'D', 'D', 'E', 'E', 'E', 'E', 'E',
+    'E', 'E', 'G', 'G', 'G', 'G', 'H', 'H', 'I', 'I', 'I',
+    'I', 'I', 'I', 'I', 'I', 'IJ', 'J', 'Ķ', 'Ķ', 'L', 'L',
+    'L', 'L', 'L', 'N', 'N', 'N', 'N', 'O', 'O', 'O', 'O',
+    'O', 'O', 'O', 'O', 'O', 'OE', 'R', 'R', 'S', 'S', 's',
+    'S', 'T', 'T', 'T', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
+    'U', 'U', 'U', 'Y', 'Y', 'Y', 'Z', 'B', 'Ss', 'Z', 'z',
+    'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b',
+    'c', 'c', 'c', 'c', 'c', 'd', 'e', 'e', 'e', 'e', 'e',
+    'e', 'e', 'e', 'g', 'g', 'g', 'H', 'H', 'i', 'i', 'i',
+    'i', 'i', 'i', 'i', 'i', 'ij', 'j', 'k', 'l', 'l', 'l',
+    'l', 'l', 'n', 'n', 'n', 'n', 'n', 'n', 'o', 'o', 'o',
+    'o', 'o', 'o', 'o', 'o', 'o', 'oe', 'r', 'r', 'r', 's',
+    's', 's', 't', 't', 't', 'u', 'u', 'u', 'u', 'u', 'u',
+    'u', 'u', 'u', 'u', 'w', 'y', 'y', 'y', 'z', 'z'
   ]
   // Most common words in English
   const excluded = [
-      'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have',
-      'i', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you',
-      'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we',
-      'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all',
-      'would', 'there', 'their', 'what', 'so', 'up', 'out', 'if',
-      'about', 'who', 'get', 'which', 'go', 'me', 'when', 'make',
-      'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
-      'people', 'into', 'year', 'your', 'good', 'some', 'could',
-      'them', 'see', 'other', 'than', 'then', 'now', 'look',
-      'only', 'come', 'its', 'over', 'think', 'also', 'back',
-      'after', 'use', 'two', 'how', 'our', 'work', 'first',
-      'well', 'way', 'even', 'new', 'want', 'because', 'any',
-      'these', 'give', 'day', 'most', 'us', 'time', 'person',
-      'year', 'way', 'day', 'thing', 'man', 'world', 'life',
-      'hand', 'part', 'child', 'eye', 'woman', 'place', 'work',
-      'week', 'case'
+    'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have',
+    'i', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you',
+    'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we',
+    'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all',
+    'would', 'there', 'their', 'what', 'so', 'up', 'out', 'if',
+    'about', 'who', 'get', 'which', 'go', 'me', 'when', 'make',
+    'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
+    'people', 'into', 'year', 'your', 'good', 'some', 'could',
+    'them', 'see', 'other', 'than', 'then', 'now', 'look',
+    'only', 'come', 'its', 'over', 'think', 'also', 'back',
+    'after', 'use', 'two', 'how', 'our', 'work', 'first',
+    'well', 'way', 'even', 'new', 'want', 'because', 'any',
+    'these', 'give', 'day', 'most', 'us', 'time', 'person',
+    'year', 'way', 'day', 'thing', 'man', 'world', 'life',
+    'hand', 'part', 'child', 'eye', 'woman', 'place', 'work',
+    'week', 'case'
   ]
 
   let clean = input.trim()
@@ -2838,7 +2803,7 @@ const convert2kwds = (input, extraInputs, GETvars) => {
   for (let a = 0; a < find.length; a += 1) {
     clean = clean.replace(find[a], replace[a])
   }
-  clean = clean.toLowerCase();
+  clean = clean.toLowerCase()
 
   const bad = [/[^a-z0-9-]+/ig, /\s+/g]
   const good = [' ', ' ']
@@ -2848,36 +2813,36 @@ const convert2kwds = (input, extraInputs, GETvars) => {
   }
 
   clean = clean.trim()
-  let output = [clean]
+  const output = [clean]
 
   const tmp = clean.replace(/(?<=^| )[a-z]( |$)/g, '')
   if (tmp !== clean) {
-      output.push(tmp)
+    output.push(tmp)
   }
 
   let cleanBits = clean.split(' ')
   const ln = cleanBits.length
   for (let a = 0; a < ln; a += 1) {
-      // If there's a hyphenated word or name, split it into two
-      // separate words and add them to the list of keywords
-      if (cleanBits[a].indexOf('-') > -1) {
-        cleanBits = [...cleanBits, ...cleanBits[a].split('-')]
-      }
+    // If there's a hyphenated word or name, split it into two
+    // separate words and add them to the list of keywords
+    if (cleanBits[a].indexOf('-') > -1) {
+      cleanBits = [...cleanBits, ...cleanBits[a].split('-')]
+    }
   }
   console.log('cleanBits:', cleanBits)
 
   for (let a = 0; a < cleanBits.length; a += 1) {
     cleanBits[a] = cleanBits[a].trim()
 
-      // Make sure we don't already have the word in the list
-      // Also make sure the word is not a common word in English
-      // and that the word is more than two characters
-      if (output.indexOf(cleanBits[a]) === -1 &&
-          excluded.indexOf(cleanBits[a]) &&
-          cleanBits[a].length > 2
-      ) {
-          output.push(cleanBits[a])
-      }
+    // Make sure we don't already have the word in the list
+    // Also make sure the word is not a common word in English
+    // and that the word is more than two characters
+    if (output.indexOf(cleanBits[a]) === -1 &&
+        excluded.indexOf(cleanBits[a]) &&
+        cleanBits[a].length > 2
+    ) {
+      output.push(cleanBits[a])
+    }
   }
 
   let outputStr = ''
@@ -2895,13 +2860,13 @@ doStuff.register({
   name: 'Convert name/title to keywords list',
   func: convert2kwds,
   description: 'Makes sure that all the characters in the text are normal English characters, Build a list of comma separated words from the input text, strip out words that are duplicated, that are less than 3 characters or are common english language words.',
-//   // docsURL: '',
+  // docsURL: '',
   extraInputs: [],
-//   // group: '',
-//   ignore: false
-//   // inputLabel: '',
-//   // remote: false,
-//   // rawGet: false,
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
 })
 
 //  END:  Convert name/title to keywords list

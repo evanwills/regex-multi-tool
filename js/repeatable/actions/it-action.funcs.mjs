@@ -1302,8 +1302,8 @@ doStuff.register({
  */
 const securePayURL = (input, extraInputs, GETvars) => {
   const _tmp = input.trim()
-  const _regex = /[?&]([a-z]+)=([^&]+)(?=\&|$)/ig
-  const _matches = [..._tmp.matchAll(_regex)];
+  const _regex = /[?&]([a-z]+)=([^&]+)(?=&|$)/ig
+  const _matches = [..._tmp.matchAll(_regex)]
 
   const _exclude = [
     'expirydate',
@@ -1334,11 +1334,11 @@ const securePayURL = (input, extraInputs, GETvars) => {
     const key = _matches[a][1]
     const value = _matches[a][2]
 
-    tmp[key] = value;
+    tmp[key] = value
 
     if (_exclude.indexOf(key) === -1) {
       // const _key = _map[key]
-      output[key] = value;
+      output[key] = value
       console.log('key:', key)
       // console.log('_key:', _key)
       console.log('value:', value)
