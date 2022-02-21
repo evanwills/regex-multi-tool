@@ -1390,12 +1390,23 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const jira2branch = (input, extraInputs, GETvars) => {
-  const regex1 = /^\s+([a-z0-9]+-[0-9]+)\s+(.+)$/i
+  const regex = /^\s*([a-z0-9]+-[0-9]+|[a-z]+[0-9]+)\s+(.+)$/i
+  const prefix = extraInputs.branchType() + '/'
+  const desc = extraInputs.desc().trim()
+  const id = extraInputs.ticketID().trim()
 
-  return input.replace(regex1, (whole, id, name) => {
+  const cleaner = (whole, id, name) => {
     const _name = name.toLowerCase().replace(/[^a-z0-9-]+/ig, '-')
-    return id.trim() + '--' + _name.replace(/--+/g, '-')
-  })
+    return id.trim() + '--' + _name.replace(/--+/g, '-').replace(/^-|-$/g, '')
+  }
+
+  const _input = (id !== '' && desc !== '')
+    ? id + ' ' + desc
+    : input.trim()
+
+  return (_input.match(regex))
+    ? prefix + _input.replace(regex, cleaner)
+    : ''
 }
 
 doStuff.register({
@@ -1404,7 +1415,25 @@ doStuff.register({
   func: jira2branch,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  extraInputs: [
+    {
+      id: 'branchType',
+      label: 'Which type of branch',
+      type: 'select',
+      options: [
+        { value: 'feature', label: 'Feature', default: true },
+        { value: 'hotfix', label: 'Hot fix' }
+      ]
+    }, {
+      id: 'ticketID',
+      label: 'Ticket ID',
+      type: 'text'
+    }, {
+      id: 'desc',
+      label: 'Branch description',
+      type: 'text'
+    }
+  ],
   group: 'it',
   ignore: false
   // inputLabel: '',
