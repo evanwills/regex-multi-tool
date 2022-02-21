@@ -1309,25 +1309,24 @@ const securePayURL = (input, extraInputs, GETvars) => {
     'expirydate',
     'pan',
     'suramount',
-    'merchant',
+    // 'merchant',
     'baseamount',
     'surfee',
     'currency',
     'surrate'
   ]
-  const _map = {
-    settdate: 'settlementDate',
-    restext: 'status',
-    rescode: 'statusCode',
-    fingerprint: 'fingerprint',
-    amount: 'amount',
-    refid: 'paymentID',
-    summarycode: 'summaryCode',
-    timestamp: 'timestamp',
-    fingerprint: 'fingerprint',
-    txnid: 'transactionID',
-    cardtype: 'cardType'
-  }
+  // const _map = {
+  //   settdate: 'settlementDate',
+  //   restext: 'status',
+  //   rescode: 'statusCode',
+  //   fingerprint: 'fingerprint',
+  //   amount: 'amount',
+  //   refid: 'paymentID',
+  //   summarycode: 'summaryCode',
+  //   timestamp: 'timestamp',
+  //   txnid: 'transactionID',
+  //   cardtype: 'cardType'
+  // }
 
   const output = {}
   const tmp = {}
@@ -1361,7 +1360,7 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [],
-  group: 'evan',
+  group: 'it',
   ignore: false,
   // inputLabel: '',
   name: 'SecurePay URL'
@@ -1370,4 +1369,48 @@ doStuff.register({
 })
 
 //  END:  SecurePay URL
+
+// ====================================================================
+// START: JIRA ticket to git-branch
+
+/**
+ * Convert JIRA ticket ID and name to git branch compatible name
+ *
+ * created by: Evan Wills
+ * created: 2022-02-21
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const jira2branch = (input, extraInputs, GETvars) => {
+  const regex1 = /^\s+([a-z0-9]+-[0-9]+)\s+(.+)$/i
+
+  return input.replace(regex1, (whole, id, name) => {
+    const _name = name.toLowerCase().replace(/[^a-z0-9-]+/ig, '-')
+    return id.trim() + '--' + _name.replace(/--+/g, '-')
+  })
+}
+
+doStuff.register({
+  id: 'jira2branch',
+  name: 'JIRA ticket to git-branch',
+  func: jira2branch,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'it',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
 // ====================================================================
