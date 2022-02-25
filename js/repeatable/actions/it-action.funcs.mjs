@@ -1328,8 +1328,10 @@ const securePayURL = (input, extraInputs, GETvars) => {
   //   cardtype: 'cardType'
   // }
 
+  const nums = ['settdate', 'amount', 'txnid']
   const output = {}
   const tmp = {}
+
   for (let a = 0; a < _matches.length; a += 1) {
     const key = _matches[a][1]
     const value = _matches[a][2]
@@ -1349,9 +1351,16 @@ const securePayURL = (input, extraInputs, GETvars) => {
     '$1-$2-$3 $4:$5:$6'
   )
 
+
+  for (const prop in output) {
+    if (nums.indexOf(prop) >= 0) {
+      output[prop] = output[prop] * 1
+    }
+  }
+
   console.log('output:', output)
   console.log('tmp:', tmp)
-  return JSON.stringify(output)
+  return JSON.stringify(output).replace(/(?<=\{|,)/g, '\n  ').replace(/":/g, ': ').replace('}', '\n}')
 }
 
 doStuff.register({
