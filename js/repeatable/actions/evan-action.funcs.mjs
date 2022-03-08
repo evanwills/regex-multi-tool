@@ -3248,9 +3248,9 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  _TMP Constants to private properties
 // ====================================================================
-// START: Action name
+// START: Fixing custom properties
 
 /**
  * Action description goes here
@@ -3282,8 +3282,8 @@ const cssCustomProps = (input, extraInputs, GETvars) => {
     const val = (typeof match[2] === 'string')
       ? match[2]
       : (typeof match[3] === 'string')
-        ? match[3]
-        : '[[UNDEFINED]]'
+          ? match[3]
+          : '[[UNDEFINED]]'
     root += '\n      -' + prop + ': ' + val + ';'
     host += '\n      --wc-' + prop + ': var(-' + prop + ');'
     oldHost += '\n      -wc-' + prop + ': ' + val + ';'
@@ -3315,5 +3315,5 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Fixing custom properties
 // ====================================================================
