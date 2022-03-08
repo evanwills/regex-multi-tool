@@ -290,9 +290,8 @@ export const padStr = (input, len, char, centre) => {
   const output = (isNumeric(input))
     ? strL + strR + _input
     : (_centre)
-      ? strL + _input + strR
-      : _input + strL + strR
-
+        ? strL + _input + strR
+        : _input + strL + strR
 
   return _char + output + _char
 }
@@ -354,12 +353,66 @@ export const makeSingle = (input) => {
 
   if (input.substring(l - 1) === 's') {
     output = (output.substring(l - 4) === 'ies')
-    ? output.substring(0, l - 5) + 'y'
-    : output.substring(0, l - 1)
+      ? output.substring(0, l - 5) + 'y'
+      : output.substring(0, l - 1)
   }
 
   console.log('output:', output)
   console.groupEnd()
 
   return output
+}
+
+/**
+ * Get a function that converts boolean input to appropriate string
+ * (and returns unmodified string if not boolean)
+ *
+ * @param {string,number} outputMode Output mode of bool2str
+ *
+ * @returns {function}
+ */
+export const getBool2str = (outputMode) => {
+  let _true = ''
+  let _false = ''
+
+  switch (outputMode.toLowerCase()) {
+    case 'true':
+    case 'truefalse':
+      _true = 'True'
+      _false = 'False'
+      break
+
+    case 'yes':
+    case 'yesno':
+      _true = 'Yes'
+      _false = 'No'
+      break
+
+    case 0:
+    case 1:
+    case '0':
+    case '1':
+    case 'zeroone':
+      _true = '0'
+      _false = '1'
+      break
+  }
+
+  if (_true === '') {
+    return (input) => {
+      return input
+    }
+  } else {
+    return (input) => {
+      const _input = input.toLowerCase().trim()
+
+      if (['true', 'yes', '1', 1].indexOf(_input) > -1) {
+        return _true
+      } else if (['false', 'no', '0', 0].indexOf(_input) > -1) {
+        return _false
+      } else {
+        return input
+      }
+    }
+  }
 }

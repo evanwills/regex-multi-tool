@@ -3188,3 +3188,132 @@ doStuff.register({
 
 //  END:  Laravel to JS post conversion clean-up
 // ====================================================================
+// START: _TMP const to private prop
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const constToProp = (input, extraInputs, GETvars) => {
+  const _oldVar = []
+  const _newVar = []
+  const _replacer = (whole, key, value) => {
+    const _tmp = '_' + snakeToCamelCase(key.toLowerCase())
+
+    _oldVar.push(key)
+    _newVar.push(_tmp)
+
+    return '    private $' + _tmp + ' = ' + value + ';'
+  }
+
+  let output = input.replace(
+    /define\('([^']+)', *('[^']+'|[0-9]+(?:\.[0-9]+)?)\);/ig,
+    _replacer
+  )
+
+  for (let a = 0, c = _oldVar.length; a < c; a += 1) {
+    output = output.replaceAll(
+      _oldVar[a],
+      '$this->' + _newVar[a]
+    )
+  }
+
+  console.log()
+  return output
+}
+
+doStuff.register({
+  id: 'constToProp',
+  name: 'Constants to private properties',
+  func: constToProp,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+// START: Action name
+
+/**
+ * Action description goes here
+ *
+ * created by: Evan Wills
+ * created: 2022-03-03
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const cssCustomProps = (input, extraInputs, GETvars) => {
+  const regex = /(-(?:(?:-[a-z0-9]+)+))\s*:\s*(?:var\(-(?:-[a-z0-9]+)+(?:\s*,\s([^)]+)*)?\)|([^;]+));/ig
+  const matches = input.matchAll(regex)
+
+  let root = '\n    :root {'
+  let host = '\n    :host {'
+  let oldHost = '\n    :host {'
+
+  for (const match of matches) {
+    console.log('match:', match)
+    const prop = match[1].replace(/^-(?:-wc)?/, '')
+    const val = (typeof match[2] === 'string')
+      ? match[2]
+      : (typeof match[3] === 'string')
+        ? match[3]
+        : '[[UNDEFINED]]'
+    root += '\n      -' + prop + ': ' + val + ';'
+    host += '\n      --wc-' + prop + ': var(-' + prop + ');'
+    oldHost += '\n      -wc-' + prop + ': ' + val + ';'
+  }
+
+  let tail = '\n\n      background-color: inherit' +
+              '\n      color: inherit' +
+              '\n      font-family: inherit' +
+              '\n      font-size: inherit'
+
+  root += '\n    }\n'
+  host += tail + '\n    }\n'
+  oldHost += tail + '\n    }\n'
+
+  return root + host + oldHost
+}
+
+doStuff.register({
+  id: 'cssCustomProps',
+  name: 'Fixing custom properties',
+  func: cssCustomProps,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: true
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================

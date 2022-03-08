@@ -8,7 +8,7 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
 import { isNumber, isNonEmptyStr } from '../../utilities/validation.mjs'
-import { padStr } from '../../utilities/sanitise.mjs'
+import { padStr, getBool2str } from '../../utilities/sanitise.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -2254,6 +2254,8 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
   let tmp = input.trim()
   let output = ''
   let sep = ''
+  const centre = extraInputs.options('centre')
+  const toBoolStr = getBool2str(extraInputs.convertBool())
 
   tmp = input.split(rowDelim)
 
@@ -2287,8 +2289,8 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
 
   for (let a = 1; a < tmp.length; a += 1) {
     for (let b = 0; b < c; b += 1) {
-      console.log('sdflier: tmp[' + a + '][' + b + ']:', tmp[a][b])
-      output += '|' + padStr(tmp[a][b], lengths[b])
+      const _centre = (b > 0) ? centre : false
+      output += '|' + padStr(toBoolStr(tmp[a][b]), lengths[b], ' ', _centre)
     }
     output += '|\n'
   }
@@ -2313,6 +2315,23 @@ doStuff.register({
     label: 'Row delimiter',
     default: '\\n',
     maxlength: 2
+  }, {
+    id: 'options',
+    type: 'checkbox',
+    label: 'Extra formatting options',
+    options: [
+      { value: 'centre', label: 'Centre data columns' }
+    ]
+  }, {
+    id: 'convertBool',
+    type: 'radio',
+    label: 'Convert boolean values',
+    options: [
+      { value: 'leave', label: 'Leave as is', default: true },
+      { value: 'yesNo', label: 'Convert to "Yes" / "No"' },
+      { value: 'trueFalse', label: 'Convert to "True" / "False"' },
+      { value: 'zeroOne', label: 'Convert to "0" / "1"' }
+    ]
   }],
   // group: '',
   ignore: false,
