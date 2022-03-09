@@ -35,6 +35,16 @@
   .repeatable-field .checkable-grp__items {
     grid-area: "field";
   }
+
+  .checkbox-grp__items {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+  }
+
+  .checkbox-grp__items label {
+    padding-left: 2.5rem;
+  }
 }
 
 

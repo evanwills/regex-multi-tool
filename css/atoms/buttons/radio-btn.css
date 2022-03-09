@@ -1,14 +1,26 @@
 
 .radio-grp__items {
+  display: flex;
+  flex-direction: column;
   align-items: stretch;
   align-content: stretch;
   border: var(--line-weight-hvy) solid var(--txt-colour);
-  border-radius: 2em;
+  border-radius: 1em;
   justify-content: space-between;
   margin: 0.5em 0;
   overflow: hidden;
+  padding: 0.1rem 0.3rem;
   position: relative;
 }
+
+@media screen and (min-width: 35rem) {
+  .radio-grp__items {
+    flex-direction: row;
+    padding: 0;
+    border-radius: 2rem;
+  }
+}
+
 .radio-grp__items > li {
   flex-grow: 1;
 }

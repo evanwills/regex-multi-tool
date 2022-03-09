@@ -2341,9 +2341,9 @@ doStuff.register({
     label: 'Convert boolean values',
     options: [
       { value: 'leave', label: 'Leave as is', default: true },
-      { value: 'yesNo', label: 'Convert to "Yes" / "No"' },
-      { value: 'trueFalse', label: 'Convert to "True" / "False"' },
-      { value: 'zeroOne', label: 'Convert to "0" / "1"' }
+      { value: 'yesNo', label: '"Yes" / "No"' },
+      { value: 'trueFalse', label: '"True" / "False"' },
+      { value: 'zeroOne', label: '"0" / "1"' }
     ]
   }],
   // group: '',

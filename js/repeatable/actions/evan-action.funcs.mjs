@@ -1839,6 +1839,7 @@ const rewritePHP = (input, extraInputs, GETvars) => {
     output = output.replace(/(\$[a-z]+)_([a-z])/ig, fixVarNames)
     output = output.replace(/([a-z])_([a-z])(?=[a-z]+ ?\()/ig, fixVarNames)
     max -= 1
+    coun -= 1
   }
 
   const regex = [
@@ -3191,10 +3192,10 @@ doStuff.register({
 // START: _TMP const to private prop
 
 /**
- * Action description goes here
+ * Convert constants to private properties
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-03-09
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -3272,6 +3273,11 @@ const cssCustomProps = (input, extraInputs, GETvars) => {
   const regex = /(-(?:(?:-[a-z0-9]+)+))\s*:\s*(?:var\(-(?:-[a-z0-9]+)+(?:\s*,\s([^)]+)*)?\)|([^;]+));/ig
   const matches = input.matchAll(regex)
 
+  const tail = '\n\n      background-color: inherit;' +
+                 '\n      color: inherit;' +
+                 '\n      font-family: inherit;' +
+                 '\n      font-size: inherit;'
+
   let root = '\n    :root {'
   let host = '\n    :host {'
   let oldHost = '\n    :host {'
@@ -3289,11 +3295,6 @@ const cssCustomProps = (input, extraInputs, GETvars) => {
     oldHost += '\n      -wc-' + prop + ': ' + val + ';'
   }
 
-  let tail = '\n\n      background-color: inherit' +
-              '\n      color: inherit' +
-              '\n      font-family: inherit' +
-              '\n      font-size: inherit'
-
   root += '\n    }\n'
   host += tail + '\n    }\n'
   oldHost += tail + '\n    }\n'
@@ -3308,7 +3309,7 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [],
-  // group: '',
+  // group: 'evan',
   ignore: true
   // inputLabel: '',
   // remote: false,

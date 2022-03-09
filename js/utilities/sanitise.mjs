@@ -258,7 +258,6 @@ export const getClassName = (props, BEMelement, BEMmodifier, prefix) => {
   return _output
 }
 
-
 /**
  * Add padding characters to a string to ensure it's the right
  * length
