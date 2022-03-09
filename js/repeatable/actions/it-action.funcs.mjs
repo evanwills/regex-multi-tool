@@ -990,9 +990,20 @@ const sitecore2localLocalOrGlobalPath = (whole, fileType, fileName) => {
     fonts: [],
     css: [
       'acu-style.css',
+      'acu_online.css',
       'owl.carousel.min.css',
       'side-accordion.css',
-      'theme_purple.css'
+      'theme-purple.css',
+      'theme-staff.css',
+      'theme-student.css',
+      'theme-white.css',
+      'theme_purple.css',
+      'theme_staff.css',
+      'theme_student.css',
+      'theme_white.css',
+      'microsite_custom.css',
+      'policies.css',
+      'staff.css'
     ],
     js: [
       'acu-scripts.js',
