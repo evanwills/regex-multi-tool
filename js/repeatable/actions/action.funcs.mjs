@@ -7,7 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
-import { isNumber, isNonEmptyStr } from '../../utilities/validation.mjs'
+import { isNumber, isNonEmptyStr, isStrNum } from '../../utilities/validation.mjs'
 import { padStr, getBool2str } from '../../utilities/sanitise.mjs'
 
 /**
@@ -2255,6 +2255,7 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
   let output = ''
   let sep = ''
   const centre = extraInputs.options('centre')
+  const confluence = extraInputs.options('confluence')
   const toBoolStr = getBool2str(extraInputs.convertBool())
 
   tmp = input.split(rowDelim)
@@ -2280,17 +2281,28 @@ const tsv2Markdown = (input, extraInputs, GETvars) => {
 
   const c = tmp[0].length
 
+  const headPipe = (confluence) ? '||' : ' |'
+  const lengthMod = (confluence) ? 1 : 0
+
   for (let a = 0; a < c; a += 1) {
-    output += '|' + padStr(tmp[0][a], lengths[a], ' ', true)
-    sep += '|' + padStr('', lengths[a], '-')
+    output += headPipe + padStr(tmp[0][a], lengths[a], ' ', true)
+    sep += '|' + padStr('', lengths[a] + lengthMod, '-')
   }
 
-  output += '|\n' + sep + '|\n'
+  output += headPipe + '\n'
+  if (confluence === false) {
+    output += sep + '|\n'
+  }
 
   for (let a = 1; a < tmp.length; a += 1) {
     for (let b = 0; b < c; b += 1) {
+      // make sure we at least have an empty string for this cell
+      tmp[a][b] = (isStrNum(tmp[a][b]))
+        ? tmp[a][b]
+        : ''
+
       const _centre = (b > 0) ? centre : false
-      output += '|' + padStr(toBoolStr(tmp[a][b]), lengths[b], ' ', _centre)
+      output += '|' + padStr(toBoolStr(tmp[a][b]), lengths[b] + lengthMod, ' ', _centre)
     }
     output += '|\n'
   }
@@ -2320,7 +2332,8 @@ doStuff.register({
     type: 'checkbox',
     label: 'Extra formatting options',
     options: [
-      { value: 'centre', label: 'Centre data columns' }
+      { value: 'centre', label: 'Centre data columns' },
+      { value: 'confluence', label: 'Confluence style markdown' }
     ]
   }, {
     id: 'convertBool',

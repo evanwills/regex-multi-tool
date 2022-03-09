@@ -378,7 +378,7 @@ export const getBool2str = (outputMode) => {
   switch (outputMode.toLowerCase()) {
     case 'true':
     case 'truefalse':
-      _true =  'True '
+      _true = 'True '
       _false = 'False'
       break
 
