@@ -1,5 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
-import {repeat} from '../../lit-html/directives/repeat.mjs';
+import { repeat } from '../../lit-html/directives/repeat.mjs'
 import {
   isBool,
   isStr,

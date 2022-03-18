@@ -4,6 +4,7 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 
 import { isNonEmptyStr } from '../../utilities/validation.mjs'
+import { padStr } from '../../utilities/sanitise.mjs'
 
 // import { url } from '../url.mjs'
 // ====================================================================
@@ -92,7 +93,8 @@ doStuff.register({
 // START: Transform RYI Suburb/Schools JSON
 
 /**
- * Action description goes here
+ * Transform RYI Suburb/Schools JSON string to JavaScript variable
+ * for use in WWW RYI from
  *
  * created by: Evan Wills
  * created: 2020-04-09
@@ -299,4 +301,127 @@ doStuff.register({
 })
 
 //  END:  Image gallery HTML
+// ====================================================================
+// START: Icon library viewer HTML generator
+
+/**
+ * Convert icon library CSS into icon library viewer HTML
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const iconLibrary = (input, extraInputs, GETvars) => {
+  const regex = /(\.icon-(.*?))(?: \.path[0-9]+)?:before \{[\n\r\t ]+content: "([^"]+)"/ig
+  const tmp = [...input.matchAll(regex)]
+  const duplicates = {}
+  const pre = '<!-- ' +
+                    'https://test-webapps.acu.edu.au/mini-apps/regex-multi-tool/' +
+                    '?groups=' + GETvars.groups +
+                    '&mode=repeatable&action=iconLibrary ' +
+              '-->\n\n'
+
+  let output = ''
+  let report = ''
+  const css = `\n\n<style type="text/css">
+  .icon-lib {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  .icon-lib__item {
+    border: 0.1rem solid #eee;
+    border-radius: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0.5rem;
+    text-align: center;
+    width: 11.25rem;
+  }
+  .icon-lib__icon {
+    display: block;
+    font-size: 3.25rem;
+    padding: 1rem;
+  }
+  .icon-lib__label {
+    display: block;
+    font-weight: bold;
+    padding: 0.5rem 1rem 1rem;
+  }
+  .icon-lib__class {
+    background-color: #f9f2f4;
+    color: #c7254e;
+    flex-grow: 1;
+    font-size: 0.9rem;
+    padding: 1em;
+  }\n</style>\n`
+
+  for (let a = 0, c = tmp.length; a < c; a += 1) {
+    if (typeof duplicates[tmp[a][3]] === 'undefined') {
+      duplicates[tmp[a][3]] = {
+        classes: [tmp[a][1]]
+      }
+
+      output += '\n' +
+                '    <div class="icon-lib__item">\n' +
+                '        <span class="icon-lib__icon icon icon-' + tmp[a][2] + '"></span>\n' +
+                '        <span class="icon-lib__label">' + tmp[a][2].replaceAll('_', ' ') + '</span>\n' +
+                '        <code class="icon-lib__class">\n' +
+                '            &lt;span class="icon icon-' + tmp[a][2] + '"&gt;&lt;/span&gt;\n' +
+                '        </code>\n' +
+                '    </div>\n'
+    } else {
+      duplicates[tmp[a][3]].classes.push([tmp[a][1]])
+    }
+  }
+
+  for (const key in duplicates) {
+    const c = duplicates[key].classes.length
+    if (c > 1) {
+      report += '\n ! -----------------------------------------------------' +
+                '\n ! The following classes all share the same icon (' + key + ')' +
+                '\n !' +
+                '\n !  * included:  ' + duplicates[key].classes[0]
+
+      for (let a = 1; a < c; a += 1) {
+        report += '\n !  * omitted:   ' + duplicates[key].classes[a]
+      }
+      report += '\n !\n !'
+    }
+  }
+
+  report = (report !== '')
+    ? '\n\n<!-- \n ! Duplicate icons were found!\n !' + report + ' -->\n\n'
+    : ''
+
+  return (output !== '' || report !== '')
+    ? pre + report + css + '\n\n<div class="icon-lib">' + output + '\n</div>'
+    : ''
+}
+
+doStuff.register({
+  id: 'iconLibrary',
+  name: 'Icon library viewer HTML generator',
+  func: iconLibrary,
+  description: 'Convert CSS from icon library into HTML that can be used to view all the icons.<br /><br />Past the contents of the icon library CSS into the "Input" box below.<br /><br /><strong>Note:</strong> You only need the CSS from <code>.icon {</code> onwards. (If you use the whole lot it will take a bit longer to process.)',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'mer',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Icon library viewer HTML generator
 // ====================================================================

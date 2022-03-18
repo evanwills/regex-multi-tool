@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import { unsafeHTML } from '../../lit-html/directives/unsafe-html.mjs'
 import {
   // isInt,
   isNonEmptyStr
@@ -36,8 +37,9 @@ const renderDescription = (description) => {
 
       return html`${tmpDesc}`
     } else {
-      return html`<p class="repeatable-desc">${description}</p>`
+      return html`<p class="repeatable-desc">${unsafeHTML(description)}</p>`
     }
+    unsafe
   }
   return ''
 }

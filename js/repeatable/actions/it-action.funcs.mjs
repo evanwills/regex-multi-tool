@@ -1362,7 +1362,6 @@ const securePayURL = (input, extraInputs, GETvars) => {
     '$1-$2-$3 $4:$5:$6'
   )
 
-
   for (const prop in output) {
     if (nums.indexOf(prop) >= 0) {
       output[prop] = output[prop] * 1
