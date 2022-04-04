@@ -2920,6 +2920,45 @@ const _hex = {
   15: 'f'
 }
 
+const brand = {
+  'ed0c00': 'red--100',
+  'd00a00': 'red--120',
+  'f15047': 'red--80',
+  'f57c75': 'red--60',
+  'f8a7a3': 'red--40',
+  'fcd3d1': 'red--20',
+  '3c1053': 'purple--100',
+  '260b34': 'purple--120',
+  '634075': 'purple--80',
+  '8a7098': 'purple--60',
+  'b19fba': 'purple--40',
+  'd8cfdd': 'purple--20',
+  'e03c31': 'health-sciences',
+  '007932': 'education-arts',
+  'bc333b': 'law-business',
+  '702082': 'theology-philosophy',
+  'b8a8c1': 'testimonial-text',
+  'ccc': 'grey',
+  '6c6c6c': 'text-colour',
+  '6c6c6c': 'grey-border',
+  '3d3935': 'dark-brown',
+  '8c857b': 'stone',
+  'e8e3db': 'sand',
+  '000': 'black',
+  '6c6c6c': 'dark-grey',
+  'eee': 'light-grey',
+  'fafafa': 'x-light-grey',
+  'fff': 'body-bg',
+  'fff': 'text-colour-light',
+  '3d3935': 'charcoal--100',
+  '252320': 'charcoal--120',
+  '6c6c6c': 'black--80',
+  'ccc': 'black--40',
+  'eee': 'black--20',
+  'fafafa': 'black--10',
+  'f2ba0a': 'yellow--100'
+}
+
 const _hex2decInner = (input) => {
   if (isNumeric(input)) {
     return parseInt(input);
@@ -3020,11 +3059,41 @@ const colourConverter = (input, extraInputs, GETvars) => {
     }
 
     const _hexValues = _decimal2hex(_values)
+    const _hex = _hexValues.r + _hexValues.g + _hexValues.b
+
+    let _he = _hex.replace(/([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3(?:([a-f0-9])\4)?/i, '$1$2$3$4')
+
+    _he = (_he !== _hex)
+      ? _he
+      : ''
+
+    let _brand = (typeof brand[_hex] === 'string')
+      ? brand[_hex]
+      : (typeof brand[_he] === 'string')
+        ? brand[_he]
+        : ''
+
+    _brand = (_brand !== '')
+      ? '\n\nBrand variable: $' + _brand
+      : ''
+
+    let _a = (_he !== '' && _hexValues.a.substring(0, 1) !== _hexValues.a.substring(1, 2))
+      ? _he + _hexValues.a.substring(0, 1)
+      : ''
+    _a = (_a !== '')
+      ? '; (#' + _a + ')'
+      : ''
+
+    _he = (_he !== '')
+      ? '; (#' + _he + ')'
+      : ''
+
     return 'Original: ' + input + '\n\n' +
-           '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + ';\n' +
-           '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + ';\n\n' +
+           '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + _he + '\n' +
+           '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + _a + ';\n\n' +
            '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
-           '         RGBA: rgba(' + _values.r + ', ' + _values.g + ', ' + _values.b + ', ' + _values.a + ');\n'
+           '         RGBA: rgba(' + _values.r + ', ' + _values.g + ', ' + _values.b + ', ' + _values.a + ');\n' +
+           _brand
   } else {
     return input
   }
