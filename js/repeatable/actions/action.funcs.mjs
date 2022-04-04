@@ -7,7 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
-import { isNumber, isNonEmptyStr, isStrNum } from '../../utilities/validation.mjs'
+import { isNumber, isNonEmptyStr, isStrNum, isNumeric } from '../../utilities/validation.mjs'
 import { padStr, getBool2str } from '../../utilities/sanitise.mjs'
 
 /**
@@ -2902,4 +2902,147 @@ doStuff.register({
 })
 
 //  END:  Convert name/title to keywords list
+// ====================================================================
+// START: Colour type converter
+
+const _hex = {
+  a: 10,
+  b: 11,
+  c: 12,
+  d: 13,
+  e: 14,
+  f: 15,
+  10: 'a',
+  11: 'b',
+  12: 'c',
+  13: 'd',
+  14: 'e',
+  15: 'f'
+}
+
+const _hex2decInner = (input) => {
+  if (isNumeric(input)) {
+    return parseInt(input);
+  } else if (typeof _hex[input] === 'number') {
+    return _hex[input]
+  } else {
+    return 0
+  }
+}
+
+const _dec2hexInner = (input) => {
+  if (input < 10) {
+    return input.toString()
+  } else if (typeof _hex[input] === 'string') {
+    return _hex[input]
+  } else {
+    return 0
+  }
+}
+
+const _hex2dec = (input) => {
+  if (input.length === 1) {
+    const _tmp = _hex2decInner(input);
+    return ((_tmp * 16) + _tmp)
+  } else {
+    return (_hex2decInner(input.substring(0, 1)) * 16) + _hex2decInner(input.substring(1, 2))
+  }
+}
+
+const _dec2hex = (input) => {
+  const _r = input % 16
+  const _i = (input - _r) / 16
+
+  return _dec2hexInner(_i) + _dec2hexInner(_r)
+}
+
+const _hex2decimal = (values) => {
+  return {
+    r: _hex2dec(values.r),
+    g: _hex2dec(values.g),
+    b: _hex2dec(values.b),
+    a: (typeof values.a === 'string')
+      ? Math.round(_hex2dec(values.a) / 255)
+      : 1
+  }
+}
+
+const _decimal2hex = (values) => {
+  return {
+    r: _dec2hex(values.r),
+    g: _dec2hex(values.g),
+    b: _dec2hex(values.b),
+    a: (typeof values.a === 'number')
+      ? _dec2hex(Math.round(values.a * 255))
+      : 'ff'
+  }
+}
+
+/**
+ * Convert colour values from one format to another
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const colourConverter = (input, extraInputs, GETvars) => {
+  const _rgbRegex = /rgba?\(\s*([0-9]+),\s*([0-9]+),\s*([0-9]+)(?:,\s*([.0-9]+))?\s*\)/i
+  const _hexRegex = /#([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})?/i
+  let _rgb = true
+  let _tmp = input.trim().match(_rgbRegex)
+
+  if (_tmp === null) {
+    _tmp = input.trim().match(_hexRegex)
+    _rgb = false
+  }
+
+  if (_tmp !== null) {
+    let _values = {
+      r: _tmp[1],
+      g: _tmp[2],
+      b: _tmp[3],
+      a: (typeof _tmp[4] !== 'undefined')
+        ? _tmp[4]
+        : 1
+    }
+
+    if (_rgb === false) {
+      _values = _hex2decimal(_values)
+    }
+
+    const _hexValues = _decimal2hex(_values)
+    return 'Original: ' + input + '\n\n' +
+           '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + ';\n' +
+           '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + ';\n\n' +
+           '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
+           '         RGBA: rgba(' + _values.r + ', ' + _values.g + ', ' + _values.b + ', ' + _values.a + ');\n'
+  } else {
+    return input
+  }
+}
+
+doStuff.register({
+  id: 'colourConverter',
+  name: 'Colour type converter',
+  func: colourConverter,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Colour type converter
 // ====================================================================

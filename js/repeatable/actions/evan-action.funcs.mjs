@@ -2387,10 +2387,13 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const php2js = (input, extraInputs, GETvars) => {
-  const regex = /id: ##/
+  const regex = /id: ##/g
+  console.group('php2js()')
   console.log('extraInputs.index()', extraInputs.index())
-  let index = extraInputs.index() === 0 ? 0 : 1
+  let index = extraInputs.index()
   const constName = snakeToCamelCase(extraInputs.name(), 1)
+  console.log('extraInputs.name():', extraInputs.name())
+  console.log('constName:', constName)
   let output = input.trim()
   output = output.replace(/\s*(?:\[|array\()/g, '\n  {')
   output = output.replace(/\s*(?:\]|\))/g, '\n  }')
@@ -2399,12 +2402,15 @@ const php2js = (input, extraInputs, GETvars) => {
   output = output.replace(/((\s+)name:)/ig, '$2id: ##,$1')
   output = output.replace(/[\r\n]+\s+([a-z]+: )/ig, '\n    $1')
 
-  while (output.match(regex)) {
-    output = output.replace(regex, 'id: ' + index)
+  output = output.replace(regex, (str) => {
+    const _output = 'id: ' + index
     index += 1
-  }
+    return _output
+  })
+
   output = output.replace(/\s+id: [0-9]+,(\s+id: [0-9]+,)/gs, '$1')
 
+  console.groupEnd()
   return '\nexport const ' + constName + ' = [' + output + '\n]\n\n'
 }
 
@@ -3317,4 +3323,255 @@ doStuff.register({
 })
 
 //  END:  Fixing custom properties
+// ====================================================================
+// START: PDO::bindParam to PHP associative array
+
+/**
+ * PDO::bindParam to PHP associative array
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const bindParam2AssArr = (input, extraInputs, GETvars) => {
+  const regex = /\$stmt->bindParam\((':[A-Z0-9_]+'), (\$[a-z0-9_]+), (?:PDO::PARAM_[A-Z]+|\$[_a-z]+)\);.*?(?=[\r\n]|$)/ig
+  const tmp = [...input.matchAll(regex)]
+  let output = '';
+  let sep = ''
+  for (let a = 0; a < tmp.length; a += 1) {
+    const key = tmp[a][1]
+    const value = tmp[a][2]
+    output += sep + '\n  ' + key + ' => ' + value
+    sep = ','
+  }
+  if (output !== '') {
+    output = '\n\n$tmp = [' + output + '\n];\n\n'
+  } else {
+    output = input
+  }
+  return output
+}
+
+doStuff.register({
+  id: 'bindParam2AssArr',
+  name: 'PDO::bindParam to PHP associative array',
+  func: bindParam2AssArr,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  PDO::bindParam to PHP associative array
+// ====================================================================
+// START: MySQLi query to PDO
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const mysqli2pdo = (input, extraInputs, GETvars) => {
+  if (input.trim() === '') {
+    return ''
+  }
+  const method = extraInputs.queryMethod()
+  const pdoVar = extraInputs.pdoVar()
+  const tmp = `UPDATE  \`discounts\`
+  SET     \`price\` = '$price1',
+          \`price_student\` = '$price2',
+          \`off_price\` = '$price3',
+          \`off_price_student\` = '$price4',
+          \`description\` = '".addslashes($description)."',
+          \`dis_name\` = '".addslashes($dis_name)."'
+  WHERE   \`discount_id\` = " . $dis_id`
+
+  // const sql = input.trim()
+  const sql = tmp.trim()
+
+  if (sql.match(/^INSERT /i)) {
+    console.log('we have an INSERT')
+    const getFields = (_sql) => {
+      return [..._sql.trim().matchAll(
+        /\s*`?([^`,]+)`?(?:,|$)/ig
+      )]
+    }
+
+    const fields = getFields(sql.replace(/^.*?\((.*?)\).*$/ims, '$1'))
+    let values = ''
+    let _vSep = '\n       '
+    let bind = ''
+    let debug = ''
+    let _dSep = '\n    '
+    for (let a = 0, c = fields.length; a < c; a += 1) {
+      const _tmp = ':' + fields[a][1].toLocaleUpperCase()
+      const __tmp = '\'' + _tmp + '\''
+      values += _vSep + _tmp
+      bind += '\n$stmt->bindParam(' + __tmp + ', $' + fields[a][1] + ', PDO::PARAM_STR);'
+      _vSep = ',\n       '
+      debug += _dSep + __tmp + ' => $' + fields[a][1]
+      _dSep = ',\n    '
+      fields[a] = _tmp
+    }
+
+    return '\n\n$stmt = ' + pdoVar + '->' + method + '(\n    \'' +
+           sql.replace(/(VALUES\s*\().*\)\s*$/ims, '$1' + values) + '\n    )\'\n);' +
+           '\n' + bind + '\n$stmt->execute();\n\n\n' +
+           '$tmp = [' + debug + '\n];\n\n\nmergeParamsInSql($stmt, $tmp);'
+
+    // console.log('tmp:', _tmp)
+  } else if (sql.match(/^UPDATE /i)) {
+    console.log('we have an UPDATE')
+    const getFields = (_sql) => {
+      return [..._sql.trim().matchAll(
+        /\s*`?([^`=]+)`?\s*=\s?[^,]+(?:,|$)/ig
+      )]
+    }
+    const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim)
+  } else {
+    console.log('we have an SELECT')
+  }
+
+  return tmp
+}
+
+doStuff.register({
+  id: 'mysqli2pdo',
+  name: 'MySQLi query to PDO',
+  func: mysqli2pdo,
+  description: 'Convert a MySQLi query string to PDO query and associated bits.',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'queryMethod',
+    label: 'Query method',
+    type: 'radio',
+    options: [{
+      value: 'prepare',
+      label: 'Multi param',
+      default: true
+    }, {
+      value: 'prepBindExec',
+      label: 'Single ID param'
+    }, {
+      value: 'prepBindExecStr',
+      label: 'Single string param'
+    }]
+  }, {
+    id: 'pdoVar',
+    label: 'PDO variable name',
+    type: 'text',
+    default: '$this->_pdo'
+  }],
+  // group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  MySQLi query to PDO
+// ====================================================================
+// START: Web component attributes to markdown documentation
+
+/**
+ * Convert web component attributes to markdown documentation
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const webCompAttr = (input, extraInputs, GETvars) => {
+  let output = ''
+
+  const _attrs = [...input.matchAll(/\/\*\*\s*[\r\n]\s*\*\s*(.*?)[\r\n]*\s*\*\/\s*[\r\n]*\s*@property\([^)]*\)\s*[\r\n]*\s*([a-z0-9]+)\s*:\s*([a-z]+)\s*=\s*([^;\r\n]+);?\s*(?=[\r\n]|$)/igms)]
+
+  const tmp = []
+
+  for (let a = 0, c = _attrs.length; a < c; a += 1) {
+    tmp.push({
+      id: _attrs[a][2],
+      content: '\n\n### `' + _attrs[a][2] + '`\n\n' +
+               '*{`' + _attrs[a][3] + '`}* &ndash; *[default: `' + _attrs[a][4] + '`]*\n\n' +
+               _attrs[a][1].replace(
+                 /\s*[\r\n]+\s*\*\s*/, ' '
+               ).replace(
+                 /(?<=^|[\r\n])(\s*\*)(?:\s+\*)/g, '$1'
+               ) + '\n'
+    })
+  }
+  if (extraInputs.sortOrder('alpha') === true) {
+    tmp.sort((itemA, itemB) => {
+      if (itemA.id < itemB.id) {
+        return -1
+      } else if (itemA.id > itemB.id) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+  }
+
+  for (let a = 0, c = tmp.length; a < c; a += 1) {
+    output += tmp[a].content
+  }
+  return output
+}
+
+doStuff.register({
+  id: 'webCompAttr',
+  name: 'Web component attributes to markdown documentation',
+  func: webCompAttr,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'sortOrder',
+    type: 'checkbox',
+    label: 'Sort order',
+    options: [{
+      value: 'alpha',
+      label: 'Sort attributes into alphabetical order',
+      default: true
+    }]
+  }],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Web component attributes to markdown documentation
 // ====================================================================

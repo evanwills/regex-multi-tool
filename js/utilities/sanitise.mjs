@@ -330,7 +330,9 @@ export const snakeToCamelCase = (input, start = 0) => {
     output += ucFirst(tmp[a])
   }
 
-  return output
+  return isStr(output)
+    ? output
+    : ''
 }
 
 export const camel2human = (input) => {

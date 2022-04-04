@@ -55,6 +55,9 @@
   transition: opacity var(--ease) var(--timing);
   width: 1.25em;
 }
+li:first-child .radio-grp__label::after {
+  left: 0.45rem;
+}
 
 .radio-grp :first-child .radio-grp__label {
   margin-left: 0;
@@ -80,8 +83,6 @@
   color: var(--bg-colour);
   background-color: var(--txt-colour);
   padding-left: 2.5em;
-  width: calc(100% + .5rem);
-  /* width: 100%; */
   z-index: 1;
 }
 .radio-grp__input:checked + .radio-grp__label::after {
