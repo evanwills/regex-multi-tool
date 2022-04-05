@@ -259,7 +259,7 @@ function Repeatable (url, _remote, docs, api) {
   const getDefaultValue = (prop, get, local) => {
     if (typeof get[prop] !== 'undefined') {
       return get[prop]
-    } else if (typeof local !== 'undefined' && typeof local[prop] !== 'undefined') {
+    } else if (typeof local !== 'undefined' && local !== null && typeof local[prop] !== 'undefined') {
       return local[prop]
     }
     return null

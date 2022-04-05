@@ -39,3 +39,64 @@ doStuff.register({
 
 //  END:  Action name
 // ====================================================================
+
+// ----------------------------------------------
+// START: extraInputs field type templates
+
+const _text = {
+  id: '',
+  label: '',
+  type: '',
+  description: '',
+  pattern: '',
+  default: ''
+}
+
+const _select = {
+  description: '',
+  id: '',
+  label: '',
+  options: [
+    { value: '', label: '', default: true }
+  ],
+  type: 'select'
+}
+
+const _checkbox = {
+  id: '',
+  label: '',
+  options: [
+    {
+      default: true,
+      label: '',
+      value: ''
+    }
+  ],
+  type: 'checkbox'
+}
+
+const _radio = {
+  id: '',
+  label: '',
+  options: [
+    {
+      default: true,
+      label: '',
+      value: ''
+    }
+  ],
+  type: 'radio'
+}
+
+const _number = {
+  id: '',
+  label: '',
+  min: 1,
+  max: 1000,
+  step: 1,
+  default: 0,
+  type: 'number'
+}
+
+//  END:  extraInputs field type templates
+// ----------------------------------------------

@@ -8,7 +8,7 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
 import { isNumber, isNonEmptyStr, isStrNum, isNumeric } from '../../utilities/validation.mjs'
-import { padStr, getBool2str } from '../../utilities/sanitise.mjs'
+import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -618,52 +618,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 function urlDecodeEncode (input, extraInputs, GETvars) {
-  let find = 0
-  let output = input
-  let replace = 1
-  const findReplace = [
-    ['%25', '%', '%'], ['%09', '\t', '\\\t'], ['%0A', '\r', '\\\r'], ['%0D', '\n', '\\\n'],
-    ['%20', ' ', ' '], ['%21', '!', '!'], ['%22', '"', '"'], ['%23', '#', '#'],
-    ['%24', '$', '\\$'], ['%26', '&', '\\&'], ['%27', '\'', '\\\''], ['%28', '(', '\\('],
-    ['%29', ')', '\\)'], ['%2A', '*', '\\*'], ['%2B', '+', '\\+'], ['%2C', ',', ','],
-    ['%2D', '-', '-'], ['%2E', '.', '\\.'], ['%2F', '/', '\\/'],
-    ['%3A', ':', ':'], ['%3B', ';', ';'], ['%3C', '<', '<'], ['%3D', '=', '='],
-    ['%3E', '>', '>'], ['%3F', '?', '\\?'], ['%40', '@', '@'],
-    ['%5B', '[', '\\['], ['%5C', '\\', '\\\\'], ['%5D', ']', '\\]'], ['%5E', '^', '\\^'],
-    ['%60', '`', '`'],
-    ['%7B', '{', '\\{'], ['%7C', '|', '\\|'], ['%7D', '}', '\\}'], ['%7E', '~', '~'],
-    ['%A2', '¢', '¢'], ['%A3', '£', '£'], ['%A5', '¥', '¥'], ['%A6', '|', '\\|'],
-    ['%A7', '§', '§'], ['%AB', '«', '«'], ['%AC', '¬', '¬'], ['%AD', '¯', '¯'],
-    ['%B0', 'º', 'º'], ['%B1', '±', '±'], ['%B2', 'ª', 'ª'], ['%B4', ',', ','],
-    ['%B5', 'µ', 'µ'], ['%BB', '»', '»'], ['%BC', '¼', '¼'], ['%BD', '½', '½'],
-    ['%BF', '¿', '¿'],
-    ['%C0', 'À', 'À'], ['%C1', 'Á', 'Á'], ['%C2', 'Â', 'Â'], ['%C3', 'Ã', 'Ã'],
-    ['%C4', 'Ä', 'Ä'], ['%C5', 'Å', 'Å'], ['%C6', 'Æ', 'Æ'], ['%C7', 'Ç', 'Ç'],
-    ['%C8', 'È', 'È'], ['%C9', 'É', 'É'], ['%CA', 'Ê', 'Ê'], ['%CB', 'Ë', 'Ë'],
-    ['%CC', 'Ì', 'Ì'], ['%CD', 'Í', 'Í'], ['%CE', 'Î', 'Î'], ['%CF', 'Ï', 'Ï'],
-    ['%D0', 'Ð', 'Ð'], ['%D1', 'Ñ', 'Ñ'], ['%D2', 'Ò', 'Ò'],
-    ['%D3', 'Ó', 'Ó'], ['%D4', 'Ô', 'Ô'], ['%D5', 'Õ', 'Õ'], ['%D6', 'Ö', 'Ö'],
-    ['%D8', 'Ø', 'Ø'],
-    ['%D9', 'Ù', 'Ù'], ['%DA', 'Ú', 'Ú'], ['%DB', 'Û', 'Û'], ['%DC', 'Ü', 'Ü'],
-    ['%DD', 'Ý', 'Ý'], ['%DE', 'Þ', 'Þ'], ['%DF', 'ß', 'ß'],
-    ['%E0', 'à', 'à'], ['%E1', 'á', 'á'], ['%E2', 'â', 'â'], ['%E3', 'ã', 'ã'],
-    ['%E4', 'ä', 'ä'], ['%E5', 'å', 'å'], ['%E6', 'æ', 'æ'], ['%E7', 'ç', 'ç'],
-    ['%E8', 'è', 'è'], ['%E9', 'é', 'é'], ['%EA', 'ê', 'ê'], ['%EB', 'ë', 'ë'],
-    ['%EC', 'ì', 'ì'], ['%ED', 'í', 'í'], ['%EE', 'î', 'î'], ['%EF', 'ï', 'ï'],
-    ['%F0', 'ð', 'ð'], ['%F1', 'ñ', 'ñ'], ['%F2', 'ò', 'ò'], ['%F3', 'ó', 'ó'],
-    ['%F4', 'ô', 'ô'], ['%F5', 'õ', 'õ'], ['%F6', 'ö', 'ö'],
-    ['%F7', '÷', '÷'], ['%F8', 'ø', 'ø'],
-    ['%F9', 'ù', 'ù'], ['%FA', 'ú', 'ú'], ['%FB', 'û', 'û'], ['%FC', 'ü', 'ü'],
-    ['%FD', 'ý', 'ý'], ['%FE', 'þ', 'þ'], ['%FF', 'ÿ', 'ÿ']
-  ]
-  if (extraInputs.mode() === 'encode') {
-    find = 2
-    replace = 0
-  }
-  for (let a = 0; a < findReplace.length; a += 1) {
-    output = output.replace(new RegExp(findReplace[a][find], 'g'), findReplace[a][replace])
-  }
-  return output
+  return decodeEncodeURI(input, !(extraInputs.mode() === 'encode'))
 }
 
 doStuff.register({
@@ -1246,7 +1201,7 @@ doStuff.register({
       ]
     }],
   // group: 'cim',
-  ignore: false,
+  ignore: true,
   name: 'Format handbook policy'
 })
 
@@ -2920,44 +2875,61 @@ const _hex = {
   15: 'f'
 }
 
-const brand = {
-  'ed0c00': 'red--100',
-  'd00a00': 'red--120',
-  'f15047': 'red--80',
-  'f57c75': 'red--60',
-  'f8a7a3': 'red--40',
-  'fcd3d1': 'red--20',
-  '3c1053': 'purple--100',
-  '260b34': 'purple--120',
-  '634075': 'purple--80',
-  '8a7098': 'purple--60',
-  'b19fba': 'purple--40',
-  'd8cfdd': 'purple--20',
-  'e03c31': 'health-sciences',
-  '007932': 'education-arts',
-  'bc333b': 'law-business',
-  '702082': 'theology-philosophy',
-  'b8a8c1': 'testimonial-text',
-  'ccc': 'grey',
-  '6c6c6c': 'text-colour',
-  '6c6c6c': 'grey-border',
-  '3d3935': 'dark-brown',
-  '8c857b': 'stone',
-  'e8e3db': 'sand',
-  '000': 'black',
-  '6c6c6c': 'dark-grey',
-  'eee': 'light-grey',
-  'fafafa': 'x-light-grey',
-  'fff': 'body-bg',
-  'fff': 'text-colour-light',
-  '3d3935': 'charcoal--100',
-  '252320': 'charcoal--120',
-  '6c6c6c': 'black--80',
-  'ccc': 'black--40',
-  'eee': 'black--20',
-  'fafafa': 'black--10',
-  'f2ba0a': 'yellow--100'
+const _brandColours = {
+  'ed0c00': ['red--100'],
+  'd00a00': ['red--120'],
+  'f15047': ['red--80'],
+  'f57c75': ['red--60'],
+  'f8a7a3': ['red--40'],
+  'fcd3d1': ['red--20'],
+  '3c1053': ['purple--100'],
+  '260b34': ['purple--120'],
+  '634075': ['purple--80'],
+  '8a7098': ['purple--60'],
+  'b19fba': ['purple--40'],
+  'd8cfdd': ['purple--20'],
+  'e03c31': ['health-sciences'],
+  '007932': ['education-arts'],
+  'bc333b': ['law-business'],
+  '702082': ['theology-philosophy'],
+  'b8a8c1': ['testimonial-text'],
+  '3d3935': ['dark-brown'],
+  '8c857b': ['stone'],
+  'e8e3db': ['sand'],
+  '000': ['black'],
+  'fff': ['text-colour-light', 'body-bg'],
+  '3d3935': ['charcoal--100'],
+  '252320': ['charcoal--120'],
+  '6c6c6c': ['black--80', 'text-colour', 'dark-grey', 'grey-border'],
+  'ccc': ['black--40', 'grey'],
+  'eee': ['black--20', 'light-grey'],
+  'fafafa': ['black--10', 'x-light-grey'],
+  'f2ba0a': ['yellow--100', 'online']
 }
+
+const _mediaQ = {
+  xs: 480,
+  sm: 768,
+  md: 992,
+  lg: 1200
+}
+
+const _pxVars = [
+  { px: 320, v: ['mobile-width'] },
+  { px: 480, v: ['screen-xs', 'screen-phone'] },
+  { px: _mediaQ.sm, v: ['screen-sm', 'screen-sm-min', 'screen-tablet', 'tablet-width'] },
+  { px: _mediaQ.md, v: ['screen-md', 'screen-md-min', 'screen-desktop'] },
+  { px: _mediaQ.lg, v: ['screen-lg', '$screen-lg-min', 'screen-lg-desktop'] },
+  { px: 510, v: ['content-width-xs'] },
+  { px: 690, v: ['content-width-sm'] },
+  { px: 930, v: ['content-width-md'] },
+  { px: 1140, v: ['content-width-lg'] },
+  { px: 1365, v: ['container-width'] },
+
+  { px: (_mediaQ.sm - 1), v: ['screen-xs-max'] },
+  { px: (_mediaQ.md - 1), v: ['screen-sm-max'] },
+  { px: (_mediaQ.lg - 1), v: ['screen-md-max'] }
+]
 
 const _hex2decInner = (input) => {
   if (isNumeric(input)) {
@@ -3033,80 +3005,137 @@ const _decimal2hex = (values) => {
  *
  * @returns {string} modified version user input
  */
-const colourConverter = (input, extraInputs, GETvars) => {
-  const _rgbRegex = /rgba?\(\s*([0-9]+),\s*([0-9]+),\s*([0-9]+)(?:,\s*([.0-9]+))?\s*\)/i
-  const _hexRegex = /#([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})?/i
-  let _rgb = true
-  let _tmp = input.trim().match(_rgbRegex)
+const acuFrontEndHelper = (input, extraInputs, GETvars) => {
+  const _colour = decodeURI(extraInputs.colour())
+  let _sep = ''
 
-  if (_tmp === null) {
-    _tmp = input.trim().match(_hexRegex)
-    _rgb = false
-  }
+  console.group('colourConverter()')
+  console.log('extraInputs.colour():', extraInputs.colour())
+  console.log('extraInputs.pixels():', extraInputs.pixels())
+  if (_colour !== '') {
+    console.group('colourConverter() (colour')
+    const _rgbRegex = /rgba?\(\s*([0-9]+),\s*([0-9]+),\s*([0-9]+)(?:,\s*([.0-9]+))?\s*\)/i
+    const _hexRegex = /#?([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})?/i
+    let _rgb = true
+    let _tmp = extraInputs.colour().trim().match(_rgbRegex)
 
-  if (_tmp !== null) {
-    let _values = {
-      r: _tmp[1],
-      g: _tmp[2],
-      b: _tmp[3],
-      a: (typeof _tmp[4] !== 'undefined')
-        ? _tmp[4]
-        : 1
+    if (_tmp === null) {
+      _tmp = extraInputs.colour().trim().match(_hexRegex)
+      _rgb = false
     }
+    console.log('_tmp:', _tmp)
 
-    if (_rgb === false) {
-      _values = _hex2decimal(_values)
-    }
+    if (_tmp !== null) {
+      let _values = {
+        r: _tmp[1],
+        g: _tmp[2],
+        b: _tmp[3],
+        a: (typeof _tmp[4] !== 'undefined')
+          ? _tmp[4]
+          : 1
+      }
 
-    const _hexValues = _decimal2hex(_values)
-    const _hex = _hexValues.r + _hexValues.g + _hexValues.b
+      if (_rgb === false) {
+        _values = _hex2decimal(_values)
+      }
 
-    let _he = _hex.replace(/([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3(?:([a-f0-9])\4)?/i, '$1$2$3$4')
+      const _hexValues = _decimal2hex(_values)
+      const _hex = _hexValues.r + _hexValues.g + _hexValues.b
 
-    _he = (_he !== _hex)
-      ? _he
-      : ''
+      let _he = _hex.replace(/([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3(?:([a-f0-9])\4)?/i, '$1$2$3$4')
 
-    let _brand = (typeof brand[_hex] === 'string')
-      ? brand[_hex]
-      : (typeof brand[_he] === 'string')
-        ? brand[_he]
+      _he = (_he !== _hex)
+        ? _he
         : ''
 
-    _brand = (_brand !== '')
-      ? '\n\nBrand variable: $' + _brand
-      : ''
+      const _tmpBrand = (Array.isArray(_brandColours[_hex]))
+        ? _brandColours[_hex]
+        : (Array.isArray(_brandColours[_he]))
+          ? _brandColours[_he]
+          : []
 
-    let _a = (_he !== '' && _hexValues.a.substring(0, 1) !== _hexValues.a.substring(1, 2))
-      ? _he + _hexValues.a.substring(0, 1)
-      : ''
-    _a = (_a !== '')
-      ? '; (#' + _a + ')'
-      : ''
+      let _brand = ''
+      if (_tmpBrand) {
+        _brand = '\n\nBrand variable'
+        _sep = ': '
+        for (let a = 0; a < _tmpBrand.length; a += 1) {
+          _brand += _sep + '$' + _tmpBrand[a]
+          _sep = ',\n                '
+        }
+      }
 
-    _he = (_he !== '')
-      ? '; (#' + _he + ')'
-      : ''
+      let _a = (_he !== '' && _hexValues.a.substring(0, 1) !== _hexValues.a.substring(1, 2))
+        ? _he + _hexValues.a.substring(0, 1)
+        : ''
+      _a = (_a !== '')
+        ? '; (#' + _a + ')'
+        : ''
 
-    return 'Original: ' + input + '\n\n' +
-           '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + _he + '\n' +
-           '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + _a + ';\n\n' +
-           '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
-           '         RGBA: rgba(' + _values.r + ', ' + _values.g + ', ' + _values.b + ', ' + _values.a + ');\n' +
-           _brand
+      _he = (_he !== '')
+        ? '; (#' + _he + ')'
+        : ''
+
+      console.groupEnd()
+      console.groupEnd()
+      return 'Original: ' + extraInputs.colour() + '\n\n' +
+             '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + _he + '\n' +
+             '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + _a + ';\n\n' +
+             '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
+             '         RGBA: rgba(' + _values.r + ', ' + _values.g + ', ' + _values.b + ', ' + _values.a + ');\n' +
+             _brand
+    }
+    console.groupEnd()
   } else {
-    return input
+    console.group('colourConverter() (px)')
+    console.log('extraInputs.pixels():', extraInputs.pixels())
+    console.log('extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', extraInputs.pixels())
+    const _px = extraInputs.pixels().replace(/[^-0-9.]+/g, '')
+    console.log('isNumeric(' + _px + '):', isNumeric(_px))
+    if (isNumeric(_px)) {
+      let _output = '\n                 REMs: ' + _px / 16 + 'rem'
+
+      console.log('_px / 16:', _px / 16)
+      const _matchVars = _pxVars.filter(item => item.px == _px)
+      console.log('_matchVars:', _matchVars)
+      _sep = ' $'
+      if (_matchVars.length > 0) {
+        _output += '\n\nMedia query variables:'
+        for (let a = 0; a < _matchVars[0].v.length; a += 1) {
+          _output += _sep + _matchVars[0].v[a]
+          _sep = '\n                       $'
+        }
+        console.groupEnd()
+      }
+      return _output
+    }
+    console.groupEnd()
   }
+  console.groupEnd()
+  return ''
 }
 
 doStuff.register({
-  id: 'colourConverter',
-  name: 'Colour type converter',
-  func: colourConverter,
-  description: '',
+  id: 'acuFrontEndHelper',
+  name: 'ACU front end helper',
+  func: acuFrontEndHelper,
+  description: 'Convert colour values to other colour formats (and find SASS variable) or convert pixel value to REMs (and find SASS variable)<br /><br />To check colours, enter a colour value into the "Colour value" field & click the "MODIFY" button (bottom left of window)<br /><br />To check pixel values, enter a pixel value into the "Pixel value" field and click MODIFY. Pixel value will be converted to REMS and (if possible) a sass variable will also be shown',
+  inputLabel: 'Output',
   // docsURL: '',
-  extraInputs: [],
-  // group: '',
+  extraInputs: [
+    {
+      id: 'colour',
+      label: 'Colour value',
+      type: 'text',
+      description: 'Colour value as hex, alpha-hex, rgb() or rgba()'
+    },
+    {
+      id: 'pixels',
+      label: 'Pixel value',
+      type: 'text',
+      description: 'Convert pixel value to REMs'
+    }
+  ],
+  group: 'it',
   ignore: false
   // inputLabel: '',
   // remote: false,
