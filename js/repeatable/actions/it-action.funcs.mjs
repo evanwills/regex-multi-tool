@@ -1460,5 +1460,140 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  JIRA ticket to git-branch
+// ====================================================================
+// START: DB setup for local dev
+
+/**
+ * DB setup for local dev
+ *
+ * created by: Evan Wills
+ * created: 2022-05-13
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const newDbAndUser = (input, extraInputs, GETvars) => {
+  const dbName = extraInputs.dbName()
+  const staffDirDb = extraInputs.staffDirDb()
+  const dbHost = extraInputs.dbHost()
+  const userName = extraInputs.userName()
+  const userPassword = extraInputs.userPassword().replace(/['"]/g, '').substring(0, 20)
+  const staffDir = extraInputs.staffDir()
+  let output = ''
+
+  console.log('dbName:', dbName)
+  console.log('userName:', userName)
+  console.log('userPassword:', userPassword)
+  console.log('staffDir:', staffDir)
+
+  if (userPassword !== extraInputs.userPassword()) {
+    output += '-- DB user\'s password has been truncated to 20 characters\n' +
+              '-- and/or had single & double quotes removed\n\n'
+  }
+
+  output += 'CREATE USER \'' + userName + '\'@\'' + dbHost + '\' ' +
+            'IDENTIFIED BY \'' + userPassword + '\';\n\n'
+  output += 'CREATE DATABASE `' + dbName + '`;\n\n'
+
+  if (staffDir === 2) {
+    output += 'CREATE DATABASE `acu_user2`;\n\n'
+  }
+  output += 'GRANT SELECT, INSERT, UPDATE, DELETE ON `' + dbName +
+            '`.* TO \'' + userName + '\'@\'' + dbHost + '\';\n\n'
+  if (staffDir > 0) {
+    output += 'GRANT SELECT ON `' + staffDirDb + '`.* ' +
+              'TO \'' + userName + '\'@\'' + dbHost + '\';\n\n'
+  }
+
+  output += 'FLUSH PRIVILEGES;\n\n'
+  return output
+}
+
+doStuff.register({
+  id: 'newDbAndUser',
+  name: 'DB setup for local dev',
+  func: newDbAndUser,
+  description: 'Get MySQL/MariaDB commands to create new user and DB and give user access to DB',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'dbName',
+      label: 'DB name',
+      type: 'text',
+      description: 'Name of the primary database',
+      pattern: '[a-zA-Z0-9_]+',
+      // default: ''
+      default: 'cfb__DEV'
+    },
+    {
+      id: 'staffDirDb',
+      label: 'Staff Directory DB name',
+      type: 'text',
+      description: 'Name of the staff directory database',
+      pattern: '[a-zA-Z0-9_]+',
+      default: 'acu_user2'
+    },
+    {
+      id: 'dbHost',
+      label: 'Database host',
+      type: 'text',
+      description: 'Database server\'s domain name or IP addres',
+      pattern: '',
+      default: 'localhost'
+    },
+    {
+      id: 'userName',
+      label: 'User name',
+      type: 'text',
+      description: 'Database username to connect to database',
+      pattern: '[a-zA-Z0-9_]+',
+      // default: ''
+      default: 'cfb__USER'
+    },
+    {
+      id: 'userPassword',
+      label: 'User password',
+      type: 'text',
+      description: 'Database user\'s password to connect to database',
+      pattern: '^.{10,64}$',
+      // default: ''
+      default: 'VpDtDa+k{1Wo4\/`K;Te'
+    },
+    {
+      id: 'staffDir',
+      label: 'Staff directory',
+      options: [
+        {
+          default: false,
+          label: 'No access to Staff Directory DB',
+          value: '0'
+        },
+        {
+          default: true,
+          label: 'Give access to Staff Directory DB but do not create DB',
+          value: '1'
+        },
+        {
+          default: false,
+          label: 'Create Staff Directory DB and give user access',
+          value: '2'
+        }
+      ],
+      type: 'radio',
+      description: 'This assumes the Staff Directory\'s DB name is <code>acu_user2</code>'
+    }
+  ],
+  group: 'IT',
+  ignore: false
+})
+
+//  END:  DB setup for local dev
 // ====================================================================

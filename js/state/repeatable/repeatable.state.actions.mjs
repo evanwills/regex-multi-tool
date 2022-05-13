@@ -14,7 +14,8 @@ export const repeatActions = {
   TOGGLE_NAV: 'REPEATABLE_TOGGLE_NAV',
   // TOGGLE_DEBUG: 'REPEATABLE_TOGGLE_DEBUG',
   ERROR: 'REPEATABLE_ERROR',
-  INIT: 'REPEATABLE_INIT'
+  INIT: 'REPEATABLE_INIT',
+  FILTER: 'REPEATABLE_FILTER_ACTIONS'
 }
 
 export const getAutoDispatchHrefAction = (_dispatch) => {
@@ -58,14 +59,15 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
 
 export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
-    console.log('inside getAutoDispatchValueAction()')
+    // console.log('inside getAutoDispatchValueAction()')
     const meta = getMeta(this.id)
     // let _type = ''
 
-    // console.group('getAutoDispatchValueAction()')
-    // console.log('meta:', meta)
-    // console.log('this:', this)
-    // console.log('this.checked:', this.checked)
+    console.group('getAutoDispatchValueAction()')
+    console.log('meta:', meta)
+    console.log('this:', this)
+    console.log('this.checked:', this.checked)
+    console.groupEnd();
 
     switch (meta.type) {
       case 'extraInputs':
@@ -86,6 +88,14 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         _dispatch({
           type: mainAppActions.SET_INPUT,
           payload: this.value
+        })
+        break
+
+      case 'filter':
+        console.log('setting actions filter')
+        _dispatch({
+          type: repeatActions.FILTER,
+          payload: this.value.toLowerCase()
         })
         break
     }

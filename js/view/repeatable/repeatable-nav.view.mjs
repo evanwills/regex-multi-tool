@@ -10,12 +10,18 @@ const navLink = (_baseURL, _action, _click, currentActionID) => {
   `
 }
 
-const navGroup = (actionGroup, href, eventHandler, currentActionID) => {
+const navGroup = (actionGroup, href, eventHandler, currentActionID, filter) => {
+  const _filteredActions = (filter !== '')
+    ? actionGroup.actions.filter(item => {
+        return (filter === '' || item.name.toLowerCase().indexOf(filter) > -1)
+      })
+    : actionGroup.actions
+
   return html`
     <li class="action-nav__group">
       <h2 class="action-nav__group-name">${ucFirst(actionGroup.name)}</h2>
       <ul class="list-clean list-clean--tight action-nav__actions">
-        ${actionGroup.actions.map((action) => navLink(
+        ${_filteredActions.map((action) => navLink(
           href,
           action,
           eventHandler,
@@ -25,12 +31,14 @@ const navGroup = (actionGroup, href, eventHandler, currentActionID) => {
     </li>`
 }
 
-export const repeatableActionNav = (_open, _baseURL, _actions, events, currentActionID) => {
+export const repeatableActionNav = (_open, _baseURL, _actions, actionsCount, filter, events, currentActionID) => {
   const navClass = (_open === true) ? 'opened' : 'closed'
-
+  const _filter = filter.trim()
   const _href = _baseURL.split('#')
   _href[0] = stripGETaction(_href[0])
-  _href[0] += (_href[0].indexOf('?') > -1) ? '&' : '?'
+  _href[0] += (_href[0].indexOf('?') > -1)
+    ? '&'
+    : '?'
   _href[0] += 'action=[[ACTION_ID]]'
 
   return html`
@@ -38,7 +46,15 @@ export const repeatableActionNav = (_open, _baseURL, _actions, events, currentAc
       <button id="action-toggle" value="toggle-nav" class="action-nav__toggle action-nav__toggle--open action-nav__toggle--${navClass}" @click=${events.simpleEvent}>${(_open === false) ? 'Open' : 'Close'}</button>
       <nav id="action-nav" class="action-nav">
         <ul class="list-clean list-clean--tight">
-          ${_actions.map((actionGroup) => navGroup(actionGroup, _href[0], events.hrefEvent, currentActionID))}
+        ${(actionsCount > 20)
+          ? html`
+            <li class="action-nav__group search-block">
+            <label for="action-filter" class="sr-only">Search:</label>
+            <input type="search" class="search-block__search" id="action-filter" value="" placeholder="Search for an action" @keyup=${events.valueEvent} /><span class="search-block__icon">&telrec;</span>`
+          : ''
+        }
+        </li>
+          ${_actions.map((actionGroup) => navGroup(actionGroup, _href[0], events.hrefEvent, currentActionID, _filter))}
         </ul>
       </nav>
     </div>

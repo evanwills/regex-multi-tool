@@ -42,3 +42,21 @@ textarea.xl {
 .oneOff-input__split__input {
   width: 4rem;
 }
+
+.search-block {
+  background-color: var(--bg-colour);
+  border-bottom: var(--line-weight-hvy) solid var(--txt-colour);
+
+}
+.search-block__search {
+  display: inline-block;
+  width: 100%;
+  border: none;
+  padding: 0.2rem 1.25rem 0.3rem 0.4rem;
+  margin-right: -1.25rem;
+}
+.search-block__icon {
+  color: var(--txt-colour);
+  position: relative;
+  top: 0.1rem;
+}

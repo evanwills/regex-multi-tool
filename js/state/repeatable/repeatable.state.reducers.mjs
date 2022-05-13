@@ -29,6 +29,9 @@ export const defaultRepeat = {
   // (e.g. when creating both a HTML for display to the user
   //       and HTML for an email)
   extraOutputs: [],
+  // Search string for filtering available actions.
+  filter: '',
+  actionsCount: 0,
   navOpen: false
 }
 
@@ -43,6 +46,7 @@ const sortActionsList = (actionsList) => {
   // const _newList = []
   const groupedActions = {}
   const publicActions = []
+  let actionsCount = 0
 
   const sortByActionLabel = (a, b) => {
     if (a.name < b.name) {
@@ -201,15 +205,15 @@ const getExtraInputKeyValues = (extraInputs, get) => {
 
 const updateFields = (state, payload) => {
   const { id, key, value } = payload
-  console.group('updateFields()')
-  console.log('id:', id)
-  console.log('key:', key)
-  console.log('value:', value)
-  console.log('state[' + key + ']:', state[key])
-  console.log('isNumeric(state[' + key + ']):', isNumeric(state[key]))
-  console.log('isStr(state[' + key + ']):', isStr(state[key]))
-  console.log('state[' + key + '] !== value', state[key] !== value)
-  console.groupEnd()
+  // console.group('updateFields()')
+  // console.log('id:', id)
+  // console.log('key:', key)
+  // console.log('value:', value)
+  // console.log('state[' + key + ']:', state[key])
+  // console.log('isNumeric(state[' + key + ']):', isNumeric(state[key]))
+  // console.log('isStr(state[' + key + ']):', isStr(state[key]))
+  // console.log('state[' + key + '] !== value', state[key] !== value)
+  // console.groupEnd()
 
   switch (id) {
     case 'extraInputs':
@@ -277,7 +281,8 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
     case repeatActions.REGISTER_ALL_ACTIONS:
       return {
         ...state,
-        allActions: sortActionsList(action.payload)
+        allActions: sortActionsList(action.payload),
+        actionsCount: action.payload.length
       }
 
     case repeatActions.UPDATE_FIELD:
@@ -316,6 +321,12 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       return {
         ...state,
         navOpen: !state.navOpen
+      }
+
+    case repeatActions.FILTER:
+      return {
+        ...state,
+        filter: action.payload
       }
 
       // case repeatActions.TOGGLE_DEBUG:

@@ -46,7 +46,7 @@ doStuff.register({
 const _text = {
   id: '',
   label: '',
-  type: '',
+  type: 'text',
   description: '',
   pattern: '',
   default: ''

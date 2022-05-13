@@ -63,14 +63,11 @@ export const repeatableUI = (props) => {
     : ''
   const hasAction = isNonEmptyStr(props.activeAction.id)
 
-  if (Array.isArray(props.chainable)) {
-    // blah
-  } else {
-    // blah
-  }
-  // console.group('repeatableUI()')
-  // console.log('props:', props)
-  // console.groupEnd()
+  // if (Array.isArray(props.chainable)) {
+  //   // blah
+  // } else {
+  //   // blah
+  // }
 
   return html`
     <section>
@@ -80,6 +77,8 @@ export const repeatableUI = (props) => {
         (hasAction) ? props.navOpen : true,
         props.href,
         props.allActions,
+        props.actionsCount,
+        props.filter,
         props.events,
         activeActionID)}
 
