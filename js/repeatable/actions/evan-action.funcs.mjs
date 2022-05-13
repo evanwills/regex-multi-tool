@@ -9,6 +9,7 @@ import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
 import {
   camel2human,
+  makeHumanReadableAttr,
   makeSingle,
   padStrLeft,
   snakeToCamelCase,
@@ -3523,7 +3524,7 @@ const webCompAttr = (input, extraInputs, GETvars) => {
   for (let a = 0, c = _attrs.length; a < c; a += 1) {
     tmp.push({
       id: _attrs[a][2],
-      content: '\n\n### `' + _attrs[a][2] + '`\n\n' +
+      content: '\n\n### `' + _attrs[a][2].toLowerCase() + '` - ' + ucFirst(camel2human(_attrs[a][2]).toLowerCase()) + '\n\n' +
                '*{`' + _attrs[a][3] + '`}* &ndash; *[default: `' + _attrs[a][4] + '`]*\n\n' +
                _attrs[a][1].replace(
                  /\s*[\r\n]+\s*\*\s*/, ' '
@@ -3566,7 +3567,7 @@ doStuff.register({
       default: true
     }]
   }],
-  // group: '',
+  group: 'evan',
   ignore: false
   // inputLabel: '',
   // remote: false,
