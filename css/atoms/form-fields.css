@@ -52,11 +52,14 @@ textarea.xl {
   display: inline-block;
   width: 100%;
   border: none;
-  padding: 0.2rem 1.25rem 0.3rem 0.4rem;
-  margin-right: -1.25rem;
+  padding: 0.2rem 1.3rem 0.3rem 0.4rem;
+  margin-right: -1.3rem;
 }
 .search-block__icon {
   color: var(--txt-colour);
+  font-size: 1.4rem;
+  display: inline-block;
+  margin-top: -0.45rem;
   position: relative;
-  top: 0.1rem;
+  top: 0.2rem;
 }

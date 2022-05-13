@@ -84,7 +84,7 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         break
 
       case 'primaryInput':
-        console.log('setting main input')
+        // console.log('setting main input')
         _dispatch({
           type: mainAppActions.SET_INPUT,
           payload: this.value
@@ -92,21 +92,13 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         break
 
       case 'filter':
-        console.log('setting actions filter')
+        // console.log('setting actions filter')
         _dispatch({
           type: repeatActions.FILTER,
           payload: this.value.toLowerCase()
         })
         break
     }
-
-    // if (_type !== '') {
-    //   _dispatch({
-    //     type: _type,
-    //     payload: this.value
-    //   })
-    // }
-    // console.groupEnd()
   }
 }
 

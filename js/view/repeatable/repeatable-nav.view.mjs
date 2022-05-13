@@ -50,7 +50,7 @@ export const repeatableActionNav = (_open, _baseURL, _actions, actionsCount, fil
           ? html`
             <li class="action-nav__group search-block">
             <label for="action-filter" class="sr-only">Search:</label>
-            <input type="search" class="search-block__search" id="action-filter" value="" placeholder="Search for an action" @keyup=${events.valueEvent} /><span class="search-block__icon">&telrec;</span>`
+            <input type="search" class="search-block__search" id="action-filter" value="" placeholder="Filter action list" @keyup=${events.valueEvent} /><span class="search-block__icon">&telrec;</span>`
           : ''
         }
         </li>
