@@ -46,7 +46,6 @@ const sortActionsList = (actionsList) => {
   // const _newList = []
   const groupedActions = {}
   const publicActions = []
-  let actionsCount = 0
 
   const sortByActionLabel = (a, b) => {
     if (a.name < b.name) {

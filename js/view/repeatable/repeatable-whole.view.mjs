@@ -39,7 +39,7 @@ const renderDescription = (description) => {
     } else {
       return html`<p class="repeatable-desc">${unsafeHTML(description)}</p>`
     }
-    unsafe
+    // unsafe
   }
   return ''
 }

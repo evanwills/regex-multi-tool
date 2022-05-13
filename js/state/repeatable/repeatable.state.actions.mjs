@@ -63,11 +63,11 @@ export const getAutoDispatchValueAction = (_dispatch) => {
     const meta = getMeta(this.id)
     // let _type = ''
 
-    console.group('getAutoDispatchValueAction()')
-    console.log('meta:', meta)
-    console.log('this:', this)
-    console.log('this.checked:', this.checked)
-    console.groupEnd();
+    // console.group('getAutoDispatchValueAction()')
+    // console.log('meta:', meta)
+    // console.log('this:', this)
+    // console.log('this.checked:', this.checked)
+    // console.groupEnd()
 
     switch (meta.type) {
       case 'extraInputs':
