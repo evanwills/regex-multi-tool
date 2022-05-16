@@ -1514,6 +1514,7 @@ const newDbAndUser = (input, extraInputs, GETvars) => {
   }
 
   output += 'FLUSH PRIVILEGES;\n\n'
+  output += 'SHOW GRANTS FOR \'' + userName + '\'@\'' + dbHost + '\';\n\n'
   return output
 }
 
