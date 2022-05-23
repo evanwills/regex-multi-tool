@@ -6,7 +6,7 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
+import { isBoolTrue, isInt, isNumeric } from '../../utilities/validation.mjs'
 import {
   camel2human,
   makeHumanReadableAttr,
@@ -3383,7 +3383,7 @@ doStuff.register({
 /**
  * Action description goes here
  *
- * created by: Firstname LastName
+ * created by: Evan Wills
  * created: YYYY-MM-DD
  *
  * @param {string} input user supplied content (expects HTML code)
@@ -3575,4 +3575,171 @@ doStuff.register({
 })
 
 //  END:  Web component attributes to markdown documentation
+
+// ====================================================================
+// START: DB Enum to TS IDbEnum objects
+
+const wrapDesc = (input) => {
+  const _input = input.replace(/(?<=[^\\])'/g, '\\\'')
+  const len = 48
+  const lenAll = len - 3
+
+  if (_input.length < (lenAll)) {
+    return "'" + _input + "'"
+  }
+
+  let _tmpFront = _input.substring(0, len)
+  let _tmpBack = _input.substring(len)
+  let output = "'" + _tmpFront.replace(/^(.*?\s+)[^\s+]+$/, '$1') + "'"
+
+  let _tail = _tmpFront.replace(/.*?\s+([^\s]+)$/, '$1')
+
+  let _next = (_tail !== _tmpFront)
+    ? _tail + _tmpBack
+    : _tmpBack
+  while (_next.length > lenAll) {
+    _tmpFront = _next.substring(0, len)
+    _tmpBack = _next.substring(len)
+    _tail = _tmpFront.replace(/.*?\s+([^\s]+)$/, '$1')
+    _next = (_tail !== _tmpFront)
+      ? _tail + _tmpBack
+      : _tmpBack
+
+    output += " +\n                 '" +
+              _tmpFront.replace(/^(.*?\s+)[^\s+]+$/, '$1') +
+              "'"
+  }
+
+  if (_next.length > 0) {
+    output += " +\n                 '" + _next + "'"
+  }
+
+  return output
+}
+
+/**
+ * Action description goes here
+ *
+ * created by: Evan Wills
+ * created: 2022-05-23
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const dbEnum2IDbEnum = (input, extraInputs, GETvars) => {
+  const _name = snakeToCamelCase(extraInputs.name().replace(/_+$/, '').replace(/^enum_/i, ''))
+  let _id = (extraInputs.basezero('1'))
+    ? 1
+    : 0
+
+  const cleaner = [
+    {
+      find: /\/\/.*?[\r\n]+/g,
+      replace: ''
+    },
+    {
+      find: / *[\r\n]+ +/g,
+      replace: ''
+    },
+    {
+      find: /'\.'/ig,
+      replace: ''
+    },
+    {
+      find: /\[([^[\]]+)\]/isg,
+      replace: '{$1}'
+    },
+    {
+      find: /"/g,
+      replace: '\\"'
+    },
+    {
+      find: /\\'/g,
+      replace: '\''
+    },
+    {
+      find: /'[a-z0-9]+(?:_[a-z0-9]+)*_(name|description)'\s*=>\s*'(.*?)'(,|\})/ig,
+      replace: '"$1": "$2"$3'
+    },
+    {
+      find: /^(?:\s*\[\s*)*/g,
+      replace: '['
+    },
+    {
+      find: /(?<=\})(?:(?:,?\s*)?(?:\],?\s*)?)*$/g,
+      replace: ']'
+    }
+  ]
+
+  let _tmp = input
+
+  for (let a = 0; a < cleaner.length; a += 1) {
+    _tmp = _tmp.replace(cleaner[a].find, cleaner[a].replace)
+  }
+
+  let _data = null
+  try {
+    _data = JSON.parse(_tmp);
+  } catch (error) {
+    console.error(
+      'Could not parse input Laravel Migration code. ' + error
+    )
+    return input
+  }
+
+  let output = 'export const ' + _name + ' : Array<IDbEnum> = ['
+  let _sep = ''
+  for (let a = 0; a < _data.length; a += 1) {
+    output += _sep + '\n  {\n    id: ' + _id + ',\n' +
+              "    name: '" + _data[a].name + "',\n" +
+              '    description: ' + wrapDesc(_data[a].description) + '\n' +
+              '  }'
+    _sep = ','
+    _id += 1
+  }
+
+  return output + '\n];\n'
+}
+// '    description: "'
+doStuff.register({
+  id: 'dbEnum2IDbEnum',
+  name: 'DB Enum to TS IDbEnum objects',
+  func: dbEnum2IDbEnum,
+  description: '',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'name',
+      label: 'DB Table name',
+      type: 'text',
+      description: 'Name of enum table in DB (to be converted to camelCase',
+      pattern: '^[a-z0-9]+(?:_[a-z0-9]+)*$',
+      default: ''
+    }, {
+      id: 'basezero',
+      label: 'Index start',
+      options: [
+        {
+          label: 'Index starts at one',
+          value: '1'
+        }
+      ],
+      type: 'checkbox'
+    }
+  ],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  DB Enum to TS IDbEnum objects
 // ====================================================================
