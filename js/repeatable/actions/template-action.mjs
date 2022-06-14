@@ -43,7 +43,7 @@ doStuff.register({
 // ----------------------------------------------
 // START: extraInputs field type templates
 
-const _text = {
+export const _text = {
   id: '',
   label: '',
   type: 'text',
@@ -52,7 +52,7 @@ const _text = {
   default: ''
 }
 
-const _select = {
+export const _select = {
   description: '',
   id: '',
   label: '',
@@ -62,7 +62,7 @@ const _select = {
   type: 'select'
 }
 
-const _checkbox = {
+export const _checkbox = {
   id: '',
   label: '',
   options: [
@@ -75,7 +75,7 @@ const _checkbox = {
   type: 'checkbox'
 }
 
-const _radio = {
+export const _radio = {
   id: '',
   label: '',
   options: [
@@ -88,7 +88,7 @@ const _radio = {
   type: 'radio'
 }
 
-const _number = {
+export const _number = {
   id: '',
   label: '',
   min: 1,

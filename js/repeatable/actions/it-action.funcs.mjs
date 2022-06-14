@@ -7,6 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isNonEmptyStr } from '../../utilities/validation.mjs'
+import { ucFirst } from '../../utilities/sanitise.mjs'
 
 const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '
@@ -860,7 +861,7 @@ doStuff.register({
   description: 'Sort list of components into alphabetical order',
   // docsURL: '',
   extraInputs: [],
-  // group: 'it',
+  group: 'it',
   ignore: false,
   name: 'Sort components alphabetically'
 })
@@ -974,7 +975,7 @@ doStuff.register({
     type: 'text',
     default: 'zgqXOnRN7i4Gqe2x4JNjaH4wDm35e9FWb2dmrkKEjYs6RaDh8RrBbgZecxWOWUirEYFydC0AzGFCOJ35GTbSPgDrdrwwfTSreH1HeiEmRNo1x27v4qAgOIkhc95AbeVVRJVfXuz4rLdAnpZMPYxe7Ugj8OQbgjedUJGJ2xAUF6ht2KLAy1meS9HMshRaukvakvoTLk7wvsyaqWX8zTJ7QmX67s1cPRkMQJqFdwT7c9YJDUq15NfHqy0Omgo0OnTr3oIE3ZxXB50Erm9lWTiWFNSiQqtcTXnsRBebJA4x0ccZiu2SslxQmF93CUY'
   }],
-  // group: 'it',
+  group: 'it',
   ignore: true,
   name: 'Unique characters only'
 })
@@ -1532,7 +1533,7 @@ doStuff.register({
       description: 'Name of the primary database',
       pattern: '[a-zA-Z0-9_]+',
       // default: ''
-      default: 'cfb__DEV'
+      default: ''
     },
     {
       id: 'staffDirDb',
@@ -1557,7 +1558,7 @@ doStuff.register({
       description: 'Database username to connect to database',
       pattern: '[a-zA-Z0-9_]+',
       // default: ''
-      default: 'cfb__USER'
+      default: ''
     },
     {
       id: 'userPassword',
@@ -1566,7 +1567,7 @@ doStuff.register({
       description: 'Database user\'s password to connect to database',
       pattern: '^.{10,64}$',
       // default: ''
-      default: 'VpDtDa+k{1Wo4\/`K;Te'
+      default: ''
     },
     {
       id: 'staffDir',
@@ -1597,4 +1598,234 @@ doStuff.register({
 })
 
 //  END:  DB setup for local dev
+// ====================================================================
+// START: Get raw char count
+
+/**
+ * Get raw char count
+ *
+ * created by: Evan Wills
+ * created: 2022-05-23
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const rawCharCount = (input, extraInputs, GETvars) => {
+  const _tmp = input.replace(/'\.[\s\r\n]+'/sg, '').replace(/^\s*'|'(?:\s*,)?\s*$/g, '')
+
+  return _tmp + '\n\n' + _tmp.length
+}
+
+doStuff.register({
+  id: 'rawCharCount',
+  name: 'Get raw char count',
+  func: rawCharCount,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'it',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
+// ====================================================================
+// START: Add missing sessions to PASS AR
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const addPassArSessions = (input, extraInputs, GETvars) => {
+  const tmp = 'Location	Campus	SubjectCode	Description	Time	Date	DayOfWeek	ActivityCode\n' +
+              '502.2.25	5	CHEM105_5C_Sem1	Foundations of Chemistry	12:00	6/02/2022	Thu	1\n' +
+              '502.2.25	5	CHEM105_5C_Sem1	Foundations of Chemistry	13:00	6/02/2022	Thu	1\n' +
+              'NSY_Online	5	LAWS106_5C_Sem1	Criminal Law and Procedure	12:00	31/05/2022	Tue	1\n' +
+              'NSY_Online	5	LAWS106_5C_Sem1	Criminal Law and Procedure	13:00	31/05/2022	Tue	1\n' +
+              '600.G.12	6	EDES101_6C_Sem1	Educational Thought	10:00	31/05/2022	Tue	2\n' +
+              '600.G.12	6	EDES101_6C_Sem1	Educational Thought	11:00	31/05/2022	Tue	2\n' +
+              '600.G.12	6	THBS100_6C_Sem1	Introduction to the Bible	12:00	6/01/2022	Wed	2\n' +
+              '600.G.12	6	THBS100_6C_Sem1	Introduction to the Bible	13:00	6/01/2022	Wed	2\n' +
+              '640.1.32	6	ANAT100_6C_Sem1	Anatomical Foundations of Exercise Science	10:00	6/01/2022	Wed	4\n' +
+              '640.1.32	6	ANAT100_6C_Sem1	Anatomical Foundations of Exercise Science	11:00	6/01/2022	Wed	4\n' +
+              'MEL_Online	4	CHEM105_4C_Sem1	Foundations of Chemistry	10:00	31/05/2022	Tue	4\n' +
+              'MEL_Online	4	SPHY103_4C_Sem1	Linguistics and Phonetics for Speech Pathology	10:00	6/01/2022	Wed	4\n' +
+              'MEL_Online	4	SPHY103_4C_Sem1	Linguistics and Phonetics for Speech Pathology	11:00	6/01/2022	Wed	4\n' +
+              'MEL_Online	4	BIOL121_4C_Sem1	Human Biological Science I	10:00	31/05/2022	Tues	4\n' +
+              'MEL_Online	4	LAWS106_4C_Sem1	Criminal Law and Procedure	9:00	5/02/2022	Thu	4\n' +
+              'MEL_Online	4	PSYC100_4C_Sem1	Foundations of Psychology	12:00	6/01/2022	Wed	4\n' +
+              'BAL_Online Live	1	ANAT101_1C_Sem1	Physiotherapy Anatomy I	12:00	6/01/2022	Wednes	1\n' +
+              'BAL_Online Live	1	ANAT101_1C_Sem1	Physiotherapy Anatomy I	13:00	6/01/2022	Wednes	1\n' +
+              '212.2.02	2	ANAT101_2C_Sem1	Anatomical Foundations of Exercise Science	12:00	31/05/2022	Tue	1\n' +
+              '212.2.04	2	ANAT101_2C_Sem1	Anatomical Foundations of Exercise Science	12:00	6/01/2022	Wed	1\n' +
+              'BRI_Online	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	17:00	31/05/2022	Tue	1\n' +
+              'BRI_Online	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	17:00	6/02/2022	Thu	2\n' +
+              '231.G.01	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	12:00	6/01/2022	Wed	2\n' +
+              '225.G.07	2	BIOL121_2C_Sem1	Human Biological Science I	12:00	6/02/2022	Thu	2\n' +
+              '231.G.01	2	BIOL125_2C_Sem1	Human Biology 1	9:00	6/01/2022	Wed	2\n' +
+              '231.G.03	2	BUSN104_2C_Sem1	Money Matters	10:00	6/02/2022	Thu	4\n' +
+              '231.G.01	2	CHED105_2C_Sem1	Foundations of Chemistry	11:00	30/05/2022	Mon	4\n' +
+              '216.1.16	2	EDEN100_2C_Sem1	Foundations of Literacy	12:00	31/05/2022	Tue	4\n' +
+              '216.1.16	2	EDES101_2C_Sem1	Educational Thought	12:00	6/01/2022	Wed	4\n' +
+              '220.1.13	2	SPHY103_2C_Sem1	Linguistics and Phonetics for Speech Pathology	12:00	6/01/2022	Wed	4\n' +
+              'BRI_Online	2	SWTP108_2C_Sem1	Purpose and Context of Social Work and Human Services	13:00	30/05/2022	Mon	4'
+
+  console.group('addPassArSessions()')
+
+  const getData = (row, index, type = 'string') => {
+    const field = typeof row[index] === 'string'
+      ? row[index].trim()
+      : ''
+
+    if (field === '') {
+      return field
+    }
+
+    switch (type) {
+      case 'date':
+        return field.replace(/^([0-9]+)\/([0-9]+)\/([0-9]+)$/, '$3-$2-$1')
+      case 'time':
+        return field.replace(/^(?=[0-9]:[0-9]+)$/, '0')
+      case 'dow':
+        return ucFirst(field.substring(0, 3).toLowerCase())
+      default:
+        return field;
+    }
+  }
+
+  const alphaSort = (a, b) => {
+    if (a < b) {
+      return -1
+    } else if (a > b) {
+      return 1
+    } else {
+      return 0
+    }
+  }
+
+  const tmpData = tmp.split('\n')
+  // console.log('tmpData:', tmpData)
+  let tmpHeaders = tmpData.shift()
+  tmpHeaders = tmpHeaders.toLowerCase().split('\t')
+  for (let a = 0; a < tmpHeaders.length; a += 1) {
+    tmpHeaders[a] = tmpHeaders[a].trim()
+  }
+  console.log('tmpHeaders:', tmpHeaders)
+
+  const headers = {
+    location: tmpHeaders.indexOf('location'),
+    campus: tmpHeaders.indexOf('campus'),
+    subjectCode: tmpHeaders.indexOf('subjectcode'),
+    description: tmpHeaders.indexOf('description'),
+    time: tmpHeaders.indexOf('time'),
+    date: tmpHeaders.indexOf('date'),
+    dayOfWeek: tmpHeaders.indexOf('dayofweek')
+  }
+
+  const subjects = []
+  const subjectCodes = []
+  const campuses = []
+
+  const data = []
+  for (let a = 0; a < tmpData.length; a += 1) {
+    tmpData[a] = tmpData[a].split('\t')
+    const _tmp = {
+      location: getData(tmpData[a], headers.location),
+      campus: getData(tmpData[a], headers.campus),
+      subjectCode: getData(tmpData[a], headers.subjectCode),
+      description: getData(tmpData[a], headers.description),
+      time: getData(tmpData[a], headers.time, 'time'),
+      date: getData(tmpData[a], headers.date, 'date'),
+      dayOfWeek: getData(tmpData[a], headers.dayOfWeek, 'dow')
+    }
+
+    if (_tmp.location !== '' && _tmp.campus !== '' &&
+        _tmp.subjectCode !== '' && _tmp.description !== '' &&
+        _tmp.time !== '' && _tmp.date !== '' && _tmp.dayOfWeek !== ''
+    ) {
+      const meta = _tmp.subjectCode.split('_')
+      _tmp.unit = meta[0]
+      _tmp.campusCode = (typeof meta[1] === 'string')
+        ? meta[1]
+        : ''
+      _tmp.semester = (typeof meta[2] === 'string')
+        ? meta[2]
+        : ''
+
+      if (subjects.indexOf(_tmp.unit) === -1) {
+        subjects.push(_tmp.unit)
+      }
+
+      if (subjectCodes.indexOf(_tmp.subjectCode) === -1) {
+        subjectCodes.push(_tmp.subjectCode)
+      }
+
+      if (campuses.indexOf(_tmp.campus) === -1) {
+        campuses.push(_tmp.campus)
+      }
+
+      data.push(_tmp)
+    }
+  }
+  subjects.sort(alphaSort)
+  subjectCodes.sort(alphaSort)
+  campuses.sort(alphaSort)
+
+  const subjectSQL = '\nSELECT *\n' +
+                     'FROM   dbo.Subject\n' +
+                     'WHERE  Code LIKE \'%' +
+                     subjects.join('%\'\nOR     Code LIKE \'%') +
+                     '%\'\nORDER BY Code;'
+
+  const subjectCodeSQL = '\nSELECT *\n' +
+                         'FROM   dbo.Subject\n' +
+                         'WHERE  Code = \'' +
+                         subjectCodes.join('\'\nOR     Code = \'') +
+                         '\'\nORDER BY Code;'
+
+  console.log('data:', data)
+  console.log('subjects:', subjects)
+  console.log('campuses:', campuses)
+  console.log('subjectSQL:', subjectSQL)
+  console.log('subjectCodeSQL:', subjectCodeSQL)
+
+  return JSON.stringify(data) + '\n\n' + subjectSQL + '\n\n' + subjectCodeSQL
+}
+
+doStuff.register({
+  id: 'addPassArSessions',
+  name: 'Add missing sessions to PASS AR',
+  func: addPassArSessions,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'it',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Add missing sessions to PASS AR
 // ====================================================================

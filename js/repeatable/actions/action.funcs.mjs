@@ -37,34 +37,34 @@ import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.m
  * created: 2019-03-22
  *
  * @param {string} input user supplied content
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const exposeChickens = (input, extraInputs, GETvars) => {
+const exposeChickens = (input, _extraInputs, _GETvars) => {
   // console.group('exposeChickens()')
   // console.log('input:', input)
-  // console.log('extraInputs:', extraInputs)
-  // console.log('extraInputs.year():', extraInputs.year())
-  // console.log('extraInputs.gender():', extraInputs.gender())
-  // console.log('extraInputs.mood("unsure"):', extraInputs.mood('unsure'))
-  // console.log('extraInputs.mood("angry"):', extraInputs.mood('angry'))
-  // console.log('extraInputs.mood("excited"):', extraInputs.mood('excited'))
-  // console.log('GETvars:', GETvars)
+  // console.log('_extraInputs:', _extraInputs)
+  // console.log('_extraInputs.year():', _extraInputs.year())
+  // console.log('_extraInputs.gender():', _extraInputs.gender())
+  // console.log('_extraInputs.mood("unsure"):', _extraInputs.mood('unsure'))
+  // console.log('_extraInputs.mood("angry"):', _extraInputs.mood('angry'))
+  // console.log('_extraInputs.mood("excited"):', _extraInputs.mood('excited'))
+  // console.log('_GETvars:', _GETvars)
   // console.groupEnd()
 
-  const _unsure = (extraInputs.mood('unsure')) ? ' I think' : ''
-  const _angry = extraInputs.mood('angry')
-  const _excited = extraInputs.mood('excited')
+  const _unsure = (_extraInputs.mood('unsure')) ? ' I think' : ''
+  const _angry = _extraInputs.mood('angry')
+  const _excited = _extraInputs.mood('excited')
   // We retrieve the value of _gender by calling the function that
   // matches the ID (or name) of the input field
-  const _gender = extraInputs.gender()
-  const _year = extraInputs.year()
+  const _gender = _extraInputs.gender()
+  const _year = _extraInputs.year()
 
   let _boc = 'BOC! BOC!!'
   let _chicken = 'chicken'
@@ -101,7 +101,7 @@ const exposeChickens = (input, extraInputs, GETvars) => {
     output = output.toUpperCase()
   }
 
-  if (typeof GETvars.backwards === 'boolean' && GETvars.backwards === true) {
+  if (typeof _GETvars.backwards === 'boolean' && _GETvars.backwards === true) {
     output = output.split('').reverse().join('')
   }
 
@@ -114,7 +114,7 @@ doStuff.register({
   description: 'Change all vowels into chickens',
   // docURL: 'docs/expose-chickens.html',
   docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/expose-chickens',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'year',
       label: 'Year chicken was hatched',
@@ -155,16 +155,16 @@ doStuff.register({
 // ====================================================================
 // START: heading to accordion
 
-const makeAccordion = (input, extraInputs, GETvars) => {
-  const heading = extraInputs.heading()
-  const multi = extraInputs.multiCollpase('multi')
-  const parent = extraInputs.parent()
+const makeAccordion = (input, _extraInputs, _GETvars) => {
+  const heading = _extraInputs.heading()
+  const multi = _extraInputs.multiCollpase('multi')
+  const parent = _extraInputs.parent()
   // var content = ''
   // var tmp = ''
   const regexHead = new RegExp('\\s*<h' + heading + '[^>]*>\\s*([\\s\\S]*?)\\s*</h' + heading + '>\\s*([\\s\\S]*?)\\s*(?=<h' + heading + '[^>]*>|$)', 'ig')
   let expand = true
   // var clean = new RegExp('(?:<div[^>]*>\\s*){2}<h2[^>]*>\\s*<a[^>]*>\\s*([\\s\\S]*?)\\s*<span[^>]*>[\\s\\S]*?</div>\\s*<div class="panel-body">\\s*([\\s\\S]*?)(?:\\s*</div>){3}', 'ig')
-  const expandMode = extraInputs.expandMode()
+  const expandMode = _extraInputs.expandMode()
   let defaultExpand = false
 
   if (expandMode === 'closeAll') {
@@ -283,7 +283,7 @@ const makeAccordion = (input, extraInputs, GETvars) => {
     ))
   }
 
-  switch (extraInputs.mode()) {
+  switch (_extraInputs.mode()) {
     case 'headings':
       return headingFunc(input)
       // return ''
@@ -303,7 +303,7 @@ doStuff.register({
   id: 'heading2accordion',
   description: 'Convert content to an accordion using specific headings as the separator for the accordion',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mode',
       label: 'Convert mode',
@@ -386,7 +386,7 @@ doStuff.register({
 // ====================================================================
 // START: Syntax highlighting for JS
 
-function jsSyntaxHighlight (input, extraInputs, GETvars) {
+function jsSyntaxHighlight (input, _extraInputs, _GETvars) {
   const findReplace = [
     { // 0 function name
       find: '([a-z0-9_]+(?:\\[(?:\'.*?\'|[a-z0-9_.])\\]|\\.[a-z0-9_]+)*)(?=\\s*\\()',
@@ -449,17 +449,17 @@ doStuff.register({
  * created: 2019-08-22
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function incrementH (input, extraInputs, GETvars) {
-  const mode = Number.parseInt(extraInputs.mode())
+function incrementH (input, _extraInputs, _GETvars) {
+  const mode = Number.parseInt(_extraInputs.mode())
   const replace = function (matches, close, level) {
     let h = '<'
     let newLevel = (Number.parseInt(level) + mode)
@@ -481,7 +481,7 @@ doStuff.register({
   name: 'Decrement or Increment HTML heading',
   description: 'Fix heading levels when Migrating HTML from one system to another',
   // docURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mode',
       label: 'Decrement/Increment heading importance',
@@ -513,16 +513,16 @@ doStuff.register({
  * created: 2019-08-28
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function matchPaymentIDs (input, extraInputs, GETvars) {
+function matchPaymentIDs (input, _extraInputs, _GETvars) {
   /**
    * splitPaymentID() takes a list of payment IDs as provided by
    * Finance and extracts the payment ID as listed in Form Build
@@ -574,7 +574,7 @@ function matchPaymentIDs (input, extraInputs, GETvars) {
     return (str !== '') ? accum + sep + str : accum
   }
 
-  const paymentIDs = splitNclean(extraInputs.paymentIDs())
+  const paymentIDs = splitNclean(_extraInputs.paymentIDs())
 
   return paymentIDs.map(grep).filter(str => str !== '').reduce(implode, '')
 }
@@ -587,7 +587,7 @@ doStuff.register({
   // docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/match_unfinished_payment_ids_to_confirmed_payments.',
   docURL: 'docs/match-unfinished-payment.html',
   inputLabel: 'Copied "Unfinished" payments listing',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'paymentIDs',
       label: 'Transaction Reference IDs (from finance)',
@@ -608,17 +608,17 @@ doStuff.register({
  * created: 2019-08-28
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function urlDecodeEncode (input, extraInputs, GETvars) {
-  return decodeEncodeURI(input, !(extraInputs.mode() === 'encode'))
+function urlDecodeEncode (input, _extraInputs, _GETvars) {
+  return decodeEncodeURI(input, !(_extraInputs.mode() === 'encode'))
 }
 
 doStuff.register({
@@ -630,7 +630,7 @@ doStuff.register({
   // docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/match_unfinished_payment_ids_to_confirmed_payments.',
   // docURL: 'docs/match-unfinished-payment.html',
   inputLabel: 'action',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mode',
       label: 'Mode',
@@ -654,10 +654,10 @@ doStuff.register({
 // ====================================================================
 // START: Staff Access Card URL
 
-function staffAccessCard (input, extraInputs, GETvars) {
+function staffAccessCard (input, _extraInputs, _GETvars) {
   const baseURL = 'https://forms.acu.edu.au/public/staff_access_card'
   const altURL = 'https://forms.acu.edu.au/public/staff_access_card_validation_test'
-  const raw = window.btoa('?email=' + extraInputs.email() + '&gender=' + extraInputs.gender())
+  const raw = window.btoa('?email=' + _extraInputs.email() + '&gender=' + _extraInputs.gender())
   let data = ''
 
   for (let a = (raw.length - 1); a >= 0; a -= 1) {
@@ -672,7 +672,7 @@ doStuff.register({
   func: staffAccessCard,
   description: 'Generate a staff access card URL with email and gender bound in',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'email',
       label: 'Email address',
@@ -709,16 +709,16 @@ doStuff.register({
  * created: 2020-04-09
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function fixCEGunitURLs (input, extraInputs, GETvars) {
+function fixCEGunitURLs (input, _extraInputs, _GETvars) {
   let output = input
   const regex = [
     {
@@ -747,7 +747,7 @@ doStuff.register({
   func: fixCEGunitURLs,
   description: 'Fix CEG unit modal URLs',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   ignore: true,
   name: 'Fix CEG unit URLs'
 })
@@ -764,16 +764,16 @@ doStuff.register({
  * created: 2020-08-04
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function fixPoliciesAnchorLinksV1 (input, extraInputs, GETvars) {
+function fixPoliciesAnchorLinksV1 (input, _extraInputs, _GETvars) {
   let output = input
   const labelsAndIDs = []
 
@@ -878,7 +878,7 @@ doStuff.register({
   func: fixPoliciesAnchorLinksV1,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   ignore: true,
   name: 'Fix policy anchor links'
 })
@@ -894,21 +894,21 @@ doStuff.register({
  * created: 2020-04-09
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function stripTableStyles (input, extraInputs, GETvars) {
+function stripTableStyles (input, _extraInputs, _GETvars) {
   const tableInner = (whole) => {
     return whole.replace(/\sstyle="[^"]+"/igs, '')
   }
 
-  if (extraInputs.whichStyle() === 'table') {
+  if (_extraInputs.whichStyle() === 'table') {
     return input.replace(/<(?:table|t(?:[hdr]|head|body|foot))[^>]+>/igs, tableInner)
   } else {
     return tableInner(input)
@@ -920,7 +920,7 @@ doStuff.register({
   func: stripTableStyles,
   description: 'Remove style attributes (inline styles) from HTML',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'whichStyle',
       label: 'Which style blocks to delete',
@@ -939,8 +939,8 @@ doStuff.register({
 // ====================================================================
 // START: Base64
 
-function base64 (input, extraInputs, GETvars) {
-  if (extraInputs.mode() === 'true') {
+function base64 (input, _extraInputs, _GETvars) {
+  if (_extraInputs.mode() === 'true') {
     console.log('Base64 encoding')
     return window.btoa(input)
   } else {
@@ -956,7 +956,7 @@ doStuff.register({
   // group: 'it',
   // ignore: true,
   name: 'Base64 encode/decode',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mode',
       label: 'Encode/Decode mode',
@@ -987,16 +987,16 @@ doStuff.register({
  * created: 2020-04-09
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const commaSepThousand = (input, extraInputs, GETvars) => {
+const commaSepThousand = (input, _extraInputs, _GETvars) => {
   const revStr = (str) => {
     const _str = str.split('')
     const _rst = _str.reverse()
@@ -1017,7 +1017,7 @@ doStuff.register({
   func: commaSepThousand,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: '',
   ignore: false,
   name: 'Comma separated thousands'
@@ -1034,16 +1034,16 @@ doStuff.register({
  * created: 2020-04-09
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const formatHandbookPolicy = (input, extraInputs, GETvars) => {
+const formatHandbookPolicy = (input, _extraInputs, _GETvars) => {
   // let currentHeading = 0
   let depth = 0
   // let openSections = 0
@@ -1169,15 +1169,15 @@ const formatHandbookPolicy = (input, extraInputs, GETvars) => {
     }
   }
 
-  // if (extraInputs.mods('sections') === true) {
+  // if (_extraInputs.mods('sections') === true) {
   //   output = output.replace(/<h([1-6])[^>]*>(.*?)<\/h$1>/ig, wrapSection)
   // }
 
-  if (extraInputs.mods('lists') === true) {
+  if (_extraInputs.mods('lists') === true) {
     output = output.replace(/<(\/?)(ol|li)([^>]*)>/ig, listClasses)
   }
 
-  if (extraInputs.mods('outerWrap') === true && !output.match('policy-document--ph')) {
+  if (_extraInputs.mods('outerWrap') === true && !output.match('policy-document--ph')) {
     output = '<div class="policy-document policy-document--ph">\n\n' + output + '\n\n</div>'
   }
 
@@ -1189,7 +1189,7 @@ doStuff.register({
   func: formatHandbookPolicy,
   description: '',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mods',
       label: 'Modification options',
@@ -1216,16 +1216,16 @@ doStuff.register({
  * created: 2020-04-09
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const htmlSpecialChars = (input, extraInputs, GETvars) => {
+const htmlSpecialChars = (input, _extraInputs, _GETvars) => {
   const findReplace = [
     [/&/g, '&amp;'],
     [/\u0160/g, '&nbsp;'], // NO-BREAK SPACE
@@ -2164,7 +2164,7 @@ doStuff.register({
   func: htmlSpecialChars,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: '',
   ignore: false,
   // inputLabel: '',
@@ -2184,34 +2184,34 @@ doStuff.register({
  * created: 2021-08-05
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const tsv2Markdown = (input, extraInputs, GETvars) => {
+const tsv2Markdown = (input, _extraInputs, _GETvars) => {
   const delimChars = {
     '\\n': '\n',
     '\\t': '\t',
     '\\r': '\r'
   }
   const lengths = []
-  const colDelim = (typeof delimChars[extraInputs.column()] === 'string')
-    ? delimChars[extraInputs.column()]
-    : extraInputs.column()
-  const rowDelim = (typeof delimChars[extraInputs.row()] === 'string')
-    ? delimChars[extraInputs.row()]
-    : extraInputs.row()
+  const colDelim = (typeof delimChars[_extraInputs.column()] === 'string')
+    ? delimChars[_extraInputs.column()]
+    : _extraInputs.column()
+  const rowDelim = (typeof delimChars[_extraInputs.row()] === 'string')
+    ? delimChars[_extraInputs.row()]
+    : _extraInputs.row()
   let tmp = input.trim()
   let output = ''
   let sep = ''
-  const centre = extraInputs.options('centre')
-  const confluence = extraInputs.options('confluence')
-  const toBoolStr = getBool2str(extraInputs.convertBool())
+  const centre = _extraInputs.options('centre')
+  const confluence = _extraInputs.options('confluence')
+  const toBoolStr = getBool2str(_extraInputs.convertBool())
 
   tmp = input.split(rowDelim)
 
@@ -2270,7 +2270,7 @@ doStuff.register({
   func: tsv2Markdown,
   description: 'Convert delimited text block (with headers) (e.g. CSV or TSV) to markdown formatted table',
   // docsURL: '',
-  extraInputs: [{
+  _extraInputs: [{
     id: 'column',
     type: 'text',
     label: 'Column delimiter',
@@ -2320,16 +2320,16 @@ doStuff.register({
  * created: 2021-08-05
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const markdown2tsv = (input, extraInputs, GETvars) => {
+const markdown2tsv = (input, _extraInputs, _GETvars) => {
   const rows = []
   let output = ''
   let colSep = ''
@@ -2378,7 +2378,7 @@ doStuff.register({
   func: markdown2tsv,
   description: 'Convert Markdown formatted table to TSV data that can be pasted directly into Excel.<br />(Also works for terminal/CLI SQL query results)',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: '',
   ignore: false,
   // inputLabel: '',
@@ -2434,16 +2434,16 @@ const encodeMap = (input) => {
  * created: 2021-06-30
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const degoogle = (input, extraInputs, GETvars) => {
+const degoogle = (input, _extraInputs, _GETvars) => {
   let encodedURL = input.trim()
   encodedURL = encodedURL.replace(/^.*?url=(http.*?)&.*$/g, '$1')
 
@@ -2464,7 +2464,7 @@ doStuff.register({
   func: degoogle,
   description: '',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: 'evan',
   ignore: false,
   // inputLabel: '',
@@ -2484,16 +2484,16 @@ doStuff.register({
  * created: 2021-10-28
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const stripLines = (input, extraInputs, GETvars) => {
+const stripLines = (input, _extraInputs, _GETvars) => {
   return input.replace(/\s+/g, ' ')
 }
 
@@ -2502,7 +2502,7 @@ doStuff.register({
   func: stripLines,
   description: 'Strip lines breaks from text so it can be used in CSV/TSV',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: '',
   ignore: false,
   // inputLabel: '',
@@ -2525,16 +2525,16 @@ doStuff.register({
  * created: 2021-11-23
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const posix2pcre = (input, extraInputs, GETvars) => {
+const posix2pcre = (input, _extraInputs, _GETvars) => {
   const find = [
     /\\\(/g, /\(/g, /~~~~/g,
     /\\\)/g, /\)/g, /~~~~/g,
@@ -2567,7 +2567,7 @@ doStuff.register({
   func: posix2pcre,
   description: 'Convert a PCRE regular expression to POSIX and vice versa',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     // {
     //   id: 'direction',
     //   label: 'Conversion direction',
@@ -2597,26 +2597,26 @@ doStuff.register({
  * created: 2021-11-24
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const truncateText = (input, extraInputs, GETvars) => {
-  const count = (isNumber(extraInputs.count()))
-    ? extraInputs.count()
+const truncateText = (input, _extraInputs, _GETvars) => {
+  const count = (isNumber(_extraInputs.count()))
+    ? _extraInputs.count()
     : 250
 
-  const mode1 = (isNonEmptyStr(extraInputs.mode1()))
-    ? extraInputs.mode1()
+  const mode1 = (isNonEmptyStr(_extraInputs.mode1()))
+    ? _extraInputs.mode1()
     : 'char'
 
-  const mode2 = (isNonEmptyStr(extraInputs.mode2()))
-    ? extraInputs.mode2()
+  const mode2 = (isNonEmptyStr(_extraInputs.mode2()))
+    ? _extraInputs.mode2()
     : 'sentence'
 
   // Convert multiple consecutive white-space characters into a
@@ -2668,7 +2668,7 @@ doStuff.register({
   func: truncateText,
   description: 'Truncate text by character count then trim incomplete tail',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'mode1',
       label: 'Truncation by',
@@ -2718,16 +2718,16 @@ doStuff.register({
  * created: 2021-12-03
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const convert2kwds = (input, extraInputs, GETvars) => {
+const convert2kwds = (input, _extraInputs, _GETvars) => {
   // Non-English characters
   const find = [
     /À/g, /Á/g, /Â/g, /Ã/g, /Ä/g, /Å/g, /Ā/g, /Ă/g, /Ą/g, /Æ/g, /Ć/g,
@@ -2848,7 +2848,7 @@ doStuff.register({
   func: convert2kwds,
   description: 'Makes sure that all the characters in the text are normal English characters, Build a list of comma separated words from the input text, strip out words that are duplicated, that are less than 3 characters or are common english language words.',
   // docsURL: '',
-  extraInputs: [],
+  _extraInputs: [],
   // group: '',
   ignore: false
   // inputLabel: '',
@@ -2996,31 +2996,31 @@ const _decimal2hex = (values) => {
  * created: YYYY-MM-DD
  *
  * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} _extraInputs all the values from "extra" form
  *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
+ * @param {object} _GETvars all the GET variables from the URL as
  *               key/value pairs
  *               NOTE: numeric strings are converted to numbers and
  *                     "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const acuFrontEndHelper = (input, extraInputs, GETvars) => {
-  const _colour = decodeURI(extraInputs.colour())
+const acuFrontEndHelper = (input, _extraInputs, _GETvars) => {
+  const _colour = decodeURI(_extraInputs.colour())
   let _sep = ''
 
   console.group('colourConverter()')
-  console.log('extraInputs.colour():', extraInputs.colour())
-  console.log('extraInputs.pixels():', extraInputs.pixels())
+  console.log('_extraInputs.colour():', _extraInputs.colour())
+  console.log('_extraInputs.pixels():', _extraInputs.pixels())
   if (_colour !== '') {
     console.group('colourConverter() (colour')
     const _rgbRegex = /rgba?\(\s*([0-9]+),\s*([0-9]+),\s*([0-9]+)(?:,\s*([.0-9]+))?\s*\)/i
     const _hexRegex = /#?([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})?/i
     let _rgb = true
-    let _tmp = extraInputs.colour().trim().match(_rgbRegex)
+    let _tmp = _extraInputs.colour().trim().match(_rgbRegex)
 
     if (_tmp === null) {
-      _tmp = extraInputs.colour().trim().match(_hexRegex)
+      _tmp = _extraInputs.colour().trim().match(_hexRegex)
       _rgb = false
     }
     console.log('_tmp:', _tmp)
@@ -3077,7 +3077,7 @@ const acuFrontEndHelper = (input, extraInputs, GETvars) => {
 
       console.groupEnd()
       console.groupEnd()
-      return 'Original: ' + extraInputs.colour() + '\n\n' +
+      return 'Original: ' + _extraInputs.colour() + '\n\n' +
              '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + _he + '\n' +
              '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + _a + ';\n\n' +
              '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
@@ -3087,9 +3087,9 @@ const acuFrontEndHelper = (input, extraInputs, GETvars) => {
     console.groupEnd()
   } else {
     console.group('colourConverter() (px)')
-    console.log('extraInputs.pixels():', extraInputs.pixels())
-    console.log('extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', extraInputs.pixels())
-    const _px = extraInputs.pixels().replace(/[^-0-9.]+/g, '')
+    console.log('_extraInputs.pixels():', _extraInputs.pixels())
+    console.log('_extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', _extraInputs.pixels())
+    const _px = _extraInputs.pixels().replace(/[^-0-9.]+/g, '')
     console.log('isNumeric(' + _px + '):', isNumeric(_px))
     if (isNumeric(_px)) {
       let _output = '\n                 REMs: ' + _px / 16 + 'rem'
@@ -3121,7 +3121,7 @@ doStuff.register({
   description: 'Convert colour values to other colour formats (and find SASS variable) or convert pixel value to REMs (and find SASS variable)<br /><br />To check colours, enter a colour value into the "Colour value" field & click the "MODIFY" button (bottom left of window)<br /><br />To check pixel values, enter a pixel value into the "Pixel value" field and click MODIFY. Pixel value will be converted to REMS and (if possible) a sass variable will also be shown',
   inputLabel: 'Output',
   // docsURL: '',
-  extraInputs: [
+  _extraInputs: [
     {
       id: 'colour',
       label: 'Colour value',
@@ -3143,4 +3143,254 @@ doStuff.register({
 })
 
 //  END:  Colour type converter
+// ====================================================================
+// START: Unix timestamp
+
+/**
+ * Get current timestamp or Timestamp for specified ISO 8601 date
+ *
+ * > __NOTE:__ Multiple date/time strings can be parsed
+ *             (separated by new line)
+ *
+ * created by: Evan Wills
+ * created: 2022-06-11
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} _extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} _GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const unixTimestamp = (input, _extraInputs, _GETvars) => {
+  const regex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}(?:[T ][0-9]{2}:[0-9]{2}(?::[0-9]{2})?)?/
+  const through = input.trim().split('\n')
+  let output = ''
+  let sep = ''
+
+  for (let a = 0; a < through.length; a += 1) {
+    through[a] = through[a].trim()
+
+    if (through[a].match(regex)) {
+      output += sep + Math.round(new Date(through[a]).getTime() / 1000).toString();
+      sep = '\n'
+    }
+  }
+
+  if (output !== '') {
+    return output
+  } else {
+    return Math.round(Date.now() / 1000).toString()
+  }
+}
+
+doStuff.register({
+  id: 'unixTimestamp',
+  name: 'Unix timestamp',
+  func: unixTimestamp,
+  description: 'Get current timestamp or Timestamp for specified ISO 8601 date<br /><br /><strong>NOTE:</strong> Multiple date/time strings can be parsed (separated by new line)',
+  // docsURL: '',
+  _extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Unix timestamp
+// ====================================================================
+// START: Colour syntax converter
+
+const hexToIntInner = (input) => {
+  const hexInt = { a: 10, b: 11, c: 12, d: 13, e: 14, f: 15 }
+  return (typeof hexInt[input] === 'number')
+    ? hexInt[input]
+    : parseInt(input);
+}
+const hexToInt = (input) => {
+  const tmp = input.split('')
+
+  const a = hexToIntInner(tmp[0]) * 16
+  const b = (typeof tmp[1] === 'string')
+    ? hexToIntInner(tmp[1])
+    : 0
+
+  return a + b
+}
+
+const intToHexInner = (input) => {
+  const intHex = {
+    0: '0',
+    1: '1',
+    2: '2',
+    3: '3',
+    4: '4',
+    5: '5',
+    6: '6',
+    7: '7',
+    8: '8',
+    9: '9',
+    10: 'a',
+    11: 'b',
+    12: 'c',
+    13: 'd',
+    14: 'e',
+    15: 'f'
+  }
+  if (typeof intHex[input] === 'string') {
+    return intHex[input]
+  } else {
+    throw new Error(
+      'could not match input value ("' + input + '") to Hex equivalent'
+    )
+  }
+
+}
+
+const intToHex = (input) => {
+  if (input < 0) {
+    return { a: '0', b: '0' }
+  } else if (input > 255) {
+    return { a: 'f', b: 'f' }
+  }
+  const a = Math.floor(input / 16)
+  const b = input % 16
+
+
+  return {
+    a: intToHexInner(a),
+    b: intToHexInner(b)
+  }
+}
+
+/**
+ * Convert colour values from one syntax to another
+ *
+ * created by: Evan Wills
+ * created: 2022-06-14
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} _extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} _GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
+  const regex = /^^(?:(?:rgba?\(\s*)?([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:(?:,\s*|\s+)(1|0?.[0-9]{1,5}))?(?:\s*\))|#(?:([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?|([a-f0-9])([a-f0-9])([a-f0-9])))$/i
+
+  // const dummy = '#ed0c00\nrgb(204, 204, 204)\n#abc\nrgba(123,46,89,0.5)'
+  // const through = dummy.trim().split('\n')
+  const through = input.trim().split('\n')
+  let output = ''
+  let sep = ''
+  let r = -1
+  let g = -1
+  let b = -1
+  let a = -1
+  let mode = false
+
+  for (let i = 0; i < through.length; i += 1) {
+    through[i] = through[i].trim()
+
+    if (through[i] === '') {
+      continue
+    }
+
+    const tmp = regex.exec(through[i])
+    console.log('tmp:', tmp)
+    if (tmp !== null) {
+      if (typeof tmp[1] === 'string') {
+        mode = 'rgb'
+        r = parseInt(tmp[1])
+        g = parseInt(tmp[2])
+        b = parseInt(tmp[3])
+        if (typeof tmp[4] === 'string') {
+          a = parseFloat(tmp[4])
+          a = (a > 1)
+            ? 1
+            : (a < 0)
+              ? 0
+              : Math.round(a * 255)
+        }
+
+        console.log('RGB')
+      } else if (typeof tmp[5] === 'string') {
+        mode = 'hex'
+        r = hexToInt(tmp[5])
+        g = hexToInt(tmp[6])
+        b = hexToInt(tmp[7])
+        if (typeof tmp[8] === 'string') {
+          a = tmp[8]
+        }
+      } else if (typeof tmp[9] === 'string') {
+        mode = 'hex'
+        r = hexToInt(tmp[9])
+        g = hexToInt(tmp[10])
+        b = hexToInt(tmp[11])
+      }
+
+      let tmpOut = ''
+
+      if (mode === 'hex') {
+        tmpOut = 'rgb'
+
+        if (a > -1) {
+          tmpOut += 'a'
+        }
+
+        tmpOut += '(' + r + ', ' + g + ', ' + b
+
+        if (a > -1) {
+          tmpOut += ', ' + a
+        }
+
+        tmpOut += ')'
+      } else if (mode === 'rgb') {
+        const _r = intToHex(r)
+        const _g = intToHex(g)
+        const _b = intToHex(b)
+        const _a = (a > -1)
+          ? intToHex(a)
+          : { a: '', b: '' }
+
+        tmpOut = (_r.a === _r.b && _g.a === _g.b && _b.a === _b.b && a === -1)
+          ? '#' + _r.a + _g.a + _b.a
+          : '#' + _r.a + _r.b + _g.a + _g.b + _b.a + _b.b + _a.a + _a.b
+      }
+
+      if (tmpOut !== '') {
+        output += sep + tmpOut
+        sep = '\n'
+      }
+
+      mode = false
+    }
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'colourSyntaxConverter',
+  name: 'Colour syntax converter',
+  func: colourSyntaxConverter,
+  description: 'Convert colour values from one syntax to another',
+  // docsURL: '',
+  _extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Unix timestamp
 // ====================================================================

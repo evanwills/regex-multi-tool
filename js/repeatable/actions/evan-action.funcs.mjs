@@ -6,10 +6,10 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isInt, isNumeric } from '../../utilities/validation.mjs'
+import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
 import {
   camel2human,
-  makeHumanReadableAttr,
+  // makeHumanReadableAttr,
   makeSingle,
   padStrLeft,
   snakeToCamelCase,
@@ -2626,7 +2626,7 @@ doStuff.register({
       ]
     }
   ],
-  // group: '',
+  group: 'evan',
   ignore: false
   // inputLabel: '',
   // remote: false,
@@ -3008,6 +3008,20 @@ const sql2json = (input, extraInputs, GETvars) => {
   const tableName = extraInputs.table()
   const colName = extraInputs.idProp()
   let id = 0
+  const prefix = (extraInputs.stripPrefix() !== '')
+    ? extraInputs.stripPrefix() + '_'
+    : ''
+  const addSaveState = extraInputs.extras('saveState')
+  const addMessages = extraInputs.extras('messages')
+  const dataType = (extraInputs.dataType() !== '')
+    ? ': ' + extraInputs.dataType()
+    : ''
+
+  // console.group('sql2json')
+  // console.log('prefix:', prefix)
+  // console.log('addSaveState:', addSaveState)
+  // console.log('addMessages:', addMessages)
+
   /**
    * Do the actual heavy lifting of wrapping long value strings so
    * the total length of line is less than 70 characters
@@ -3027,7 +3041,7 @@ const sql2json = (input, extraInputs, GETvars) => {
     let head = ''
     let tail = input
 
-    // let a = 0;
+    let a = 0
     while (tail.length > maxLen) {
       head += _sep + tail.substring(0, maxLen)
       tail = tail.substring(maxLen)
@@ -3038,6 +3052,10 @@ const sql2json = (input, extraInputs, GETvars) => {
       }
 
       _sep = sep
+      a += 1
+      if (a > 100) {
+        break
+      }
     }
 
     return head + _sep + tail
@@ -3071,39 +3089,73 @@ const sql2json = (input, extraInputs, GETvars) => {
    *
    * @returns {string}
    */
-  const camelKey = (match, key) => '    ' + snakeToCamelCase(key)
+  const camelKey = (_match, _prefix, _key) => {
+    const tmp = (_prefix !== prefix)
+      ? _prefix + _key
+      : _key
+    return '    ' + snakeToCamelCase(tmp)
+  }
 
+  /**
+   * Clean up the Laravel Insert code
+   *
+   * @param {string} input Do all the things needed to make each
+   *                       object clean
+   * @returns Text suitable for use as JavaScript objects
+   */
   const standardClean = (input) => {
     let output = input.replace(/'\.[\r\n]+\s+'/g, '')
-
+    console.group('standardClean()')
     // output = output.replace(/'/g, '"')
-    output = output.replace(/ +\[/g, (match) => {
-      id += 1
-      return '  {\n    ' + colName + ': ' + id + ','
-    })
+
+    if (addSaveState) {
+      output = output.replace(
+        / +\[/g,
+        (_match) => {
+          id += 1
+          return '  {\n    ' + colName + ': ' + id + ',\n' +
+                      '    saveState: 1,'
+        }
+      )
+    } else {
+      output = output.replace(
+        / +\[/g,
+        (_match) => {
+          id += 1
+          return '  {\n    ' + colName + ': ' + id + ','
+        }
+      )
+    }
 
     // console.log('output:', output)
-    output = output.replace(/ +\]/g, '  }')
+    if (addMessages) {
+      output = output.replace(
+        /[\r\n]+ +\]/g,
+        ',\n    messages: {\n      error: \'\',\n      warning: \'\',\n      info: \'\'\n    }\n  }'
+      )
+    } else {
+      output = output.replace(/ +\]/g, '  }')
+    }
     // console.log('output:', output)
     output = output.replace(/ *=> +/g, ': ')
     // console.log('output:', output)
-    output = output.replace(/ +'([a-z_]+)'(?=: )/ig, camelKey)
+    output = output.replace(/ +'([a-z]+_)([a-z_]+)'(?=: )/ig, camelKey)
     output = output.replace(/\s*,\s*$/s, '')
     // console.log('output:', output)
-    output = output.replace(/^/, '[')
+    output = output.replace(/^(?:\s*\[)?/, '[')
     // console.log('output:', output)
     output = output.replace(/$/, '\n]')
     // console.log('output:', output)
-
+    console.groupEnd()
     return output.replace(/(?<= {4})([a-z]+): '(.*?)'(?=,|[\r\n])/ig, wrapLongLine)
   }
 
-  console.log('tableName:', tableName)
-  console.log('tableName:', tableName)
-
+  // console.log('tableName:', tableName)
+  // console.log('tableName:', tableName)
+  // console.groupEnd()
   return 'export const ' + snakeToCamelCase(
     tableName.replace('data_', '')
-  ) + 'State = ' + standardClean(input)
+  ) + 'State ' + dataType + ' = ' + standardClean(input)
 }
 
 doStuff.register({
@@ -3119,6 +3171,30 @@ doStuff.register({
   }, {
     id: 'idProp',
     label: 'ID column name',
+    type: 'text'
+  }, {
+    id: 'extras',
+    label: 'Add extra properties',
+    options: [
+      {
+        default: true,
+        label: 'Save State',
+        value: 'saveState'
+      },
+      {
+        default: true,
+        label: 'Messages',
+        value: 'messages'
+      }
+    ],
+    type: 'checkbox'
+  }, {
+    id: 'stripPrefix',
+    label: 'Prefix to strip from properties',
+    type: 'text'
+  }, {
+    id: 'dataType',
+    label: 'Typescript data type',
     type: 'text'
   }],
   group: 'evan',
@@ -3316,7 +3392,7 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [],
-  // group: 'evan',
+  group: 'evan',
   ignore: true
   // inputLabel: '',
   // remote: false,
@@ -3330,8 +3406,8 @@ doStuff.register({
 /**
  * PDO::bindParam to PHP associative array
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-04-4
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -3346,7 +3422,7 @@ doStuff.register({
 const bindParam2AssArr = (input, extraInputs, GETvars) => {
   const regex = /\$stmt->bindParam\((':[A-Z0-9_]+'), (\$[a-z0-9_]+), (?:PDO::PARAM_[A-Z]+|\$[_a-z]+)\);.*?(?=[\r\n]|$)/ig
   const tmp = [...input.matchAll(regex)]
-  let output = '';
+  let output = ''
   let sep = ''
   for (let a = 0; a < tmp.length; a += 1) {
     const key = tmp[a][1]
@@ -3384,7 +3460,7 @@ doStuff.register({
  * Action description goes here
  *
  * created by: Evan Wills
- * created: YYYY-MM-DD
+ * created: 2022-04-04
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -3452,7 +3528,7 @@ const mysqli2pdo = (input, extraInputs, GETvars) => {
         /\s*`?([^`=]+)`?\s*=\s?[^,]+(?:,|$)/ig
       )]
     }
-    const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim)
+    const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim())
   } else {
     console.log('we have an SELECT')
   }
@@ -3487,7 +3563,7 @@ doStuff.register({
     type: 'text',
     default: '$this->_pdo'
   }],
-  // group: 'evan',
+  group: 'evan',
   ignore: false
   // inputLabel: '',
   // remote: false,
@@ -3501,8 +3577,8 @@ doStuff.register({
 /**
  * Convert web component attributes to markdown documentation
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-04-04
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -3686,7 +3762,7 @@ const dbEnum2IDbEnum = (input, extraInputs, GETvars) => {
 
   let _data = null
   try {
-    _data = JSON.parse(_tmp);
+    _data = JSON.parse(_tmp)
   } catch (error) {
     console.error(
       'Could not parse input Laravel Migration code. ' + error
@@ -3742,4 +3818,237 @@ doStuff.register({
 })
 
 //  END:  DB Enum to TS IDbEnum objects
+// ====================================================================
+// START: Clean up converted Laravel Insert to Redux state
+
+/**
+ * Clean up converted Laravel Insert to Redux state
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const postLaravelClean = (input, extraInputs, GETvars) => {
+  let output = input.replace(/"/g, '\'')
+
+  const regex = /(?<=(?:title|href)=)'([^']+)'/ig
+
+  output = output.replace(/(?<=[a-z])(?='[a-z])/ig, '\\')
+  output = output.replace(/(?<=[^a-z])(?='\]\+)/ig, '\\')
+  output = output.replace(/(?<= )'([a-z]+)'(?= )/ig, '"$1"')
+  output = output.replace(regex, '"$1"')
+
+  output = output.replace(
+    'const tmp',
+    'import { IInputFieldType } from \'../../types/IInputFields\';\n\n' +
+    'export const inputFieldTypesState: Array<IInputFieldType>'
+  )
+
+  return output
+}
+
+doStuff.register({
+  id: 'postLaravelClean',
+  name: 'Clean up converted Laravel Insert to Redux state',
+  func: postLaravelClean,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Clean up converted Laravel Insert to Redux state
+// ====================================================================
+// START: Typescript Types to PHP class stuff (Laravel)
+
+/**
+ * Get PHP class properties from Typescript interface definition
+ *
+ * created by: Evan Wills
+ * created: 2022-06-08
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const ts2Php = (input, extraInputs, GETvars) => {
+  /**
+   * Convert Typescript types into PHP class private properties
+   *
+   * @param {string} _whole
+   * @param {string|undefined} space
+   * @param {string|undefined} comClose
+   * @param {string} prop
+   * @param {string} propType
+   *
+   * @returns {string} Get class properties
+   */
+  const firstClean = (_whole, comClose, prop, propType) => {
+    let value = 'null'
+
+    switch (propType.toLowerCase()) {
+      case 'boolean':
+        value = 'false'
+        break
+
+      case 'string':
+        value = '\'\''
+        break
+
+      case 'number':
+        propType = 'integer'
+        value = '0'
+        break
+
+      case 'array':
+        value = '[]'
+        break
+    }
+
+    const comment = (typeof comClose === 'string' && comClose !== '')
+      ? '\n   *\n   * @var ' + propType + ' $_' + prop + '\n   */\n  '
+      : ''
+
+    return comment + '  private $_' + prop + ' = ' + value + ';\n'
+  }
+  const classStr = extraInputs.className()
+  const _classstr = camel2human(classStr).toLowerCase()
+
+  let output = '<?php\n' +
+               '/**\n' +
+               ' * ' + classStr +
+               ' class provides a way of importing ' + _classstr + 's from external\n' +
+               ' * systems and making their data easy to use\n' +
+               ' *\n' +
+               ' * PHP Version 8.x\n' +
+               ' *\n' +
+               ' * @category Expensum_DataExtract\n' +
+               ' * @package  Expensum_DataExtract\n' +
+               ' * @author   Evan Wills <evan.wills@acu.edu.au>\n' +
+               ' * @license  ACU https://www.acu.edu.au\n' +
+               ' * @link     https://www.acu.edu.au\n' +
+               ' */\n\n\n' +
+               '/**\n' +
+               ' * ' + classStr +
+               ' class provides a way of importing ' + _classstr + 's from external\n' +
+               ' * systems and making their data easy to use\n' +
+               ' *\n' +
+               ' * @category Expensum_DataExtract\n' +
+               ' * @package  Expensum_DataExtract\n' +
+               ' * @author   Evan Wills <evan.wills@acu.edu.au>\n' +
+               ' * @license  ACU https://www.acu.edu.au\n' +
+               ' * @link     https://www.acu.edu.au\n' +
+               ' */\n\n' +
+               'class ' + classStr + '\n{'
+
+  output += input.trim().replace(
+    /(?:[\r\n]* +(\*\/[\r\n]+ +))?([a-z0-9]+): ([a-z]+)[^,]*(?:,|$)/ig,
+    firstClean
+  )
+
+  let construct = ''
+  let toStr = ''
+  const tmp = input.trim().match(/(?<=[\r\n]+ +)([a-z0-9]+): ([a-z]+)(?=[^,]+(?:,|$))/ig)
+
+  for (let a = 0; a < tmp.length; a += 1) {
+    const bits = tmp[a].split(': ')
+    const _key = bits[0].trim()
+    const _type = bits[1].trim().toLowerCase()
+    construct += '\n        $this->_' + _key + ' = $data[\'' + _key + '\'];'
+    toStr += '\n            "      ' + _key + ': '
+    toStr += (_type === 'array')
+      ? '[".implode(\',\\n          \', $this->_' + _key + ')."]'
+      : '{$this->_' + _key + '}'
+    toStr += ',\\n".'
+  }
+  output += '\n' +
+            '    /**\n' +
+            '     * Constructor for ' + classStr + ' object\n' +
+            '     *\n' +
+            '     * @param array   $data ' + _classstr + ' data from DB\n' +
+            '     * @param integer $id   Expensum ID for this ' + _classstr + '\n' +
+            '     */\n' +
+            '    public function __construct(array $data, int $id)\n' +
+            '    {\n' + construct + '\n    }\n\n' +
+            '    /**\n' +
+            '     * Get this object as a JavaScript object\n' +
+            '     *\n' +
+            '     * @return string\n' +
+            '     */\n' +
+            '    public function __toString() : string\n' +
+            '    {\n' +
+            '        return "{\\n".' + toStr + '\n' +
+            '            "    }";\n' +
+            '    }\n\n' +
+            '    /**\n' +
+            '     * Get the expensum ID for this ' + _classstr + '\n' +
+            '     *\n' +
+            '     * @return integer\n' +
+            '     */\n' +
+            '    public function id() : string\n' +
+            '    {\n' +
+            '        return $this->_id;\n' +
+            '    }\n\n' +
+            '    /**\n' +
+            '     * Set the created at & updated at times for this ' + _classstr + '\n' +
+            '     *\n' +
+            '     * @param integer $time Unix timestamp for when the ' + _classstr + '\n' +
+            '     *                      was created' +
+            '     *\n' +
+            '     * @return boolean TRUE if properties were updated.\n' +
+            '     *                 FALSE otherwise\n' +
+            '     */\n' +
+            '    public function setMeta(int $time) : bool\n' +
+            '    {\n' +
+            '        if ($this->_createdAt === 0) {\n' +
+            '            $this->_createdAt = $time;\n' +
+            '            $this->_updatedAt = $time;\n\n' +
+            '            return true;\n' +
+            '        }\n' +
+            '    }\n}\n'
+
+  return output
+}
+
+doStuff.register({
+  id: 'ts2Php',
+  name: 'Typescript Types to PHP class stuff (Laravel)',
+  func: ts2Php,
+  description: 'Generate a PHP class based',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'className',
+    label: 'Class name',
+    type: 'text',
+    description: 'Name of class that will encapsulate the supplied data',
+    pattern: '',
+    default: ''
+  }],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Typescript Types to PHP class stuff (Laravel)
 // ====================================================================
