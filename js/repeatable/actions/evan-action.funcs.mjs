@@ -4052,3 +4052,78 @@ doStuff.register({
 
 //  END:  Typescript Types to PHP class stuff (Laravel)
 // ====================================================================
+// START: Sort typescript type properties alphabetically
+
+/**
+ * Action description goes here
+ *
+ * created by: Evan Wills
+ * created: 2022-06-19
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const sortTypeProps = (input, extraInputs, GETvars) => {
+  const tmp = input.split('\n').map(
+    line => line.trim()
+  ).filter(
+    line => {
+      if (line === '') {
+        return false
+      }
+      const two = line.substring(0, 2)
+      console.group('sortTypeProps() - filter')
+      console.log('line:', line)
+      console.log('two:', two)
+      console.log('[\'//\', \'/*\', \' *\'].indexOf(two):', ['//', '/*', ' *'].indexOf(two))
+      console.groupEnd()
+      return ['//', '/*', '*/', '*,', '* ', ' *'].indexOf(two) === -1
+    }
+  ).map(
+    line => line.replace(/ ?\?? ?: ?/g, ' ? : ')
+  )
+
+  tmp.sort((a, b) => {
+    if (a < b) {
+      return -1
+    } else if (a > b) {
+      return 1
+    }
+    return 0;
+  })
+
+  let sep = ''
+
+  return tmp.reduce(
+    (last, line) => {
+      const output = last + sep + line.replace(/^(.*?),?$/, '  $1,')
+      sep = '\n'
+      return output
+    },
+    ''
+  ).replace(/((?<=[\r\n]) {2}[^,]+,[\r\n]+)\1+/g, '$1')
+}
+
+doStuff.register({
+  id: 'sortTypeProps',
+  name: 'Sort typescript type properties alphabetically',
+  func: sortTypeProps,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Sort typescript type properties alphabetically
+// ====================================================================

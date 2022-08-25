@@ -1502,6 +1502,8 @@ const newDbAndUser = (input, extraInputs, GETvars) => {
 
   output += 'CREATE USER \'' + userName + '\'@\'' + dbHost + '\' ' +
             'IDENTIFIED BY \'' + userPassword + '\';\n\n'
+  output += 'ALTER USER \'' + userName + '\'@\'' + dbHost + '\' ' +
+            'IDENTIFIED BY \'' + userPassword + '\';\n\n'
   output += 'CREATE DATABASE `' + dbName + '`;\n\n'
 
   if (staffDir === 2) {
@@ -1515,6 +1517,7 @@ const newDbAndUser = (input, extraInputs, GETvars) => {
   }
 
   output += 'FLUSH PRIVILEGES;\n\n'
+  output += 'SELECT user as username, host FROM mysql.user ORDER BY user;\n\n'
   output += 'SHOW GRANTS FOR \'' + userName + '\'@\'' + dbHost + '\';\n\n'
   return output
 }
