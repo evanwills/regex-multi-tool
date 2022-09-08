@@ -6,7 +6,11 @@
 
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
-import { isBoolTrue, isNumeric } from '../../utilities/validation.mjs'
+import {
+  isBoolTrue,
+  // isInt,
+  isNumeric
+} from '../../utilities/validation.mjs'
 import {
   camel2human,
   // makeHumanReadableAttr,
@@ -3523,12 +3527,12 @@ const mysqli2pdo = (input, extraInputs, GETvars) => {
     // console.log('tmp:', _tmp)
   } else if (sql.match(/^UPDATE /i)) {
     console.log('we have an UPDATE')
-    const getFields = (_sql) => {
-      return [..._sql.trim().matchAll(
-        /\s*`?([^`=]+)`?\s*=\s?[^,]+(?:,|$)/ig
-      )]
-    }
-    const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim())
+    // const getFields = (_sql) => {
+    //   return [..._sql.trim().matchAll(
+    //     /\s*`?([^`=]+)`?\s*=\s?[^,]+(?:,|$)/ig
+    //   )]
+    // }
+    // const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim())
   } else {
     console.log('we have an SELECT')
   }
@@ -4096,7 +4100,7 @@ const sortTypeProps = (input, extraInputs, GETvars) => {
     } else if (a > b) {
       return 1
     }
-    return 0;
+    return 0
   })
 
   let sep = ''

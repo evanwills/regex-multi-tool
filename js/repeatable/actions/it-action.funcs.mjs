@@ -1832,3 +1832,65 @@ doStuff.register({
 
 //  END:  Add missing sessions to PASS AR
 // ====================================================================
+// START: Unit report table clean
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const unitReportCleaner = (input, extraInputs, GETvars) => {
+  const regex = /[\r\n\t ]*<tr>[\r\n\t ]*(.*?)[\r\n\t ]*<\/tr>[\r\n\t ]*/igs
+
+  const rowClean = (row) => {
+    const _row = row.replace(/(?:&(?:nbsp|#160|);|[\r\n\t ])+/ig, ' ').replace(/(?<=[a-z])(?=[A-Z])/g, ' ')
+    const _tds = row.match(/<td[^>]*>/ig)
+
+    let _extraTD = ''
+
+    for (let a = _tds.length; a < 4; a += 1) {
+      _extraTD += '\n  <td>&nbsp;</td>'
+    }
+
+    return '\n  <tr>' + _row.replace(/[\r\n\t ]+<td/ig, '\n    <td') + _extraTD + '\n  </tr>\n'
+  }
+
+  let output = ''
+  // let a = 0
+  let _row = []
+  while ((_row = regex.exec(input)) !== null) {
+    output += rowClean(_row[1])
+  }
+
+  return (output !== '')
+    ? '<tbody>' + output + '</tbody>'
+    : ''
+}
+
+doStuff.register({
+  id: 'unitReportCleaner',
+  name: 'Unit report table clean',
+  func: unitReportCleaner,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'it',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Unit report table clean
+// ====================================================================
