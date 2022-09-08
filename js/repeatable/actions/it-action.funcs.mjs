@@ -1872,7 +1872,6 @@ const unitReportCleaner = (input, extraInputs, GETvars) => {
      * Regular expression for finding multiple consecutive white
      * space characters and white space HTML character entities
      *
-     *
      * @var {RegExp} _regSpace
      */
     const regSpace = /(?:&(?:nbsp|#160|);|[\r\n\t ])+/ig
@@ -1887,27 +1886,28 @@ const unitReportCleaner = (input, extraInputs, GETvars) => {
     // Replace multiple consecutive white space characters and
     // entities with a single space character. Then add a space
     // between incorrectly concatinated words
-    const _row = row.replace(regSpace, ' ').replace(regCamel, ' ')
+    const cleanRow = row.replace(regSpace, ' ').replace(regCamel, ' ')
 
     // Find how many table cells are in the table row
-    const _tds = row.match(/<td[^>]*>/ig)
+    const tds = row.match(/<td[^>]*>/ig)
 
-    let _extraTD = ''
+    let extraTD = ''
 
-    for (let a = _tds.length; a < 4; a += 1) {
+    for (let a = tds.length; a < 4; a += 1) {
       // Add extra table cells if there are less than four
-      _extraTD += '\n  <td>&nbsp;</td>'
+      extraTD += '\n  <td>&nbsp;</td>'
     }
 
     // Make the ouptut pretty.
-    return '\n  <tr>' + _row.replace(/[\r\n\t ]+<td/ig, '\n    <td') + _extraTD + '\n  </tr>\n'
+    return '\n  <tr>' + cleanRow.replace(/[\r\n\t ]+<td/ig, '\n    <td') + extraTD + '\n  </tr>\n'
   }
 
   let output = ''
   // let a = 0
-  let _row = []
-  while ((_row = regex.exec(input)) !== null) {
-    output += rowClean(_row[1])
+  let rowHTML = []
+  while ((rowHTML = regex.exec(input)) !== null) {
+    // Process each row, one by one
+    output += rowClean(rowHTML[1])
   }
 
   return (output !== '')
