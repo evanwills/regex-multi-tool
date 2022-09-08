@@ -1835,7 +1835,7 @@ doStuff.register({
 // START: Unit report table clean
 
 /**
- * Action description goes here
+ * Clean white space in contents of Unit report table
  *
  * created by: Firstname LastName
  * created: YYYY-MM-DD
@@ -1851,18 +1851,55 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const unitReportCleaner = (input, extraInputs, GETvars) => {
+  /**
+   * Find every table row
+   *
+   * @var {RegExp} regex
+   */
   const regex = /[\r\n\t ]*<tr>[\r\n\t ]*(.*?)[\r\n\t ]*<\/tr>[\r\n\t ]*/igs
 
+  /**
+   * Clean up the white space in a Unit Report table row and add
+   * extra table cells (if required) so each row has four columns
+   *
+   * @param {string} row Contents of a single table row
+   *
+   * @returns {string} cleaned contents of a single table row with
+   *                   extra table cells added if required
+   */
   const rowClean = (row) => {
-    const _row = row.replace(/(?:&(?:nbsp|#160|);|[\r\n\t ])+/ig, ' ').replace(/(?<=[a-z])(?=[A-Z])/g, ' ')
+    /**
+     * Regular expression for finding multiple consecutive white
+     * space characters and white space HTML character entities
+     *
+     *
+     * @var {RegExp} _regSpace
+     */
+    const regSpace = /(?:&(?:nbsp|#160|);|[\r\n\t ])+/ig
+    /**
+     * Regular expression for finding where two words have been
+     * concatinated possibly due to incorrect removal of white space
+     *
+     * @var {RegExp} _regSpace
+     */
+    const regCamel = /(?<=[a-z])(?=[A-Z])/g
+
+    // Replace multiple consecutive white space characters and
+    // entities with a single space character. Then add a space
+    // between incorrectly concatinated words
+    const _row = row.replace(regSpace, ' ').replace(regCamel, ' ')
+
+    // Find how many table cells are in the table row
     const _tds = row.match(/<td[^>]*>/ig)
 
     let _extraTD = ''
 
     for (let a = _tds.length; a < 4; a += 1) {
+      // Add extra table cells if there are less than four
       _extraTD += '\n  <td>&nbsp;</td>'
     }
 
+    // Make the ouptut pretty.
     return '\n  <tr>' + _row.replace(/[\r\n\t ]+<td/ig, '\n    <td') + _extraTD + '\n  </tr>\n'
   }
 
@@ -1882,7 +1919,7 @@ doStuff.register({
   id: 'unitReportCleaner',
   name: 'Unit report table clean',
   func: unitReportCleaner,
-  description: '',
+  description: 'Using the browser\'s Dev tools get the contents of the Unit Report\'s <code>&lt;TBODY&gt;</code>, paste it in the box below. Then click "MODIFY".<br />Then replace the contents of the HTML in the browser Dev tools with the contents of the box below.',
   // docsURL: '',
   extraInputs: [],
   group: 'it',
