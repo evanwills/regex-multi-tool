@@ -1640,15 +1640,15 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Get raw char count
 // ====================================================================
 // START: Add missing sessions to PASS AR
 
 /**
- * Action description goes here
+ * Add missing sessions to PASS AR
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-06-14
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
@@ -1661,39 +1661,6 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const addPassArSessions = (input, extraInputs, GETvars) => {
-  const tmp = 'Location	Campus	SubjectCode	Description	Time	Date	DayOfWeek	ActivityCode\n' +
-              '502.2.25	5	CHEM105_5C_Sem1	Foundations of Chemistry	12:00	6/02/2022	Thu	1\n' +
-              '502.2.25	5	CHEM105_5C_Sem1	Foundations of Chemistry	13:00	6/02/2022	Thu	1\n' +
-              'NSY_Online	5	LAWS106_5C_Sem1	Criminal Law and Procedure	12:00	31/05/2022	Tue	1\n' +
-              'NSY_Online	5	LAWS106_5C_Sem1	Criminal Law and Procedure	13:00	31/05/2022	Tue	1\n' +
-              '600.G.12	6	EDES101_6C_Sem1	Educational Thought	10:00	31/05/2022	Tue	2\n' +
-              '600.G.12	6	EDES101_6C_Sem1	Educational Thought	11:00	31/05/2022	Tue	2\n' +
-              '600.G.12	6	THBS100_6C_Sem1	Introduction to the Bible	12:00	6/01/2022	Wed	2\n' +
-              '600.G.12	6	THBS100_6C_Sem1	Introduction to the Bible	13:00	6/01/2022	Wed	2\n' +
-              '640.1.32	6	ANAT100_6C_Sem1	Anatomical Foundations of Exercise Science	10:00	6/01/2022	Wed	4\n' +
-              '640.1.32	6	ANAT100_6C_Sem1	Anatomical Foundations of Exercise Science	11:00	6/01/2022	Wed	4\n' +
-              'MEL_Online	4	CHEM105_4C_Sem1	Foundations of Chemistry	10:00	31/05/2022	Tue	4\n' +
-              'MEL_Online	4	SPHY103_4C_Sem1	Linguistics and Phonetics for Speech Pathology	10:00	6/01/2022	Wed	4\n' +
-              'MEL_Online	4	SPHY103_4C_Sem1	Linguistics and Phonetics for Speech Pathology	11:00	6/01/2022	Wed	4\n' +
-              'MEL_Online	4	BIOL121_4C_Sem1	Human Biological Science I	10:00	31/05/2022	Tues	4\n' +
-              'MEL_Online	4	LAWS106_4C_Sem1	Criminal Law and Procedure	9:00	5/02/2022	Thu	4\n' +
-              'MEL_Online	4	PSYC100_4C_Sem1	Foundations of Psychology	12:00	6/01/2022	Wed	4\n' +
-              'BAL_Online Live	1	ANAT101_1C_Sem1	Physiotherapy Anatomy I	12:00	6/01/2022	Wednes	1\n' +
-              'BAL_Online Live	1	ANAT101_1C_Sem1	Physiotherapy Anatomy I	13:00	6/01/2022	Wednes	1\n' +
-              '212.2.02	2	ANAT101_2C_Sem1	Anatomical Foundations of Exercise Science	12:00	31/05/2022	Tue	1\n' +
-              '212.2.04	2	ANAT101_2C_Sem1	Anatomical Foundations of Exercise Science	12:00	6/01/2022	Wed	1\n' +
-              'BRI_Online	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	17:00	31/05/2022	Tue	1\n' +
-              'BRI_Online	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	17:00	6/02/2022	Thu	2\n' +
-              '231.G.01	2	ANAT101_2C_Sem1	Physiotherapy Anatomy I	12:00	6/01/2022	Wed	2\n' +
-              '225.G.07	2	BIOL121_2C_Sem1	Human Biological Science I	12:00	6/02/2022	Thu	2\n' +
-              '231.G.01	2	BIOL125_2C_Sem1	Human Biology 1	9:00	6/01/2022	Wed	2\n' +
-              '231.G.03	2	BUSN104_2C_Sem1	Money Matters	10:00	6/02/2022	Thu	4\n' +
-              '231.G.01	2	CHED105_2C_Sem1	Foundations of Chemistry	11:00	30/05/2022	Mon	4\n' +
-              '216.1.16	2	EDEN100_2C_Sem1	Foundations of Literacy	12:00	31/05/2022	Tue	4\n' +
-              '216.1.16	2	EDES101_2C_Sem1	Educational Thought	12:00	6/01/2022	Wed	4\n' +
-              '220.1.13	2	SPHY103_2C_Sem1	Linguistics and Phonetics for Speech Pathology	12:00	6/01/2022	Wed	4\n' +
-              'BRI_Online	2	SWTP108_2C_Sem1	Purpose and Context of Social Work and Human Services	13:00	30/05/2022	Mon	4'
-
   console.group('addPassArSessions()')
 
   const getData = (row, index, type = 'string') => {
@@ -1713,7 +1680,7 @@ const addPassArSessions = (input, extraInputs, GETvars) => {
       case 'dow':
         return ucFirst(field.substring(0, 3).toLowerCase())
       default:
-        return field;
+        return field
     }
   }
 
@@ -1727,14 +1694,15 @@ const addPassArSessions = (input, extraInputs, GETvars) => {
     }
   }
 
-  const tmpData = tmp.split('\n')
+  const tmpData = input.split('\n')
   // console.log('tmpData:', tmpData)
   let tmpHeaders = tmpData.shift()
+
   tmpHeaders = tmpHeaders.toLowerCase().split('\t')
   for (let a = 0; a < tmpHeaders.length; a += 1) {
     tmpHeaders[a] = tmpHeaders[a].trim()
   }
-  console.log('tmpHeaders:', tmpHeaders)
+  // console.log('tmpHeaders:', tmpHeaders)
 
   const headers = {
     location: tmpHeaders.indexOf('location'),
@@ -1807,11 +1775,11 @@ const addPassArSessions = (input, extraInputs, GETvars) => {
                          subjectCodes.join('\'\nOR     Code = \'') +
                          '\'\nORDER BY Code;'
 
-  console.log('data:', data)
-  console.log('subjects:', subjects)
-  console.log('campuses:', campuses)
-  console.log('subjectSQL:', subjectSQL)
-  console.log('subjectCodeSQL:', subjectCodeSQL)
+  // console.log('data:', data)
+  // console.log('subjects:', subjects)
+  // console.log('campuses:', campuses)
+  // console.log('subjectSQL:', subjectSQL)
+  // console.log('subjectCodeSQL:', subjectCodeSQL)
 
   return JSON.stringify(data) + '\n\n' + subjectSQL + '\n\n' + subjectCodeSQL
 }
@@ -1837,16 +1805,16 @@ doStuff.register({
 /**
  * Clean white space in contents of Unit report table
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-09-08
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
+ *                 fields specified when registering the ation
  * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ *                 key/value pairs
+ *                 NOTE: numeric strings are converted to numbers and
+ *                       "true" & "false" are converted to booleans
  *
  * @returns {string} modified version user input
  */
