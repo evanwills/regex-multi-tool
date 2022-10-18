@@ -2206,12 +2206,17 @@ const tsv2Markdown = (input, _extraInputs, _GETvars) => {
   const rowDelim = (typeof delimChars[_extraInputs.row()] === 'string')
     ? delimChars[_extraInputs.row()]
     : _extraInputs.row()
+  // const colDelim = '\t'
+  // const rowDelim = '\n'
   let tmp = input.trim()
   let output = ''
   let sep = ''
   const centre = _extraInputs.options('centre')
   const confluence = _extraInputs.options('confluence')
   const toBoolStr = getBool2str(_extraInputs.convertBool())
+  // const centre = false
+  // const confluence = false
+  // const toBoolStr = false
 
   tmp = input.split(rowDelim)
 
@@ -2270,7 +2275,7 @@ doStuff.register({
   func: tsv2Markdown,
   description: 'Convert delimited text block (with headers) (e.g. CSV or TSV) to markdown formatted table',
   // docsURL: '',
-  _extraInputs: [{
+  extraInputs: [{
     id: 'column',
     type: 'text',
     label: 'Column delimiter',

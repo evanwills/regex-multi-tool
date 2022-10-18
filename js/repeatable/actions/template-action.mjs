@@ -10,13 +10,16 @@
  * created by: Firstname LastName
  * created: YYYY-MM-DD
  *
- * @param {string} input user supplied content (expects HTML code)
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
  * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */

@@ -4131,3 +4131,297 @@ doStuff.register({
 
 //  END:  Sort typescript type properties alphabetically
 // ====================================================================
+// START: Test ACU staff ID regex pattern
+
+/**
+ * Test ACU staff ID regex pattern
+ *
+ * created by: Evan Wills
+ * created: 2022-10-15
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const staffIdRegex = (input, extraInputs, GETvars) => {
+  const tmp = input.split('\n')
+  const regex = /^(?:[0-9][A-Z]|[A-Z]{1,2})?[0-9]{3,6}$/
+  let output = ''
+  let sep = ''
+
+  // console.log('tmp:', tmp)
+  for (let a = 0; a < tmp.length; a += 1) {
+    const _tmp = tmp[a].trim()
+
+    if (regex.test(_tmp) === false) {
+      output += sep + _tmp
+      sep = '\n'
+    }
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'staffIdRegex',
+  name: 'Test ACU staff ID regex pattern',
+  func: staffIdRegex,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: true
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Test ACU staff ID regex pattern
+// ====================================================================
+// START: Test ACU staff username regex pattern
+
+/**
+ * Test staff ID regex pattern
+ *
+ * created by: Evan Wills
+ * created: 2022-10-15
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const staffUsernameRegex = (input, extraInputs, GETvars) => {
+  const tmp = input.split('\n')
+  const regex = /^[a-z_-]{4,24}$/
+  let output = ''
+  let sep = ''
+
+  // console.log('tmp:', tmp)
+  for (let a = 0; a < tmp.length; a += 1) {
+    const _tmp = tmp[a].trim()
+
+    console.log('tmp[' + a + ']:', tmp[a])
+    console.log('regex:', regex)
+    console.log(regex + 'test(' + _tmp + '):', regex.test(_tmp))
+    if (regex.test(_tmp) === false) {
+      output += sep + _tmp
+      sep = '\n'
+    }
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'staffUsernameRegex',
+  name: 'Test ACU staff username regex pattern',
+  func: staffUsernameRegex,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: true
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  est ACU staff username regex pattern
+// ====================================================================
+// START: Modify unit test code
+
+const unitTestCode = `
+
+    // ----------------------------------------------------
+
+    /**
+     * Test trying to update user object's \`[[PROPERTY]]\` property with (bad)
+     * string value
+     *
+     * @return void
+     */
+    public function testFail[[TEST_METHOD]]NotInt() : void
+    {
+        /**
+         * User object to be tested
+         *
+         * @var ImportUser
+         */
+        $user = new ImportUser(self::DUMMY_USER);
+        $this->expectError(\\Exception::class);
+        $this->expectErrorMessageMatches(
+            '/^Argument 1 passed to ImportUser::[[METHOD]]\\(\\) '.
+            'must be of the type int,/'
+        );
+        $user->[[METHOD]]('blah');
+
+    }
+
+    /**
+     * Test trying to update user object's \`[[PROPERTY]]\` property with (bad)
+     * negative integer value
+     *
+     * @return void
+     */
+    public function testFail[[TEST_METHOD]]Minus() : void
+    {
+        /**
+         * User object to be tested
+         *
+         * @var ImportUser
+         */
+        $user = new ImportUser(self::DUMMY_USER);
+        $this->expectException(\\Exception::class);
+        $this->expectExceptionMessage(
+            'ImportUser::[[METHOD]]() expects only parameter '.
+            '\`$[[PROPERTY]]ID\` to be an integer between 0 and [[MAX]] '.
+            '(inclusive).'
+        );
+        $user->[[METHOD]](-1);
+    }
+
+    /**
+     * Test trying to update user object's \`[[PROPERTY]]\` property with (bad)
+     * excessively high integer value
+     *
+     * @return void
+     */
+    public function testFail[[TEST_METHOD]]High() : void
+    {
+        /**
+         * User object to be tested
+         *
+         * @var ImportUser
+         */
+        $user = new ImportUser(self::DUMMY_USER);
+        $this->expectException(\\Exception::class);
+        $this->expectExceptionMessage(
+            'ImportUser::[[METHOD]]() expects only parameter '.
+            '\`$[[PROPERTY]]ID\` to be an integer between 0 and [[MAX]] '.
+            '(inclusive).'
+        );
+        $user->[[METHOD]]([[MAX1]]);
+    }
+
+    /**
+     * Test trying to update user object's \`[[PROPERTY]]\` property with (good)
+     * integer value
+     *
+     * @return void
+     */
+    public function test[[TEST_METHOD]]() : void
+    {
+        /**
+         * User object to be tested
+         *
+         * @var ImportUser
+         */
+        $user = new ImportUser(self::DUMMY_USER);
+
+        $old = $user->[[PROPERTY]];
+        $expected = 1;
+        $user->[[METHOD]]($expected);
+        $actual = $user->[[PROPERTY]];
+
+        $this->assertNotEquals(
+            $old,
+            $actual,
+            'Expected ImportUser::[[METHOD]]() to update the '.
+            '\`[[PROPERTY]]\` property of user object'
+        );
+        $this->assertIsInt(
+            $actual,
+            'Expected user property \`[[PROPERTY]]\` to be an integer '.
+            'after calling ImportUser::[[METHOD]]() with valid input'
+        );
+        $this->assertEquals(
+            $expected,
+            $actual,
+            'Expected user property \`[[PROPERTY]]\` to be the integer '.
+            $expected.' after calling ImportUser::[[METHOD]]() with '.
+            'valid input'
+        );
+    }`
+
+/**
+ * Test staff ID regex pattern
+ *
+ * created by: Evan Wills
+ * created: 2022-10-15
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const modifyUnitTestCode = (input, extraInputs, GETvars) => {
+  const prop = extraInputs.property()
+  const method = ucFirst(snakeToCamelCase(prop))
+  const things = [
+    { key: 'max', value: extraInputs.max() },
+    { key: 'max1', value: (extraInputs.max() + 1) },
+    { key: 'property', value: prop },
+    { key: 'method', value: 'set' + method },
+    { key: 'test_method', value: 'Set' + method }
+  ]
+  const findReplace = []
+  for (let a = 0; a < things.length; a += 1) {
+    findReplace.push(
+      {
+        find: new RegExp('\\[\\[' + things[a].key.toUpperCase() + '\\]\\]', 'g'),
+        replace: things[a].value
+      }
+    )
+  }
+
+  return multiLitRegexReplace(unitTestCode, findReplace)
+}
+
+doStuff.register({
+  id: 'modifyUnitTestCode',
+  name: 'Modify unit test code',
+  func: modifyUnitTestCode,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'property',
+    label: 'property',
+    type: 'text',
+    description: '',
+    pattern: '',
+    default: ''
+  }, {
+    id: 'max',
+    label: 'Max',
+    min: 1,
+    max: 100000,
+    step: 10,
+    default: 0,
+    type: 'number'
+  }],
+  group: 'evan',
+  ignore: true
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Modify unit test code
+// ====================================================================

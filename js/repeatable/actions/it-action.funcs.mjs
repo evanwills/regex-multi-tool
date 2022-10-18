@@ -8,6 +8,7 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isNonEmptyStr } from '../../utilities/validation.mjs'
 import { ucFirst } from '../../utilities/sanitise.mjs'
+import { strPad } from '../../utilities/general.mjs'
 
 const kssComponentName = 'Component name'
 const kssCommentStart = '/**\n * [[COMPONENT_NAME]]\n *\n * Comment description goes here (may be multiple lines)\n *\n * Sample file path: [[SAMPLE_PATH]]\n *\n *\n * Markup:\n '
@@ -1905,4 +1906,156 @@ doStuff.register({
 })
 
 //  END:  Unit report table clean
+// ====================================================================
+// START: Convert SQL table definition to SQL Insert
+
+const tmpSql = `CREATE TABLE \`conference_description\` (
+  \`conf_id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  \`conf_name\` varchar(150) NOT NULL,
+  \`conf_acro_id\` int(11) unsigned NOT NULL,
+  \`conf_status\` tinyint(4) unsigned NOT NULL DEFAULT 0,
+  \`conf_created\` datetime NOT NULL,
+  \`conf_updated\` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  \`conf_auto_open\` datetime NOT NULL,
+  \`conf_auto_close\` datetime DEFAULT NULL,
+  \`conf_earlybird_end\` datetime DEFAULT NULL COMMENT 'When earlybird period ends',
+  \`conf_archive_in_days\` smallint(6) unsigned NOT NULL DEFAULT 365 COMMENT 'Automatically archive payment in this many days [Default: 1 year]',
+  \`conf_delete_in_days\` smallint(6) unsigned NOT NULL DEFAULT 2557 COMMENT 'Automatically delete payment (and related data) in this many days [Default: 7 years]',
+  \`conf_includes_gst\` tinyint(1) unsigned NOT NULL,
+  \`conf_allow_group\` tinyint(1) unsigned NOT NULL DEFAULT 1 COMMENT 'Whether or not to allow group bookings',
+  \`conf_has_cooncession\` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Whether or not this form has a student discount field',
+  \`conf_is_merch\` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  \`conf_email\` varchar(200) NOT NULL DEFAULT '',
+  \`conf_override_url\` varchar(255) DEFAULT NULL,
+  \`conf_items_label\` varchar(30) NOT NULL DEFAULT 'Items',
+  \`conf_packages_label\` varchar(30) NOT NULL DEFAULT 'Packages',
+  \`conf_external_link\` varchar(255) DEFAULT NULL,
+  \`conf_description\` text DEFAULT NULL,
+  \`conf_local_response\` text DEFAULT NULL,
+  \`conf_cancel_policy\` text DEFAULT NULL,
+  \`conf_ina\` text DEFAULT NULL,
+  PRIMARY KEY (\`conf_id\`),
+  KEY \`IND_conf_has_cooncession\` (\`conf_has_cooncession\`),
+  KEY \`IND_conf_includes_gst\` (\`conf_includes_gst\`),
+  KEY \`IND_conf_status\` (\`conf_status\`),
+  KEY \`IND_conf_acro_id\` (\`conf_acro_id\`),
+  KEY \`IND_conf_allow_group\` (\`conf_allow_group\`)
+) ENGINE=InnoDB AUTO_INCREMENT=1552 DEFAULT CHARSET=utf8mb3 COMMENT='basic details of conference'`
+
+/**
+ * Convert SQL table definition to SQL Insert
+ *
+ * created by: Evan Wills
+ * created: 2022-10-17
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const convert2SqlInsert = (input, extraInputs, GETvars) => {
+  input = tmpSql
+  const dbVar = extraInputs.dbVar()
+  const tableName = input.replace(/^CREATE TABLE (`[^`]+`).*(?:.*(?:[\r\n]|$))*/ms, '$1')
+  const idField = input.replace(/^.*?`([^`\r\n ]+)`[^\r\n]+?AUTO_INCREMENT.*$/ism, '$1')
+  const regex = /(?<=[\r\n]) +`([^`]+)` ([a-z]+(?:\([^)]+\))?).*?(?=[\r\n]|$)/ig
+  const _cols = []
+  const _types = []
+  const _COLS = []
+  const _dols = []
+  const _SEP = ',\n        '
+
+  let col = []
+  let max = 0
+  let l = 0
+  let _insert = ''
+  let _iSep = ''
+  let _set = ''
+  let _uSep = 'SET    '
+  let bind = ''
+  let type = ''
+
+  while ((col = regex.exec(input)) !== null) {
+    l = col[1].length
+    if (l > max) {
+      max = l
+    }
+    _cols.push('`' + col[1] + '`')
+    _COLS.push(':' + col[1].toUpperCase())
+    _dols.push('$' + col[1])
+
+    type = col[2].toLowerCase().trim()
+    console.log('type:', type)
+    if (type === 'tinyint(1)') {
+      _types.push('BOOL')
+    } else if (type.includes('int')) {
+      _types.push('INT')
+    } else {
+      _types.push('STR')
+    }
+  }
+
+  max += 2
+
+  for (let a = 0; a < _cols.length; a += 1) {
+    _insert += _iSep + strPad(_COLS[a] + ',', max) + ' -- ' + _cols[a]
+    _set += _uSep + strPad(_cols[a], max) + ' = ' + _COLS[a]
+    _uSep = ',\n            '
+    _iSep = '\n        '
+    bind += '\n$stmt->bindParam(\'' + _COLS[a] + '\', ' + _dols[a] + ', PDO::PARAM_' + _types[a] + ');'
+  }
+
+  // insert = insert.replace()
+
+  const ln = '// ----------------------------------------------' +
+                '--------------------\n'
+  return ln +
+    '// START: ' + tableName + '\n\n' +
+    '$stmt = ' + dbVar + '->prepare(\n' +
+    '    \'INSERT INTO ' + tableName + '(\n        ' +
+         _cols.join(_SEP) + '\n' +
+    '     ) VALUES (\n        ' + _insert + '\n     );\'\n' +
+    ');' + bind + '\n\n' + dbVar + '->execute($stmt);\n\n\n' +
+    '$stmt = ' + dbVar + '->prepare(\n' +
+    '    \'UPDATE ' + tableName + '\n' +
+    '     ' + _set + '\n' +
+    '     WHERE  `' + idField + '` = :' + idField.toUpperCase() + ';\'\n' +
+    ');' + bind + '\n\n' + dbVar + '->execute($stmt);\n\n\n' +
+    '//  END:  ' + tableName + '\n'
+}
+
+doStuff.register({
+  id: 'convert2SqlInsert',
+  name: 'Convert SQL table definition to SQL Insert & SQL Update ' +
+        'queries',
+  func: convert2SqlInsert,
+  description: 'Copy the SQL definition of a database into the ' +
+               'input box then press MODIFY',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'dbVar',
+    label: 'PDO variable name',
+    type: 'text',
+    description: 'The name of the variable that holds the PDO ' +
+                 'connection<br />' +
+                 '(often <code>$db</code> or <code>$this->db</code>',
+    pattern: '',
+    default: '$db'
+  }],
+  group: 'it',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Convert SQL table definition to SQL Insert
 // ====================================================================
