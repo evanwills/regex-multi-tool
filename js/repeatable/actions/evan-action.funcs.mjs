@@ -1747,8 +1747,7 @@ const tab2markdown = (input, extraInputs, GETvars) => {
   let rows = input.split('\n')
   rows = rows.map(row => row.split('\t').map(col => col.trim()))
 
-  const pad = (_input, len, header) => {
-    const char = (_input.length > 0) ? ' ' : '-'
+  const pad = (_input, len, header, char = ' ') => {
     let a = false
     let _output = _input
 
@@ -1792,7 +1791,10 @@ const tab2markdown = (input, extraInputs, GETvars) => {
   for (let a = 0; a < rows.length; a += 1) {
     output += '|'
     for (let b = 0; b < rows[a].length; b += 1) {
-      output += pad(rows[a][b], cols[b], a === 0)
+      const char = (a === 1)
+        ? '-'
+        : ' '
+      output += pad(rows[a][b], cols[b], a === 0, char)
     }
     output += '\n'
   }
@@ -4424,4 +4426,188 @@ doStuff.register({
 })
 
 //  END:  Modify unit test code
+// ====================================================================
+// START: Get Unit test stats
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const getUnitTestStats = (input, extraInputs, GETvars) => {
+  const regex = /(?<=^|[\r\n])={80}[\r\n\t ]+([a-z ]+?) Tests.*?Time: ([0-9]{2}):([0-9]{2}\.[0-9]{3}).*?(?:OK \(([0-9]+) tests, ([0-9]+) assertions\)|Tests: ([0-9]+), Assertions: ([0-9]+), Failures: ([0-9]+).)/gism
+  const basic = [['Test suite', 'Tests', 'Assertions', 'Errors', 'Time', 'Avg assert/test', 'Avg time/test'].join('\t')]
+  const overall = {
+    suites: {
+      total: 0,
+      average: -1,
+      averagePerTest: -1,
+      min: -1,
+      max: -1
+    },
+    tests: {
+      total: 0,
+      average: 0,
+      averagePerTest: -1,
+      min: 100000,
+      max: 0
+    },
+    assertions: {
+      total: 0,
+      average: 0,
+      averagePerTest: 0,
+      min: 100000,
+      max: 0
+    },
+    time: {
+      total: 0,
+      average: 0,
+      averagePerTest: 0,
+      min: 100000,
+      max: 0
+    },
+    errors: {
+      total: 0,
+      average: 0,
+      averagePerTest: 0,
+      min: 100000,
+      max: 0
+    }
+  }
+  let bits
+
+  const emptyStr = (input) => {
+    return (input < 0)
+      ? ''
+      : round(input, 3)
+  }
+
+  while ((bits = regex.exec(input)) !== null) {
+    const temp = {
+      name: (bits[1]),
+      tests: (typeof bits[6] !== 'undefined')
+        ? (bits[6] * 1)
+        : (bits[4] * 1),
+      assertions: (typeof bits[7] !== 'undefined')
+        ? (bits[7] * 1)
+        : (bits[5] * 1),
+      errors: (typeof bits[8] !== 'undefined')
+        ? (bits[8] * 1)
+        : 0,
+      time: (bits[2] * 60) + (bits[3] * 1),
+      avgAssertions: 0,
+      avgTime: 0
+    }
+
+    temp.avgAssertions = temp.assertions / temp.tests
+    temp.avgTime = temp.time / temp.tests
+
+    basic.push(
+      [
+        temp.name,
+        temp.tests,
+        temp.assertions,
+        temp.errors,
+        temp.time,
+        round(temp.avgAssertions, 3),
+        round(temp.avgTime, 3)
+      ].join('\t')
+    )
+
+    overall.suites.total += 1
+
+    overall.tests.total += temp.tests
+    if (temp.tests < overall.tests.min) {
+      overall.tests.min = temp.tests
+    }
+    if (temp.tests > overall.tests.max) {
+      overall.tests.max = temp.tests
+    }
+
+    overall.assertions.total += temp.assertions
+    if (temp.assertions < overall.assertions.min) {
+      overall.assertions.min = temp.assertions
+    }
+    if (temp.assertions > overall.assertions.max) {
+      overall.assertions.max = temp.assertions
+    }
+
+    overall.time.total += temp.time
+    if (temp.time < overall.time.min) {
+      overall.time.min = temp.time
+    }
+    if (temp.time > overall.time.max) {
+      overall.time.max = temp.time
+    }
+
+    overall.errors.total += temp.errors
+    if (temp.errors < overall.errors.min) {
+      overall.errors.min = temp.errors
+    }
+    if (temp.errors > overall.errors.max) {
+      overall.errors.max = temp.errors
+    }
+  }
+
+  overall.tests.average = round((overall.tests.total / overall.suites.total), 3)
+  overall.assertions.average = round((overall.assertions.total / overall.suites.total), 3)
+  overall.assertions.averagePerTest = round((overall.assertions.total / overall.tests.total), 3)
+  overall.time.average = round((overall.time.total / overall.suites.total), 3)
+  overall.time.averagePerTest = round((overall.time.total / overall.tests.total), 3)
+  overall.errors.average = round((overall.errors.total / overall.suites.total), 3)
+  overall.errors.averagePerTest = round((overall.errors.total / overall.tests.total), 3)
+
+  // console.log('overall:', overall)
+  // console.log('basic:', basic)
+
+  const tmp = [['\tTotal\tAverage\tAvg/Test\tMinimum\tMaximum']]
+
+  for (var key in overall) {
+    tmp.push([
+      key,
+      round(overall[key].total, 3),
+      emptyStr(overall[key].average),
+      emptyStr(overall[key].averagePerTest),
+      emptyStr(overall[key].min),
+      emptyStr(overall[key].max)
+    ].join('\t'))
+  }
+
+  let output = tab2markdown(tmp.join('\n'), extraInputs, GETvars)
+
+  output += '\n\n\n'
+  output += tab2markdown(basic.join('\n'), extraInputs, GETvars)
+
+  return output
+}
+
+doStuff.register({
+  id: 'getUnitTestStats',
+  name: 'Get Unit test stats',
+  func: getUnitTestStats,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Get Unit test stats
 // ====================================================================

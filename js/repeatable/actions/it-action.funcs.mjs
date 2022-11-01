@@ -7,7 +7,7 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 import { isNonEmptyStr } from '../../utilities/validation.mjs'
-import { ucFirst } from '../../utilities/sanitise.mjs'
+import { snakeToCamelCase, ucFirst } from '../../utilities/sanitise.mjs'
 import { strPad } from '../../utilities/general.mjs'
 
 const kssComponentName = 'Component name'
@@ -1909,39 +1909,6 @@ doStuff.register({
 // ====================================================================
 // START: Convert SQL table definition to SQL Insert
 
-const tmpSql = `CREATE TABLE \`conference_description\` (
-  \`conf_id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  \`conf_name\` varchar(150) NOT NULL,
-  \`conf_acro_id\` int(11) unsigned NOT NULL,
-  \`conf_status\` tinyint(4) unsigned NOT NULL DEFAULT 0,
-  \`conf_created\` datetime NOT NULL,
-  \`conf_updated\` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  \`conf_auto_open\` datetime NOT NULL,
-  \`conf_auto_close\` datetime DEFAULT NULL,
-  \`conf_earlybird_end\` datetime DEFAULT NULL COMMENT 'When earlybird period ends',
-  \`conf_archive_in_days\` smallint(6) unsigned NOT NULL DEFAULT 365 COMMENT 'Automatically archive payment in this many days [Default: 1 year]',
-  \`conf_delete_in_days\` smallint(6) unsigned NOT NULL DEFAULT 2557 COMMENT 'Automatically delete payment (and related data) in this many days [Default: 7 years]',
-  \`conf_includes_gst\` tinyint(1) unsigned NOT NULL,
-  \`conf_allow_group\` tinyint(1) unsigned NOT NULL DEFAULT 1 COMMENT 'Whether or not to allow group bookings',
-  \`conf_has_cooncession\` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Whether or not this form has a student discount field',
-  \`conf_is_merch\` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  \`conf_email\` varchar(200) NOT NULL DEFAULT '',
-  \`conf_override_url\` varchar(255) DEFAULT NULL,
-  \`conf_items_label\` varchar(30) NOT NULL DEFAULT 'Items',
-  \`conf_packages_label\` varchar(30) NOT NULL DEFAULT 'Packages',
-  \`conf_external_link\` varchar(255) DEFAULT NULL,
-  \`conf_description\` text DEFAULT NULL,
-  \`conf_local_response\` text DEFAULT NULL,
-  \`conf_cancel_policy\` text DEFAULT NULL,
-  \`conf_ina\` text DEFAULT NULL,
-  PRIMARY KEY (\`conf_id\`),
-  KEY \`IND_conf_has_cooncession\` (\`conf_has_cooncession\`),
-  KEY \`IND_conf_includes_gst\` (\`conf_includes_gst\`),
-  KEY \`IND_conf_status\` (\`conf_status\`),
-  KEY \`IND_conf_acro_id\` (\`conf_acro_id\`),
-  KEY \`IND_conf_allow_group\` (\`conf_allow_group\`)
-) ENGINE=InnoDB AUTO_INCREMENT=1552 DEFAULT CHARSET=utf8mb3 COMMENT='basic details of conference'`
-
 /**
  * Convert SQL table definition to SQL Insert
  *
@@ -1962,8 +1929,9 @@ const tmpSql = `CREATE TABLE \`conference_description\` (
  * @returns {string} modified version user input
  */
 const convert2SqlInsert = (input, extraInputs, GETvars) => {
-  input = tmpSql
+  // input = tmpSql
   const dbVar = extraInputs.dbVar()
+  const isArray = (extraInputs.input() == 1)
   const tableName = input.replace(/^CREATE TABLE (`[^`]+`).*(?:.*(?:[\r\n]|$))*/ms, '$1')
   const idField = input.replace(/^.*?`([^`\r\n ]+)`[^\r\n]+?AUTO_INCREMENT.*$/ism, '$1')
   const regex = /(?<=[\r\n]) +`([^`]+)` ([a-z]+(?:\([^)]+\))?).*?(?=[\r\n]|$)/ig
@@ -1971,17 +1939,24 @@ const convert2SqlInsert = (input, extraInputs, GETvars) => {
   const _types = []
   const _COLS = []
   const _dols = []
+  const _AS = []
   const _SEP = ',\n        '
+  const _getDols = (isArray === true)
+    ? (_input) => { return '$' + _input }
+    : (_input) => { return '$data[\'' + _input + '\']' }
 
   let col = []
   let max = 0
   let l = 0
   let _insert = ''
+  let _select = ''
   let _iSep = ''
   let _set = ''
   let _uSep = 'SET    '
+  let _sSep = ''
   let bind = ''
   let type = ''
+  let _tmp = ''
 
   while ((col = regex.exec(input)) !== null) {
     l = col[1].length
@@ -1990,7 +1965,14 @@ const convert2SqlInsert = (input, extraInputs, GETvars) => {
     }
     _cols.push('`' + col[1] + '`')
     _COLS.push(':' + col[1].toUpperCase())
-    _dols.push('$' + col[1])
+    _dols.push(_getDols(col[1]))
+
+    _tmp = snakeToCamelCase(col[1])
+
+    _AS.push((_tmp !== col[1])
+      ? '`' + _tmp + '`'
+      : ''
+    )
 
     type = col[2].toLowerCase().trim()
     console.log('type:', type)
@@ -2008,9 +1990,28 @@ const convert2SqlInsert = (input, extraInputs, GETvars) => {
   for (let a = 0; a < _cols.length; a += 1) {
     _insert += _iSep + strPad(_COLS[a] + ',', max) + ' -- ' + _cols[a]
     _set += _uSep + strPad(_cols[a], max) + ' = ' + _COLS[a]
+
+    if (_AS[a] !== '') {
+      _select += _sSep + strPad(_cols[a], (max)) + ' AS ' + _AS[a]
+    } else {
+      _select += _sSep + _cols[a]
+    }
+
     _uSep = ',\n            '
+    _sSep = ',\n            '
     _iSep = '\n        '
-    bind += '\n$stmt->bindParam(\'' + _COLS[a] + '\', ' + _dols[a] + ', PDO::PARAM_' + _types[a] + ');'
+    if (_dols[a].length > 18) {
+      _tmp = '\n    \'' + _COLS[a] + '\',' +
+             '\n    ' + _dols[a] + ',' +
+             '\n    PDO::PARAM_' + _types[a] +
+             '\n'
+    } else {
+      _tmp = '\'' + _COLS[a] + '\', ' + _dols[a] + ', PDO::PARAM_' + _types[a]
+      if (_tmp.length > 45) {
+        _tmp = '\n    ' + _tmp + '\n'
+      }
+    }
+    bind += '\n$stmt->bindParam(' + _tmp + ');'
   }
 
   // insert = insert.replace()
@@ -2019,6 +2020,12 @@ const convert2SqlInsert = (input, extraInputs, GETvars) => {
                 '--------------------\n'
   return ln +
     '// START: ' + tableName + '\n\n' +
+    '$stmt = ' + dbVar + '->prepBindExec(\n' +
+    '    \'SELECT ' + _select + '\n' +
+    '     FROM   ' + tableName + '\n' +
+    '     WHERE  `' + idField + '` = :ID\',\n' +
+    '    $id\n' +
+    ');\n\n' +
     '$stmt = ' + dbVar + '->prepare(\n' +
     '    \'INSERT INTO ' + tableName + '(\n        ' +
          _cols.join(_SEP) + '\n' +
@@ -2040,16 +2047,34 @@ doStuff.register({
   description: 'Copy the SQL definition of a database into the ' +
                'input box then press MODIFY',
   // docsURL: '',
-  extraInputs: [{
-    id: 'dbVar',
-    label: 'PDO variable name',
-    type: 'text',
-    description: 'The name of the variable that holds the PDO ' +
-                 'connection<br />' +
-                 '(often <code>$db</code> or <code>$this->db</code>',
-    pattern: '',
-    default: '$db'
-  }],
+  extraInputs: [
+    {
+      id: 'dbVar',
+      label: 'PDO variable name',
+      type: 'text',
+      description: 'The name of the variable that holds the PDO ' +
+                  'connection<br />' +
+                  '(often <code>$db</code> or <code>$this->db</code>',
+      pattern: '',
+      default: '$db'
+    }, {
+      id: 'input',
+      label: 'Value is in array',
+      options: [
+        {
+          default: false,
+          label: 'Value is in array',
+          value: '0'
+        },
+        {
+          default: true,
+          label: 'Value is stand-alone variable',
+          value: '1'
+        }
+      ],
+      type: 'radio'
+    }
+  ],
   group: 'it',
   ignore: false
   // inputLabel: '',
