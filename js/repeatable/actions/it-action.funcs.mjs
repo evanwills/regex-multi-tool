@@ -1234,7 +1234,16 @@ const sitecore2local = (input, extraInputs, GETvars) => {
 doStuff.register({
   id: 'sitecore2local',
   func: sitecore2local,
-  description: 'Rewrite URLs to point to local version of CSS, font & JS files. Plus rewrite image URLs to point to server.',
+  description: 'Rewrite URLs to point to local version of CSS, font, JS & image files.' +
+               '<h4>How to use:</h4>' +
+               '<ol><li>View web page source</li>' +
+               '<li>Copy whole source</li>' +
+               '<li>Paste full source into Input box below</li>' +
+               '<li>Click "MODIFY"</li>' +
+               '<li>Copy the file name from the file name comment (at the bottom of the modified code)</li>' +
+               '<li>Create a new file in <code>Website/src/Project/ACUPublic/ACU.Static/testing/</code></li>' +
+               '<li>Paste full <em>modified</em> contents of input field into the file you just created</li>' +
+               '</ol>',
   // docsURL: '',
   extraInputs: [{
     id: 'domain',
