@@ -4518,7 +4518,7 @@ const getUnitTestStats = (input, extraInputs, GETvars) => {
 
     basic.push(
       [
-        temp.name,
+        ucFirst(temp.name),
         temp.tests,
         temp.assertions,
         temp.errors,
@@ -4578,7 +4578,7 @@ const getUnitTestStats = (input, extraInputs, GETvars) => {
 
   for (var key in overall) {
     tmp.push([
-      key,
+      ucFirst(key),
       round(overall[key].total, 3),
       emptyStr(overall[key].average),
       emptyStr(overall[key].averagePerTest),
@@ -4587,9 +4587,13 @@ const getUnitTestStats = (input, extraInputs, GETvars) => {
     ].join('\t'))
   }
 
-  let output = tab2markdown(tmp.join('\n'), extraInputs, GETvars)
+  let output = '__Last run:__ ' + new Date().toLocaleString('en-au')
+  output += '\n\nThe following table provides basic statistics for ' +
+            'the whole run\n\n'
+  output += tab2markdown(tmp.join('\n'), extraInputs, GETvars)
 
-  output += '\n\n\n'
+  output += '\n\n\nThe following table provides statistics for ' +
+            'each suite of unit tests\n\n'
   output += tab2markdown(basic.join('\n'), extraInputs, GETvars)
 
   return output
@@ -4610,4 +4614,176 @@ doStuff.register({
 })
 
 //  END:  Get Unit test stats
+// ====================================================================
+// START: Extract unit test data
+
+const _samp = `
+================================================================================
+
+   Acronym Getter Method Tests
+
+
+PHPUnit 9.5.25 #StandWithUkraine
+
+..............                                                    14 / 14 (100%)
+
+Time: 00:00.138, Memory: 8.00 MB
+
+OK (14 tests, 59 assertions)
+
+
+--------------------------------------------------------------------------------
+
+To rerun this test on its own use:
+
+  ./run-all-tests.sh refresh Acronym/AcronymGetterMethodTests
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+
+   Admin Static Method Tests
+
+
+PHPUnit 9.5.25 #StandWithUkraine
+
+........                                                            8 / 8 (100%)
+
+Time: 00:00.089, Memory: 8.00 MB
+
+OK (8 tests, 68 assertions)
+
+
+--------------------------------------------------------------------------------
+
+To rerun this test on its own use:
+
+  ./run-all-tests.sh refresh Admin/AdminStaticMethodTests
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+
+   Form Create Method Test1
+
+
+PHPUnit 9.5.25 #StandWithUkraine
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.039, Memory: 8.00 MB
+
+OK (1 test, 1 assertion)
+
+
+--------------------------------------------------------------------------------
+
+To rerun this test on its own use:
+
+  ./run-all-tests.sh refresh Form/FormCreateMethodTest1
+
+--------------------------------------------------------------------------------
+`
+
+/**
+ * Action Extract unit test data
+ *
+ * created by: Evan Wills
+ * created: 2022-11-16
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const extractUnitTestData = (input, extraInputs, GETvars) => {
+  input = _samp
+
+  const regex1 = /={80}[\r\n\t ]*(.*?)[\r\n\t ]*-{80}/gsm
+  const regex2 = /^(.*?) test/i
+  let outer = []
+
+  while ((outer = regex1.exec(input)) !== null) {
+    console.log('outer[1]:', outer[1])
+    const bits = outer[1].match(regex2)
+    console.log('bits:', bits)
+  }
+
+  return input
+}
+
+doStuff.register({
+  id: 'extractUnitTestData',
+  name: 'Extract unit test data',
+  func: extractUnitTestData,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Extract unit test data
+// ====================================================================
+// START: Row comment
+
+/**
+ * Action description goes here
+ *
+ * created by: Evan Wills
+ * created: 2022-12-05
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const rowComment = (input, extraInputs, GETvars) => {
+  let c = -1;
+  const doReplace = (whole) => {
+    c += 1
+    return whole + ' data-row="' + c + '"'
+  }
+
+  return input.replace(/(?<=<tr)(?=>)/g, doReplace)
+}
+
+doStuff.register({
+  id: 'rowComment',
+  name: 'Row comment',
+  func: rowComment,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Row comment
 // ====================================================================

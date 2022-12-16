@@ -1085,6 +1085,37 @@ const sitecore2localGeCanonical = (input, base) => {
   return ''
 }
 
+const sitecore2localStripUnwantedLinked = (url) => {
+  const unwanted = [
+    'static.searchstax.com/studio-js',
+    'cdnjs.cloudflare.com/ajax/libs/bluebird/',
+    'addevent.com',
+    'acu-au.libanswers.com'
+  ]
+
+  for (let a = 0; a < unwanted.length; a += 1) {
+    if (url.includes(unwanted[a])) {
+      return true
+    }
+  }
+
+  return false
+}
+
+const sitecore2localStripUnwantedLinkedMid = (whole, attrs) => {
+  const url = attrs.replace(/^.*?(?:src|href)="https?:\/\/(.*?)".*$/is, '$1')
+  return (sitecore2localStripUnwantedLinked(url))
+    ? ''
+    : whole
+}
+
+const sitecore2localStripUnwantedLinkedOuter = (input) => {
+  const output = input.replace(
+    /<script([^>]+)>[\r\n\t ]*<\/script>/ig, sitecore2localStripUnwantedLinkedMid
+  )
+  return output.replace(/<link([^>]+)>/ig, sitecore2localStripUnwantedLinkedMid)
+}
+
 /**
  * Action description goes here
  *
@@ -1183,14 +1214,21 @@ const sitecore2local = (input, extraInputs, GETvars) => {
     }, {
       find: /<!--\s+Google\s+Tag\s+Manager(?:\s+\(noscript\))?\s+-->.*?<!--\s+End\s+Google\s+Tag\s+Manager(?:\s+\(noscript\))?\s+-->/isg,
       replace: ''
-    },
-    {
-      find: /https:\/\/static\.searchstax\.com\/studio-js\/v2(?=\/css)/ig,
-      replace: '..'
+    }, {
+      find: /<!-- +SiteImprove Analytics scripts +-->.*?<!-- \/ SiteImprove Analytics scripts -->/ism,
+      replace: ''
+    }, {
+      find: /([\r\n\t ]+)(margin-right: auto) (?=padding-right: [0-9]+px;)/ig,
+      replace: '$1$2;$1'
+    }, {
+      find: /https:\/\/.*?\/(117-logo-alternate.jpg|askacu_logo_pos_rgb_title-icon.svg)[^"]*(?=")/ig,
+      replace: '../img/$1'
     }
   ]
 
-  return multiLitRegexReplace(input, regex)
+  return multiLitRegexReplace(
+    sitecore2localStripUnwantedLinkedOuter(input), regex
+  )
 }
 
 doStuff.register({
