@@ -19,6 +19,7 @@ import {
   snakeToCamelCase,
   ucFirst
 } from '../../utilities/sanitise.mjs'
+import { strPad } from '../../utilities/general.mjs'
 
 /**
  * getVarsToFileName() makes a GET variable string usable as a
@@ -4576,7 +4577,7 @@ const getUnitTestStats = (input, extraInputs, GETvars) => {
 
   const tmp = [['\tTotal\tAverage\tAvg/Test\tMinimum\tMaximum']]
 
-  for (var key in overall) {
+  for (const key in overall) {
     tmp.push([
       ucFirst(key),
       round(overall[key].total, 3),
@@ -4617,78 +4618,6 @@ doStuff.register({
 // ====================================================================
 // START: Extract unit test data
 
-const _samp = `
-================================================================================
-
-   Acronym Getter Method Tests
-
-
-PHPUnit 9.5.25 #StandWithUkraine
-
-..............                                                    14 / 14 (100%)
-
-Time: 00:00.138, Memory: 8.00 MB
-
-OK (14 tests, 59 assertions)
-
-
---------------------------------------------------------------------------------
-
-To rerun this test on its own use:
-
-  ./run-all-tests.sh refresh Acronym/AcronymGetterMethodTests
-
---------------------------------------------------------------------------------
-
-
-
-================================================================================
-
-   Admin Static Method Tests
-
-
-PHPUnit 9.5.25 #StandWithUkraine
-
-........                                                            8 / 8 (100%)
-
-Time: 00:00.089, Memory: 8.00 MB
-
-OK (8 tests, 68 assertions)
-
-
---------------------------------------------------------------------------------
-
-To rerun this test on its own use:
-
-  ./run-all-tests.sh refresh Admin/AdminStaticMethodTests
-
---------------------------------------------------------------------------------
-
-
-
-================================================================================
-
-   Form Create Method Test1
-
-
-PHPUnit 9.5.25 #StandWithUkraine
-
-.                                                                   1 / 1 (100%)
-
-Time: 00:00.039, Memory: 8.00 MB
-
-OK (1 test, 1 assertion)
-
-
---------------------------------------------------------------------------------
-
-To rerun this test on its own use:
-
-  ./run-all-tests.sh refresh Form/FormCreateMethodTest1
-
---------------------------------------------------------------------------------
-`
-
 /**
  * Action Extract unit test data
  *
@@ -4709,8 +4638,6 @@ To rerun this test on its own use:
  * @returns {string} modified version user input
  */
 const extractUnitTestData = (input, extraInputs, GETvars) => {
-  input = _samp
-
   const regex1 = /={80}[\r\n\t ]*(.*?)[\r\n\t ]*-{80}/gsm
   const regex2 = /^(.*?) test/i
   let outer = []
@@ -4762,7 +4689,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const rowComment = (input, extraInputs, GETvars) => {
-  let c = -1;
+  let c = -1
   const doReplace = (whole) => {
     c += 1
     return whole + ' data-row="' + c + '"'
@@ -4786,4 +4713,320 @@ doStuff.register({
 })
 
 //  END:  Row comment
+// ====================================================================
+// START: Laravel fixed option to CFB insert SQL
+
+/**
+ * Laravel fixed option to CFB insert SQL
+ *
+ * created by: Evan Wills
+ * created: 2022-12-19
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const laravelToSql = (input, extraInputs, GETvars) => {
+  const fieldID = extraInputs.id()
+
+  const l1 = (whole, inner) => {
+    const bits = {
+      key: '',
+      label: '',
+      show: 1
+    }
+    const regex = /'(value|label|hide)' => (?:(true|false)|'(.*?)'(?:[.][\s\r\n\t ]*'(.*?)'(?:[.][\s\r\n\t ]*'(.*?)')?)?)(?=,|$)/igsm
+    let subBits
+
+    while ((subBits = regex.exec(inner)) !== null) {
+      console.log('subBits:', subBits)
+      switch (subBits[1]) {
+        case 'value':
+          bits.key = subBits[3]
+
+          if (typeof subBits[4] === 'string') {
+            bits.key += subBits[4]
+            if (typeof subBits[4] === 'string') {
+              bits.key += subBits[4]
+            }
+          }
+          break
+
+        case 'label':
+          bits.label = subBits[3]
+          if (typeof subBits[4] === 'string') {
+            bits.label += subBits[4]
+            if (typeof subBits[4] === 'string') {
+              bits.label += subBits[4]
+            }
+          }
+          break
+
+        case 'hide':
+          bits.show = (subBits[2] === 'true')
+            ? '0'
+            : '1'
+          break
+      }
+    }
+
+    if (bits.label === '') {
+      bits.label = bits.key
+    }
+
+    console.log('inner:', inner)
+    console.log('bits:', bits)
+
+    return ',\n     ( ' + fieldID + ', "' + bits.key + '", ' +
+          '"' + bits.label + '", ' + bits.show + ' )'
+  }
+
+  return input.replace(/\[[a-z]+\]/ig, '').replace(/[\s\r\n\t ]*\[[\s\r\n\t ]*(.*?)[\s\r\n\t ]*\][\s\r\n\t ]*,?/gism, l1)
+}
+
+doStuff.register({
+  id: 'laravelToSql',
+  name: 'Laravel fixed option to CFB insert SQL',
+  func: laravelToSql,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'id',
+    label: 'ID',
+    min: 1,
+    max: 1000,
+    step: 1,
+    default: 0,
+    type: 'number'
+  }],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Laravel fixed option to CFB insert SQL
+// ====================================================================
+// START: Stored Procedure Parameters
+
+/**
+ * Convert table defnition to Stored Procedure Parameters
+ *
+ * created by: Evan Wills
+ * created: 2022-12-20
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const storedProcParams = (input, extraInputs, GETvars) => {
+  const _cols = []
+  const _tableName = extraInputs.tableName()
+  const _thingName = _tableName.replace(/s$/i, '')
+  const regex = /(-- +)?`([a-z_]+)`( (?:varchar|char|float|datetime|timestamp|text|(?:tiny|small|medium)?int)(?:\([0-9]+\))?(?: unsigned)?)[^,]*(,|$)/ig
+  let maxCol = 0
+  let maxIn = 0
+  let maxParam = 0
+  let _tmp
+  let _x = 0
+
+  let outputIn = ''
+  let outputInsertFields = ''
+  let outputInsertValues = ''
+  let outputUpdate = ''
+  let outputSelect = ''
+
+  while ((_tmp = regex.exec(input)) !== null) {
+    // console.log('_tmp:', _tmp);
+    const _cmnt = (typeof _tmp[1] === 'string')
+    const _col = _tmp[2]
+    const _param = _tmp[2].replace(/_/g, '')
+    const _in = 'IN ' + _param + _tmp[3]
+
+    if (_param.length > maxCol) {
+      maxCol = _param.length
+    }
+    if (_in.length > maxIn) {
+      maxIn = _in.length
+    }
+    if (_param.length > maxParam) {
+      maxParam = _param.length
+    }
+
+    _cols.push({
+      comment: _cmnt,
+      col: _col,
+      param: _param,
+      camel: snakeToCamelCase(_col),
+      in: _in
+    })
+  }
+
+  maxIn += 2
+  maxCol += 5
+  maxParam += 2
+
+  for (let a = 0; a < _cols.length; a += 1) {
+    const _sep = (a < _cols.length - 1)
+      ? ','
+      : ''
+    let _pre = '\n        '
+    _pre += _cols[a].comment
+      ? '--  '
+      : '    '
+    _x += (_cols[a].comment)
+      ? 0
+      : 1
+    const _b = (_cols[a].comment)
+      ? '  '
+      : (_x < 10)
+          ? ' ' + _x
+          : _x
+
+    outputIn += _pre + strPad(_cols[a].in + _sep, maxIn) + '-- ' + _b
+    outputInsertValues += _pre + strPad(_cols[a].param + _sep, maxParam) + '-- ' + _b + ' - `' + _cols[a].col + '`'
+    outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + '-- ' + _b + ' - ' + _cols[a].param + ''
+    outputUpdate += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + ' = ' + _cols[a].param + _sep
+    outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
+  }
+  const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n        FROM   `' + _tableName + '`\n        WHERE  `id` = '
+
+  return '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
+         '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
+         '     END;\n\n\n\n\n' + '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
+         '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
+         '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
+         '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n\n        ' + extraSelect + '@newID;\n' +
+         '     END;\n\n\n\n\n' +
+         '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
+         '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
+         '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n' +
+         '     END;'
+}
+
+doStuff.register({
+  id: 'storedProcParams',
+  name: 'Table definition to Stored procedure parameters',
+  func: storedProcParams,
+  description: '',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'tableName',
+      label: 'Table name',
+      type: 'text',
+      description: '',
+      pattern: '',
+      default: ''
+    }
+  ],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Stored Procedure Parameters
+// ====================================================================
+// START: turning tool codes
+
+/**
+ * Action description goes here
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const turningToolCodes = (input, extraInputs, GETvars) => {
+  const angles = ['000', '075', '150', '225', '300', '375', '450']
+  const hand = ['L', 'R']
+  const type = ['H', 'F']
+  const codes = []
+  let x = 1
+  let output = ''
+  for (let a = 0; a < type.length; a += 1) {
+    output += '\n' + x + '\t' + type[a] + 'S'
+
+    for (let b = 1; b < angles.length; b += 1) {
+      x += 1
+      output += '\n' + x + '\t' + type[a] + 'S-' + angles[b]
+    }
+
+    for (let b = 0; b < hand.length; b += 1) {
+      x += 1
+      const code = type[a] + hand[b]
+
+      output += '\n' + x + '\t' + code
+
+      for (let c = 0; c < angles.length; c += 1) {
+        for (let d = 0; d < angles.length; d += 1) {
+          const bend = '-' + angles[d]
+
+          const arc = (d > 0)
+            ? '-' + angles[c]
+            : ''
+
+          const tail = arc + bend
+          x += 1
+
+          if (c > 0 || d > 0) {
+            output += '\n' + x + '\t' + code + tail
+          }
+        }
+      }
+      codes.push(code)
+    }
+    x += 1
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'turningToolCodes',
+  name: 'Turning tool codes',
+  func: turningToolCodes,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Action name
 // ====================================================================

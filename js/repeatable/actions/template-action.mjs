@@ -33,7 +33,7 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [],
-  // group: '',
+  // group: 'evan',
   ignore: false
   // inputLabel: '',
   // remote: false,

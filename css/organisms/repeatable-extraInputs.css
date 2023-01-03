@@ -53,6 +53,10 @@
   border-top: var(--line-weight) dashed var(--txt-colour);
   padding: 1rem 0;
 }
+.repeat-input:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
 
 
 .repeat-input__label  {
