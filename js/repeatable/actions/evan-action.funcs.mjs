@@ -4840,7 +4840,7 @@ doStuff.register({
  */
 const storedProcParams = (input, extraInputs, GETvars) => {
   const _cols = []
-  const _tableName = extraInputs.tableName()
+  const _tableName = input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')
   const _thingName = _tableName.replace(/s$/i, '')
   const regex = /(-- +)?`([a-z_]+)`( (?:varchar|char|float|datetime|timestamp|text|(?:tiny|small|medium)?int)(?:\([0-9]+\))?(?: unsigned)?)[^,]*(,|$)/ig
   let maxCol = 0
@@ -4882,7 +4882,8 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   }
 
   maxIn += 2
-  maxCol += 5
+  maxCol += 4
+  const maxColIn = maxCol + 1
   maxParam += 2
 
   for (let a = 0; a < _cols.length; a += 1) {
@@ -4904,23 +4905,29 @@ const storedProcParams = (input, extraInputs, GETvars) => {
 
     outputIn += _pre + strPad(_cols[a].in + _sep, maxIn) + '-- ' + _b
     outputInsertValues += _pre + strPad(_cols[a].param + _sep, maxParam) + '-- ' + _b + ' - `' + _cols[a].col + '`'
-    outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + '-- ' + _b + ' - ' + _cols[a].param + ''
-    outputUpdate += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + ' = ' + _cols[a].param + _sep
-    outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`' + _sep, maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
+    outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxColIn) + '-- ' + _b + ' - ' + _cols[a].param + ''
+    outputUpdate += _pre + strPad('`' + _cols[a].col + '`', maxCol) + ' = ' + _cols[a].param + _sep
+    outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`', maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
   }
   const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n        FROM   `' + _tableName + '`\n        WHERE  `id` = '
 
-  return '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
-         '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
-         '     END;\n\n\n\n\n' + '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
-         '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
-         '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
-         '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n\n        ' + extraSelect + '@newID;\n' +
-         '     END;\n\n\n\n\n' +
-         '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
-         '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
-         '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n' +
-         '     END;'
+  const output =  '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
+                  '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
+                  '     END;\n\n\n' +
+                  '     -- ==========================================\n\n\n' + 
+                  '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
+                  '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
+                  '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
+                  '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n' +
+                  '     END;\n\n\n' +
+                  '     -- ==========================================\n\n\n' + 
+                  '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
+                  '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
+                  '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n\n' +
+                  '        CALL get_' + _thingName + '_by_id(id);\n' +
+                  '     END;'
+  
+  return output.replace(/(`[a-z0-9_]+`) +AS \1/g, '$1')
 }
 
 doStuff.register({
@@ -4930,14 +4937,14 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [
-    {
-      id: 'tableName',
-      label: 'Table name',
-      type: 'text',
-      description: '',
-      pattern: '',
-      default: ''
-    }
+    // {
+    //   id: 'tableName',
+    //   label: 'Table name',
+    //   type: 'text',
+    //   description: '',
+    //   pattern: '',
+    //   default: ''
+    // }
   ],
   group: 'evan',
   ignore: false
