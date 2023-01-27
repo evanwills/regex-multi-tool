@@ -21,6 +21,12 @@ import {
 } from '../../utilities/sanitise.mjs'
 import { strPad } from '../../utilities/general.mjs'
 
+
+// ====================================================================
+// START: Convert GET variable string to file name string
+
+
+
 /**
  * getVarsToFileName() makes a GET variable string usable as a
  * file name
@@ -54,6 +60,12 @@ doStuff.register({
   // description: 'Fix heading levels when Migrating HTML from one system to another',
   // docURL: '',
 })
+
+
+//  END:  Convert GET variable string to file name string
+// ====================================================================
+// START: Extract all the URLs in a string
+
 
 function extractURLs (input, extraInputs, GETvars) {
   const regex = /('|"|\()(https?:\/\/.*?((?:[^."'/]+\.)+(js|css|svg|eot|woff2|woff|ttf|png|jpe?g|gif|ico)))(?:'|"|\))/g
@@ -99,6 +111,12 @@ doStuff.register({
   // docURL: '',
 })
 
+
+//  END:  Extract all the URLs in a string
+// ====================================================================
+// START: Fix Data Source keywords
+
+
 /**
  * fixDS() Fix Data Source keywords
  * file name
@@ -137,6 +155,12 @@ doStuff.register({
   // docURL: '',
 })
 
+
+//  END:  Fix Data Source keywords
+// ====================================================================
+// START: Make string usable as a constant name
+
+
 /**
  * stringToConstFormat() Make string usable as a constant name (UPPER_CASE)
  *
@@ -170,8 +194,14 @@ doStuff.register({
   // docURL: '',
 })
 
+
+//  END:  Make string usable as a constant name
+// ====================================================================
+// START: Make form admin URLs local
+
+
 /**
- * formAdminLocalURLs() Make string usable as a constant name (UPPER_CASE)
+ * formAdminLocalURLs() Make form admin URLs local
  *
  * created by: Evan Wills
  * created: 2019-11-29
@@ -210,6 +240,12 @@ doStuff.register({
   // description: 'Fix heading levels when Migrating HTML from one system to another',
   // docURL: '',
 })
+
+
+//  END:  Make form admin URLs local
+// ====================================================================
+// START: SQL for inserting SA Main acros into form_build
+
 
 /**
  * buildAcroSQL() Generate an SQL statement for inserting SA Main
@@ -253,6 +289,12 @@ doStuff.register({
   // description: 'Fix heading levels when Migrating HTML from one system to another',
   // docURL: '',
 })
+
+
+//  END:  SQL for inserting SA Main acros into form_build
+// ====================================================================
+// START: Fix config set order
+
 
 /**
  * Use to reliably rewrite some PHP code after an API change.
@@ -4819,6 +4861,106 @@ doStuff.register({
 // ====================================================================
 // START: Stored Procedure Parameters
 
+const storedProc = `CREATE TABLE \`data_form_details\` (
+	\`form_id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	\`form_group_id\` int(10) unsigned NOT NULL,
+	\`form_status_id\` tinyint(3) unsigned NOT NULL DEFAULT 0,
+	\`form_login_mode_id\` tinyint(3) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Login mode (0 = public, 1 = Student login required, 2 = staff login required)',
+	\`form_primary_owner_id\` int(11) unsigned NOT NULL,
+	\`form_user_type_id\` smallint(5) unsigned NOT NULL DEFAULT 0
+		COMMENT 'What type of user is expected to be submitting to/purchasing from this form',
+	\`form_name\` varchar(150) COLLATE utf8mb3_unicode_ci NOT NULL,
+	\`form_contact_email\` varchar(200) COLLATE utf8mb3_unicode_ci NOT NULL,
+	\`form_url\` varchar(500) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT ''
+		COMMENT 'URL where end users select their items and fill in their details',
+	\`form_items_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Items',
+	\`form_packages_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Packages',
+	\`form_add_to_group_btn_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Add another group member',
+	\`form_created_at\` timestamp NOT NULL DEFAULT NOW(),
+	\`form_created_by\` int(11) unsigned NOT NULL,
+	\`form_updated_at\` timestamp DEFAULT NULL,
+	\`form_updated_by\` int(11) unsigned DEFAULT NULL,
+	\`form_archived_at\` timestamp DEFAULT NULL,
+	\`form_auto_open_at\` timestamp DEFAULT NULL
+		COMMENT 'When this form will automatically open',
+	\`form_auto_close_at\` timestamp DEFAULT NULL
+		COMMENT 'When this form will automatically close',
+	\`form_lock_expires_at\` timestamp DEFAULT NULL
+		COMMENT 'When the lock for this form will be released',
+	\`form_locked_by\` int(11) unsigned DEFAULT NULL
+		COMMENT 'ID of admin who holds (or last held) the lock for this form',
+	\`form_last_payment_at\` timestamp DEFAULT NULL
+		COMMENT 'Date and time this form last received a payment/registration',
+	\`form_max_payment_details_age\` int(10) unsigned NOT NULL DEFAULT 31557600
+		COMMENT 'Number of seconds after a payment was created payment details should be deleted (default: 1 year). NOTE: Basic payment info: Date/times for payment, username and amount are retianed. User inputs (including email), purchased items and payment process logs are deleted.',
+	\`form_max_payment_record_age\` int(10) unsigned NOT NULL DEFAULT 220903200
+		COMMENT 'Number of seconds after a payment was created all payment infomation is completely removed from the system. (default: 7 years).',
+	\`form_has_been_tested\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether or not this form has received a test payment',
+	\`form_has_concession\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether or not this form has a concession discount',
+	\`form_gst_is_included\` tinyint(1) unsigned NOT NULL DEFAULT 1
+		COMMENT 'Prices in this form include GST',
+	\`form_is_predefined\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether or not this form is used for predefined payments (If TRUE, only known users can make payments)',
+	\`form_is_survey\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether or not this form is used for surveys (i.e. it has no purchasable items)',
+	\`form_ui_items_before_packages\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether items should be displayed before packages',
+	\`form_ui_inputs_first\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether user input fields should be displayed before items & packages',
+	\`form_ui_all_in_one\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether items should be displayed on the same page as user input fields',
+	\`form_allow_group_booking\` tinyint(1) unsigned NOT NULL DEFAULT 0
+		COMMENT 'Whether or not a user can purchase on behalf of other people',
+		\`form_allow_free\` tinyint(1) unsigned NOT NULL DEFAULT 1
+			COMMENT 'Whether or not to allow zero dollar (free) purchasable items & packages)',
+	-- \`form_concession_discount\` decimal(5,4) NOT NULL DEFAULT 1.0000
+	--   COMMENT 'Level of discount applied to users elegible for concession discount (1 = 0% discount, 0 = 100% discount - AKA free)',
+	PRIMARY KEY (\`form_id\`),
+	KEY \`IND_form_status_id\` (\`form_status_id\`),
+	KEY \`IND_form_group_id\` (\`form_group_id\`),
+	KEY \`IND_form_login_mode_id\` (\`form_login_mode_id\`),
+	KEY \`IND_form_auto_open_at\` (\`form_auto_open_at\`),
+	KEY \`IND_form_auto_close_at\` (\`form_auto_close_at\`),
+	KEY \`IND_form_lock_expires_at\` (\`form_lock_expires_at\`),
+	KEY \`IND_form_last_payment_at\` (\`form_last_payment_at\`),
+	KEY \`IND_form_is_predefined\` (\`form_is_predefined\`),
+	KEY \`IND_form_max_payment_details_age\` (\`form_max_payment_details_age\`),
+	KEY \`IND_form_max_payment_record_age\` (\`form_max_payment_record_age\`),
+	KEY \`IND_form_primary_owner_id\` (\`form_primary_owner_id\`),
+	KEY \`data_form_details_form_user_type_id_foreign\` (\`form_user_type_id\`),
+	KEY \`data_form_details_form_created_by_foreign\` (\`form_created_by\`),
+	KEY \`data_form_details_form_updated_by_foreign\` (\`form_updated_by\`),
+	KEY \`data_form_details_form_locked_by_foreign\` (\`form_locked_by\`),
+	CONSTRAINT \`data_form_details_form_created_by_foreign\`
+		FOREIGN KEY (\`form_created_by\`)
+		REFERENCES \`users\` (\`id\`),
+	CONSTRAINT \`data_form_details_form_group_id_foreign\`
+		FOREIGN KEY (\`form_group_id\`)
+		REFERENCES \`data_income_groups\` (\`group_id\`),
+	CONSTRAINT \`data_form_details_form_locked_by_foreign\`
+		FOREIGN KEY (\`form_locked_by\`)
+		REFERENCES \`users\` (\`id\`),
+	CONSTRAINT \`data_form_details_form_login_mode_id_foreign\`
+		FOREIGN KEY (\`form_login_mode_id\`)
+		REFERENCES \`enum_form_login_modes\` (\`login_mode_id\`),
+	CONSTRAINT \`data_form_details_form_primary_owner_id_foreign\`
+		FOREIGN KEY (\`form_primary_owner_id\`)
+		REFERENCES \`users\` (\`id\`),
+	CONSTRAINT \`data_form_details_form_status_id_foreign\`
+		FOREIGN KEY (\`form_status_id\`)
+		REFERENCES \`enum_form_status\` (\`form_status_id\`),
+	CONSTRAINT \`data_form_details_form_updated_by_foreign\`
+		FOREIGN KEY (\`form_updated_by\`)
+		REFERENCES \`users\` (\`id\`),
+	CONSTRAINT \`data_form_details_form_user_type_id_foreign\`
+		FOREIGN KEY (\`form_user_type_id\`)
+		REFERENCES \`data_input_field_types\` (\`field_type_id\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci
+  COMMENT='Primary configuration for individual forms';`;
+
 /**
  * Convert table defnition to Stored Procedure Parameters
  *
@@ -4842,12 +4984,13 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   const _cols = []
   const _tableName = input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')
   const _thingName = _tableName.replace(/s$/i, '')
-  const regex = /(-- +)?`([a-z_]+)`( (?:varchar|char|float|datetime|timestamp|text|(?:tiny|small|medium)?int)(?:\([0-9]+\))?(?: unsigned)?)[^,]*(,|$)/ig
+  const _prefix = new RegExp('(?:' + _thingName + '|' + _thingName.replace('data', '') + '|' + _thingNmae.replace('_details', '') + ')', 'i')
+  const regex = /(-- +)?`([a-z_]+)`(?: ((?:varchar|char|float|datetime|timestamp|(?:long)?text|(?:tiny|small|medium)?int(?:\([0-9]+\))?(?: unsigned)?)))[^,]*?(AUTO_INCREMENT)?(?=,|$)/ig
   let maxCol = 0
-  let maxIn = 0
   let maxParam = 0
   let _tmp
   let _x = 0
+  let isLockable = false;
 
   let outputIn = ''
   let outputInsertFields = ''
@@ -4856,78 +4999,96 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   let outputSelect = ''
 
   while ((_tmp = regex.exec(input)) !== null) {
+    let fieldType = 0;
+    if (typeof _tmp[4] === 'string') {
+      fieldType = 1; // primary key / ID field
+    } else if (_tmp[2].includes('created_at')) {
+      fieldType = 2;
+    } else if (_tmp[2].includes('created_by')) {
+      fieldType = 3;
+    } else if (_tmp[2].includes('updated_at')) {
+      fieldType = 4;
+    } else if (_tmp[2].includes('updated_by')) {
+      fieldType = 5;
+    } else if (_tmp[2].includes('expires_at')) {
+      fieldType = 6;
+      isLockable = true;
+    } else if (_tmp[2].includes('locked_by')) {
+      fieldType = 7;
+      isLockable = true;
+    }
+    const _field = {
+      col: _tmp[2],
+      type: _tmp[3],
+      cmnt: (typeof _tmp[1] === 'string'),
+      param: snakeToCamelCase(_tmp[2]).replace(_prefix, ''),
+      subType: fieldType
+    };
     // console.log('_tmp:', _tmp);
-    const _cmnt = (typeof _tmp[1] === 'string')
-    const _col = _tmp[2]
-    const _param = _tmp[2].replace(/_/g, '')
-    const _in = 'IN ' + _param + _tmp[3]
+    // const _cmnt = (typeof _tmp[1] === 'string')
+    // const _col = _tmp[2]
+    // const _param = _tmp[2].replace(/_/g, '')
+    // const _in = 'IN ' + _param + _tmp[3]
 
-    if (_param.length > maxCol) {
-      maxCol = _param.length
+    if (_field.col.length > maxCol) {
+      maxCol = _field.col.length;
     }
-    if (_in.length > maxIn) {
-      maxIn = _in.length
-    }
-    if (_param.length > maxParam) {
-      maxParam = _param.length
+    if (_field.param.length > maxParam) {
+      maxParam = _field.param.length;
     }
 
-    _cols.push({
-      comment: _cmnt,
-      col: _col,
-      param: _param,
-      camel: snakeToCamelCase(_col),
-      in: _in
-    })
+    _cols.push(_field)
   }
 
-  maxIn += 2
-  maxCol += 4
-  const maxColIn = maxCol + 1
-  maxParam += 2
+  // maxIn += 2
+  // maxCol += 4
+  // const maxColIn = maxCol + 1
+  // maxParam += 2
 
-  for (let a = 0; a < _cols.length; a += 1) {
-    const _sep = (a < _cols.length - 1)
-      ? ','
-      : ''
-    let _pre = '\n        '
-    _pre += _cols[a].comment
-      ? '--  '
-      : '    '
-    _x += (_cols[a].comment)
-      ? 0
-      : 1
-    const _b = (_cols[a].comment)
-      ? '  '
-      : (_x < 10)
-          ? ' ' + _x
-          : _x
+  // for (let a = 0; a < _cols.length; a += 1) {
+  //   const _sep = (a < _cols.length - 1)
+  //     ? ','
+  //     : ''
+  //   let _pre = '\n        '
+  //   _pre += _cols[a].comment
+  //     ? '--  '
+  //     : '    '
+  //   _x += (_cols[a].comment)
+  //     ? 0
+  //     : 1
+  //   const _b = (_cols[a].comment)
+  //     ? '  '
+  //     : (_x < 10)
+  //         ? ' ' + _x
+  //         : _x
 
-    outputIn += _pre + strPad(_cols[a].in + _sep, maxIn) + '-- ' + _b
-    outputInsertValues += _pre + strPad(_cols[a].param + _sep, maxParam) + '-- ' + _b + ' - `' + _cols[a].col + '`'
-    outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxColIn) + '-- ' + _b + ' - ' + _cols[a].param + ''
-    outputUpdate += _pre + strPad('`' + _cols[a].col + '`', maxCol) + ' = ' + _cols[a].param + _sep
-    outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`', maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
-  }
-  const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n        FROM   `' + _tableName + '`\n        WHERE  `id` = '
+  //   outputIn += _pre + strPad(_cols[a].in + _sep, maxIn) + '-- ' + _b
+  //   outputInsertValues += _pre + strPad(_cols[a].param + _sep, maxParam) + '-- ' + _b + ' - `' + _cols[a].col + '`'
+  //   outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxColIn) + '-- ' + _b + ' - ' + _cols[a].param + ''
+  //   outputUpdate += _pre + strPad('`' + _cols[a].col + '`', maxCol) + ' = ' + _cols[a].param + _sep
+  //   outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`', maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
+  // }
+  // const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n        FROM   `' + _tableName + '`\n        WHERE  `id` = '
 
-  const output =  '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
-                  '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
-                  '     END;\n\n\n' +
-                  '     -- ==========================================\n\n\n' + 
-                  '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
-                  '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
-                  '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
-                  '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n' +
-                  '     END;\n\n\n' +
-                  '     -- ==========================================\n\n\n' + 
-                  '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
-                  '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
-                  '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n\n' +
-                  '        CALL get_' + _thingName + '_by_id(id);\n' +
-                  '     END;'
-  
-  return output.replace(/(`[a-z0-9_]+`) +AS \1/g, '$1')
+  // const output =  '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
+  //                 '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
+  //                 '     END;\n\n\n' +
+  //                 '     -- ==========================================\n\n\n' +
+  //                 '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
+  //                 '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
+  //                 '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
+  //                 '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n' +
+  //                 '     END;\n\n\n' +
+  //                 '     -- ==========================================\n\n\n' +
+  //                 '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
+  //                 '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
+  //                 '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n\n' +
+  //                 '        CALL get_' + _thingName + '_by_id(id);\n' +
+  //                 '     END;'
+
+  // return output.replace(/(`[a-z0-9_]+`) +AS \1/g, '$1')
+
+  return storedProc;
 }
 
 doStuff.register({
@@ -4938,8 +5099,8 @@ doStuff.register({
   // docsURL: '',
   extraInputs: [
     // {
-    //   id: 'tableName',
-    //   label: 'Table name',
+    //   id: 'fieldPrefix',
+    //   label: 'fieldPrefix',
     //   type: 'text',
     //   description: '',
     //   pattern: '',
@@ -4955,13 +5116,13 @@ doStuff.register({
 
 //  END:  Stored Procedure Parameters
 // ====================================================================
-// START: turning tool codes
+// START: Turning tool codes
 
 /**
- * Action description goes here
+ * Turning tool codes
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2023-01-03
  *
  * @param {string} input       user supplied content
  *                             (expects text HTML code)
@@ -5035,5 +5196,5 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Action name
+//  END:  Turning tool codes
 // ====================================================================
