@@ -109,3 +109,21 @@ if (forceUiUpdate === true) {
   const tmp = store.getState()
   forceUIupdate(tmp.userSettings)
 }
+
+
+// ========================================================
+// START: guestimate and set ideal height for input box
+
+const tmpInputHeight = ((window.innerHeight / 16) - 16.5)
+
+const inputHeight = (tmpInputHeight > 28.5)
+  ? tmpInputHeight
+  : 28.5;
+
+const pageRoot = document.documentElement;
+if (typeof pageRoot !== 'undefined') {
+  pageRoot.style.setProperty('--input-height', inputHeight + 'rem')
+}
+
+//  END:  guestimate and set ideal height for input box
+// ========================================================

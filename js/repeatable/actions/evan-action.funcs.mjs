@@ -4877,47 +4877,47 @@ const _tableDef = `CREATE TABLE \`data_form_details\` (
 	\`form_items_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Items',
 	\`form_packages_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Packages',
 	\`form_add_to_group_btn_label\` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'Add another group member',
-	\`form_created_at\` timestamp NOT NULL DEFAULT NOW(),
-	\`form_created_by\` int(11) unsigned NOT NULL,
-	\`form_updated_at\` timestamp DEFAULT NULL,
-	\`form_updated_by\` int(11) unsigned DEFAULT NULL,
 	\`form_archived_at\` timestamp DEFAULT NULL,
 	\`form_auto_open_at\` timestamp DEFAULT NULL
-		COMMENT 'When this form will automatically open',
+  COMMENT 'When this form will automatically open',
 	\`form_auto_close_at\` timestamp DEFAULT NULL
-		COMMENT 'When this form will automatically close',
-	\`form_lock_expires_at\` timestamp DEFAULT NULL
-		COMMENT 'When the lock for this form will be released',
-	\`form_locked_by\` int(11) unsigned DEFAULT NULL
-		COMMENT 'ID of admin who holds (or last held) the lock for this form',
+  COMMENT 'When this form will automatically close',
 	\`form_last_payment_at\` timestamp DEFAULT NULL
-		COMMENT 'Date and time this form last received a payment/registration',
+  COMMENT 'Date and time this form last received a payment/registration',
 	\`form_max_payment_details_age\` int(10) unsigned NOT NULL DEFAULT 31557600
-		COMMENT 'Number of seconds after a payment was created payment details should be deleted (default: 1 year). NOTE: Basic payment info: Date/times for payment, username and amount are retianed. User inputs (including email), purchased items and payment process logs are deleted.',
+  COMMENT 'Number of seconds after a payment was created payment details should be deleted (default: 1 year). NOTE: Basic payment info: Date/times for payment, username and amount are retianed. User inputs (including email), purchased items and payment process logs are deleted.',
 	\`form_max_payment_record_age\` int(10) unsigned NOT NULL DEFAULT 220903200
-		COMMENT 'Number of seconds after a payment was created all payment infomation is completely removed from the system. (default: 7 years).',
+  COMMENT 'Number of seconds after a payment was created all payment infomation is completely removed from the system. (default: 7 years).',
 	\`form_has_been_tested\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether or not this form has received a test payment',
-	\`form_has_concession\` tinyint(1) unsigned NOT NULL DEFAULT 0
+  \`form_has_concession\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether or not this form has a concession discount',
-	\`form_gst_is_included\` tinyint(1) unsigned NOT NULL DEFAULT 1
+  \`form_gst_is_included\` tinyint(1) unsigned NOT NULL DEFAULT 1
 		COMMENT 'Prices in this form include GST',
-	\`form_is_predefined\` tinyint(1) unsigned NOT NULL DEFAULT 0
+  \`form_is_predefined\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether or not this form is used for predefined payments (If TRUE, only known users can make payments)',
-	\`form_is_survey\` tinyint(1) unsigned NOT NULL DEFAULT 0
+  \`form_is_survey\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether or not this form is used for surveys (i.e. it has no purchasable items)',
-	\`form_ui_items_before_packages\` tinyint(1) unsigned NOT NULL DEFAULT 0
+  \`form_ui_items_before_packages\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether items should be displayed before packages',
-	\`form_ui_inputs_first\` tinyint(1) unsigned NOT NULL DEFAULT 0
+  \`form_ui_inputs_first\` tinyint(1) unsigned NOT NULL DEFAULT 0
 		COMMENT 'Whether user input fields should be displayed before items & packages',
 	\`form_ui_all_in_one\` tinyint(1) unsigned NOT NULL DEFAULT 0
-		COMMENT 'Whether items should be displayed on the same page as user input fields',
+    COMMENT 'Whether items should be displayed on the same page as user input fields',
 	\`form_allow_group_booking\` tinyint(1) unsigned NOT NULL DEFAULT 0
-		COMMENT 'Whether or not a user can purchase on behalf of other people',
-		\`form_allow_free\` tinyint(1) unsigned NOT NULL DEFAULT 1
-			COMMENT 'Whether or not to allow zero dollar (free) purchasable items & packages)',
+    COMMENT 'Whether or not a user can purchase on behalf of other people',
+  \`form_allow_free\` tinyint(1) unsigned NOT NULL DEFAULT 1
+    COMMENT 'Whether or not to allow zero dollar (free) purchasable items & packages)',
 	-- \`form_concession_discount\` decimal(5,4) NOT NULL DEFAULT 1.0000
 	--   COMMENT 'Level of discount applied to users elegible for concession discount (1 = 0% discount, 0 = 100% discount - AKA free)',
+  \`form_created_at\` timestamp NOT NULL DEFAULT NOW(),
+  \`form_created_by\` int(11) unsigned NOT NULL,
+  \`form_updated_at\` timestamp DEFAULT NULL,
+  \`form_updated_by\` int(11) unsigned DEFAULT NULL,
+  \`form_lock_expires_at\` timestamp DEFAULT NULL
+    COMMENT 'When the lock for this form will be released',
+  \`form_locked_by\` int(11) unsigned DEFAULT NULL
+    COMMENT 'ID of admin who holds (or last held) the lock for this form',
 	PRIMARY KEY (\`form_id\`),
 	KEY \`IND_form_status_id\` (\`form_status_id\`),
 	KEY \`IND_form_group_id\` (\`form_group_id\`),
@@ -4962,16 +4962,21 @@ const _tableDef = `CREATE TABLE \`data_form_details\` (
   COMMENT='Primary configuration for individual forms';`;
 
 const stProcLn = '-- ========================================================';
+
+const commaRegex = /,(?=[^,\r\n]*$)/s
+
 /**
  * Generate Stored Procedure code for handling locks
  * on a lockable type
  *
- * @param {string} tableName Name of table procedure applies to
- * @param {string} thingName
- * @param {string} procName
- * @param {Object[]} fields
+ * @param {Object[]} fields    List of all fields/columns in table
+ * @param {string}   tableName Name of table procedure applies to
+ * @param {string}   thingName Name of the thing the data represents
+ * @param {string}   procName  Table specific part of the stored
+ *                             procedure's name
  *
- * @returns {string}
+ * @returns {string} A collection of stored procedures for managing
+ *                   editing locks on a single row
  */
 const stProcLocks = (fields, tableName, thingName, procName) => {
   let id = null;
@@ -5024,7 +5029,7 @@ const stProcLocks = (fields, tableName, thingName, procName) => {
 
   return `
 ${stProcLn}
-// START: \`acquire_${procName}_lock\`
+-- START: \`acquire_${procName}_lock\`
 
 
 DROP PROCEDURE IF EXISTS \`acquire_${procName}_lock\`;
@@ -5078,9 +5083,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`acquire_${procName}_lock\`
+--  END:  \`acquire_${procName}_lock\`
 ${stProcLn}
-// START: \`release_${procName}_lock\`
+-- START: \`release_${procName}_lock\`
 
 
 DROP PROCEDURE IF EXISTS \`release_${procName}_lock\`;
@@ -5113,9 +5118,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`release_${procName}_lock\`
+--  END:  \`release_${procName}_lock\`
 ${stProcLn}
-// START: \`refresh_${procName}_lock\`
+-- START: \`refresh_${procName}_lock\`
 
 
 DROP PROCEDURE IF EXISTS \`refresh_${procName}_lock\`;
@@ -5139,9 +5144,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`refresh_${procName}_lock\`
+--  END:  \`refresh_${procName}_lock\`
 ${stProcLn}
-// START: \`get_${procName}_lock_error\`
+-- START: \`get_${procName}_lock_error\`
 
 
 DROP PROCEDURE IF EXISTS \`get_${procName}_lock_error\`;
@@ -5180,11 +5185,23 @@ $$
 DELIMITER ;
 
 
-//  END:  \`get_${procName}_lock_error\`
+--  END:  \`get_${procName}_lock_error\`
 ${stProcLn}`;
 }
 
-const stProcGet = (fields, tableName, thingName, procName, maxCol, maxProp) => {
+/**
+ * Generate Stored Procedure code for fetching single row of data
+ *
+ * @param {Object[]} fields    List of all fields/columns in table
+ * @param {string}   tableName Name of table procedure applies to
+ * @param {string}   thingName Name of the thing the data represents
+ * @param {string}   procName  Table specific part of the stored
+ *                             procedure's name
+ *
+ * @returns {string} A collection of stored procedures for getting
+ *                   data for a single row
+ */
+const stProcGet = (fields, tableName, thingName, procName) => {
   let isLockable = false;
   let id = null;
   let formID = '';
@@ -5192,7 +5209,6 @@ const stProcGet = (fields, tableName, thingName, procName, maxCol, maxProp) => {
 
   let select = '';
   let selectFull = '';
-  let expires = 'dummy'
   let out = '';
   let into = '';
   let outSel = '';
@@ -5201,30 +5217,37 @@ const stProcGet = (fields, tableName, thingName, procName, maxCol, maxProp) => {
   let sepOut = '';
   let sepInto = '';
   // let if = 'user_has_locked_form(adminID, formId)';
-  for (let a = 0, b = 0, c = 0; a < fields.length; a += 1) {
+  for (let a = 0, b = 0, c = fields.length; a < c; a += 1) {
     // console.log('fields[' + a + ']:', fields[a])
-    const _field = strPad(`\`${fields[a].col}\``, maxCol);
-    const _prop = strPad(`\`${fields[a].param}\``, maxProp);
+    const _field = strPad(`\`${fields[a].col}\``, fields[a].maxCol);
+    const _prop = strPad(`\`${fields[a].param}\``, fields[a].maxParam);
+    const _outParam = strPad(fields[a].param, fields[a].maxParam);
 
-    selectFull += `${sepFull}\`${fields[a].col}\``
+    b += 1;
+
+    const _b = ((c => 10) && (b < 10))
+      ? ` ${b}`
+      : b;
+
+    selectFull += `${sepFull}${strPad(`\`${fields[a].col}\`,`, (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
     out += `${sepOut}DECLARE ${fields[a].param} ${fields[a].type}`
-    outSel += `${sepInto}${_prop} AS ${fields[a].param}`
+    outSel += `${sepInto}${_outParam}AS ${strPad(`\`${fields[a].param}\`,`, (fields[a].maxParam + 2))}-- ${_b} - \`${fields[a].col}\``
 
-    into += `${sepInto}${fields[a].param}`
+    into += `${sepInto}${strPad(fields[a].param + ',', fields[a].maxParam)} -- ${_b} - ${fields[a].col}`
 
     sepFull = ',\n\t\t';
     sepOut = ',\n\t';
-    sepInto = ',\n\t\t\t';
+    sepInto = '\n\t\t\t';
 
     if (fields[a].subType === 'id') {
       id = fields[a];
     } else if (fields[a].subType === '') {
       if (fields[a].cmnt === false) {
-        select += `${sep}${_field}AS \`${fields[a].param}\``
+        select += `${sep}${_field} AS \`${fields[a].param}\``
         sep = ',\n\t\t';
       }
     } else if (['expiresAt', 'lockedBy'].indexOf(fields[a].subType)) {
-      expires = fields[a].param;
+      isLockable = true;
     }
   }
 
@@ -5232,13 +5255,17 @@ const stProcGet = (fields, tableName, thingName, procName, maxCol, maxProp) => {
     return '';
   }
 
-  if (expires === 'dummy') {
+  if (isLockable === true) {
     logProps = 'formID, ' + thingName + 'ID';
     formID = ',\n\tIN formID int(11) unsigned';
   }
 
+  selectFull = selectFull.replace(commaRegex, ' ')
+  into = into.replace(commaRegex, ' ')
+  outSel = outSel.replace(commaRegex, ';')
+
   return `
-// START: \`get_${procName}_by_id\`
+-- START: \`get_${procName}_by_id\`
 
 
 DROP PROCEDURE IF EXISTS \`get_${procName}_by_id\`;
@@ -5259,9 +5286,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`get_${procName}_by_id\`
+--  END:  \`get_${procName}_by_id\`
 ${stProcLn}
-// START: \`get_${procName}_by_id__full\`
+-- START: \`get_${procName}_by_id__full\`
 
 
 DROP PROCEDURE IF EXISTS \`get_${procName}_by_id__full\`;
@@ -5285,7 +5312,7 @@ BEGIN
 
 \t\tCALL log_action(adminID, 2, [[BBBB]], ${logProps}, 1, ROW_COUNT()});
 
-\t\tSELECT\t${outSel};
+\t\tSELECT\t${outSel}
 \tELSE
 \t\tCALL log_action(adminID, 2, [[BBBB]], ${logProps}, 3, 0);
 
@@ -5298,11 +5325,24 @@ $$
 DELIMITER ;
 
 
-//  END:  \`get_${procName}_by_id__full\`
+--  END:  \`get_${procName}_by_id__full\`
 ${stProcLn}`;
 }
 
-const stProcCUD = (fields, tableName, thingName, procName, maxCol, maxProp) => {
+/**
+ * Generate Stored Procedure code for creating, updating and deleting
+ * a single row of data in the table
+ *
+ * @param {Object[]} fields    List of all fields/columns in table
+ * @param {string}   tableName Name of table procedure applies to
+ * @param {string}   thingName Name of the thing the data represents
+ * @param {string}   procName  Table specific part of the stored
+ *                             procedure's name
+ *
+ * @returns {string} A collection of stored procedures for creating,
+ *                   updating and deleting data for a single row
+ */
+const stProcCUD = (fields, tableName, thingName, procName) => {
   let id = null;
   let logProps = thingName + 'ID, NULL'
   let testFunc = `is_authorised(adminID, 2, '[[AAAA]]', ${thingName}ID)`;
@@ -5313,8 +5353,6 @@ const stProcCUD = (fields, tableName, thingName, procName, maxCol, maxProp) => {
   let updatedBy = null;
   let expiresAt = null;
   let lockedBy = null;
-  const canFunc = '1 = 1';
-
   let setLock = '';
   let lockCols = '';
   let lockVals = '';
@@ -5324,7 +5362,7 @@ const stProcCUD = (fields, tableName, thingName, procName, maxCol, maxProp) => {
   let inValues = '';
   let inSep = '';
 
-  for (let a = 0; a < fields.length; a += 1) {
+  for (let a = 0, b = 0, c = fields.length; a < c; a += 1) {
     switch (fields[a].subType) {
       case 'id':
         id = fields[a];
@@ -5357,26 +5395,41 @@ const stProcCUD = (fields, tableName, thingName, procName, maxCol, maxProp) => {
         break;
 
       default:
-        let _prop = strPad(fields[a].param, maxProp);
-        inParams += `,\n\tIN ${_prop} ${fields[a].type}`
-        inFields += `${inSep}\`${fields[a].col}\``
-        inValues += `${inSep}${fields[a].param}`
-        setVals += `${inSep}\`${fields[a].col}\` = ${fields[a].param}`
-        inSep = ',\n\t\t\t'
+        b += 1
+        const _inParam = strPad(`${fields[a].param} ${fields[a].type},`, (fields[a].maxIn + 1));
+        const _col = strPad('`' + fields[a].col + '`', fields[a].maxCol)
+        const _param = strPad(fields[a].param + ',', (fields[a].maxParam))
+        const _b = (c >= 10 && b < 10)
+          ? ' ' + b
+          : b;
+
+        inParams += `\n\tIN ${_inParam} -- ${_b} - \`${fields[a].col}\``
+        inFields += `${inSep}${strPad('`' + fields[a].col + '`,', (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
+        inValues += `${inSep}${_param}-- ${_b} - \`${fields[a].col}\``
+        setVals += `${inSep}${_col} = ${_param}-- ${_b}`
+        inSep = '\n\t\t\t'
     }
   }
 
   if (expires === 'dummy') {
     logProps = 'formID, ' + thingName + 'ID';
     testFunc = 'user_has_locked_form(adminID, formID)';
+    // inFields = inFields.replace(commaRegex, ' ')
+    // inValues = inValues.replace(commaRegex, ' ')
   } else {
-    lockCols = `,\n\t\t\t\`${expiresAt.col}\`,\n\t\t\t\`${lockedBy.col}\``
-    lockVals = ',\n\t\t\tget_new_expiration(),\n\t\t\tadminID'
-    setLock =  `,\n\t\t\t\`${expiresAt.col}\` = get_new_expiration(),\n\t\t\t\`${lockedBy.col}\` = adminID`
+    lockCols = `\n\t\t\t${strPad(`\`${expiresAt.col}\`,`, (expiresAt.maxCol + 1))} --    - get_new_expiration()` +
+               `\n\t\t\t${strPad(`\`${lockedBy.col}\``, (lockedBy.maxCol + 1))} --    - adminID`
+    lockVals = `\n\t\t\t${strPad('get_new_expiration(),', (expiresAt.maxParam))}--    - \`${expiresAt.col}\`` +
+               `\n\t\t\t${strPad('adminID', (expiresAt.maxParam))}--    - \`${lockedBy.col}\``
+    setLock =  `\n\t\t\t${strPad(`\`${expiresAt.col}\``, (expiresAt.maxCol + 1))}= ` +
+                        `${strPad('get_new_expiration(),', expiresAt.maxParam)}--` +
+              `\n\t\t\t${strPad(`\`${lockedBy.col}\``, (lockedBy.maxCol + 1))}= ${strPad('adminID', expiresAt.maxParam)}--`
   }
+  inParams = inParams.replace(commaRegex, ' ')
+  setVals = setVals.replace(commaRegex, ' ')
 
   return `
-// START: \`add_${procName}\`
+-- START: \`add_${procName}\`
 
 
 DROP PROCEDURE IF EXISTS \`add_${procName}\`;
@@ -5390,28 +5443,34 @@ BEGIN
 
 \tIF ${testFunc} THEN
 \t\tINSERT INTO ${tableName} (
-\t\t\t${inFields},
-\t\t\t\`${createdAt.col}\`,
-\t\t\t\`${createdBy.col}\`,
-\t\t\t\`${updatedAt.col}\`,
-\t\t\t\`${updatedBy.col}\`${lockCols}
+\t\t\t${inFields}
+\t\t\t${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()
+\t\t\t${strPad(`\`${createdBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID
+\t\t\t${strPad(`\`${updatedAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()
+\t\t\t${strPad(`\`${updatedBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID${lockCols}
 \t\t) VALUES (
 \t\t\t${inValues}
-\t\t\tNOW(),
-\t\t\tadminID,
-\t\t\tNOW(),
-\t\t\tadminID${lockVals}
+\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\`,
+\t\t\t${strPad('adminID,', createdAt.maxParam)}--    - \`${createdBy.col}\`
+\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${updatedAt.col}\`
+\t\t\t${strPad('adminID,', createdAt.maxParam)}--    - \`${updatedBy.col}\`${lockVals}
 \t\t);
 
-\t\tCALL log_action(adminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()});
+\t\tCALL log_action(
+\t\t\tadminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()
+\t\t);
 
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\tCALL get_${procName}_by_id__full(adminID, LAST_INSERT_ID());
+\t\t\tCALL get_${procName}_by_id__full(
+\t\t\t\tadminID, LAST_INSERT_ID()
+\t\t\t);
 \t\tELSE
 \t\t\tSELECT NULL;
 \t\tEND IF;
 \tELSE
-\t\tCALL log_action(adminID, 2, [[BBBB]], ${logProps}, 3, 0);
+\t\tCALL log_action(
+\t\t\tadminID, 2, [[BBBB]], ${logProps}, 3, 0
+\t\t);
 
 \t\tSELECT NULL;
 \tEND IF;
@@ -5422,9 +5481,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`add_${procName}\`
+--  END:  \`add_${procName}\`
 ${stProcLn}
-// START: \`update_${procName}\`
+-- START: \`update_${procName}\`
 
 
 DROP PROCEDURE IF EXISTS \`update_${procName}\`;
@@ -5432,7 +5491,7 @@ DROP PROCEDURE IF EXISTS \`update_${procName}\`;
 DELIMITER $$
 
 CREATE PROCEDURE \`update_${procName}\` (
-  \tIN adminID int(11) unsigned${inParams},
+  \tIN adminID int(11) unsigned,
   \tIN ${thingName}ID int(11) unsigned${inParams}
 )
 BEGIN
@@ -5442,30 +5501,40 @@ BEGIN
 
 \tIF ${testFunc} THEN
 \t\tUPDATE ${tableName}
-\t\tSET\t${setVals},
-\t\t--\t\`${createdAt.col}\` = NOW(),
-\t\t--\t\`${createdBy.col}\` = adminID,
-\t\t\t\`${updatedAt.col}\` = NOW(),
-\t\t\t\`${updatedBy.col}\` = adminID${setLock}
+\t\tSET\t${setVals}
+\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
+\t\t --\t${strPad(`\`${createdBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--
+\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
+\t\t\t${strPad(`\`${updatedBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--${setLock}
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID
 \t\tAND\t\t\`${lockedBy.col}\` = adminID
 \t\tAND\t\t\`${expiresAt.col}\` > NOW();
 
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\tCALL log_action(adminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()});
+\t\t\tCALL log_action(
+\t\t\t\tadminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()
+\t\t\t);
 
-\t\t\tCALL get_${procName}_by_id__full(adminID, LAST_INSERT_ID());
+\t\t\tCALL get_${procName}_by_id__full(
+\t\t\t\tadminID, LAST_INSERT_ID()
+\t\t\t);
 \t\tELSE
-\t\t\tCALL get_income_groups_lock_error(groupID, adminID errorID);
+\t\t\tCALL get_income_groups_lock_error(
+\t\t\t\tgroupID, adminID errorID
+\t\t\t);
 
-\t\t\tCALL log_action(adminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()});
+\t\t\tCALL log_action(
+\t\t\t\tadminID, 4, [[BBBB]], ${logProps}, errorID, 0
+\t\t\t);
 
 \t\t\tSELECT NULL;
 \t\tEND IF;
 \tELSE
 \t\t-- Get more info on why update failed
 
-\t\tCALL log_action(adminID, 3, [[BBBB]], ${logProps}, errorID, 0);
+\t\tCALL log_action(
+\t\t\tadminID, 3, [[BBBB]], ${logProps}, errorID, 0
+\t\t);
 
 \t\tSELECT NULL;
 \tEND IF;
@@ -5476,9 +5545,9 @@ $$
 DELIMITER ;
 
 
-//  END:  \`update_${procName}\`
+--  END:  \`update_${procName}\`
 ${stProcLn}
-// START: \`delete_${procName}\`
+-- START: \`delete_${procName}\`
 
 
 DROP PROCEDURE IF EXISTS \`delete_${procName}\`;
@@ -5502,19 +5571,29 @@ BEGIN
 
 \t\tIF ROW_COUNT() > 0 THEN
 \t\t\t-- SUCCESS!!!
-\t\t\tCALL log_action(adminID, 6, [[BBBB]], ${logProps}, 6, ROW_COUNT()});
+\t\t\tCALL log_action(
+\t\t\t\tadminID, 6, [[BBBB]], ${logProps}, 6, ROW_COUNT()
+\t\t\t);
 
-\t\t\tCALL get_${procName}_by_id__full(adminID, LAST_INSERT_ID());
+\t\t\tCALL get_${procName}_by_id__full(
+\t\t\t\tadminID, LAST_INSERT_ID()
+\t\t\t);
 \t\tELSE
 \t\t\t-- Get more info on why update failed
-\t\t\tCALL get_${procName}_lock_error(groupID, adminID, errorID);
+\t\t\tCALL get_${procName}_lock_error(
+\t\t\t\tgroupID, adminID, errorID
+\t\t\t);
 
-\t\t\tCALL log_action(adminID, 6, [[BBBB]], ${logProps}, errorID, 0);
+\t\t\tCALL log_action(
+\t\t\t\tadminID, 6, [[BBBB]], ${logProps}, errorID, 0
+\t\t\t);
 
 \t\t\tSELECT NULL;
 \t\tEND IF;
 \tELSE
-\t\t\tCALL log_action(adminID, 6, [[BBBB]], ${logProps}, errorID, 0);
+\t\tCALL log_action(
+\t\t\tadminID, 6, [[BBBB]], ${logProps}, errorID, 0
+\t\t);
 \tEND IF;
 END;
 
@@ -5523,7 +5602,7 @@ $$
 DELIMITER ;
 
 
-//  END:  \`add_${procName}\`
+--  END:  \`add_${procName}\`
 ${stProcLn}`;
 }
 
@@ -5557,6 +5636,7 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   const _procName = _tableName.replace(/^data_(.*?)s$/i, '$1')
   let maxCol = 0
   let maxParam = 0
+  let maxIn = 0;
   let _tmp
   let _x = 0
   let isLockable = false;
@@ -5589,7 +5669,10 @@ const storedProcParams = (input, extraInputs, GETvars) => {
       type: _tmp[3],
       cmnt: (typeof _tmp[1] === 'string'),
       param: snakeToCamelCase(_tmp[2].replace(_prefix, '')),
-      subType: fieldType
+      subType: fieldType,
+      maxCol: 0,
+      maxParam: 0,
+      maxIn: 0
     };
     // console.log('_prefix:', _prefix);
     // console.log('_tmp[2]:', _tmp[2]);
@@ -5601,11 +5684,16 @@ const storedProcParams = (input, extraInputs, GETvars) => {
     // const _param = _tmp[2].replace(/_/g, '')
     // const _in = 'IN ' + _param + _tmp[3]
 
+    const _in = _field.param + ' ' + _field.type
+
     if (_field.col.length > maxCol) {
       maxCol = _field.col.length;
     }
     if (_field.param.length > maxParam) {
       maxParam = _field.param.length;
+    }
+    if (_in.length > maxIn) {
+      maxIn = _in.length;
     }
 
     _cols.push(_field)
@@ -5614,15 +5702,21 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   // console.log('_cols:', _cols)
 
   // maxIn += 2
-  maxCol += 4
+  maxCol += 2
   // const maxColIn = maxCol + 1
   maxParam += 2
 
-  if (isLockable === true) {
-    storedProc = stProcLocks(_cols, _tableName, _thingName, _procName, 'AAAA', )
+  for (let a = 0; a < _cols.length; a += 1) {
+    _cols[a].maxCol = maxCol;
+    _cols[a].maxParam = maxParam;
+    _cols[a].maxIn = maxIn;
   }
-  storedProc += stProcGet(_cols, _tableName, _thingName, _procName, maxCol, maxParam)
-  storedProc += stProcCUD(_cols, _tableName, _thingName, _procName, maxCol, maxParam)
+
+  if (isLockable === true) {
+    storedProc += stProcLocks(_cols, _tableName, _thingName, _procName, 'AAAA', )
+  }
+  storedProc += stProcGet(_cols, _tableName, _thingName, _procName)
+  storedProc += stProcCUD(_cols, _tableName, _thingName, _procName)
 
   return storedProc;
 }
