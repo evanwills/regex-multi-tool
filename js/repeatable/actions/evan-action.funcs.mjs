@@ -4884,6 +4884,8 @@ const stProcLocks = (fields, tableName, thingName, procName) => {
   let expiresAt = null;
   let lockedBy = null;
   let canFunc = '1 = 1';
+  let acID = '[[AAAA]]';
+  let relID = '[[AAAA]]';
 
   for (let a = 0; a < fields.length; a += 1) {
     switch (fields[a].subType) {
@@ -4903,24 +4905,34 @@ const stProcLocks = (fields, tableName, thingName, procName) => {
 
   switch (thingName) {
     case 'config':
-      canFunc = `isAuthorised(adminID, 3, 'editconfig') = 1`;
+      canFunc = `is_authorised(adminID, 4, 'editconfig')`;
+      acID = '92';
+      relID = '93';
       break;
 
     case 'inputField':
-      canFunc = `isAuthorised(adminID, 3, 'editinputfield') = 1`;
+      canFunc = `is_authorised(adminID, 3, 'editinputfield')`;
+      acID = '109';
+      relID = '110';
       break;
 
     case 'textBlock':
-      canFunc = `isAuthorised(adminID, 3, 'edittextblock') = 1`;
+      canFunc = `is_authorised(adminID, 3, 'edittextblock')`;
+      acID = '100';
+      relID = '101';
       break;
 
     case 'group':
-      canFunc = `can_edit_group(adminID, ${thingName}ID) = 1`;
+      canFunc = `can_edit_group(adminID, ${thingName}ID)`;
+      acID = '132';
+      relID = '136';
       break;
 
     case 'form':
     default:
-      canFunc = `can_edit_form(adminID, ${thingName}ID) = 1`;
+      canFunc = `can_edit_form(adminID, ${thingName}ID)`;
+      acID = '11';
+      relID = '12';
       break;
   }
 
@@ -4939,44 +4951,46 @@ DELIMITER $$
 
 CREATE PROCEDURE \`acquire_${procName}_lock\` (
 \tIN adminID int(11) unsigned,
-\tIN ${thingName}ID  ${id.type},
-\tOUT expries datetime
+\tIN ${thingName}ID ${id.type},
+\tOUT expriesAt datetime
 )
 BEGIN
-\tIF ${canFunc} = 1 THEN
-\t\tDECLARE expries datetime;
-\t\tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE expriesAt datetime;
+\tDECLARE errorID tinyint(3) unsigned;
 
-\t\tSET expries = get_new_expiration();
+\tset expriesAt = NULL;
+
+\tIF ${canFunc} = 1 THEN
+\t\tSET expriesAt = get_new_expiration();
 \t\tSET errorID = 9;
 
 \t\tUPDATE\t\`${tableName}\`
-\t\tSET\t\t\`${expiresAt.col}\` = expries,
+\t\tSET\t\t\`${expiresAt.col}\` = expriesAt,
 \t\t\t\t\`${lockedBy.col}\` = adminID
-\t\tWHERE	\`${id.col}\` = ${thingName}ID
-\t\tAND	(
+\t\tWHERE\t\`${id.col}\` = ${thingName}ID
+\t\tAND\t(
 \t\t\t\t\`${expiresAt.col}\` IS NULL
-\t\t\tOR  \`${expiresAt.col}\` < NOW()
-\t\t\tOR	(
-\t\t\t\t\`${lockedBy.col}\` = adminID
-\t\t\t)
+\t\t\tOR\t\`${expiresAt.col}\` < NOW()
+\t\t\tOR\t\`${lockedBy.col}\` = adminID
 \t\t);
 
 \t\tIF ROW_COUNT() = 0 THEN
 \t\t\t-- lock could not be acquired
 \t\t\t-- (probably because someone else already holds it)
+
+\t\t\t-- Let's see if we can find out more info
 \t\t\tCALL get_${procName}_lock_error(adminID, ${thingName}ID, errorID);
-\t\t\tset expries = NULL;
+
+\t\t\tset expriesAt = NULL;
 \t\tEND IF;
 
-
-\t\tCALL log_action(adminID, 9, [[BBBB]], ${thingName}ID, NULL, errorID, ROW_COUNT());
+\t\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, errorID, ROW_COUNT());
 \tELSE
 \t\t-- user does not have permission
-\t\tCALL log_action(adminID, 9, [[BBBB]], ${thingName}ID, NULL, 3, 0);
+\t\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, 3, 0);
 \tEND IF;
 
-\tSELECT expries;
+\tSELECT expriesAt;
 END;
 
 $$
@@ -4996,12 +5010,12 @@ DELIMITER $$
 CREATE PROCEDURE \`release_${procName}_lock\` (
 \tIN adminID int(11) unsigned,
 \tIN ${thingName}ID ${id.type},
-\tOUT done tinyint(1) unsigned
+\tOUT success tinyint(1) unsigned
 )
 BEGIN
-\tDECLARE done = datetime;
+\tDECLARE success = tinyint(1) unsigned;
 
-\tSET done = 0;
+\tSET success = 0;
 
 \tUPDATE\t\`${tableName}\`
 \tSET\t\t\`${expiresAt.col}\` = expire_lock()
@@ -5009,9 +5023,11 @@ BEGIN
 \tAND\t\t\`${expiresAt.col}\` < NOW()
 \tAND\t\t\`${lockedBy.col}\` = adminID;
 
-\tCALL log_action(adminID, 10, [[BBBB]], ${thingName}ID, NULL, 10, ROW_COUNT(), 0, dummy);
+\tCALL log_action(adminID, 10, ${relID}, ${thingName}ID, NULL, 10, ROW_COUNT());
 
-\tSELECT done;
+\tSET success = (ROW_COUNT() > 0);
+
+\tSELECT success;
 END;
 
 $$
@@ -5030,7 +5046,7 @@ DELIMITER $$
 
 CREATE PROCEDURE \`refresh_${procName}_lock\` (
 \tIN adminID int(11) unsigned,
-\tIN ${thingName}ID  ${id.type}
+\tIN ${thingName}ID ${id.type}
 )
 BEGIN
 \tUPDATE\t\`${tableName}\`
@@ -5136,16 +5152,16 @@ const stProcGet = (fields, tableName, thingName, procName) => {
 
     into += `${sepInto}${strPad(fields[a].param + ',', fields[a].maxParam)} -- ${_b} - ${fields[a].col}`
 
-    sepFull = ',\n\t\t';
+    sepFull = ',\n\t\t\t';
     sepOut = ',\n\t';
-    sepInto = '\n\t\t\t';
+    sepInto = '\n\t\t\t\t';
 
     if (fields[a].subType === 'id') {
       id = fields[a];
     } else if (fields[a].subType === '') {
       if (fields[a].cmnt === false) {
         select += `${sep}${_field} AS \`${fields[a].param}\``
-        sep = ',\n\t\t';
+        sep = ',\n\t\t\t';
       }
     } else if (['expiresAt', 'lockedBy'].indexOf(fields[a].subType)) {
       isLockable = true;
@@ -5189,14 +5205,14 @@ DELIMITER ;
 
 --  END:  \`get_${procName}_by_id\`
 ${stProcLn}
--- START: \`get_${procName}_by_id__full\`
+-- START: \`get_${procName}_by_id__admin\`
 
 
-DROP PROCEDURE IF EXISTS \`get_${procName}_by_id__full\`;
+DROP PROCEDURE IF EXISTS \`get_${procName}_by_id__admin\`;
 
 DELIMITER $$
 
-CREATE PROCEDURE \`get_${procName}_by_id__full\` (
+CREATE PROCEDURE \`get_${procName}_by_id__admin\` (
 \tIN adminID int(11) unsigned${formID},
 \tIN ${thingName}ID ${id.type}
 )
@@ -5226,7 +5242,7 @@ $$
 DELIMITER ;
 
 
---  END:  \`get_${procName}_by_id__full\`
+--  END:  \`get_${procName}_by_id__admin\`
 ${stProcLn}`;
 }
 
@@ -5248,6 +5264,7 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   let logProps = thingName + 'ID, NULL'
   let testFunc = `is_authorised(adminID, 2, '[[AAAA]]', ${thingName}ID)`;
   let expires = 'dummy'
+  let isLockable = false;
   let createdAt = null;
   let createdBy = null;
   let updatedAt = null;
@@ -5260,6 +5277,9 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   let setVals = '';
   let inParams = '';
   let inFields = '';
+  let inColCreatedBy = '';
+  let inValCreatedBy = '';
+  let upSetCreatedBy = '';
   let inValues = '';
   let inSep = '';
   let andClause = '';
@@ -5287,12 +5307,12 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
         break;
 
       case 'expiresAt':
-        expires = fields[a].param;
+        isLockable = true;
         expiresAt = fields[a];
         break;
 
       case 'lockedBy':
-        expires = fields[a].param;
+        isLockable = true;
         lockedBy = fields[a];
         break;
 
@@ -5305,15 +5325,15 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
           ? ' ' + b
           : b;
 
-        inParams += `\n\tIN ${_inParam} -- ${_b} - \`${fields[a].col}\``
+        inParams += `,\n\tIN ${_inParam} -- ${_b} - \`${fields[a].col}\``
         inFields += `${inSep}${strPad('`' + fields[a].col + '`,', (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
         inValues += `${inSep}${_param}-- ${_b} - \`${fields[a].col}\``
-        setVals += `${inSep}${_col} = ${_param}-- ${_b}`
+        setVals += `${inSep}\t${_col} = ${_param}-- ${_b}`
         inSep = '\n\t\t\t'
     }
   }
 
-  if (expires === 'dummy') {
+  if (isLockable === false) {
     logProps = 'formID, ' + thingName + 'ID';
     testFunc = 'user_has_locked_form(adminID, formID)';
     // inFields = inFields.replace(commaRegex, ' ')
@@ -5324,11 +5344,19 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
     lockVals = `\n\t\t\t${strPad('get_new_expiration(),', (expiresAt.maxParam))}--    - \`${expiresAt.col}\`` +
                `\n\t\t\t${strPad('adminID', (expiresAt.maxParam))}--    - \`${lockedBy.col}\``
     setLock =  `\n\t\t\t${strPad(`\`${expiresAt.col}\``, (expiresAt.maxCol + 1))}= ` +
-                        `${strPad('get_new_expiration(),', expiresAt.maxParam)}--` +
-              `\n\t\t\t${strPad(`\`${lockedBy.col}\``, (lockedBy.maxCol + 1))}= ${strPad('adminID', expiresAt.maxParam)}--`
+                        `${strPad('get_new_expiration(),', (expiresAt.maxParam + 1))}--` +
+              `\n\t\t\t${strPad(`\`${lockedBy.col}\``, (lockedBy.maxCol + 1))}= ${strPad('adminID', (expiresAt.maxParam + 1))}--`
     andClause = `\n\t\tAND\t\t\`${lockedBy.col}\` = adminID` +
                 `\n\t\tAND\t\t\`${expiresAt.col}\` > NOW()`
   }
+
+  if (createdBy !== null) {
+    inColCreatedBy = `\n\t\t\t${strPad(`\`${createdBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID`
+    inValCreatedBy = `\n\t\t\t${strPad('adminID,', createdBy.maxParam)}--    - \`${createdBy.col}\``
+    upSetCreatedBy = `\n\t\t\t --\t${strPad(`\`${createdBy.col}\``, (createdAt.maxCol + 1))}` +
+                     `= ${strPad('adminID,', (createdAt.maxParam))}--`
+  }
+
   inParams = inParams.replace(commaRegex, ' ')
   setVals = setVals.replace(commaRegex, ' ')
 
@@ -5348,16 +5376,14 @@ BEGIN
 \tIF ${testFunc} THEN
 \t\tINSERT INTO ${tableName} (
 \t\t\t${inFields}
-\t\t\t${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()
-\t\t\t${strPad(`\`${createdBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID
-\t\t\t${strPad(`\`${updatedAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()
-\t\t\t${strPad(`\`${updatedBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID${lockCols}
+\t\t\t${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()${inColCreatedBy}
+\t\t\t${strPad(`\`${updatedAt.col}\`,`, (updatedAt.maxCol + 1))} --    - NOW()
+\t\t\t${strPad(`\`${updatedBy.col}\`,`, (updatedBy.maxCol + 1))} --    - adminID${lockCols}
 \t\t) VALUES (
 \t\t\t${inValues}
-\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\`,
-\t\t\t${strPad('adminID,', createdAt.maxParam)}--    - \`${createdBy.col}\`
-\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${updatedAt.col}\`
-\t\t\t${strPad('adminID,', createdAt.maxParam)}--    - \`${updatedBy.col}\`${lockVals}
+\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\`${inValCreatedBy}
+\t\t\t${strPad('NOW(),', updatedAt.maxParam)}--    - \`${updatedAt.col}\`
+\t\t\t${strPad('adminID,', updatedBy.maxParam)}--    - \`${updatedBy.col}\`${lockVals}
 \t\t);
 
 \t\tCALL log_action(
@@ -5365,7 +5391,7 @@ BEGIN
 \t\t);
 
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\tCALL get_${procName}_by_id__full(
+\t\t\tCALL get_${procName}_by_id__admin(
 \t\t\t\tadminID, LAST_INSERT_ID()
 \t\t\t);
 \t\tELSE
@@ -5396,7 +5422,7 @@ DELIMITER $$
 
 CREATE PROCEDURE \`update_${procName}\` (
   \tIN adminID int(11) unsigned,
-  \tIN ${thingName}ID int(11) unsigned${inParams}
+  \tIN ${thingName}ID ${id.type}${inParams}
 )
 BEGIN
 \tDECLARE errorID tinyint(3) unsigned;
@@ -5404,12 +5430,11 @@ BEGIN
 \tSET errorID = 0;
 
 \tIF ${testFunc} THEN
-\t\tUPDATE ${tableName}
+\t\tUPDATE \`${tableName}\`
 \t\tSET\t${setVals}
-\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
-\t\t --\t${strPad(`\`${createdBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--
-\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
-\t\t\t${strPad(`\`${updatedBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--${setLock}
+\t\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--${upSetCreatedBy}
+\t\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
+\t\t\t\t${strPad(`\`${updatedBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--${setLock}
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5417,8 +5442,8 @@ BEGIN
 \t\t\t\tadminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()
 \t\t\t);
 
-\t\t\tCALL get_${procName}_by_id__full(
-\t\t\t\tadminID, LAST_INSERT_ID()
+\t\t\tCALL get_${procName}_by_id__admin(
+\t\t\t\tadminID, ${thingName}ID
 \t\t\t);
 \t\tELSE
 \t\t\tCALL get_income_groups_lock_error(
@@ -5475,7 +5500,7 @@ BEGIN
 \t\t\t\tadminID, 6, [[BBBB]], ${logProps}, 6, ROW_COUNT()
 \t\t\t);
 
-\t\t\tCALL get_${procName}_by_id__full(
+\t\t\tCALL get_${procName}_by_id__admin(
 \t\t\t\tadminID, LAST_INSERT_ID()
 \t\t\t);
 \t\tELSE
@@ -5527,14 +5552,14 @@ ${stProcLn}`;
  */
 const storedProcParams = (input, extraInputs, GETvars) => {
   // const _input = _tableDef;
-  const stripperRegex = /(?:data_)?(?:income_|purchasable_)?(.*?)(?:s|_details_?)?$/i
+  const stripperRegex = /(?:data_)?(?:(?:income|purchasable|app)_)?(.*?)(?:s|_details_?)?$/i
   const _input = input;
   const _cols = []
   const _tableName = _input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')
-  const _thingName = _tableName.replace(stripperRegex, '$1')
+  const _thingName = snakeToCamelCase(_tableName.replace(stripperRegex, '$1'))
   const _prefix = new RegExp('^' + _tableName.replace(stripperRegex, '$1_'), 'i')
   const regex = /(-- +)?`([a-z_]+)`(?: ((?:(?:var)?char(?:\([0-9]+\))?|float|datetime|timestamp|(?:long)?text|(?:tiny|small|medium)?int(?:\([0-9]+\))?(?: unsigned)?)))[^,]*?(AUTO_INCREMENT)?(?=,|$)/ig
-  const _procName = _tableName.replace(/^data_(.*?)s$/i, '$1')
+  const _procName = _tableName.replace(/^data_(.*?)s?$/i, '$1')
   let maxCol = 0
   let maxParam = 0
   let maxIn = 0;
