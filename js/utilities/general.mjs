@@ -42,6 +42,10 @@ export const strPad = (str, len, sep = ' ', padType = 'r') => {
   let diff = (len - output.length)
   let lSep = ''
   let rSep = sep
+  // console.log('output:', output)
+  // console.log('len:', len)
+  // console.log('output.length:', output.length)
+  // console.log('diff:', diff)
 
   if (diff > 0) {
     switch (mode) {

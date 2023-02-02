@@ -871,7 +871,7 @@ doStuff.register({
  */
 const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
   const lines = input.split('\n')
-  const thisURL = 'file:///C:/Users/evwills/Documents/Evan/code/do-JS-regex-stuff/do-JS-regex-stuff.html?groups=it,evan&action=fixbadsitecoremerge'
+  const thisURL = 'file:///C:/Users/evan/Documents/code/do-JS-regex-stuff/do-JS-regex-stuff.html?groups=it,evan&action=fixbadsitecoremerge'
   let uncommitted = false
   let untracked = false
   let line = ''
@@ -978,7 +978,7 @@ doStuff.register({
 const acceptChanges = (input, extraInputs, GETvars) => {
   const lines = input.split('\n')
   const doCheckout = extraInputs.add('checkout')
-  const thisURL = 'file:///C:/Users/evwills/Documents/Evan/code/do-JS-regex-stuff/do-JS-regex-stuff.html?groups=it,evan&action=acceptChanges'
+  const thisURL = 'file:///C:/Users/evan/Documents/code/do-JS-regex-stuff/do-JS-regex-stuff.html?groups=it,evan&action=acceptChanges'
   let line = ''
   let output = ''
   let oursTheirs = extraInputs.oursTheirs()
@@ -4839,10 +4839,11 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const storedProcParams = (input, extraInputs, GETvars) => {
+  const _prefix = extraInputs.prefix() + '_'
   const _cols = []
   const _tableName = input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')
   const _thingName = _tableName.replace(/s$/i, '')
-  const regex = /(-- +)?`([a-z_]+)`( (?:varchar|char|float|datetime|timestamp|text|(?:tiny|small|medium)?int)(?:\([0-9]+\))?(?: unsigned)?)[^,]*(,|$)/ig
+  const regex = /(-- +)?`([a-z_]+)`( (?:varchar|char|float|datetime|timestamp|text|(?:tiny|small|medium|big)?int)(?:\([0-9]+\))?(?: unsigned)?)[^,]*?(AUTO_INCREMENT)?(,|$)/ig
   let maxCol = 0
   let maxIn = 0
   let maxParam = 0
@@ -4854,16 +4855,20 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   let outputInsertValues = ''
   let outputUpdate = ''
   let outputSelect = ''
+  let idColl = '';
 
   while ((_tmp = regex.exec(input)) !== null) {
-    // console.log('_tmp:', _tmp);
+    console.log('_tmp:', _tmp);
     const _cmnt = (typeof _tmp[1] === 'string')
     const _col = _tmp[2]
-    const _param = _tmp[2].replace(/_/g, '')
-    const _in = 'IN ' + _param + _tmp[3]
-
-    if (_param.length > maxCol) {
-      maxCol = _param.length
+    const _param = snakeToCamelCase(_col.replace(_prefix, ''))
+    const _in = 'IN ' + _param + _tmp[3];
+    
+    if (typeof _tmp[4] === 'string' && _tmp[4] === 'AUTO_INCREMENT') {
+      idColl = _tmp[2];
+    }
+    if (_col.length > maxCol) {
+      maxCol = _col.length
     }
     if (_in.length > maxIn) {
       maxIn = _in.length
@@ -4881,16 +4886,25 @@ const storedProcParams = (input, extraInputs, GETvars) => {
     })
   }
 
+  if (idColl === '') {
+    idColl = 'id'
+  }
+
   maxIn += 2
   maxCol += 4
   const maxColIn = maxCol + 1
   maxParam += 2
 
+  console.log('maxIn:', maxIn)
+  console.log('maxCol:', maxCol)
+  console.log('maxColIn:', maxColIn)
+  console.log('maxParam:', maxParam)
+
   for (let a = 0; a < _cols.length; a += 1) {
     const _sep = (a < _cols.length - 1)
       ? ','
       : ''
-    let _pre = '\n        '
+    let _pre = '\n    '
     _pre += _cols[a].comment
       ? '--  '
       : '    '
@@ -4906,26 +4920,43 @@ const storedProcParams = (input, extraInputs, GETvars) => {
     outputIn += _pre + strPad(_cols[a].in + _sep, maxIn) + '-- ' + _b
     outputInsertValues += _pre + strPad(_cols[a].param + _sep, maxParam) + '-- ' + _b + ' - `' + _cols[a].col + '`'
     outputInsertFields += _pre + strPad('`' + _cols[a].col + '`' + _sep, maxColIn) + '-- ' + _b + ' - ' + _cols[a].param + ''
-    outputUpdate += _pre + strPad('`' + _cols[a].col + '`', maxCol) + ' = ' + _cols[a].param + _sep
-    outputSelect += _pre + '   ' + strPad('`' + _cols[a].col + '`', maxCol) + ' AS `' + snakeToCamelCase(_cols[a].col) + '`' + _sep
+    outputUpdate += _pre + strPad('`' + _cols[a].col + '`', maxCol) + ' = ' + strPad(_cols[a].param + _sep, maxParam) + ' -- ' +  _b 
+    outputSelect += _pre + '    ' + strPad('`' + _cols[a].col + '`', maxCol) + ' AS `' + _cols[a].param + '`' + _sep
   }
-  const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n        FROM   `' + _tableName + '`\n        WHERE  `id` = '
+  const extraSelect = 'SELECT ' + outputSelect.replace(/^[\r\n\t\ ]+/, '') + '\n     ' + 
+                      'FROM   `' + _tableName + '`\n    ' + 
+                      'WHERE  `' + idColl + '` = '
 
-  const output =  '     CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n        uniqueid int(11) unsigned\n     )\n' +
-                  '     BEGIN\n        ' + extraSelect + 'uniqueid;\n' +
-                  '     END;\n\n\n' +
-                  '     -- ==========================================\n\n\n' + 
-                  '     CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n     )\n' +
-                  '     BEGIN\n        INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
-                  '        ) VALUES (' + outputInsertValues + '\n        );\n\n' +
-                  '        CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n' +
-                  '     END;\n\n\n' +
-                  '     -- ==========================================\n\n\n' + 
-                  '     CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
-                  '     BEGIN\n        UPDATE `' + _tableName + '`\n' +
-                  '        SET' + outputUpdate + '\n        WHERE `id` = uniqueid;\n\n' +
-                  '        CALL get_' + _thingName + '_by_id(id);\n' +
-                  '     END;'
+  const output =  'DROP PROCEDURE IF EXISTS `get_' + _thingName + '_by_id`;\n' +
+                  'CREATE PROCEDURE `get_' + _thingName + '_by_id` (\n    IN uniqueID int(11) unsigned\n)\n' +
+                  'BEGIN\n    ' + extraSelect + 'uniqueID;\n' +
+                  'END;\n\n\n' +
+                  '-- ==========================================\n\n\n' + 
+                  'DROP PROCEDURE IF EXISTS `get_all_' + _thingName + '_by_id`;\n' +
+                  'CREATE PROCEDURE `get_all_' + _thingName + '_by_id` (\n    IN uniqueID int(11) unsigned\n)\n' +
+                  'BEGIN\n    ' + extraSelect + 'uniqueID;\n' +
+                  'END;\n\n\n' +
+                  '-- ==========================================\n\n\n' + 
+                  'DROP PROCEDURE IF EXISTS `add_new_' + _thingName + '`;\n' +
+                  'CREATE PROCEDURE `add_new_' + _thingName + '` (' + outputIn + '\n)\n' +
+                  'BEGIN\n    INSERT INTO `' + _tableName + '` (' + outputInsertFields + '\n' +
+                  '    ) VALUES (' + outputInsertValues + '\n    );\n\n' +
+                  '    CALL get_' + _thingName + '_by_id(LAST_INSERT_ID());\n' +
+                  'END;\n\n\n' +
+                  '-- ==========================================\n\n\n' + 
+                  'DROP PROCEDURE IF EXISTS `update_' + _thingName + '`;\n' +
+                  'CREATE PROCEDURE `update_' + _thingName + '` (' + outputIn + '\n     )\n' +
+                  'BEGIN\n    UPDATE `' + _tableName + '`\n' +
+                  '    SET' + outputUpdate + '\n    WHERE `' + idColl + '` = uniqueID;\n\n' +
+                  '    CALL get_' + _thingName + '_by_id(uniqueID);\n' +
+                  'END;\n\n\n' +
+                  '-- ==========================================\n\n\n' + 
+                  'DROP PROCEDURE IF EXISTS `delete_' + _thingName + '_by_id`;\n' +
+                  'CREATE PROCEDURE `delete_' + _thingName + '_by_id` ' + 
+                  '(\n    IN uniqueID int(11) unsigned\n)\n' +
+                  'BEGIN\n    DELETE FROM `' + _tableName + '`\n' +
+                  '    WHERE `' + idColl + '` = uniqueID;\n' +
+                  'END;'
   
   return output.replace(/(`[a-z0-9_]+`) +AS \1/g, '$1')
 }
@@ -4937,14 +4968,14 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [
-    // {
-    //   id: 'tableName',
-    //   label: 'Table name',
-    //   type: 'text',
-    //   description: '',
-    //   pattern: '',
-    //   default: ''
-    // }
+    {
+      id: 'prefix',
+      label: 'Field prefix',
+      type: 'text',
+      description: '',
+      pattern: '',
+      default: ''
+    }
   ],
   group: 'evan',
   ignore: false

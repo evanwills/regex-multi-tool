@@ -279,6 +279,9 @@ export const padStr = (input, len, char, centre) => {
   const _input = input.toString()
   const _iLen = _input.length
 
+  console.log('len:', len)
+  console.log('_iLen:', _iLen)
+
   for (let a = _iLen; a < len; a += 2) {
     strR += _char
     if ((strL.length + strR.length + _iLen) < len) {
@@ -327,6 +330,8 @@ export const snakeToCamelCase = (input, start = 0) => {
   let output = tmp[start]
 
   for (let a = start + 1; a < tmp.length; a += 1) {
+    // console.log('tmp[' + a + ']:', tmp[a])
+    // console.log('ucFirst(tmp[' + a + ']):', ucFirst(tmp[a]))
     output += ucFirst(tmp[a])
   }
 

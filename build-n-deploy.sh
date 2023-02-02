@@ -1,6 +1,6 @@
 #!/bin/sh
 
-deployTo='/c/Users/evwills/Documents/Evan/code/shell-scripts/deploy-to.sh';
+deployTo='/c/Users/evan/Documents/code/shell-scripts/deploy-to.sh';
 
 npm run build;
 
