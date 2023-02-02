@@ -328,6 +328,9 @@ export const snakeToCamelCase = (input, start = 0) => {
     : '_'
   const tmp = input.split(splitter)
   let output = tmp[start]
+  // console.log('input:', input);
+  // console.log('tmp:', tmp);
+  // console.log('output:', output);
 
   for (let a = start + 1; a < tmp.length; a += 1) {
     // console.log('tmp[' + a + ']:', tmp[a])
