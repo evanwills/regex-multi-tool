@@ -5039,12 +5039,14 @@ CREATE PROCEDURE \`acquire_${procName}_lock\` (
 BEGIN
 \tDECLARE expriesAt datetime;
 \tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE success tinyint(1) unsigned;
 
 \tset expriesAt = NULL;
+\tset errorID = 9;
+\tset success = 0;
 
 \tIF ${canFunc} = 1 THEN
 \t\tSET expriesAt = get_new_expiration();
-\t\tSET errorID = 9;
 
 \t\tUPDATE\t\`${tableName}\`
 \t\tSET\t\t\`${expiresAt.col}\` = expriesAt,
@@ -5056,7 +5058,9 @@ BEGIN
 \t\t\tOR\t\`${lockedBy.col}\` = adminID
 \t\t);
 
-\t\tIF ROW_COUNT() = 0 THEN
+\t\tSET success = (ROW_COUNT > 0);
+
+\t\tIF success = 0 THEN
 \t\t\t-- lock could not be acquired
 \t\t\t-- (probably because someone else already holds it)
 
@@ -5065,12 +5069,12 @@ BEGIN
 
 \t\t\tset expriesAt = NULL;
 \t\tEND IF;
-
-\t\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, errorID, ROW_COUNT());
 \tELSE
 \t\t-- user does not have permission
-\t\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, 3, 0);
+\t\tSET errorID = 3;
 \tEND IF;
+
+\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, errorID, 0);
 
 \tSELECT expriesAt;
 END;
@@ -5105,9 +5109,9 @@ BEGIN
 \tAND\t\t\`${expiresAt.col}\` < NOW()
 \tAND\t\t\`${lockedBy.col}\` = adminID;
 
-\tCALL log_action(adminID, 10, ${relID}, ${thingName}ID, NULL, 10, ROW_COUNT());
-
 \tSET success = (ROW_COUNT() > 0);
+
+\tCALL log_action(adminID, 10, ${relID}, ${thingName}ID, NULL, 10, success);
 
 \tSELECT success;
 END;
@@ -5454,6 +5458,11 @@ CREATE PROCEDURE \`add_${procName}\` (
 \tIN adminID int(11) unsigned${inParams}
 )
 BEGIN
+\tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE success tinyint(1) unsigned;
+
+\tSET errorID = 6;
+\tSET success = 0;
 
 \tIF ${testFunc} THEN
 \t\tINSERT INTO ${tableName} (
@@ -5468,22 +5477,22 @@ BEGIN
 \t\t\t${strPad('adminID,', updatedBy.maxParam)}--    - \`${updatedBy.col}\`${lockVals}
 \t\t);
 
-\t\tCALL log_action(
-\t\t\tadminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()
-\t\t);
-
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\tCALL get_${procName}_by_id__admin(
-\t\t\t\tadminID, LAST_INSERT_ID()
-\t\t\t);
-\t\tELSE
-\t\t\tSELECT NULL;
+\t\t\tSET success = 1;
 \t\tEND IF;
 \tELSE
+\t\tSET errorID = 3;
+\tEND IF;
+
 \t\tCALL log_action(
-\t\t\tadminID, 2, [[BBBB]], ${logProps}, 3, 0
+\t\t\tadminID, 2, [[BBBB]], ${logProps}, errorID, success
 \t\t);
 
+\tIF success = 1 THEN
+\t\tCALL get_${procName}_by_id__admin(
+\t\t\tadminID, LAST_INSERT_ID()
+\t\t);
+\tELSE
 \t\tSELECT NULL;
 \tEND IF;
 END;
@@ -5508,8 +5517,10 @@ CREATE PROCEDURE \`update_${procName}\` (
 )
 BEGIN
 \tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE success tinyint(1) unsigned;
 
-\tSET errorID = 0;
+\tSET errorID = 6;
+\tSET success = 0;
 
 \tIF ${testFunc} THEN
 \t\tUPDATE \`${tableName}\`
@@ -5520,31 +5531,28 @@ BEGIN
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\tCALL log_action(
-\t\t\t\tadminID, 4, [[BBBB]], ${logProps}, 6, ROW_COUNT()
-\t\t\t);
+\t\t\t-- Yay!!! ${thingName} was updated
 
-\t\t\tCALL get_${procName}_by_id__admin(
-\t\t\t\tadminID, ${thingName}ID
-\t\t\t);
+\t\t\tSET success = 1;
 \t\tELSE
+\t\t\t-- Hmmmm??? Something went wrong. Better find out more.
+
 \t\t\tCALL get_income_groups_lock_error(
 \t\t\t\tgroupID, adminID errorID
 \t\t\t);
-
-\t\t\tCALL log_action(
-\t\t\t\tadminID, 4, [[BBBB]], ${logProps}, errorID, 0
-\t\t\t);
-
-\t\t\tSELECT NULL;
 \t\tEND IF;
 \tELSE
-\t\t-- Get more info on why update failed
+\t\t-- admin is not authorised to update ${thingName}
+\t\tSET errorID = 3;
+\tEND IF;
 
-\t\tCALL log_action(
-\t\t\tadminID, 3, [[BBBB]], ${logProps}, errorID, 0
-\t\t);
+\tCALL log_action(
+\t\tadminID, 4, [[BBBB]], ${logProps}, errorID, success
+\t);
 
+\tIF success = 1 THEN
+\t\tCALL get_${procName}_by_id__admin(adminID, ${thingName}ID);
+\tELSE
 \t\tSELECT NULL;
 \tEND IF;
 END;
@@ -5577,13 +5585,9 @@ BEGIN
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
-\t\t\t-- SUCCESS!!!
+\t\t\t-- SUCCESS!!! ${thingName} was deleted
 \t\t\tCALL log_action(
 \t\t\t\tadminID, 6, [[BBBB]], ${logProps}, 6, ROW_COUNT()
-\t\t\t);
-
-\t\t\tCALL get_${procName}_by_id__admin(
-\t\t\t\tadminID, LAST_INSERT_ID()
 \t\t\t);
 \t\tELSE
 \t\t\t-- Get more info on why update failed
@@ -5609,7 +5613,7 @@ $$
 DELIMITER ;
 
 
---  END:  \`add_${procName}\`
+--  END:  \`delete_${procName}\`
 ${stProcLn}`;
 }
 
@@ -5718,7 +5722,7 @@ const storedProcParams = (input, extraInputs, GETvars) => {
 
   console.log('maxIn:', maxIn)
   console.log('maxCol:', maxCol)
-  console.log('maxColIn:', maxColIn)
+  // console.log('maxColIn:', maxColIn)
   console.log('maxParam:', maxParam)
 
   for (let a = 0; a < _cols.length; a += 1) {
