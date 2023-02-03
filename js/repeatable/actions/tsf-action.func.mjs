@@ -1,6 +1,7 @@
 /* jslint browser: true */
 /* global doStuff */
 
+import { strPad } from '../../utilities/general.mjs';
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 
 // ====================================================================
@@ -245,4 +246,152 @@ doStuff.register({
 })
 
 //  END:  TSF brand refresh
+// ====================================================================
+// START: Brand colour variables to MD table
+
+
+/**
+ * Brand colour variables to MD table
+ *
+ * created by: Evan Wills
+ * created: 2023-02-01
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const sassVarsMdTable = (input, extraInputs, GETvars) => {
+  const brandCols = '$tsf-red: #da1710; // was #e31837\n' +
+                    '$tsf-red-hover: #b2150f; // was #ba0414' +
+                    '$tsf-field-borders: #8295ab; // was #d8d8d8' +
+                    '$tsf-bright-blue: #0021ea; // was #0069d5' +
+                    '$tsf-golden-sand-dark: #da7e1b; // was #e58221' +
+                    '$tsf-golden-sand-dark-hover: #985812; // was #d75b05' +
+                    '$navy-blue: #0a214d;  // was #002647' +
+                    '$light-navy-blue: #003767;' +
+                    '$electric-blue: #259ad5;' +
+                    '$middle-blue: #003768;' +
+                    '$light-blue: #184f7e;' +
+                    '$pale-blue: #e6f1f6;' +
+                    '$orange: #f37814;' +
+                    '$grey: #F7F7F7;' +
+                    '$dark-grey: #333333; // was #444444' +
+                    '$light-grey-para: #666666;' +
+                    '$regular-grey: #cccccc;' +
+                    '$middle-grey: #e5e5e5;' +
+                    '$light-grey: #FDFAFA;' +
+                    '$utility-green: #0F870F;' +
+                    '$utility-red: #E31837;' +
+                    '$utility-red-hover: #E31837;' +
+                    '$white: #ffffff;' +
+                    '$off-white: #bdbdbd;' +
+                    '$black: #000000;' +
+                    '$utility-blue: #0069D5;' +
+                    '$utility-blue-hover: #0017a3; // was #025DA3' +
+                    '$utility-yellow: #F1C761;' +
+                    '$blue: #0069D5;' +
+                    '$blue-hover: #0017a3; // was #025DA3' +
+                    '$utility-lightred: #ffebeb;'
+
+  const regex = /(\$[a-z0-9-]+)\s*?:\s*(#[a-f0-9]{3,6})\s*(?:;?\s*\/\/\s*was\s*(#[a-f0-9]{3,6}))?/ig
+  const sorter = (a, b) => {
+    // if (a.val > b.val) {
+    //   return 1
+    // } else if (a.val < b.val) {
+    //   return -1
+    // } else {
+    //   if (a.var > b.var) {
+    //     return 1
+    //   } else if (a.var < b.var) {
+    //     return -1
+    //   } else {
+    //     return 0;
+    //   }
+    // }
+    if (a.var > b.var) {
+      return 1
+    } else if (a.var < b.var) {
+      return -1
+    } else {
+      if (a.val > b.val) {
+        return 1
+      } else if (a.val < b.val) {
+        return -1
+      } else {
+        return 0;
+      }
+    }
+  }
+
+  let output = '';
+  const colours = [];
+  let _tmp
+  let maxVar = 'variable name'.length;
+  let maxVal = 0;
+  let maxOld = 'old colour'.length;
+
+  while ((_tmp = regex.exec(brandCols)) !== null) {
+    const tmp = {
+      var: _tmp[1],
+      val: '`' + _tmp[2] + '`',
+      old: (typeof _tmp[3] === 'string')
+        ? _tmp[3]
+        : ''
+    }
+
+    if (tmp.var.length > maxVar) {
+      maxVar = tmp.var.length
+    }
+    if (tmp.val.length > maxVal) {
+      maxVal = tmp.val.length
+    }
+    if (tmp.old.length > maxOld) {
+      maxOld = tmp.old.length
+    }
+
+    colours.push(tmp);
+  }
+
+  colours.sort(sorter)
+
+  output = '| ' + strPad('variable name', maxVar) +
+          ' | ' + strPad('colour', maxVal) +
+          ' | ' + strPad('old colour', maxOld) + ' |\n' +
+           '|-' + strPad('', maxVar, '-') +
+          '-|-' + strPad('', maxVal, '-') +
+          '-|-' + strPad('', maxOld, '-') + '-|'
+
+  for (let a = 0; a < colours.length; a += 1) {
+    output += '\n| ' + strPad(colours[a].var, maxVar) +
+               ' | ' + strPad(colours[a].val, maxVal) +
+               ' | ' + strPad(colours[a].old, maxOld) + ' |'
+  }
+
+  return output;
+}
+
+doStuff.register({
+  id: 'sassVarsMdTable',
+  name: 'Brand colour variables to MD table',
+  func: sassVarsMdTable,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'tsf',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Brand colour variables to MD table
 // ====================================================================

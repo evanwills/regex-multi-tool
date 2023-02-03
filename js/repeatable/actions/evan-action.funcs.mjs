@@ -4859,6 +4859,88 @@ doStuff.register({
 
 //  END:  Laravel fixed option to CFB insert SQL
 // ====================================================================
+// START: Turning tool codes
+
+/**
+ * Turning tool codes
+ *
+ * created by: Evan Wills
+ * created: 2023-01-03
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const turningToolCodes = (input, extraInputs, GETvars) => {
+  const angles = ['000', '075', '150', '225', '300', '375', '450']
+  const hand = ['L', 'R']
+  const type = ['H', 'F']
+  const codes = []
+  let x = 1
+  let output = ''
+  for (let a = 0; a < type.length; a += 1) {
+    output += '\n' + x + '\t' + type[a] + 'S'
+
+    for (let b = 1; b < angles.length; b += 1) {
+      x += 1
+      output += '\n' + x + '\t' + type[a] + 'S-' + angles[b]
+    }
+
+    for (let b = 0; b < hand.length; b += 1) {
+      x += 1
+      const code = type[a] + hand[b]
+
+      output += '\n' + x + '\t' + code
+
+      for (let c = 0; c < angles.length; c += 1) {
+        for (let d = 0; d < angles.length; d += 1) {
+          const bend = '-' + angles[d]
+
+          const arc = (d > 0)
+            ? '-' + angles[c]
+            : ''
+
+          const tail = arc + bend
+          x += 1
+
+          if (c > 0 || d > 0) {
+            output += '\n' + x + '\t' + code + tail
+          }
+        }
+      }
+      codes.push(code)
+    }
+    x += 1
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'turningToolCodes',
+  name: 'Turning tool codes',
+  func: turningToolCodes,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Turning tool codes
+// ====================================================================
 // START: Stored Procedure Parameters
 
 
@@ -5678,86 +5760,4 @@ doStuff.register({
 })
 
 //  END:  Stored Procedure Parameters
-// ====================================================================
-// START: Turning tool codes
-
-/**
- * Turning tool codes
- *
- * created by: Evan Wills
- * created: 2023-01-03
- *
- * @param {string} input       user supplied content
- *                             (expects text HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *                             fields specified when registering
- *                             the ation
- * @param {object} GETvars     all the GET variables from the URL as
- *                             key/value pairs
- *                             NOTE: numeric strings are converted
- *                                   to numbers and "true" & "false"
- *                                   are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const turningToolCodes = (input, extraInputs, GETvars) => {
-  const angles = ['000', '075', '150', '225', '300', '375', '450']
-  const hand = ['L', 'R']
-  const type = ['H', 'F']
-  const codes = []
-  let x = 1
-  let output = ''
-  for (let a = 0; a < type.length; a += 1) {
-    output += '\n' + x + '\t' + type[a] + 'S'
-
-    for (let b = 1; b < angles.length; b += 1) {
-      x += 1
-      output += '\n' + x + '\t' + type[a] + 'S-' + angles[b]
-    }
-
-    for (let b = 0; b < hand.length; b += 1) {
-      x += 1
-      const code = type[a] + hand[b]
-
-      output += '\n' + x + '\t' + code
-
-      for (let c = 0; c < angles.length; c += 1) {
-        for (let d = 0; d < angles.length; d += 1) {
-          const bend = '-' + angles[d]
-
-          const arc = (d > 0)
-            ? '-' + angles[c]
-            : ''
-
-          const tail = arc + bend
-          x += 1
-
-          if (c > 0 || d > 0) {
-            output += '\n' + x + '\t' + code + tail
-          }
-        }
-      }
-      codes.push(code)
-    }
-    x += 1
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'turningToolCodes',
-  name: 'Turning tool codes',
-  func: turningToolCodes,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Turning tool codes
 // ====================================================================
