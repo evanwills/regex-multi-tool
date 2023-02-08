@@ -5193,6 +5193,412 @@ ${stProcLn}`;
 }
 
 /**
+ * Generate Stored Procedure code for handling sorting
+ * on a sortable type
+ *
+ * @param {Object[]} fields    List of all fields/columns in table
+ * @param {string}   tableName Name of table procedure applies to
+ * @param {string}   thingName Name of the thing the data represents
+ * @param {string}   procName  Table specific part of the stored
+ *                             procedure's name
+ *
+ * @returns {string} A collection of stored procedures for managing
+ *                   editing locks on a single row
+ */
+const stProcSort = (fields, tableName, thingName, procName) => {
+  let id = null;
+  let sortOrder = null;
+  let updatedAt = null;
+  let updatedBy = null;
+  let canFunc = '1 = 1';
+  let acID = '[[AAAA]]';
+  let relID = '[[AAAA]]';
+  let c = 0;
+
+  for (let a = 0; a < fields.length; a += 1) {
+    switch (fields[a].subType) {
+      case 'id':
+        id = fields[a];
+        c += 1;
+        break;
+
+      case 'sort':
+        sortOrder = fields[a];
+        c += 1;
+        break;
+
+      case 'updatedAt':
+        updatedAt = fields[a];
+        c += 1;
+        break;
+
+      case 'updatedBy':
+        updatedBy = fields[a];
+        c += 1;
+        break;
+    }
+    if (c === 4) {
+      break;
+    }
+  }
+
+  switch (thingName) {
+    case 'config':
+      canFunc = `is_authorised(adminID, 4, 'editconfig')`;
+      acID = '92';
+      relID = '93';
+      break;
+
+    case 'inputField':
+      canFunc = `is_authorised(adminID, 3, 'editinputfield')`;
+      acID = '109';
+      relID = '110';
+      break;
+
+    case 'textBlock':
+      canFunc = `is_authorised(adminID, 3, 'edittextblock')`;
+      acID = '100';
+      relID = '101';
+      break;
+
+    case 'group':
+      canFunc = `can_edit_group(adminID, ${thingName}ID)`;
+      acID = '132';
+      relID = '136';
+      break;
+
+    case 'form':
+    default:
+      canFunc = `can_edit_form(adminID, ${thingName}ID)`;
+      acID = '11';
+      relID = '12';
+      break;
+  }
+
+  if (id === null || sortOrder === null) {
+    return '';
+  }
+
+  return `
+${stProcLn}
+-- START: \`get_last_${procName}_pos\`
+
+
+DROP FUNCTION IF EXISTS \`get_last_${procName}_pos\`;
+
+DELIMITER $$
+
+CREATE FUNCTION \`get_last_${procName}_pos\` (
+\tIN formID int(11) unsigned,
+\tIN increment tinyint(1) unsigned
+) RETURNS tinyint(3) unsigned DETERMINISTIC
+BEGIN
+\tDECLARE ${thingName}Count tinyint(3) unsigned;
+
+\tSELECT\tMAX(\`${sortOrder.col}\`)
+\tINTO\t${thingName}Count
+\tFROM\t\`${tableName}\`
+\tWHERE\t\`form_id\` = formID;
+
+\tRETURN (${thingName}Count + increment);
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`get_last_${procName}_pos\`
+${stProcLn}
+-- START: \`get_${procName}_sort_order\`
+
+
+DROP PROCEDURE IF EXISTS \`get_${procName}_sort_order\`;
+
+DELIMITER $$
+
+CREATE PROCEDURE \`get_${procName}_sort_order\` (
+\tIN ${thingName}ID ${id.type},
+\tINOUT formID int(11) unsigned,
+\tINOUT sortOrder tinyint(3) unsigned
+) DETERMINISTIC
+BEGIN
+\tSELECT\t\`form_id\`,
+\t\t\t\`${sortOrder.col}\`
+\tINTO	${thingName}ID,
+\t\t\tsortOrder
+\tFROM	\`${tableName}\`
+\tWHERE	\`${id.col}\` = ${thingName}ID;
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`get_${procName}_sort_order\`
+${stProcLn}
+-- START: \`reset_${procName}_sort_order\`
+
+
+DROP PROCEDURE IF EXISTS \`reset_${procName}_sort_order\`;
+
+DELIMITER $$
+
+CREATE PROCEDURE \`reset_${procName}_sort_order\` (
+\tIN formID int(11) unsigned
+)
+BEGIN
+\tUPDATE\t\`${tableName}\`
+\tSET\t\t\`${sortOrder.col}\` = ROW_NUMBER() OVER (ORDER BY \`${sortOrder.col}\` ASC)
+\tWHERE\t\`form_id\` = formID;
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`reset_${procName}_sort_order\`
+${stProcLn}
+-- START: \`reorder_${procName}s\`
+
+
+DROP PROCEDURE IF EXISTS \`reorder_${procName}s\`;
+
+DELIMITER $$
+
+CREATE PROCEDURE \`reorder_${procName}s\` (
+	IN  adminID	int(11) unsigned,
+	IN  ${thingName}ID	${sortOrder.type},
+	IN  newPos	tinyint(3) unsigned
+)
+BEGIN
+\tDECLARE success tinyint(1) unsigned;
+\tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE formID int(11) unsigned;
+\tDECLARE oldPos tinyint(3) unsigned;
+
+\tSET success = 0;
+\tSET errorID = 17;
+
+\tCALL get_${procName}_sort_order(${thingName}ID, formID, oldPos);
+
+\tIF user_has_locked_form(adminID, formId) THEN
+\t\tIF new_pos < oldPos THEN
+\t\t\tIF oldPOS <= 1 THEN
+\t\t\t\t-- nothing to do here
+\t\t\t\t-- ${thingName} is already first
+\t\t\t\tSET errorID = 37;
+\t\t\tELSE
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = \`${sortOrder.col}\` + 1,
+\t\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`form_id\` = formID
+\t\t\t\tAND		\`${sortOrder.col}\` >= oldPos
+\t\t\t\tAND		\`${sortOrder.col}\` < new_pos;
+
+\t\t\t\tSET success = (ROW_COUNT() > 0);
+\t\t\tEND IF;
+\t\tELSEIF new_pos > oldPos THEN
+\t\t\tIF oldPos >= get_last_field_pos(formID) THEN
+\t\t\t\t-- nothing to do here
+\t\t\t\t-- ${thingName} is already last
+\t\t\t\tSET errorID = 38;
+\t\t\tELSE
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = \`${sortOrder.col}\` - 1,
+\t\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`form_id\` = formID
+\t\t\t\tAND		\`${sortOrder.col}\` <= new_pos
+\t\t\t\tAND		\`${sortOrder.col}\` > oldPos;
+
+\t\t\t\tSET success = (ROW_COUNT() > 0);
+\t\t\tEND IF
+
+\t\tEND IF;
+
+\t\tIF success = 1 THEN
+\t\t\tUPDATE	\`${tableName}\`
+\t\t\tSET		\`${sortOrder.col}\` = new_pos,
+\t\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
+
+\t\t\tSET success = (ROW_COUNT() > 0);
+\t\tEND IF;
+\tELSE
+\t\tSET errorID = 7;
+\tEND IF;
+
+\tIF success = 1 THEN
+\t\tCALL reset_field_order(formID);
+\tEND IF;
+
+\tCALL log_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
+
+\tSELECT success AS \`changed\`;
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`reorder_${procName}s\`
+${stProcLn}
+-- START: \`move_${procName}_up\`
+
+
+DROP PROCEDURE IF EXISTS \`move_${procName}_up\`;
+
+DELIMITER $$
+
+CREATE PROCEDURE \`move_${procName}_up\` (
+	IN adminID int(11) unsigned,
+	IN ${thingName}ID int(11) unsigned
+)
+BEGIN
+\tDECLARE success tinyint(1) unsigned;
+\tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE oldPos tinyint(3) unsigned;
+\tDECLARE newPos tinyint(3) unsigned;
+\tDECLARE formID int(11) unsigned;
+
+\tSET success = 0;
+\tSET errorID = 37;
+
+\tCALL get_${procName}_sort_order(${thingName}ID, formID, oldPos);
+
+\tIF user_has_locked_form(adminID, formId) THEN
+\t\tIF oldPos <= 1 THEN
+\t\t\t-- nothing to do because ${thingName} is alredy first
+\t\t\tSET errorID = 37;
+\t\tELSE
+\t\t\tSET newPos = oldPos -1;
+
+\t\t\t-- Move chosen ${thingName} to where no other ${thingName} is positioned
+\t\t\tUPDATE	\`${tableName}\`
+\t\t\tSET		\`${sortOrder.col}\` = (get_last_field_pos(formID) + 1)
+\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
+
+\t\t\tIF ROW_COUNT > 0 THEN
+\t\t\t\t-- Move ${thingName} that previously sat above ${thingName} to move
+\t\t\t\t-- down to the position of the ${thingName} to be moved
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = oldPos,
+\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`form_id\` = formId
+\t\t\t\tAND		\`${sortOrder.col}\` = newPos;
+
+\t\t\t\t-- Move chosen ${thingName} to it's new position
+\t\t\t\t-- (above it's previous position)
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = newPos,
+\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
+
+\t\t\t\tSET success = 1;
+\t\t\tELSE;
+\t\t\t\tSET errorID = 17;
+\t\t\tEND IF;
+\t\tEND IF;
+\tELSE
+\t\tSET errorID = 7;
+\tEND IF;
+
+\tCALL log_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
+
+\tSELECT success AS \`success\`;
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`move_${procName}_up\`
+${stProcLn}
+-- START: \`move_${procName}_down\`
+
+
+DROP PROCEDURE IF EXISTS \`move_${procName}_down\`;
+
+DELIMITER $$
+
+CREATE PROCEDURE \`move_${procName}_down\` (
+	IN adminID int(11) unsigned,
+	IN ${thingName}ID int(11) unsigned
+)
+BEGIN
+\tDECLARE success tinyint(1) unsigned;
+\tDECLARE errorID tinyint(3) unsigned;
+\tDECLARE oldPos tinyint(3) unsigned;
+\tDECLARE newPos tinyint(3) unsigned;
+\tDECLARE formID int(11) unsigned;
+
+\tSET success = 0;
+\tSET errorID = 38;
+
+\tCALL get_${procName}_sort_order(${thingName}ID, formID, oldPos);
+
+\tIF user_has_locked_form(adminID, formId) THEN
+\t\tIF oldPos <= 1 THEN
+\t\t\t-- nothing to do because ${thingName} is alredy last
+\t\tELSE
+\t\t\tSET newPos = oldPos -1;
+
+\t\t\t-- Move chosen ${thingName} to where no other ${thingName} is positioned
+\t\t\tUPDATE	\`${tableName}\`
+\t\t\tSET		\`${sortOrder.col}\` = (get_last_field_pos(formID) + 1)
+\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
+
+\t\t\tIF ROW_COUNT > 0 THEN
+\t\t\t\t-- Move ${thingName} that previously sat below ${thingName} to move
+\t\t\t\t-- up to the position of the ${thingName} to be moved
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = oldPos,
+\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`form_id\` = formId
+\t\t\t\tAND		\`${sortOrder.col}\` = newPos;
+
+\t\t\t\t-- Move chosen ${thingName} to it's new position
+\t\t\t\t-- (below it's previous position)
+\t\t\t\tUPDATE	\`${tableName}\`
+\t\t\t\tSET		\`${sortOrder.col}\` = newPos,
+\t\t\t\t\t\`${updatedAt.col}\` = NOW(),
+\t\t\t\t\t\`${updatedBy.col}\` = adminID
+\t\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
+
+\t\t\t\tSET success = 1;
+\t\t\tELSE;
+\t\t\t\tSET errorID = 17;
+\t\t\tEND IF;
+\t\tEND IF;
+\tELSE
+\t\tSET errorID = 7;
+\tEND IF;
+
+\tCALL log_action(adminID, 8, 154, formID, ${thingName}ID, errorID, success);
+
+\tSELECT success AS \`success\`;
+END;
+
+$$
+
+DELIMITER ;
+
+
+--  END:  \`move_${procName}_down\`
+${stProcLn}`;
+}
+
+/**
  * Generate Stored Procedure code for fetching single row of data
  *
  * @param {Object[]} fields    List of all fields/columns in table
@@ -5366,11 +5772,20 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   let inColCreatedBy = '';
   let inValCreatedBy = '';
   let upSetCreatedBy = '';
+  let inColUpdatedBy = '';
+  let inValUpdatedBy = '';
+  let upSetUpdatedBy = '';
   let inValues = '';
   let inSep = '';
   let andClause = '';
 
   for (let a = 0, b = 0, c = fields.length; a < c; a += 1) {
+    console.group('field[' + a + ']');
+    console.log('fields[' + a +']:', fields[a]);
+    console.log('fields[' + a +'].subType:', fields[a].subType);
+    console.log('fields[' + a +'].col:', fields[a].col);
+    console.log('fields[' + a +'].subType === "updatedBy":', fields[a].subType === 'updatedBy');
+    console.groupEnd();
     switch (fields[a].subType) {
       case 'id':
         id = fields[a];
@@ -5443,8 +5858,17 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
                      `= ${strPad('adminID,', (createdAt.maxParam))}--`
   }
 
+  if (updatedBy !== null) {
+    inColUpdatedBy = `\n\t\t\t${strPad(`\`${updatedBy.col}\`,`, (updatedBy.maxCol + 1))} --    - adminID`
+    inValUpdatedBy = `\n\t\t\t${strPad('adminID,', updatedBy.maxParam)}--    - \`${updatedBy.col}\``
+    upSetUpdatedBy = `\n\t\t\t --\t${strPad(`\`${updatedBy.col}\``, (updatedBy.maxCol + 1))}` +
+                     `= ${strPad('adminID,', (updatedBy.maxParam))}--`
+  }
+
   inParams = inParams.replace(commaRegex, ' ')
   setVals = setVals.replace(commaRegex, ' ')
+
+  console.log('updatedBy:', updatedBy)
 
   return `
 -- START: \`add_${procName}\`
@@ -5465,16 +5889,14 @@ BEGIN
 \tSET success = 0;
 
 \tIF ${testFunc} THEN
-\t\tINSERT INTO ${tableName} (
+\t\tINSERT INTO \`${tableName}\` (
 \t\t\t${inFields}
 \t\t\t${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()${inColCreatedBy}
-\t\t\t${strPad(`\`${updatedAt.col}\`,`, (updatedAt.maxCol + 1))} --    - NOW()
-\t\t\t${strPad(`\`${updatedBy.col}\`,`, (updatedBy.maxCol + 1))} --    - adminID${lockCols}
+\t\t\t${strPad(`\`${updatedAt.col}\`,`, (updatedAt.maxCol + 1))} --    - NOW()${inColUpdatedBy}${lockCols}
 \t\t) VALUES (
 \t\t\t${inValues}
 \t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\`${inValCreatedBy}
-\t\t\t${strPad('NOW(),', updatedAt.maxParam)}--    - \`${updatedAt.col}\`
-\t\t\t${strPad('adminID,', updatedBy.maxParam)}--    - \`${updatedBy.col}\`${lockVals}
+\t\t\t${strPad('NOW(),', updatedAt.maxParam)}--    - \`${updatedAt.col}\`${inValUpdatedBy}${lockVals}
 \t\t);
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5526,8 +5948,7 @@ BEGIN
 \t\tUPDATE \`${tableName}\`
 \t\tSET\t${setVals}
 \t\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--${upSetCreatedBy}
-\t\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--
-\t\t\t\t${strPad(`\`${updatedBy.col}\``, (createdAt.maxCol + 1))}= ${strPad('adminID,', (createdAt.maxParam))}--${setLock}
+\t\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--${upSetUpdatedBy}${setLock}
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5581,7 +6002,7 @@ BEGIN
 \tSET errorID = 8;
 
 \tIF ${testFunc} THEN
-\t\tDELETE FROM ${tableName}
+\t\tDELETE FROM \`${tableName}\`
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5638,20 +6059,21 @@ ${stProcLn}`;
  */
 const storedProcParams = (input, extraInputs, GETvars) => {
   // const _input = _tableDef;
-  const stripperRegex = /(?:data_)?(?:(?:income|purchasable|app)_)?(.*?)(?:s|_details_?)?$/i
+  const stripperRegex = /(?:data_)?(?:(?:income|purchasable|app|form)_)?(.*?)(?:s|_(?:details|metadata)_?)?$/i
   const _input = input;
   const _cols = []
   const _tableName = _input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')
   const _thingName = snakeToCamelCase(_tableName.replace(stripperRegex, '$1'))
   const _prefix = new RegExp('^' + _tableName.replace(stripperRegex, '$1_'), 'i')
-  const regex = /(-- +)?`([a-z_]+)`(?: ((?:(?:var)?char(?:\([0-9]+\))?|float|datetime|timestamp|(?:long)?text|(?:tiny|small|medium)?int(?:\([0-9]+\))?(?: unsigned)?)))[^,]*?(AUTO_INCREMENT)?(?=,|$)/ig
-  const _procName = _tableName.replace(/^data_(.*?)s?$/i, '$1')
+  const regex = /(-- +)?`([a-z_]+)`(?: ((?:(?:var)?char(?:\([0-9]+\))?|float|datetime|timestamp|(?:long)?text|decimal\([0-9]+,\s*[0-9]+\)|(?:tiny|small|medium)?int(?:\([0-9]+\))?(?: unsigned)?)))[^,]*?(AUTO_INCREMENT)?(?=,|$)/ig
+  const _procName = _tableName.replace(/^data_(?:form_)?(.*?)s?$/i, '$1')
   let maxCol = 0
   let maxParam = 0
   let maxIn = 0;
   let _tmp
   let _x = 0
   let isLockable = false;
+  let isSortable = false;
   console.log('_tableName:', _tableName)
   console.log('_thingName:', _thingName)
   console.log('stripperRegex:', stripperRegex)
@@ -5674,6 +6096,9 @@ const storedProcParams = (input, extraInputs, GETvars) => {
     } else if (_tmp[2].includes('expires_at')) {
       fieldType = 'expiresAt';
       isLockable = true;
+    } else if (_tmp[2].includes('sort_order')) {
+      fieldType = 'sort';
+      isSortable = true;
     } else if (_tmp[2].includes('locked_by')) {
       fieldType = 'lockedBy';
       isLockable = true;
@@ -5732,7 +6157,11 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   }
 
   if (isLockable === true) {
-    storedProc += stProcLocks(_cols, _tableName, _thingName, _procName, 'AAAA', )
+    storedProc += stProcLocks(_cols, _tableName, _thingName, _procName, 'AAAA')
+  }
+
+  if (isSortable === true) {
+    storedProc += stProcSort(_cols, _tableName, _thingName, _procName, 'AAAA')
   }
   storedProc += stProcGet(_cols, _tableName, _thingName, _procName)
   storedProc += stProcCUD(_cols, _tableName, _thingName, _procName)
