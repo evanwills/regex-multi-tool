@@ -38,8 +38,18 @@
     grid-template-areas: "regex-error regex-error regex-error" "flags-error flags-error flags-error" "regex-label regex-field flags-label" "replace-label replace-field flags-field";
   }
 }
-.r-pair__error-regex {
+.r-pair__error--regex {
   grid-area: regex-error;
+  background-color: #a00;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-style: italic;
+}
+.r-pair__error--regex::before {
+  content: 'Regex error: ';
+  font-weight: bold;
+  font-style: normal;
+  padding-right: 0.5rem;
 }
 .r-pair__error--flags {
   grid-area: flags-error;

@@ -54,7 +54,7 @@ function getVarsToFileName (input, extraInputs, GETvars) {
 doStuff.register({
   id: 'getVarsToFileName',
   func: getVarsToFileName,
-  group: 'even',
+  group: 'evan',
   ignore: false,
   name: 'Convert GET variable string to file name string'
   // description: 'Fix heading levels when Migrating HTML from one system to another',
@@ -196,146 +196,6 @@ doStuff.register({
 
 
 //  END:  Make string usable as a constant name
-// ====================================================================
-// START: Make form admin URLs local
-
-
-/**
- * formAdminLocalURLs() Make form admin URLs local
- *
- * created by: Evan Wills
- * created: 2019-11-29
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function formAdminLocalURLs (input, extraInputs, GETvars) {
-  const findReplace = [{
-    find: /https:\/\/apps\.acu\.edu\.au\/~trevorg\/form_admin/g,
-    replace: 'html'
-  }, {
-    find: /((?:href|src)=")(?=(?:style|js)\/)/g,
-    replace: '$1html/'
-  }, {
-    find: /((?:href|src)=")\.\.\/acustaff(?=\/ckeditor)/g,
-    replace: '$1html/js'
-  }]
-
-  return multiLitRegexReplace(input, findReplace)
-}
-
-doStuff.register({
-  id: 'formAdminLocalURLs',
-  func: formAdminLocalURLs,
-  ignore: false,
-  group: 'evan',
-  name: 'Make form admin URLs local'
-  // description: 'Fix heading levels when Migrating HTML from one system to another',
-  // docURL: '',
-})
-
-
-//  END:  Make form admin URLs local
-// ====================================================================
-// START: SQL for inserting SA Main acros into form_build
-
-
-/**
- * buildAcroSQL() Generate an SQL statement for inserting SA Main
- * acronyms into form_build
- *
- * created by: Evan Wills
- * created: 2020-03-02
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function buildAcroSQL (input, extraInputs, GETvars) {
-  const findReplace = [{
-    find: /^SA ID\t(?:[^\t]*\t+){6}Sitecore URL[\r\n]+/ig,
-    replace: ''
-  }, {
-    find: /(?:^|[\r\n])[0-9]+\t[0-9]+\t([a-z0-9]+)\t(?:[^\t]*\t+){5}(https:\/\/.*?)(?=[\r\n]|$)/ig,
-    replace: '\n(\'$1\', \'$2\'),'
-  }, {
-    find: /,$/,
-    replace: ';'
-  }]
-
-  return 'INSERT INTO `form_acro` ( `acro`, `acro_url` ) VALUES' +
-          multiLitRegexReplace(input.trim(), findReplace).trim()
-}
-
-doStuff.register({
-  id: 'buildAcroSQL',
-  func: buildAcroSQL,
-  group: 'evan',
-  ignore: true,
-  name: 'SQL for inserting SA Main acros into form_build'
-  // description: 'Fix heading levels when Migrating HTML from one system to another',
-  // docURL: '',
-})
-
-
-//  END:  SQL for inserting SA Main acros into form_build
-// ====================================================================
-// START: Fix config set order
-
-
-/**
- * Use to reliably rewrite some PHP code after an API change.
- *
- * created by: Evan Wills
- * created: 2020-03-02
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function fixSet (input, extraInputs, GETvars) {
-  const replaceCallback = (whole, func, value, prop, key1a, key1b, key2a, key2b) => {
-    key2a = (typeof key2a === 'undefined') ? '' : key2a
-    key2b = (typeof key2b === 'undefined') ? '' : key2b
-
-    return '$config->' + func + "('" + prop.toLowerCase() + key1a.toUpperCase() + key1b + key2a.toUpperCase() + key2b + "', " + value
-  }
-
-  return input.replace(
-    /(?:RegexAPI::|\$config->)(set)Config\(([^,]+)(?:,\s+'([a-z]+)')?(?:,\s+'([a-z])([a-z]+)')?(?:,\s+'([a-z])([a-z]+)')?(?=\);)/ig,
-    replaceCallback
-  )
-}
-
-doStuff.register({
-  id: 'fixSet',
-  func: fixSet,
-  group: 'evan',
-  ignore: true,
-  name: 'Fix config set order'
-  // description: 'Fix heading levels when Migrating HTML from one system to another',
-  // docURL: '',
-})
-
 // ====================================================================
 // START: Animal Crossing 1
 
@@ -736,268 +596,7 @@ doStuff.register({
   name: 'Calculate Artbot Motor Speeds'
 })
 
-// ====================================================================
-// START: ACUSIS queries
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const acusysQueries = (input, extraInputs, GETvars) => {
-  const _invoices = input.split('\n')
-  let _in = ''
-  let _sep = ''
-  for (let a = 0; a < _invoices.length; a += 1) {
-    _in += _sep + '\n      \'' + _invoices[a].trim() + '\''
-    _sep = ','
-  }
-
-  return `
--- ====================================================
--- RUN BOTH THESE QUERIES IN ORDER EVERY TIME
--- (It saves you having to run them separately each time)
-
--- ==========================
--- Revert previous (below) change before re-running the update
-
-UPDATE acu_project_invoice
-SET    datesenttofinanace = null
-WHERE  status = 'Approved'
-AND    CAST(datesenttofinanace AS DATE) = CAST(GETDATE() AS DATE)
-AND    invoiceno IN (
-        -- - - - - - - - - - - - - - - - - - - - -
-        -- Below are all the invoice IDs to be checked
-        --
-        -- These IDs do not need to be changed/commented
-${_in}
-);
-
-
--- ==========================
--- Make change
-
-UPDATE acu_project_invoice
-SET    datesenttofinanace = getdate()
-WHERE  status = 'Approved'
-AND    datesenttofinanace is null
-AND    invoiceno IN (
-        -- - - - - - - - - - - - - - - - - - - - -
-        -- Below here should go all the invoice IDs to be checked
-        -- (Use the same list as above)
-        --
-        -- Comment all of the below out (one by one)
-        --
-        -- Step 1:  Comment out the first ID
-        -- Step 2:  Run the both SQL Queries
-        -- Step 3:  Test the batch
-        --          https://acusis.acu.edu.au/ACUSIS/ACUdefault/Enhancement/ProjectProcurement/Send_finance_email.aspx
-        -- Step 4a: If the batch failed add a commnet after the
-        --          failing ID to identify it as bad and uncomment
-        --          it.
-        -- Step 5b: If the batch succeeded, leave it the ID commented
-        --          out
-        -- Step 6:  Repeat steps 1 - 5 until all bad IDs have been
-        --          identified for each subsequent ID
-        --
-        -- NOTE: You do not need to comment out any of the IDs in the
-        --       last SQL Statement
-        --       These are ignored if their datSsenTtoFinanace is NULL
-        -- - - - - - - - - - - - - - - - - - - - -
-${_in}
-);`
-}
-
-doStuff.register({
-  id: 'acusysQueries',
-  func: acusysQueries,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false,
-  name: 'ACUSIS queries'
-})
-
-//  END: ACUSIS queries
-// ====================================================================
-// START: ACU Form Build email hash search
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const emailHashSearch = (input, extraInputs, GETvars) => {
-  const rows = input.split('\n')
-  const IDs = []
-  let IDstring = ''
-  let sep = ''
-  let output = ''
-
-  for (let a = 0; a < rows.length; a += 1) {
-    if (rows[a].trim() !== '') {
-      const row = rows[a].split('\t')
-
-      if (row[1].trim() !== '') {
-        const ref = row[1].split('_')
-        // const acro = ref[0].trim()
-        const id = ref[1].trim()
-
-        // console.log('acro:', acro)
-        // console.log('id:', id)
-        IDs.push(id)
-        IDstring += sep + id
-        sep = ', '
-      }
-    }
-  }
-
-  output = `\n-- Total rows: ${IDs.length}\n\nSELECT COUNT(*)\nFROM \`email_hash\`\nWHERE \`user_id\` IN ( ${IDstring} );`
-
-  return output
-}
-
-doStuff.register({
-  id: 'emailHashSearch',
-  func: emailHashSearch,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false,
-  name: 'ACU Form Build email hash search'
-})
-
-//  END: ACU Form Build email hash search
-// ====================================================================
-// START: (GIT) Fix bad ACU.Sitecore merge
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const fixBadSitecoreMerge = (input, extraInputs, GETvars) => {
-  const lines = input.split('\n')
-  const thisURL = 'file:///C:/Users/evan/Documents/code/do-JS-regex-stuff/do-JS-regex-stuff.html?groups=it,evan&action=fixbadsitecoremerge'
-  let uncommitted = false
-  let untracked = false
-  let line = ''
-  let output = ''
-  let file = ''
-  let checkoutFiles = ''
-  let rmFiles = ''
-  let rmDirs = ''
-  let sepCO = ' '
-  let sepRMD = ' '
-  let sepRMF = ' '
-
-  for (let a = 0; a < lines.length; a += 1) {
-    line = lines[a].trim()
-
-    if (line === '' || line.substring(line.length - 3) === '.sh' || line.substring(0, 9) === 'On branch' || line.substring(0, 1) === '(' || line.substring(0, 10) === 'no changes' || line.substring(0, 33) === 'src/Project/ACUPublic/ACU.Static/') {
-      console.log('Skipping line:', line)
-      continue
-    }
-
-    if (line === 'Changes not staged for commit:') {
-      uncommitted = true
-      untracked = false
-      // output += '\n# -----------------------\necho "Undoing merge"\n\n'
-      continue
-    }
-    if (line === 'Untracked files:') {
-      uncommitted = false
-      untracked = true
-      // output += '\n# -----------------------\necho "Removing untracked files"\n\n'
-      continue
-    }
-
-    if (uncommitted === true) {
-      file = line.replace(/^(?:deleted|modified):[\\t ]*/, '')
-      // console.log('file:', file)
-      // console.log('line:', line)
-
-      if (file !== line) {
-        checkoutFiles += sepCO + '"' + file + '"'
-        sepCO = '\\\n\t'
-      }
-    } else if (untracked === true) {
-      if (line.substring(line.length - 1) === '/') {
-        rmDirs += sepRMD + '"' + line + '"'
-        sepRMD = '\\\n\t'
-      } else {
-        rmFiles += sepRMF + '"' + line + '"'
-        sepRMF = '\\\n\t'
-      }
-    }
-  }
-
-  if (checkoutFiles !== '') {
-    output += '\n\n\n# -----------------------\n\necho "Files to be reset";\n\ngit checkout' + checkoutFiles + ';\n\ngit reset' + checkoutFiles + ';'
-  }
-  if (rmFiles !== '') {
-    output += '\n\n\n# -----------------------\n\necho "Files to be deleted";\n\nrm' + rmFiles + ';'
-  }
-  if (rmDirs !== '') {
-    output += '\n\n\n# -----------------------\n\necho "Directories to be deleted";\n\nrm -rf' + rmDirs + ';'
-  }
-
-  if (output !== '') {
-    output = '#!/bin/sh\n\n// ' + thisURL + '\n\n' + output + '\n\n\ngit status;\n\n// ' + thisURL + '\n\n'
-  } else {
-    output = input
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'fixBadSitecoreMerge',
-  func: fixBadSitecoreMerge,
-  description: 'Copy the entire output of <code>$ git status;</code> and paste it below',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false,
-  name: 'GIT: Fix bad ACU.Sitecore merge'
-})
-
-//  END: (GIT) Fix bad ACU.Sitecore merge
+//  END: Calculate Artbot Motor Speeds
 // ====================================================================
 // START: Accept all origin changes
 
@@ -1098,146 +697,7 @@ doStuff.register({
   name: 'GIT: Accept merge changes'
 })
 
-//  END: DUMMY action
-// ====================================================================
-// START: side-accordion IDs
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const sideAccordionIDs = (input, extraInputs, GETvars) => {
-  const regex = new RegExp(
-    '(@if \\(!string\\.IsNullOrEmpty\\(Model(?:\\.(?:DataItemModel|StudentType))?\\.' +
-    '([^)]+)' +
-    '\\)\\)\\s+\\{\\s+<div class="side-accordion")(?=>)',
-    'gi'
-  )
-
-  const replaceFunc = (whole, ifPart, varPart) => {
-    // console.log('whole:', whole)
-    // console.log('ifPart:', ifPart)
-    // console.log('varPart:', varPart)
-    let _varPart = varPart.replace(/[^a-zA-Z]+/ig, '-')
-    _varPart = _varPart.replace(/([a-z])(?=[A-Z])/g, '$1-')
-    return ifPart + ' id="' + _varPart.toLowerCase() + '"'
-  }
-
-  // console.log('regex:', regex)
-
-  return input.replace(regex, replaceFunc)
-}
-
-doStuff.register({
-  id: 'sideAccordionIDs',
-  func: sideAccordionIDs,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false,
-  name: 'Side Accordion IDs'
-})
-
-//  END: side-accordion IDs
-// ====================================================================
-// START: Bash path to Windows path
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const bash2windows = (input, extraInputs, GETvars) => {
-  const prefix = {
-    bash: '/c/ACU.Sitecore/Website/',
-    win: 'C:\\ACU.Sitecore\\Website\\'
-  }
-  const whichWay = extraInputs.whichWay()
-  let output = ''
-
-  input = input.trim()
-
-  const forwardBack = (_input) => {
-    const _output = _input.replace(
-      /^\/([a-z])(?=\/)/i,
-      (whole, part) => {
-        return part.toUpperCase() + ':'
-      }
-    )
-    return _output.replace(/\//g, '\\')
-  }
-  const backForward = (_input) => {
-    const _output = _input.replace(
-      /^([a-z]):(?=\\)/i,
-      (whole, part) => {
-        return '/' + part.toLowerCase()
-      }
-    )
-    return _output.replace(/\\/g, '/')
-  }
-
-  if (whichWay === 'win2bash') {
-    output = backForward(input)
-    // console.log('input:', input)
-    // console.log('input.substring(1, 2):', input.substring(1, 2))
-    if (input.substring(1, 2) === ':') {
-      output = prefix.bash + output
-    }
-  } else {
-    output = forwardBack(input)
-    if (input.substring(0, 1) === '/') {
-      output = prefix.win + output
-    }
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'bash2windows',
-  func: bash2windows,
-  description: '',
-  // docsURL: '',
-  extraInputs: [
-    {
-      id: 'whichWay',
-      label: 'Which way to convert',
-      type: 'radio',
-      options: [
-        { value: 'bash2win', label: 'Bash path to Windows path', default: true },
-        { value: 'win2bash', label: 'Windows to Bash' }
-      ]
-    }],
-  group: 'evan',
-  ignore: false,
-  name: 'Bash path to Windows path'
-})
-
-//  END: Bash path to Windows path
+//  END: Accept all origin changes
 // ====================================================================
 // START: Fix time in teams chat history
 
@@ -1294,100 +754,6 @@ doStuff.register({
 
 //  END:  Fix time in teams chat history
 // ====================================================================
-// START: Download old matrix assets
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const downloadMatrixAssets = (input, extraInputs, GETvars) => {
-  const URLs = input.split('\n')
-  const _regex = /^(?:https?:)?\/\/[a-z]+\.acu\.edu\.au\/(.*?)\/([a-z0-9._-]+?\.[a-z]+)$/i
-
-  const parseURL = (whole, path, file) => {
-    // console.group('parseURL()')
-    // console.log('whole:', whole)
-    // console.log('path:', path)
-    // console.log('file:', file)
-    // console.groupEnd()
-    return 'getURL "' + path + '" "' + file + '";' + '\n'
-  }
-
-  const _URLs = URLs.filter(url => (url.trim() !== '')).map(url => {
-    // console.group('URLs.map()')
-    const _url = url.trim()
-    const _line = _url.replace(_regex, parseURL)
-    // console.log('_url:', _url)
-    // console.log('_regex:', _regex)
-    // console.log('_line:', _line)
-    // console.groupEnd()
-    return _line
-  })
-
-  let _output = '#!/bin/sh\n\n' +
-                'function getURL {\n' +
-                '\tdownloadURL="https://forms.acu.edu.au/$1/$2";\n' +
-                '\tdownloadPath="/var/www/html/$1";\n' +
-                '\tdownloadFile="$downloadPath/$2";\n\n' +
-                '\techo;\n' +
-                '\techo "===============================";\n' +
-                '\techo;\n\n' +
-                '\tif [ ! -f "$downloadFile" ]\n' +
-                '\tthen\tif [ ! -d "$downloadPath" ]\n' +
-                '\t\tthen\tmkdir -p $downloadPath;\n' +
-                '\t\t\techo "Created \'$downloadPath\' directory";\n' +
-                '\t\telse\techo "Directory "$downloadPath" already exists";\n' +
-                '\t\tfi\n\n' +
-                '\t\tcd $downloadPath;\n' +
-                '\t\twget $downloadURL;\n\n' +
-                '\t\tif [ -f $downloadFile ]\n' +
-                '\t\tthen\techo "Downloaded "$downloadPath;\n' +
-                '\t\telse\techo;\n' +
-                '\t\t\techo "-------------------------";\n' +
-                '\t\t\techo;\n' +
-                '\t\t\techo "Download of \'$downloadFile\' FAILED!!!";\n' +
-                '\t\t\techo "\\t$downloadURL";\n' +
-                '\t\t\techo;\n' +
-                '\t\t\techo "-------------------------";\n' +
-                '\t\t\techo;\n' +
-                '\t\tfi\n' +
-                '\telse\techo "File \'$downloadFile\' already exists";\n' +
-                '\tfi\n\n' +
-                '\techo;\n\techo;\n\techo;\n' +
-                '}\n\n\n'
-
-  for (let a = 0; a < _URLs.length; a += 1) {
-    _output += _URLs[a]
-  }
-
-  return _output + '\n'
-}
-
-doStuff.register({
-  id: 'downloadMatrixAssets',
-  func: downloadMatrixAssets,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false,
-  name: 'Download old matrix assets'
-})
-
-//  END:  Download old matrix assets
-// ====================================================================
 // START: Checkout modified files with only changed line end characters
 
 /**
@@ -1439,252 +805,6 @@ doStuff.register({
 })
 
 //  END: Checkout modified files with only changed line end characters
-// ====================================================================
-// START: Transform RYI Suburb/Schools JSON
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const transformSchoolsJSONevan = (input, extraInputs, GETvars) => {
-  let json
-  try {
-    json = JSON.parse(input)
-  } catch (e) {
-    console.error('Schools JSON failed to parse.', e)
-  }
-
-  const outputMode = extraInputs.output()
-  // console.log(outputMode)
-
-  const output = []
-  const output2 = {}
-  const output3 = {}
-  // let suburbCount = 0
-  // let schoolCount = 0
-  // const allSuburbs = []
-  // const allSchools = []
-  let tmp = ''
-  let _tmp = []
-
-  const makeJS = (input) => {
-    const _through = JSON.stringify(input)
-    return _through.replace(/"([^"]+)"(?=:)/ig, (whole, key) => key.toLowerCase())
-  }
-
-  for (let a = 0; a < json.Suburbs.length; a += 1) {
-    const suburb = json.Suburbs[a]
-    // suburbCount += 1
-    output2[suburb.Name] = []
-
-    // console.log('suburb:', suburb)
-    for (let b = 0; b < suburb.Schools.length; b += 1) {
-      // schoolCount += 1
-      const better = {
-        id: suburb.Schools[b].ID,
-        name: suburb.Schools[b].Name,
-        // suburb: suburb.Name,
-        state: suburb.Schools[b].State
-      }
-      // console.log('suburb.Schools[' + b + ']:', suburb.Schools[b])
-      output.push(better)
-      output2[suburb.Name].push(better)
-    }
-  }
-
-  const sortSchools = (a, b) => {
-    if (a.suburb < b.suburb) {
-      return -1
-    } else if (a.suburb > b.suburb) {
-      return 1
-    } else {
-      if (a.state < b.state) {
-        return -1
-      } else if (a.state > b.state) {
-        return 1
-      } else {
-        if (a.name < b.name) {
-          return -1
-        } else if (a.name > b.name) {
-          return 1
-        } else {
-          return 0
-        }
-      }
-    }
-  }
-
-  // console.log('Suburb count:', suburbCount)
-  // console.log('School count:', schoolCount)
-
-  switch (outputMode) {
-    case 'suburb':
-      output.sort((a, b) => {
-        if (a.suburb < b.suburb) {
-          return -1
-        }
-        if (a.suburb > b.suburb) {
-          return 1
-        } else {
-          return 0
-        }
-      })
-      _tmp = []
-      tmp = '<label for="suburb"class=" custom-form__label">Suburb</label>\n<select id="suburb" class="ryi-area-first classic-black form-control__primary select customDropDown">'
-      for (let a = 0; a < output.length; a += 1) {
-        if (_tmp.indexOf(output[a].suburb) === -1) {
-          _tmp.push(output[a].suburb)
-          tmp += '\n\t<option value="' + output[a].suburb + '">' + output[a].suburb + '</option>'
-        }
-      }
-      return tmp + '\n</select>'
-
-    case 'school':
-      output.sort((a, b) => {
-        if (a.name < b.name) {
-          return -1
-        }
-        if (a.name > b.name) {
-          return 1
-        } else {
-          return 0
-        }
-      })
-      tmp = '<label for="school" class=" custom-form__label">School</label>\n<select id="school" class="ryi-area-first classic-black form-control__primary select customDropDown">'
-      for (let a = 0; a < output.length; a += 1) {
-        if (_tmp.indexOf(output[a].name + output[a].state) === -1) {
-          _tmp.push(output[a].name + output[a].state)
-          tmp += '\n\t<option value="' + output[a].name + '">' + output[a].name + ' (' + output[a].state + ')</option>'
-        }
-      }
-      return tmp + '\n</select>'
-
-    case 'array':
-      output.sort(sortSchools)
-      return JSON.stringify(output)
-
-    case 'object2':
-      _tmp = Object.keys(output2)
-      for (tmp in output2) {
-        // console.log('tmp:', tmp)
-        let _key = tmp.replace(/[^a-z]+/ig, '')
-        // console.log('_key:', _key)
-        _key = _key.toLowerCase()
-        // console.log('_key:', _key)
-        output3[_key] = {
-          name: tmp,
-          schools: output2[tmp]
-        }
-      }
-
-      return 'var RYIschoolSuburbs = ' + makeJS(output3)
-
-    case 'object':
-      for (const suburb in output2) {
-        output2[suburb].sort(sortSchools)
-      }
-      return JSON.stringify(output2)
-
-    case 'js':
-    default:
-      return 'var RYIschoolSuburbs = ' + makeJS(json.Suburbs)
-  }
-}
-
-doStuff.register({
-  id: 'transformSchoolsJSONevan',
-  func: transformSchoolsJSONevan,
-  description: 'Transform RYI Suburb/Schools JSON string to JavaScript variable for use in WWW RYI from</p><p>For creating the JavaScript variable use in the public website RYI form</p><ol><li>Copy the whole JSON (supplied by marketing) into the text box below</li><li>click MODIFY INPUT (green button on the bottom left)</li><li>Copy the (modified) contents of the text box</li><li>Then replace the existing variable in the sitecore <code>ryi-script.js</code> file</li></ol><p>',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'output',
-    type: 'radio',
-    label: 'Output mode',
-    options: [{
-      value: 'js',
-      label: 'JS version of original JSON',
-      default: true
-    }, {
-      value: 'object2',
-      label: 'Create keyed clean object for use in www RYI form'
-    }, {
-      value: 'object',
-      label: 'Use clean object (if not checked make flat array of school objects)'
-    }, {
-      value: 'array',
-      label: 'Single list of all schools as school objects'
-    }, {
-      value: 'suburb',
-      label: 'HTML for suburb select input'
-    }, {
-      value: 'school',
-      label: 'HTML for school select input'
-    }]
-  }],
-  group: 'evan',
-  ignore: true,
-  name: 'Transform RYI Suburb/Schools JSON'
-})
-
-//  END:  Transform RYI Suburb/Schools JSON
-// ====================================================================
-// START: Fix handbook URLs
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const fixHandbookURLs = (input, extraInputs, GETvars) => {
-  // sed -i 's/http:\/\/www\.acu\.edu\.au\/346446/\/handbook\/handbooks\/handbook_2012\/unit_descriptions_for_2012.html/ig' non-award_courses/*.html
-
-  // sed -i 's/\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/units-info\//https:\/\/archives\.acu\.edu\.au\/handbook\/units-info\//ig'
-  // var output = '#!/bin/sh\n\n' +
-  //              'function cleanHTML {\n' +
-  //              '\tif [ -d "$1" ]\n' +
-  //              '\tthen\t'
-  //              '}\n\n'
-  return input
-}
-
-doStuff.register({
-  id: 'fixHandbookURLs',
-  func: fixHandbookURLs,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: true,
-  // inputLabel: '',
-  name: 'Fix (archived) Handbook URLs'
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Fix handbook URLs
 // ====================================================================
 // START: extract unicode chars
 
@@ -2108,7 +1228,7 @@ doStuff.register({
 // START: Linux to Windows file path
 
 /**
- * Action description goes here
+ * Linux to Windows file path
  *
  * created by: Evan Wills
  * created: 2021-06-04
@@ -2222,58 +1342,6 @@ doStuff.register({
 })
 
 //  END:  Quick Staff Directory SQL generator
-// ====================================================================
-// START: Collapse SQL
-
-/**
- * Convert nicely formatted SQL into single line Plus replace query parameter tokens with supplied values
- *
- * created by: Evan Wills
- * created: 2021-07-19
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const collapseSQL = (input, extraInputs, GETvars) => {
-  const tokens = extraInputs.tokens().split(';')
-
-  let output = input
-  for (let a = 0; a < tokens.length; a += 1) {
-    tokens[a] = tokens[a].split(':')
-    output = output.replace(':' + tokens[a][0].trim(), tokens[a][1].trim())
-  }
-
-  return output.replace(/\s+/g, ' ').trim() + '\n'
-}
-
-doStuff.register({
-  id: 'collapseSQL',
-  func: collapseSQL,
-  description: '',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'tokens',
-    label: 'Query parameters (e.g. PARAM1: value1; PARAM2: value2)',
-    type: 'text',
-    default: '',
-    description: 'semi-colon separated string (colons separate token/value pairs)'
-  }],
-  group: 'evan',
-  ignore: false,
-  // inputLabel: '',
-  name: 'Collapse SQL'
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Collapse SQL
 // ====================================================================
 // START: Count number of uploaded files
 
@@ -2492,51 +1560,6 @@ doStuff.register({
 
 //  END:  PHP associative array to javascript object
 // ====================================================================
-// START: Convert laravel int fields to unsigned
-
-const int2unsignedInner = (whole, part) => {
-  return '->unsigned' + ucFirst(part) + ')'
-}
-
-/**
- * Convert laravel migration integer fields to unsigned
- * integer fields
- *
- * created by: Evan Wills
- * created: 2021-11-16
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const int2unsigned = (input, extraInputs, GETvars) => {
-  const regex = /->((?:tiny|small|medium|big)?Integer\('[^']+'), false, true\)/ig
-
-  return input.replace(regex, int2unsignedInner)
-}
-
-doStuff.register({
-  id: 'int2unsigned',
-  func: int2unsigned,
-  description: 'Convert laravel migration integer fields to unsigned integer fields',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: true,
-  // inputLabel: '',
-  name: 'Larvel ints to unsigned'
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Convert laravel int fields to unsigned
-// ====================================================================
 // START: Change variable style
 
 const snakeToArray = (input) => {
@@ -2684,643 +1707,6 @@ doStuff.register({
 
 //  END:  Change variable style
 // ====================================================================
-// START: Routes to Enums
-
-/**
- * Split list of routes into 2D array
- *
- * @param {string} input Copy/Paste from Excel
- *
- * @returns array
- */
-const splitRoutes = (input) => {
-  let routes = input.trim()
-  routes = routes.split('\n')
-  const _route = []
-  const _description = []
-  const _label = []
-
-  for (let a = 0; a < routes.length; a += 1) {
-    routes[a] = routes[a].trim()
-    if (routes[a] !== '') {
-      routes[a] = routes[a].split('\t')
-      for (let b = 0; b < routes[a].length; b += 1) {
-        routes[a][b] = routes[a][b].trim()
-        if (routes[a][b] !== '') {
-          if (b < 5) {
-            if (typeof _route[a] === 'undefined') {
-              _route[a] = []
-            }
-            _route[a].push(routes[a][b])
-          } else if (b === 5) {
-            _description[a] = routes[a][b]
-          } else {
-            _label[a] = routes[a][b]
-          }
-        }
-      }
-    }
-  }
-
-  return {
-    route: _route,
-    description: _description,
-    label: _label
-  }
-}
-
-/**
- * Routes to Enums
- *
- * created by: Evan Wills
- * created: 2021-12-10 12:19:00
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const routes2enums = (input, extraInputs, GETvars) => {
-  const fieldName = extraInputs.fieldName()
-  const routes = splitRoutes(input).route
-  const enums = []
-  let output = ''
-  console.log('routes:', routes)
-
-  for (let a = 0; a < routes.length; a += 1) {
-    if (typeof routes[a] === 'undefined') {
-      continue
-    }
-    for (let b = 0; b < routes[a].length; b += 1) {
-      if (Array.isArray(enums[b])) {
-        if (enums[b].indexOf(routes[a][b]) === -1) {
-          enums[b].push(routes[a][b])
-        }
-      } else {
-        enums.push([routes[a][b]])
-      }
-    }
-  }
-  console.log('routes:', routes)
-  console.log('enums:', enums)
-
-  for (let a = 0; a < enums.length; a += 1) {
-    enums[a].sort()
-    output += '                $table->enum(\n' +
-              '                    \'' + fieldName + (a + 1) + '\',\n' +
-              '                    ['
-    let line = ''
-    const sep = '\n                     '
-    for (let b = 0; b < enums[a].length; b += 1) {
-      enums[a][b] = enums[a][b].trim()
-
-      if (enums[a][b] !== '') {
-        if ((line.length + enums[a][b].length + 4) > 48) {
-          output += sep + line
-          line = ''
-        }
-        line += ' \'' + enums[a][b] + '\','
-      }
-    }
-    if (line !== '') {
-      output += sep + line
-    }
-
-    output += '\n' +
-              '                    ]\n' +
-              '                )->nullable();\n'
-  }
-  output = output.replace(/(?<='')(?=\n)/ig, ',')
-
-  return output
-}
-
-doStuff.register({
-  id: 'routes2enums',
-  name: 'Routes to Enums',
-  func: routes2enums,
-  description: '',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'fieldName',
-    label: 'Field Name',
-    type: 'text',
-    default: 'admin_activity_route_level_'
-  }],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Routes to Enums
-// ====================================================================
-// START: Routes insert statements
-
-const _getRoutAction = (route, level) => {
-  let output = ''
-  let _level = level
-
-  if (route[_level] !== '') {
-    output = route[_level].replace(/-/g, ' ')
-  } else {
-    _level -= 1
-    if (route[_level].substr(-3) === 'ID}') {
-      output = 'show'
-    } else if (route[_level] !== '') {
-      output = route[_level]
-    } else {
-      return 's -> listing'
-    }
-  }
-
-  return (output !== '')
-    ? ' -> ' + output
-    : ''
-}
-
-/**
- * Routes insert statements
- *
- * created by: Evan Wills
- * created: 2021-12-10 12:19:00
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const insertRoutes = (input, extraInputs, GETvars) => {
-  const fieldName = extraInputs.fieldName()
-  const routes = splitRoutes(input).route
-  const formSubs = [
-    'items', 'packages', 'fields', 'emails', 'email-rules',
-    'earlybird-discounts', 'group-discounts',
-    'text-blocks', 'payments'
-  ]
-  const settingSubs = [
-    'config', 'text-blocks', 'field-types'
-  ]
-  // const enums = []
-  let output = ''
-  let sep1 = ''
-
-  for (let a = 0; a < routes.length; a += 1) {
-    if (typeof routes[a] === 'undefined') {
-      routes[a] = []
-    }
-
-    for (let b = 0; b < 5; b += 1) {
-      if (typeof routes[a][b] !== 'string') {
-        routes[a][b] = ''
-      }
-    }
-
-    let sep2 = ''
-    let top = makeSingle(routes[a][0])
-
-    if (top === 'form') {
-      if (formSubs.indexOf(routes[a][2]) > -1) {
-        top += ': ' + makeSingle(routes[a][2]) + _getRoutAction(routes[a], 4)
-      } else {
-        top += _getRoutAction(routes[a], 2)
-      }
-    } else if (top === 'setting') {
-      top += 's'
-      if (settingSubs.indexOf(routes[a][1]) > -1) {
-        top += ': ' + makeSingle(routes[a][1]) + _getRoutAction(routes[a], 3)
-      }
-    } else if (['acronym', 'user'].indexOf(top) > -1) {
-      top += _getRoutAction(routes[a], 2)
-    }
-
-    output += sep1 + '\n                [ // ' + a + ' (' + top + ')'
-
-    for (let b = 0; b < routes[a].length; b += 1) {
-      // routes[a][b] = routes[a][b]
-
-      const value = (routes[a][b] === '')
-        ? 'null'
-        : "'" + routes[a][b] + "'"
-
-      output += sep2 + '\n                    \'' + fieldName + (b + 1) + '\' => ' + value
-      sep2 = ','
-    }
-
-    output += '\n                ]'
-    sep1 = ','
-  }
-
-  output = output.replace(/(?<=\/\/ 1 \()(?=\))/, 'home')
-
-  return output
-}
-
-doStuff.register({
-  id: 'insertRoutes',
-  name: 'Routes Insert',
-  func: insertRoutes,
-  description: '',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'fieldName',
-    label: 'Field Name',
-    type: 'text',
-    default: 'admin_activity_route_level_'
-  }],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Routes insert statements
-// ====================================================================
-// START: Routes MD format
-
-/**
- * Routes to Markdown format
- *
- * created by: Evan Wills
- * created: 2022-01-06 10:00:00
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const routes2md = (input, extraInputs, GETvars) => {
-  const routes = splitRoutes(input)
-  const isID = (input) => {
-    return /^\{[a-zA-Z]+\}$/.test(input)
-  }
-  console.log('routes:', routes)
-  // return input
-
-  let output = ''
-
-  for (let a = 0; a < routes.route.length; a += 1) {
-    if (!Array.isArray(routes.route[a])) {
-      continue
-    }
-    const c = routes.route[a].length - 1
-    const key = routes.route[a][c]
-    const preSep = padStrLeft('', (c * 2))
-    const sep = '\n  ' + preSep
-
-    if (key !== '') {
-      if (c === 0) {
-        output += '\n\n## ' + ucFirst(key) + '\n'
-      }
-
-      output += '\n' + preSep + '* '
-      output += isID(key)
-        ? key.replace(/\{([^}]+)\}/, (match, token) => '__*`[' + ucFirst(camel2human(token)) + ']`*__')
-        : '__`' + key + '`__'
-      output += (typeof routes.label[a] === 'string')
-        ? ' (' + routes.label[a] + ')'
-        : ''
-      output += sep + '> __Route:__ '
-
-      // Generate the full route string
-      let route = ''
-      let subSep = ''
-      for (let b = 0; b <= c; b += 1) {
-        route += subSep + '`'
-        route += isID(routes.route[a][b])
-          ? '_`' + routes.route[a][b] + '`_'
-          : routes.route[a][b]
-        route += '`'
-        subSep = '/'
-      }
-      output += route.replace(/`(\/`_`)|(`_`\/)`|`(\/)`|(?<=_)`$/g, '$1$2$3')
-      output += (typeof routes.description[a] === 'string')
-        ? '\n' + sep + routes.description[a]
-        : ''
-    }
-  }
-  return output
-}
-
-doStuff.register({
-  id: 'routes2md',
-  name: 'Routes to Markdown format',
-  func: routes2md,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Routes MD format
-// ====================================================================
-// START: Laravel insert SQL to JS
-
-/**
- * Routes to Markdown format
- *
- * created by: Evan Wills
- * created: 2022-01-06 10:00:00
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const sql2json = (input, extraInputs, GETvars) => {
-  const tableName = extraInputs.table()
-  const colName = extraInputs.idProp()
-  let id = 0
-  const prefix = (extraInputs.stripPrefix() !== '')
-    ? extraInputs.stripPrefix() + '_'
-    : ''
-  const addSaveState = extraInputs.extras('saveState')
-  const addMessages = extraInputs.extras('messages')
-  const dataType = (extraInputs.dataType() !== '')
-    ? ': ' + extraInputs.dataType()
-    : ''
-
-  // console.group('sql2json')
-  // console.log('prefix:', prefix)
-  // console.log('addSaveState:', addSaveState)
-  // console.log('addMessages:', addMessages)
-
-  /**
-   * Do the actual heavy lifting of wrapping long value strings so
-   * the total length of line is less than 70 characters
-   *
-   * @param {number} base1 Length of white space to prefix wrapped
-   *                       lines
-   * @param {string} input String to wrap
-   *
-   * @returns {string} wrapped output
-   */
-  const wrapLongLineInner = (base1, input) => {
-    const maxLen = 70 - (base1 + 4)
-    const headReg = /[^ ]+$/s
-    const tailReg = /^.+? (?=[^ ]+$)/s
-    const sep = "' +\n" + ''.padStart(base1, ' ') + "'"
-    let _sep = ''
-    let head = ''
-    let tail = input
-
-    let a = 0
-    while (tail.length > maxLen) {
-      head += _sep + tail.substring(0, maxLen)
-      tail = tail.substring(maxLen)
-
-      if (head.substring(head.length - 1) !== ' ') {
-        tail = head.replace(tailReg, '') + tail
-        head = head.replace(headReg, '')
-      }
-
-      _sep = sep
-      a += 1
-      if (a > 100) {
-        break
-      }
-    }
-
-    return head + _sep + tail
-  }
-
-  /**
-   * Handle makeing long value strings wrap at 70 characters
-   *
-   * @param {string} match whole pattern match
-   * @param {string} field field part of match
-   * @param {string} value value part of match
-   *
-   * @returns {string} wrapped version of whole match
-   */
-  const wrapLongLine = (match, field, value) => {
-    const baseLen = 6 + field.length
-    let output = value
-
-    if ((baseLen + 3 + output.length) > 70) {
-      output = wrapLongLineInner(baseLen, output)
-    }
-
-    return field + ": '" + output + "'"
-  }
-
-  /**
-   * Convert SQL table name into JS property name
-   *
-   * @param {string} match
-   * @param {string} key
-   *
-   * @returns {string}
-   */
-  const camelKey = (_match, _prefix, _key) => {
-    const tmp = (_prefix !== prefix)
-      ? _prefix + _key
-      : _key
-    return '    ' + snakeToCamelCase(tmp)
-  }
-
-  /**
-   * Clean up the Laravel Insert code
-   *
-   * @param {string} input Do all the things needed to make each
-   *                       object clean
-   * @returns Text suitable for use as JavaScript objects
-   */
-  const standardClean = (input) => {
-    let output = input.replace(/'\.[\r\n]+\s+'/g, '')
-    console.group('standardClean()')
-    // output = output.replace(/'/g, '"')
-
-    if (addSaveState) {
-      output = output.replace(
-        / +\[/g,
-        (_match) => {
-          id += 1
-          return '  {\n    ' + colName + ': ' + id + ',\n' +
-                      '    saveState: 1,'
-        }
-      )
-    } else {
-      output = output.replace(
-        / +\[/g,
-        (_match) => {
-          id += 1
-          return '  {\n    ' + colName + ': ' + id + ','
-        }
-      )
-    }
-
-    // console.log('output:', output)
-    if (addMessages) {
-      output = output.replace(
-        /[\r\n]+ +\]/g,
-        ',\n    messages: {\n      error: \'\',\n      warning: \'\',\n      info: \'\'\n    }\n  }'
-      )
-    } else {
-      output = output.replace(/ +\]/g, '  }')
-    }
-    // console.log('output:', output)
-    output = output.replace(/ *=> +/g, ': ')
-    // console.log('output:', output)
-    output = output.replace(/ +'([a-z]+_)([a-z_]+)'(?=: )/ig, camelKey)
-    output = output.replace(/\s*,\s*$/s, '')
-    // console.log('output:', output)
-    output = output.replace(/^(?:\s*\[)?/, '[')
-    // console.log('output:', output)
-    output = output.replace(/$/, '\n]')
-    // console.log('output:', output)
-    console.groupEnd()
-    return output.replace(/(?<= {4})([a-z]+): '(.*?)'(?=,|[\r\n])/ig, wrapLongLine)
-  }
-
-  // console.log('tableName:', tableName)
-  // console.log('tableName:', tableName)
-  // console.groupEnd()
-  return 'export const ' + snakeToCamelCase(
-    tableName.replace('data_', '')
-  ) + 'State ' + dataType + ' = ' + standardClean(input)
-}
-
-doStuff.register({
-  id: 'sql2json',
-  name: 'Laravel insert SQL to JS',
-  func: sql2json,
-  description: 'Convert Laravel insert SQL to Redux state constant',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'table',
-    label: 'Table name',
-    type: 'text'
-  }, {
-    id: 'idProp',
-    label: 'ID column name',
-    type: 'text'
-  }, {
-    id: 'extras',
-    label: 'Add extra properties',
-    options: [
-      {
-        default: true,
-        label: 'Save State',
-        value: 'saveState'
-      },
-      {
-        default: true,
-        label: 'Messages',
-        value: 'messages'
-      }
-    ],
-    type: 'checkbox'
-  }, {
-    id: 'stripPrefix',
-    label: 'Prefix to strip from properties',
-    type: 'text'
-  }, {
-    id: 'dataType',
-    label: 'Typescript data type',
-    type: 'text'
-  }],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Laravel insert SQL to JS
-// ====================================================================
-// START: Laravel to JS post conversion cleanup
-
-/**
- * Routes to Markdown format
- *
- * created by: Evan Wills
- * created: 2022-01-06 10:00:00
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const postConvertClean = (input, extraInputs, GETvars) => {
-  const steps = [
-    {
-      find: /,(?=\s+(\]|\}))/sg,
-      replace: ''
-    },
-    {
-      find: /"([^"'\r\n]*)"/g,
-      replace: '\'$1\''
-    },
-    {
-      find: /;\s*$/sg,
-      replace: ''
-    // },
-    // {
-    //   find: /((?:title|href)=)'([^']+)'/g,
-    //   replace: '$1"$2"'
-    }
-  ]
-  let output = input
-  // console.log('output:', output)
-
-  for (let a = 0; a < steps.length; a += 1) {
-    output = output.replace(steps[a].find, steps[a].replace)
-    // console.log('output:', output)
-    // console.log('steps[' + a + '].find:', steps[a].find)
-    // console.log('steps[' + a + '].replace:', steps[a].replace)
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'postConvertClean',
-  name: 'Laravel to JS clean-up',
-  func: postConvertClean,
-  description: 'Laravel to JS post conversion clean-up',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Laravel to JS post conversion clean-up
-// ====================================================================
 // START: _TMP const to private prop
 
 /**
@@ -3450,177 +1836,6 @@ doStuff.register({
 
 //  END:  Fixing custom properties
 // ====================================================================
-// START: PDO::bindParam to PHP associative array
-
-/**
- * PDO::bindParam to PHP associative array
- *
- * created by: Evan Wills
- * created: 2022-04-4
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const bindParam2AssArr = (input, extraInputs, GETvars) => {
-  const regex = /\$stmt->bindParam\((':[A-Z0-9_]+'), (\$[a-z0-9_]+), (?:PDO::PARAM_[A-Z]+|\$[_a-z]+)\);.*?(?=[\r\n]|$)/ig
-  const tmp = [...input.matchAll(regex)]
-  let output = ''
-  let sep = ''
-  for (let a = 0; a < tmp.length; a += 1) {
-    const key = tmp[a][1]
-    const value = tmp[a][2]
-    output += sep + '\n  ' + key + ' => ' + value
-    sep = ','
-  }
-  if (output !== '') {
-    output = '\n\n$tmp = [' + output + '\n];\n\n'
-  } else {
-    output = input
-  }
-  return output
-}
-
-doStuff.register({
-  id: 'bindParam2AssArr',
-  name: 'PDO::bindParam to PHP associative array',
-  func: bindParam2AssArr,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  PDO::bindParam to PHP associative array
-// ====================================================================
-// START: MySQLi query to PDO
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2022-04-04
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const mysqli2pdo = (input, extraInputs, GETvars) => {
-  if (input.trim() === '') {
-    return ''
-  }
-  const method = extraInputs.queryMethod()
-  const pdoVar = extraInputs.pdoVar()
-  const tmp = `UPDATE  \`discounts\`
-  SET     \`price\` = '$price1',
-          \`price_student\` = '$price2',
-          \`off_price\` = '$price3',
-          \`off_price_student\` = '$price4',
-          \`description\` = '".addslashes($description)."',
-          \`dis_name\` = '".addslashes($dis_name)."'
-  WHERE   \`discount_id\` = " . $dis_id`
-
-  // const sql = input.trim()
-  const sql = tmp.trim()
-
-  if (sql.match(/^INSERT /i)) {
-    console.log('we have an INSERT')
-    const getFields = (_sql) => {
-      return [..._sql.trim().matchAll(
-        /\s*`?([^`,]+)`?(?:,|$)/ig
-      )]
-    }
-
-    const fields = getFields(sql.replace(/^.*?\((.*?)\).*$/ims, '$1'))
-    let values = ''
-    let _vSep = '\n       '
-    let bind = ''
-    let debug = ''
-    let _dSep = '\n    '
-    for (let a = 0, c = fields.length; a < c; a += 1) {
-      const _tmp = ':' + fields[a][1].toLocaleUpperCase()
-      const __tmp = '\'' + _tmp + '\''
-      values += _vSep + _tmp
-      bind += '\n$stmt->bindParam(' + __tmp + ', $' + fields[a][1] + ', PDO::PARAM_STR);'
-      _vSep = ',\n       '
-      debug += _dSep + __tmp + ' => $' + fields[a][1]
-      _dSep = ',\n    '
-      fields[a] = _tmp
-    }
-
-    return '\n\n$stmt = ' + pdoVar + '->' + method + '(\n    \'' +
-           sql.replace(/(VALUES\s*\().*\)\s*$/ims, '$1' + values) + '\n    )\'\n);' +
-           '\n' + bind + '\n$stmt->execute();\n\n\n' +
-           '$tmp = [' + debug + '\n];\n\n\nmergeParamsInSql($stmt, $tmp);'
-
-    // console.log('tmp:', _tmp)
-  } else if (sql.match(/^UPDATE /i)) {
-    console.log('we have an UPDATE')
-    // const getFields = (_sql) => {
-    //   return [..._sql.trim().matchAll(
-    //     /\s*`?([^`=]+)`?\s*=\s?[^,]+(?:,|$)/ig
-    //   )]
-    // }
-    // const fields = getFields(sql.replace(/^UPDATE.*?SET(.*?)WHERE.*$/ims, '$1').trim())
-  } else {
-    console.log('we have an SELECT')
-  }
-
-  return tmp
-}
-
-doStuff.register({
-  id: 'mysqli2pdo',
-  name: 'MySQLi query to PDO',
-  func: mysqli2pdo,
-  description: 'Convert a MySQLi query string to PDO query and associated bits.',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'queryMethod',
-    label: 'Query method',
-    type: 'radio',
-    options: [{
-      value: 'prepare',
-      label: 'Multi param',
-      default: true
-    }, {
-      value: 'prepBindExec',
-      label: 'Single ID param'
-    }, {
-      value: 'prepBindExecStr',
-      label: 'Single string param'
-    }]
-  }, {
-    id: 'pdoVar',
-    label: 'PDO variable name',
-    type: 'text',
-    default: '$this->_pdo'
-  }],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  MySQLi query to PDO
-// ====================================================================
 // START: Web component attributes to markdown documentation
 
 /**
@@ -3700,590 +1915,6 @@ doStuff.register({
 })
 
 //  END:  Web component attributes to markdown documentation
-
-// ====================================================================
-// START: DB Enum to TS IDbEnum objects
-
-const wrapDesc = (input) => {
-  const _input = input.replace(/(?<=[^\\])'/g, '\\\'')
-  const len = 48
-  const lenAll = len - 3
-
-  if (_input.length < (lenAll)) {
-    return "'" + _input + "'"
-  }
-
-  let _tmpFront = _input.substring(0, len)
-  let _tmpBack = _input.substring(len)
-  let output = "'" + _tmpFront.replace(/^(.*?\s+)[^\s+]+$/, '$1') + "'"
-
-  let _tail = _tmpFront.replace(/.*?\s+([^\s]+)$/, '$1')
-
-  let _next = (_tail !== _tmpFront)
-    ? _tail + _tmpBack
-    : _tmpBack
-  while (_next.length > lenAll) {
-    _tmpFront = _next.substring(0, len)
-    _tmpBack = _next.substring(len)
-    _tail = _tmpFront.replace(/.*?\s+([^\s]+)$/, '$1')
-    _next = (_tail !== _tmpFront)
-      ? _tail + _tmpBack
-      : _tmpBack
-
-    output += " +\n                 '" +
-              _tmpFront.replace(/^(.*?\s+)[^\s+]+$/, '$1') +
-              "'"
-  }
-
-  if (_next.length > 0) {
-    output += " +\n                 '" + _next + "'"
-  }
-
-  return output
-}
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2022-05-23
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const dbEnum2IDbEnum = (input, extraInputs, GETvars) => {
-  const _name = snakeToCamelCase(extraInputs.name().replace(/_+$/, '').replace(/^enum_/i, ''))
-  let _id = (extraInputs.basezero('1'))
-    ? 1
-    : 0
-
-  const cleaner = [
-    {
-      find: /\/\/.*?[\r\n]+/g,
-      replace: ''
-    },
-    {
-      find: / *[\r\n]+ +/g,
-      replace: ''
-    },
-    {
-      find: /'\.'/ig,
-      replace: ''
-    },
-    {
-      find: /\[([^[\]]+)\]/isg,
-      replace: '{$1}'
-    },
-    {
-      find: /"/g,
-      replace: '\\"'
-    },
-    {
-      find: /\\'/g,
-      replace: '\''
-    },
-    {
-      find: /'[a-z0-9]+(?:_[a-z0-9]+)*_(name|description)'\s*=>\s*'(.*?)'(,|\})/ig,
-      replace: '"$1": "$2"$3'
-    },
-    {
-      find: /^(?:\s*\[\s*)*/g,
-      replace: '['
-    },
-    {
-      find: /(?<=\})(?:(?:,?\s*)?(?:\],?\s*)?)*$/g,
-      replace: ']'
-    }
-  ]
-
-  let _tmp = input
-
-  for (let a = 0; a < cleaner.length; a += 1) {
-    _tmp = _tmp.replace(cleaner[a].find, cleaner[a].replace)
-  }
-
-  let _data = null
-  try {
-    _data = JSON.parse(_tmp)
-  } catch (error) {
-    console.error(
-      'Could not parse input Laravel Migration code. ' + error
-    )
-    return input
-  }
-
-  let output = 'export const ' + _name + ' : Array<IDbEnum> = ['
-  let _sep = ''
-  for (let a = 0; a < _data.length; a += 1) {
-    output += _sep + '\n  {\n    id: ' + _id + ',\n' +
-              "    name: '" + _data[a].name + "',\n" +
-              '    description: ' + wrapDesc(_data[a].description) + '\n' +
-              '  }'
-    _sep = ','
-    _id += 1
-  }
-
-  return output + '\n];\n'
-}
-// '    description: "'
-doStuff.register({
-  id: 'dbEnum2IDbEnum',
-  name: 'DB Enum to TS IDbEnum objects',
-  func: dbEnum2IDbEnum,
-  description: '',
-  // docsURL: '',
-  extraInputs: [
-    {
-      id: 'name',
-      label: 'DB Table name',
-      type: 'text',
-      description: 'Name of enum table in DB (to be converted to camelCase',
-      pattern: '^[a-z0-9]+(?:_[a-z0-9]+)*$',
-      default: ''
-    }, {
-      id: 'basezero',
-      label: 'Index start',
-      options: [
-        {
-          label: 'Index starts at one',
-          value: '1'
-        }
-      ],
-      type: 'checkbox'
-    }
-  ],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  DB Enum to TS IDbEnum objects
-// ====================================================================
-// START: Clean up converted Laravel Insert to Redux state
-
-/**
- * Clean up converted Laravel Insert to Redux state
- *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const postLaravelClean = (input, extraInputs, GETvars) => {
-  let output = input.replace(/"/g, '\'')
-
-  const regex = /(?<=(?:title|href)=)'([^']+)'/ig
-
-  output = output.replace(/(?<=[a-z])(?='[a-z])/ig, '\\')
-  output = output.replace(/(?<=[^a-z])(?='\]\+)/ig, '\\')
-  output = output.replace(/(?<= )'([a-z]+)'(?= )/ig, '"$1"')
-  output = output.replace(regex, '"$1"')
-
-  output = output.replace(
-    'const tmp',
-    'import { IInputFieldType } from \'../../types/IInputFields\';\n\n' +
-    'export const inputFieldTypesState: Array<IInputFieldType>'
-  )
-
-  return output
-}
-
-doStuff.register({
-  id: 'postLaravelClean',
-  name: 'Clean up converted Laravel Insert to Redux state',
-  func: postLaravelClean,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Clean up converted Laravel Insert to Redux state
-// ====================================================================
-// START: Typescript Types to PHP class stuff (Laravel)
-
-/**
- * Get PHP class properties from Typescript interface definition
- *
- * created by: Evan Wills
- * created: 2022-06-08
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const ts2Php = (input, extraInputs, GETvars) => {
-  /**
-   * Convert Typescript types into PHP class private properties
-   *
-   * @param {string} _whole
-   * @param {string|undefined} space
-   * @param {string|undefined} comClose
-   * @param {string} prop
-   * @param {string} propType
-   *
-   * @returns {string} Get class properties
-   */
-  const firstClean = (_whole, comClose, prop, propType) => {
-    let value = 'null'
-
-    switch (propType.toLowerCase()) {
-      case 'boolean':
-        value = 'false'
-        break
-
-      case 'string':
-        value = '\'\''
-        break
-
-      case 'number':
-        propType = 'integer'
-        value = '0'
-        break
-
-      case 'array':
-        value = '[]'
-        break
-    }
-
-    const comment = (typeof comClose === 'string' && comClose !== '')
-      ? '\n   *\n   * @var ' + propType + ' $_' + prop + '\n   */\n  '
-      : ''
-
-    return comment + '  private $_' + prop + ' = ' + value + ';\n'
-  }
-  const classStr = extraInputs.className()
-  const _classstr = camel2human(classStr).toLowerCase()
-
-  let output = '<?php\n' +
-               '/**\n' +
-               ' * ' + classStr +
-               ' class provides a way of importing ' + _classstr + 's from external\n' +
-               ' * systems and making their data easy to use\n' +
-               ' *\n' +
-               ' * PHP Version 8.x\n' +
-               ' *\n' +
-               ' * @category Expensum_DataExtract\n' +
-               ' * @package  Expensum_DataExtract\n' +
-               ' * @author   Evan Wills <evan.wills@acu.edu.au>\n' +
-               ' * @license  ACU https://www.acu.edu.au\n' +
-               ' * @link     https://www.acu.edu.au\n' +
-               ' */\n\n\n' +
-               '/**\n' +
-               ' * ' + classStr +
-               ' class provides a way of importing ' + _classstr + 's from external\n' +
-               ' * systems and making their data easy to use\n' +
-               ' *\n' +
-               ' * @category Expensum_DataExtract\n' +
-               ' * @package  Expensum_DataExtract\n' +
-               ' * @author   Evan Wills <evan.wills@acu.edu.au>\n' +
-               ' * @license  ACU https://www.acu.edu.au\n' +
-               ' * @link     https://www.acu.edu.au\n' +
-               ' */\n\n' +
-               'class ' + classStr + '\n{'
-
-  output += input.trim().replace(
-    /(?:[\r\n]* +(\*\/[\r\n]+ +))?([a-z0-9]+): ([a-z]+)[^,]*(?:,|$)/ig,
-    firstClean
-  )
-
-  let construct = ''
-  let toStr = ''
-  const tmp = input.trim().match(/(?<=[\r\n]+ +)([a-z0-9]+): ([a-z]+)(?=[^,]+(?:,|$))/ig)
-
-  for (let a = 0; a < tmp.length; a += 1) {
-    const bits = tmp[a].split(': ')
-    const _key = bits[0].trim()
-    const _type = bits[1].trim().toLowerCase()
-    construct += '\n        $this->_' + _key + ' = $data[\'' + _key + '\'];'
-    toStr += '\n            "      ' + _key + ': '
-    toStr += (_type === 'array')
-      ? '[".implode(\',\\n          \', $this->_' + _key + ')."]'
-      : '{$this->_' + _key + '}'
-    toStr += ',\\n".'
-  }
-  output += '\n' +
-            '    /**\n' +
-            '     * Constructor for ' + classStr + ' object\n' +
-            '     *\n' +
-            '     * @param array   $data ' + _classstr + ' data from DB\n' +
-            '     * @param integer $id   Expensum ID for this ' + _classstr + '\n' +
-            '     */\n' +
-            '    public function __construct(array $data, int $id)\n' +
-            '    {\n' + construct + '\n    }\n\n' +
-            '    /**\n' +
-            '     * Get this object as a JavaScript object\n' +
-            '     *\n' +
-            '     * @return string\n' +
-            '     */\n' +
-            '    public function __toString() : string\n' +
-            '    {\n' +
-            '        return "{\\n".' + toStr + '\n' +
-            '            "    }";\n' +
-            '    }\n\n' +
-            '    /**\n' +
-            '     * Get the expensum ID for this ' + _classstr + '\n' +
-            '     *\n' +
-            '     * @return integer\n' +
-            '     */\n' +
-            '    public function id() : string\n' +
-            '    {\n' +
-            '        return $this->_id;\n' +
-            '    }\n\n' +
-            '    /**\n' +
-            '     * Set the created at & updated at times for this ' + _classstr + '\n' +
-            '     *\n' +
-            '     * @param integer $time Unix timestamp for when the ' + _classstr + '\n' +
-            '     *                      was created' +
-            '     *\n' +
-            '     * @return boolean TRUE if properties were updated.\n' +
-            '     *                 FALSE otherwise\n' +
-            '     */\n' +
-            '    public function setMeta(int $time) : bool\n' +
-            '    {\n' +
-            '        if ($this->_createdAt === 0) {\n' +
-            '            $this->_createdAt = $time;\n' +
-            '            $this->_updatedAt = $time;\n\n' +
-            '            return true;\n' +
-            '        }\n' +
-            '    }\n}\n'
-
-  return output
-}
-
-doStuff.register({
-  id: 'ts2Php',
-  name: 'Typescript Types to PHP class stuff (Laravel)',
-  func: ts2Php,
-  description: 'Generate a PHP class based',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'className',
-    label: 'Class name',
-    type: 'text',
-    description: 'Name of class that will encapsulate the supplied data',
-    pattern: '',
-    default: ''
-  }],
-  group: 'evan',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Typescript Types to PHP class stuff (Laravel)
-// ====================================================================
-// START: Sort typescript type properties alphabetically
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2022-06-19
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const sortTypeProps = (input, extraInputs, GETvars) => {
-  const tmp = input.split('\n').map(
-    line => line.trim()
-  ).filter(
-    line => {
-      if (line === '') {
-        return false
-      }
-      const two = line.substring(0, 2)
-      console.group('sortTypeProps() - filter')
-      console.log('line:', line)
-      console.log('two:', two)
-      console.log('[\'//\', \'/*\', \' *\'].indexOf(two):', ['//', '/*', ' *'].indexOf(two))
-      console.groupEnd()
-      return ['//', '/*', '*/', '*,', '* ', ' *'].indexOf(two) === -1
-    }
-  ).map(
-    line => line.replace(/ ?\?? ?: ?/g, ' ? : ')
-  )
-
-  tmp.sort((a, b) => {
-    if (a < b) {
-      return -1
-    } else if (a > b) {
-      return 1
-    }
-    return 0
-  })
-
-  let sep = ''
-
-  return tmp.reduce(
-    (last, line) => {
-      const output = last + sep + line.replace(/^(.*?),?$/, '  $1,')
-      sep = '\n'
-      return output
-    },
-    ''
-  ).replace(/((?<=[\r\n]) {2}[^,]+,[\r\n]+)\1+/g, '$1')
-}
-
-doStuff.register({
-  id: 'sortTypeProps',
-  name: 'Sort typescript type properties alphabetically',
-  func: sortTypeProps,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  // group: '',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Sort typescript type properties alphabetically
-// ====================================================================
-// START: Test ACU staff ID regex pattern
-
-/**
- * Test ACU staff ID regex pattern
- *
- * created by: Evan Wills
- * created: 2022-10-15
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const staffIdRegex = (input, extraInputs, GETvars) => {
-  const tmp = input.split('\n')
-  const regex = /^(?:[0-9][A-Z]|[A-Z]{1,2})?[0-9]{3,6}$/
-  let output = ''
-  let sep = ''
-
-  // console.log('tmp:', tmp)
-  for (let a = 0; a < tmp.length; a += 1) {
-    const _tmp = tmp[a].trim()
-
-    if (regex.test(_tmp) === false) {
-      output += sep + _tmp
-      sep = '\n'
-    }
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'staffIdRegex',
-  name: 'Test ACU staff ID regex pattern',
-  func: staffIdRegex,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: true
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Test ACU staff ID regex pattern
-// ====================================================================
-// START: Test ACU staff username regex pattern
-
-/**
- * Test staff ID regex pattern
- *
- * created by: Evan Wills
- * created: 2022-10-15
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const staffUsernameRegex = (input, extraInputs, GETvars) => {
-  const tmp = input.split('\n')
-  const regex = /^[a-z_-]{4,24}$/
-  let output = ''
-  let sep = ''
-
-  // console.log('tmp:', tmp)
-  for (let a = 0; a < tmp.length; a += 1) {
-    const _tmp = tmp[a].trim()
-
-    console.log('tmp[' + a + ']:', tmp[a])
-    console.log('regex:', regex)
-    console.log(regex + 'test(' + _tmp + '):', regex.test(_tmp))
-    if (regex.test(_tmp) === false) {
-      output += sep + _tmp
-      sep = '\n'
-    }
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'staffUsernameRegex',
-  name: 'Test ACU staff username regex pattern',
-  func: staffUsernameRegex,
-  description: '',
-  // docsURL: '',
-  extraInputs: [],
-  group: 'evan',
-  ignore: true
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  est ACU staff username regex pattern
 // ====================================================================
 // START: Modify unit test code
 
@@ -4712,7 +2343,7 @@ doStuff.register({
 // START: Row comment
 
 /**
- * Action description goes here
+ * Row comment
  *
  * created by: Evan Wills
  * created: 2022-12-05
@@ -4755,109 +2386,6 @@ doStuff.register({
 })
 
 //  END:  Row comment
-// ====================================================================
-// START: Laravel fixed option to CFB insert SQL
-
-/**
- * Laravel fixed option to CFB insert SQL
- *
- * created by: Evan Wills
- * created: 2022-12-19
- *
- * @param {string} input       user supplied content
- *                             (expects text HTML code)
- * @param {object} extraInputs all the values from "extra" form
- *                             fields specified when registering
- *                             the ation
- * @param {object} GETvars     all the GET variables from the URL as
- *                             key/value pairs
- *                             NOTE: numeric strings are converted
- *                                   to numbers and "true" & "false"
- *                                   are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const laravelToSql = (input, extraInputs, GETvars) => {
-  const fieldID = extraInputs.id()
-
-  const l1 = (whole, inner) => {
-    const bits = {
-      key: '',
-      label: '',
-      show: 1
-    }
-    const regex = /'(value|label|hide)' => (?:(true|false)|'(.*?)'(?:[.][\s\r\n\t ]*'(.*?)'(?:[.][\s\r\n\t ]*'(.*?)')?)?)(?=,|$)/igsm
-    let subBits
-
-    while ((subBits = regex.exec(inner)) !== null) {
-      console.log('subBits:', subBits)
-      switch (subBits[1]) {
-        case 'value':
-          bits.key = subBits[3]
-
-          if (typeof subBits[4] === 'string') {
-            bits.key += subBits[4]
-            if (typeof subBits[4] === 'string') {
-              bits.key += subBits[4]
-            }
-          }
-          break
-
-        case 'label':
-          bits.label = subBits[3]
-          if (typeof subBits[4] === 'string') {
-            bits.label += subBits[4]
-            if (typeof subBits[4] === 'string') {
-              bits.label += subBits[4]
-            }
-          }
-          break
-
-        case 'hide':
-          bits.show = (subBits[2] === 'true')
-            ? '0'
-            : '1'
-          break
-      }
-    }
-
-    if (bits.label === '') {
-      bits.label = bits.key
-    }
-
-    console.log('inner:', inner)
-    console.log('bits:', bits)
-
-    return ',\n     ( ' + fieldID + ', "' + bits.key + '", ' +
-          '"' + bits.label + '", ' + bits.show + ' )'
-  }
-
-  return input.replace(/\[[a-z]+\]/ig, '').replace(/[\s\r\n\t ]*\[[\s\r\n\t ]*(.*?)[\s\r\n\t ]*\][\s\r\n\t ]*,?/gism, l1)
-}
-
-doStuff.register({
-  id: 'laravelToSql',
-  name: 'Laravel fixed option to CFB insert SQL',
-  func: laravelToSql,
-  description: '',
-  // docsURL: '',
-  extraInputs: [{
-    id: 'id',
-    label: 'ID',
-    min: 1,
-    max: 1000,
-    step: 1,
-    default: 0,
-    type: 'number'
-  }],
-  // group: '',
-  ignore: false
-  // inputLabel: '',
-  // remote: false,
-  // rawGet: false,
-})
-
-//  END:  Laravel fixed option to CFB insert SQL
 // ====================================================================
 // START: Turning tool codes
 
@@ -5074,7 +2602,7 @@ BEGIN
 \t\tSET errorID = 3;
 \tEND IF;
 
-\tCALL log_action(adminID, 9, ${acID}, ${thingName}ID, NULL, errorID, 0);
+\tCALL log_admin_action(adminID, 9, ${acID}, ${thingName}ID, NULL, errorID, 0);
 
 \tSELECT expriesAt;
 END;
@@ -5111,7 +2639,7 @@ BEGIN
 
 \tSET success = (ROW_COUNT() > 0);
 
-\tCALL log_action(adminID, 10, ${relID}, ${thingName}ID, NULL, 10, success);
+\tCALL log_admin_action(adminID, 10, ${relID}, ${thingName}ID, NULL, 10, success);
 
 \tSELECT success;
 END;
@@ -5437,7 +2965,7 @@ BEGIN
 \t\tCALL reset_field_order(formID);
 \tEND IF;
 
-\tCALL log_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
+\tCALL log_admin_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
 
 \tSELECT success AS \`changed\`;
 END;
@@ -5473,10 +3001,7 @@ BEGIN
 \tCALL get_${procName}_sort_order(${thingName}ID, formID, oldPos);
 
 \tIF user_has_locked_form(adminID, formId) THEN
-\t\tIF oldPos <= 1 THEN
-\t\t\t-- nothing to do because ${thingName} is alredy first
-\t\t\tSET errorID = 37;
-\t\tELSE
+\t\tIF oldPos > 1 THEN
 \t\t\tSET newPos = oldPos -1;
 
 \t\t\t-- Move chosen ${thingName} to where no other ${thingName} is positioned
@@ -5502,16 +3027,21 @@ BEGIN
 \t\t\t\t\t\`${updatedBy.col}\` = adminID
 \t\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
 
+\t\t\t\tCALL reset_field_order(formID);
+
 \t\t\t\tSET success = 1;
 \t\t\tELSE;
 \t\t\t\tSET errorID = 17;
 \t\t\tEND IF;
+\t\tELSE
+\t\t\t-- nothing to do because ${thingName} is alredy first
+\t\t\tSET errorID = 37;
 \t\tEND IF;
 \tELSE
 \t\tSET errorID = 7;
 \tEND IF;
 
-\tCALL log_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
+\tCALL log_admin_action(adminID, 8, ${relID}, formID, ${thingName}ID, errorID, success);
 
 \tSELECT success AS \`success\`;
 END;
@@ -5547,9 +3077,7 @@ BEGIN
 \tCALL get_${procName}_sort_order(${thingName}ID, formID, oldPos);
 
 \tIF user_has_locked_form(adminID, formId) THEN
-\t\tIF oldPos <= 1 THEN
-\t\t\t-- nothing to do because ${thingName} is alredy last
-\t\tELSE
+\t\tIF oldPos > 1 THEN
 \t\t\tSET newPos = oldPos -1;
 
 \t\t\t-- Move chosen ${thingName} to where no other ${thingName} is positioned
@@ -5575,16 +3103,21 @@ BEGIN
 \t\t\t\t\t\`${updatedBy.col}\` = adminID
 \t\t\t\tWHERE	\`${id.col}\` = ${thingName}ID;
 
+\t\t\t\tCALL reset_field_order(formID);
+
 \t\t\t\tSET success = 1;
 \t\t\tELSE;
 \t\t\t\tSET errorID = 17;
 \t\t\tEND IF;
+\t\tELSE
+\t\t\t-- nothing to do because ${thingName} is alredy last
+\t\t\tSET errorID = 37;
 \t\tEND IF;
 \tELSE
 \t\tSET errorID = 7;
 \tEND IF;
 
-\tCALL log_action(adminID, 8, 154, formID, ${thingName}ID, errorID, success);
+\tCALL log_admin_action(adminID, 8, 154, formID, ${thingName}ID, errorID, success);
 
 \tSELECT success AS \`success\`;
 END;
@@ -5719,11 +3252,11 @@ BEGIN
 \t\tFROM\t\`${tableName}\`
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID;
 
-\t\tCALL log_action(adminID, 2, [[BBBB]], ${logProps}, 1, ROW_COUNT()});
+\t\tCALL log_admin_action(adminID, 2, [[BBBB]], ${logProps}, 1, ROW_COUNT()});
 
 \t\tSELECT\t${outSel}
 \tELSE
-\t\tCALL log_action(adminID, 2, [[BBBB]], ${logProps}, 3, 0);
+\t\tCALL log_admin_action(adminID, 2, [[BBBB]], ${logProps}, 3, 0);
 
 \t\tSELECT NULL;
 \tEND IF;
@@ -5769,6 +3302,12 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   let setVals = '';
   let inParams = '';
   let inFields = '';
+  let inColCreatedAt = '';
+  let inValCreatedAt = '';
+  let upSetCreatedAt = '';
+  let inColUpdatedAt = '';
+  let inValUpdatedAt = '';
+  let upSetUpdatedAt = '';
   let inColCreatedBy = '';
   let inValCreatedBy = '';
   let upSetCreatedBy = '';
@@ -5827,9 +3366,17 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
           : b;
 
         inParams += `,\n\tIN ${_inParam} -- ${_b} - \`${fields[a].col}\``
-        inFields += `${inSep}${strPad('`' + fields[a].col + '`,', (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
-        inValues += `${inSep}${_param}-- ${_b} - \`${fields[a].col}\``
-        setVals += `${inSep}\t${_col} = ${_param}-- ${_b}`
+
+        if (fields[a].subType === 'sort') {
+          const _AS = tableName.replace(/(?<=[a-z])[a-z0-9]+(?:_|$)/ig, '');
+          inFields += `${inSep} --\t${strPad('`' + fields[a].col + '`,', (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
+
+          inValues += `${inSep}get_last_${procName}_pos(formID, 1)\t\t\t\t--    - \`${fields[a].col}\``
+        } else {
+          inFields += `${inSep}${strPad('`' + fields[a].col + '`,', (fields[a].maxCol + 1))} -- ${_b} - ${fields[a].param}`
+          inValues += `${inSep}${_param}-- ${_b} - \`${fields[a].col}\``
+          setVals += `${inSep}\t${_col} = ${_param}-- ${_b}`
+        }
         inSep = '\n\t\t\t'
     }
   }
@@ -5851,11 +3398,25 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
                 `\n\t\tAND\t\t\`${expiresAt.col}\` > NOW()`
   }
 
+  if (createdAt !== null) {
+    inColCreatedAt = `\n\t\t\t  ${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()`
+    inValCreatedAt = `\n\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\``
+    upSetCreatedAt = `\n\t\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}` +
+                     `= ${strPad('NOW(),', (createdAt.maxParam))}--`
+  }
+
   if (createdBy !== null) {
     inColCreatedBy = `\n\t\t\t${strPad(`\`${createdBy.col}\`,`, (createdBy.maxCol + 1))} --    - adminID`
     inValCreatedBy = `\n\t\t\t${strPad('adminID,', createdBy.maxParam)}--    - \`${createdBy.col}\``
     upSetCreatedBy = `\n\t\t\t --\t${strPad(`\`${createdBy.col}\``, (createdAt.maxCol + 1))}` +
                      `= ${strPad('adminID,', (createdAt.maxParam))}--`
+  }
+
+  if (updatedAt !== null) {
+    inColUpdatedAt = `\n\t\t\t  ${strPad(`\`${updatedAt.col}\`,`, (updatedAt.maxCol + 1))} --    - NOW()`
+    inValUpdatedAt = `\n\t\t\t${strPad('NOW(),', updatedAt.maxParam)}--    - \`${createdAt.col}\``
+    upSetUpdatedAt = `\n\t\t\t --\t${strPad(`\`${updatedAt.col}\``, (updatedAt.maxCol + 1))}` +
+                     `= ${strPad('NOW(),', (updatedAt.maxParam))}--`
   }
 
   if (updatedBy !== null) {
@@ -5891,12 +3452,12 @@ BEGIN
 \tIF ${testFunc} THEN
 \t\tINSERT INTO \`${tableName}\` (
 \t\t\t${inFields}
-\t\t\t${strPad(`\`${createdAt.col}\`,`, (createdAt.maxCol + 1))} --    - NOW()${inColCreatedBy}
-\t\t\t${strPad(`\`${updatedAt.col}\`,`, (updatedAt.maxCol + 1))} --    - NOW()${inColUpdatedBy}${lockCols}
+\t\t\t${inColCreatedAt}${inColCreatedBy}
+\t\t\t${inColUpdatedBy}${inColUpdatedBy}${lockCols}
 \t\t) VALUES (
 \t\t\t${inValues}
-\t\t\t${strPad('NOW(),', createdAt.maxParam)}--    - \`${createdAt.col}\`${inValCreatedBy}
-\t\t\t${strPad('NOW(),', updatedAt.maxParam)}--    - \`${updatedAt.col}\`${inValUpdatedBy}${lockVals}
+\t\t\t${inValCreatedAt}${inValCreatedBy}
+\t\t\t${inValUpdatedAt}${inValUpdatedBy}${lockVals}
 \t\t);
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5906,9 +3467,9 @@ BEGIN
 \t\tSET errorID = 3;
 \tEND IF;
 
-\t\tCALL log_action(
-\t\t\tadminID, 2, [[BBBB]], ${logProps}, errorID, success
-\t\t);
+\tCALL log_admin_action(
+\t\tadminID, 2, [[BBBB]], ${logProps}, errorID, success
+\t);
 
 \tIF success = 1 THEN
 \t\tCALL get_${procName}_by_id__admin(
@@ -5947,8 +3508,8 @@ BEGIN
 \tIF ${testFunc} THEN
 \t\tUPDATE \`${tableName}\`
 \t\tSET\t${setVals}
-\t\t\t --\t${strPad(`\`${createdAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--${upSetCreatedBy}
-\t\t\t\t${strPad(`\`${updatedAt.col}\``, (createdAt.maxCol + 1))}= ${strPad('NOW(),', (createdAt.maxParam))}--${upSetUpdatedBy}${setLock}
+\t\t\t --\t${upSetCreatedAt}--${upSetCreatedBy}
+\t\t\t\t${upSetUpdatedBy}${upSetUpdatedBy}${setLock}
 \t\tWHERE\t\`${id.col}\` = ${thingName}ID${andClause};
 
 \t\tIF ROW_COUNT() > 0 THEN
@@ -5967,7 +3528,7 @@ BEGIN
 \t\tSET errorID = 3;
 \tEND IF;
 
-\tCALL log_action(
+\tCALL log_admin_action(
 \t\tadminID, 4, [[BBBB]], ${logProps}, errorID, success
 \t);
 
@@ -6007,7 +3568,7 @@ BEGIN
 
 \t\tIF ROW_COUNT() > 0 THEN
 \t\t\t-- SUCCESS!!! ${thingName} was deleted
-\t\t\tCALL log_action(
+\t\t\tCALL log_admin_action(
 \t\t\t\tadminID, 6, [[BBBB]], ${logProps}, 6, ROW_COUNT()
 \t\t\t);
 \t\tELSE
@@ -6016,14 +3577,14 @@ BEGIN
 \t\t\t\tgroupID, adminID, errorID
 \t\t\t);
 
-\t\t\tCALL log_action(
+\t\t\tCALL log_admin_action(
 \t\t\t\tadminID, 6, [[BBBB]], ${logProps}, errorID, 0
 \t\t\t);
 
 \t\t\tSELECT NULL;
 \t\tEND IF;
 \tELSE
-\t\tCALL log_action(
+\t\tCALL log_admin_action(
 \t\t\tadminID, 6, [[BBBB]], ${logProps}, errorID, 0
 \t\t);
 \tEND IF;
@@ -6059,7 +3620,7 @@ ${stProcLn}`;
  */
 const storedProcParams = (input, extraInputs, GETvars) => {
   // const _input = _tableDef;
-  const stripperRegex = /(?:data_)?(?:(?:income|purchasable|app|form)_)?(.*?)(?:s|_(?:details|metadata)_?)?$/i
+  const stripperRegex = /(?:data_)?(?:(?:income|purchasable|app|form)_)?(.*?)(?:s|_(?:details|metadata|item_discounts)_?)?$/i
   const _input = input;
   const _cols = []
   const _tableName = _input.replace(/^[\r\n\t \s]*CREATE TABLE `([^`]+)`.*$/ism, '$1')

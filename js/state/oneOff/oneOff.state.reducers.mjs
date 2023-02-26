@@ -50,7 +50,10 @@ const updatePos = (pairs) => {
  * @returns {object} Shallow clone of original pair with hasError
  */
 const setHasError = (pair) => {
-  const _hasError = (pair.regex.error !== '' || pair.flags.error !== '' || pair.delimiters.error !== '')
+  console.group('setHasError()')
+  console.log('pair:', pair);
+  console.groupEnd();
+  const _hasError = (pair.regex.error !== '' || pair.flags.error !== '' || pair.delims.error !== '')
 
   if (pair.hasError === _hasError) {
     // no change, just return original

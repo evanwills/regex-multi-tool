@@ -217,6 +217,29 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           _state.oneOff.defaults
         )
       })
+    case regexPairActions.UPDATE_REGEX:
+      const tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
+
+      if (tmpPair.length === 1) {
+        let errorMsg = '';
+        console.log('tmpPair:', tmpPair);
+        try {
+          const tmpRegex = new RegExp(action.payload.value, tmpPair[0].flags.flags)
+        } catch(error) {
+          errorMsg = `${error}`;
+        }
+        console.log('errorMsg:', errorMsg);
+        return next({
+          ...action,
+          payload: {
+            ...action.payload,
+            error: errorMsg.replace(/^SyntaxError: /i, '')
+          }
+        })
+      } else {
+        return next(action);
+      }
+
 
     case oneOffActions.SET_SCREEN:
       const allowedScreens = ['input', 'regex', 'matches', 'output'] // eslint-disable-line

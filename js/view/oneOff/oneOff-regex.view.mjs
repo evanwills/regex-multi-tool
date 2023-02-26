@@ -333,27 +333,60 @@ export const regexPair = (props) => {
     <article id="${props.id}" class="r-pair r-pair--${props.pos} settings_wrap">
       <header class="r-pair__header sr-only"><h4 class="r-pair__h">Regex pair ${props.pos} (#${props.id})</h4></header>
       <main class="r-pair__main${(props.fullWidth) ? ' r-pair__main--full-width' : ''}">
-        ${(isNonEmptyStr(props.regex.error)) ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">${props.regex.error}</p>` : ''}
+        ${(isNonEmptyStr(props.regex.error))
+          ? html`<p class="r-pair__error r-pair__error--regex" id="${props.id}-pattern-error">${props.regex.error}</p>`
+          : ''}
         <label for="${props.id}-regex" class="r-pair__label r-pair__label--regex">Regex</label>
         ${(props.multiLine)
-          ? html`<textarea id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__txt r-pair__field r-pair__field--regex" @change=${props.events.pairValue} placeholder="regular expression">${props.regex.pattern}</textarea>`
-          : html`<input id="${props.id}-regex" aria-describedby="${props.id}-pattern-error" class="r-pair__input r-pair__field r-pair__field--regex" value="${props.regex.pattern}" @change=${props.events.pairValue} placeholder="regular expression" />`}
-        ${(isNonEmptyStr(props.flags.error)) ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">${props.flags.error}</p>` : ''}
+          ? html`<textarea id="${props.id}-regex"
+                           aria-describedby="${props.id}-pattern-error"
+                           class="r-pair__txt r-pair__field r-pair__field--regex"
+                           placeholder="regular expression"
+                          @keyup=${props.events.pairValue}
+                          @change=${props.events.pairValue}>${props.regex.pattern}</textarea>`
+          : html`<input id="${props.id}-regex"
+                        aria-describedby="${props.id}-pattern-error"
+                        class="r-pair__input r-pair__field r-pair__field--regex"
+                        value="${props.regex.pattern}"
+                        placeholder="regular expression"
+                       @keyup=${props.events.pairValue}
+                       @change=${props.events.pairValue} />`}
+        ${(isNonEmptyStr(props.flags.error))
+          ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">${props.flags.error}</p>`
+          : ''}
         <label for="${props.id}-flags" class="r-pair__label r-pair__label--flags">Flags</label>
         <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="r-pair__input r-pair__field--flags" value="${props.flags.flags}" @keyup=${props.events.pairValue} placeholder="i" />
         <label for="${props.id}-replace" class="r-pair__label r-pair__label--replace">Replace</label>
         ${(props.multiLine)
-          ? html`<textarea id="${props.id}-replace" aria-describedby="${props.id}-replace" class="r-pair__txt r-pair__field r-pair__field--replace" placeholder="replace" @change=${props.events.pairValue}>${props.replace}</textarea>`
-          : html`<input id="${props.id}-replace" class="r-pair__input r-pair__field r-pair__field--replace" value="${props.replace}" placeholder="replace" @change=${props.events.pairValue}} />`}
+          ? html`<textarea id="${props.id}-replace"
+                           aria-describedby="${props.id}-replace"
+                           class="r-pair__txt r-pair__field r-pair__field--replace"
+                           placeholder="replace"
+                          @change=${props.events.pairValue}>${props.replace}</textarea>`
+          : html`<input id="${props.id}-replace"
+                        class="r-pair__input r-pair__field r-pair__field--replace"
+                        value="${props.replace}"
+                        placeholder="replace"
+                       @change=${props.events.pairValue}} />`}
         ${(props.delims.allow === true)
           ? html`
           ${(props.delims.error !== '') ? html`<p class="r-pair__error r-pair__delims-error" id="${props.id}-delims-error">props.delims.error</p>` : ''}
 
           <label for="${props.id}-delims-open" class="r-pair__label">Opening delimiter</label>
-          <input id="${props.id}-delims-open" aria-describedby="${props.id}-delims-error" maxchars="1" class="r-pair__input r-pair__field--delims-open" value="${props.delims.open}" @keyup=${props.events.pairValue} />
+          <input id="${props.id}-delims-open"
+                 aria-describedby="${props.id}-delims-error"
+                 maxchars="1"
+                 class="r-pair__input r-pair__field--delims-open"
+                 value="${props.delims.open}"
+                @keyup=${props.events.pairValue} />
 
           <label for="${props.id}-delims-close" class="r-pair__label">Closing delimiter</label>
-          <input id="${props.id}-delims-close" aria-describedby="${props.id}-delims-error" maxchars="1" class="r-pair__input r-pair__field--delims-close" value="${props.delims.close}" @keyup=${props.events.pairValue} />
+          <input id="${props.id}-delims-close"
+                 aria-describedby="${props.id}-delims-error"
+                 maxchars="1"
+                 class="r-pair__input r-pair__field--delims-close"
+                 value="${props.delims.close}"
+                @keyup=${props.events.pairValue} />
           `
           : ''}
       </main>
