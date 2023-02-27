@@ -54,7 +54,7 @@ export const footer = (buttons, eventHandler, userSettings) => {
         const _name = button.toLowerCase()
         const _akey = (_name === 'reset')
           ? 'x'
-          : (_name === 'replace') ? 's' : _name.substring(0, 1)
+          : (_name === 'replace') ? 'c' : _name.substring(0, 1)
         return html`
           <li class="btn-wrap btn-wrap--${button.name}">
             <button name=${_name} class="main-btn main-btn--${_name}" id=${_name} .value="${_name}" @click=${eventHandler} accesskey="${_akey}">
@@ -176,6 +176,12 @@ export const getMainAppView = (domNode, store) => {
       output: props.output,
       debug: props.debug
     }
+    // console.group('getMainAppView()');
+    // console.log('state:', state);
+    // console.log('state.screen:', state.screen);
+    // console.log('newProps:', newProps);
+    // console.log('newProps.screen:', newProps.screen);
+    // console.groupEnd();
 
     if (!isOneOff) {
       newProps.href = props.url.actionHref

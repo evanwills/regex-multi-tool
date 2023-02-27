@@ -96,7 +96,7 @@ function OneOff (url, remote, docs, api) {
   const updateRegistry = function (config) {
     let tmp = false
     const errorMsg = 'OneOff.register() expects config to contain '
-    console.group('updateRegistry()')
+    // console.group('updateRegistry()')
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // START: Validating fields
@@ -105,17 +105,17 @@ function OneOff (url, remote, docs, api) {
       // This action has been set to IGNORE
       if (noIgnore !== config.action) {
         // The user has not overridden the IGNORE directive via the URL
-        console.log('The user has not overridden the IGNORE directive via the URL')
-        console.groupEnd();
+        // console.log('The user has not overridden the IGNORE directive via the URL')
+        // console.groupEnd();
         return false
       }
     }
 
     tmp = invalidString('id', config)
     if (tmp !== false) {
-      console.error(errorMsg + 'an "id" property that is a non-empty string. ' +
-      tmp + ' given.')
-      console.groupEnd();
+      // console.error(errorMsg + 'an "id" property that is a non-empty string. ' +
+      // tmp + ' given.')
+      // console.groupEnd();
       throw Error(
         errorMsg + 'an "id" property that is a non-empty string. ' +
         tmp + ' given.'
@@ -124,11 +124,11 @@ function OneOff (url, remote, docs, api) {
 
     tmp = invalidString('name', config)
     if (tmp !== false) {
-      console.log(
-        errorMsg + 'a "name" property that is a non-empty string. ' +
-        tmp + ' given.'
-      )
-      console.groupEnd();
+      // console.log(
+      //   errorMsg + 'a "name" property that is a non-empty string. ' +
+      //   tmp + ' given.'
+      // )
+      // console.groupEnd();
       throw Error(
         errorMsg + 'a "name" property that is a non-empty string. ' +
         tmp + ' given.'
@@ -146,7 +146,7 @@ function OneOff (url, remote, docs, api) {
           'All remote Regex Engines are blocked from this host. ' +
           'Engine: "' + config.name + '" will not be available'
         )
-        console.groupEnd();
+        // console.groupEnd();
         return false
       } else if (isHTTPS === true) {
         console.warn(
@@ -159,9 +159,9 @@ function OneOff (url, remote, docs, api) {
 
     // This is a local action so it MUST have an action function
     if (typeof config.engine !== 'object') {
-      console.log('config:', config)
-      console.log('config.engine:', config.engine)
-      console.groupEnd();
+      // console.log('config:', config)
+      // console.log('config.engine:', config.engine)
+      // console.groupEnd();
       throw Error(
         errorMsg + 'an "engine" property that is a plain javascript ' +
         'function. ' + tmp + ' given.'
@@ -174,7 +174,7 @@ function OneOff (url, remote, docs, api) {
       for (let a = 0; a < requiredMethods.length; a += 1) {
         if (typeof config.engine[requiredMethods[a]] !== 'undefined' &&
             !isFunction(config.engine[requiredMethods[a]])
-        )  {
+        ) {
           throw Error(
             errorMsg + 'an "engine" property that an object ' +
             'containing the method: ' + requiredMethods[a]
@@ -196,9 +196,9 @@ function OneOff (url, remote, docs, api) {
         'boolean "allow" child property'
       )
     }
-    if (config.delimiters.allow) {
+    // if (config.delimiters.allow) {
 
-    }
+    // }
 
     registry = [...registry, config];
 
@@ -206,8 +206,8 @@ function OneOff (url, remote, docs, api) {
       // currentEngineID = registry[0].engine
       currentEngine = registry[0].engine
     }
-    console.log('registry:', registry)
-    console.groupEnd();
+    // console.log('registry:', registry)
+    // console.groupEnd();
   }
 
   /**
@@ -304,19 +304,19 @@ function OneOff (url, remote, docs, api) {
   this.register = function (config) {
     let registerOk = false
 
-    console.group('RegeEngine.setEngine()')
-    console.log('config:', config)
-    console.groupEnd();
+    // console.group('RegeEngine.setEngine()')
+    // console.log('config:', config)
+    // console.groupEnd();
     try {
       registerOk = updateRegistry(config)
     } catch (error) {
       console.error('OneOff.register() expects config to contain ' + error)
-      console.groupEnd();
+      // groupEnd();
       return false
     }
 
-    if (registry.length === 1) {
-
+    if (registry.length === 1 && currentEngine !== null) {
+      currentEngine = config.engine;
     }
 
     return registerOk
@@ -357,11 +357,11 @@ function OneOff (url, remote, docs, api) {
   }
 
   this.setEngine = function(engine) {
-    console.group('RegeEngine.setEngine()')
-    console.log('engine:', engine)
-    console.log('this:', this)
-    console.log('registry:', registry)
-    console.groupEnd()
+    // console.group('RegeEngine.setEngine()')
+    // console.log('engine:', engine)
+    // console.log('this:', this)
+    // console.log('registry:', registry)
+    // console.groupEnd()
   }
 
   /**
@@ -407,8 +407,8 @@ function OneOff (url, remote, docs, api) {
    */
   this.validate = function (pattern, flags) {
     if (currentEngine === null) {
-      console.group('OneOff.validate()')
-      console.log('OneOff.this:', this)
+      // console.group('OneOff.validate()')
+      // console.og('OneOff.this:', this)
       console.log('OneOff.getCurrentEngineID():', this.getCurrentEngineID())
       console.groupEnd()
       return '';
@@ -439,6 +439,7 @@ function OneOff (url, remote, docs, api) {
    * @returns {string} modified version user input
    */
   this.replace = function (input, regexes) {
+    console.log('RegexEngine().replace()')
     return currentEngine.replace(input, regexes)
   }
 
@@ -462,26 +463,30 @@ function OneOff (url, remote, docs, api) {
  */
  const tmpRemote = (typeof remote !== 'boolean' || remote === true) // eslint-disable-line
 
- /**
-  * @constant {string} tmpDocsURL Guaranteed string URL for docsURL value
-  */
- const tmpDocsURL = (typeof docsURL === 'string' && docsURL !== '') ? docsURL : 'docs/How_Do-JS-regex-stuff_works.html' // eslint-disable-line
+/**
+ * @constant {string} tmpDocsURL Guaranteed string URL for docsURL value
+ */
+const tmpDocsURL = (typeof docsURL === 'string' && docsURL !== '')
+  ? docsURL
+  : 'docs/How_Do-JS-regex-stuff_works.html' // eslint-disable-line
 
- /**
-  * @constant {string} apiURL Guaranteed string URL for the repeatable actions API
-  */
- const tmpApiURL = (typeof apiURL === 'string' && apiURL !== '') ? apiURL : 'docs/How_Do-JS-regex-stuff_works.html' // eslint-disable-line
+/**
+ * @constant {string} apiURL Guaranteed string URL for the repeatable actions API
+ */
+const tmpApiURL = (typeof apiURL === 'string' && apiURL !== '')
+  ? apiURL
+  : 'docs/How_Do-JS-regex-stuff_works.html' // eslint-disable-line
 
- //  END:  seting defaults
- // ======================================================
- // START: instantiate repeatable
+//  END:  seting defaults
+// ======================================================
+// START: instantiate repeatable
 
- export const regexEngines = new OneOff(
-   url,
-   tmpRemote,
-   tmpDocsURL,
-   tmpApiURL
- )
+export const regexEngines = new OneOff(
+  url,
+  tmpRemote,
+  tmpDocsURL,
+  tmpApiURL
+)
 
- //  END:  instantiate repeatable
- // ======================================================
+//  END:  instantiate repeatable
+// ======================================================

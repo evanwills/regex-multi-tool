@@ -50,9 +50,9 @@ const updatePos = (pairs) => {
  * @returns {object} Shallow clone of original pair with hasError
  */
 const setHasError = (pair) => {
-  console.group('setHasError()')
-  console.log('pair:', pair);
-  console.groupEnd();
+  // console.group('setHasError()')
+  // console.log('pair:', pair);
+  // console.groupEnd();
   const _hasError = (pair.regex.error !== '' || pair.flags.error !== '' || pair.delims.error !== '')
 
   if (pair.hasError === _hasError) {
@@ -757,6 +757,11 @@ export const regexSetOutputReducer = (state = '', action = { type: 'default' }) 
 }
 
 export const regexSetScreenReducer = (state = '', action = { type: 'default' }) => {
+  // console.group('regexSetScreenReducer()')
+  // console.log('state:', state);
+  // console.log('action:', action);
+  // console.groupEnd();
+
   if (action.type === oneOffActions.SET_SCREEN && state !== action.payload) {
     switch (action.payload) {
       case 'output':

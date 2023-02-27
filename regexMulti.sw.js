@@ -33,7 +33,7 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(cacheName).then(cache => {
-      console.log('urlsToCache:', urlsToCache)
+      // console.log('urlsToCache:', urlsToCache)
       cache.addAll(urlsToCache)
     })
   )

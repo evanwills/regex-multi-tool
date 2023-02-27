@@ -2,6 +2,7 @@ import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID, convertEscaped } from '../../utilities/sanitise.mjs'
 import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 import { regexEngines } from '../../regex-engines/regexEngine-init.mjs'
+import { oneOffMatchesView } from '../../view/oneOff/oneOff-matches.view.mjs'
 
 // ==============================================
 // START: Utility functions
@@ -183,19 +184,19 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       dispatch({
         type: oneOffActions.SET_MATCHES
       })
-      console.groupEnd();
+      // console.groupEnd();
       break
 
     case mainAppActions.RESET:
       dispatch({
         type: oneOffActions.RESET
       })
-      console.groupEnd();
+      // console.groupEnd();
       break
 
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
-      console.groupEnd();
+      // console.groupEnd();
       return next({
         type: action.type,
         payload: getNewPairAndPos(
@@ -205,20 +206,55 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case oneOffActions.SET_MATCHES:
-    case oneOffActions.SET_OUTPUT:
-      console.groupEnd();
-      return next({
+      // console.groupEnd();
+      dispatch({
         type: action.type,
-        payload: explodeAndTrim(
-          _state.oneOff.input.raw,
+        payload: trimAndImplode(
+          regexEngines.match(
+            explodeAndTrim(
+              _state.oneOff.input.raw,
+              _state.oneOff.input.split.doSplit,
+              _state.oneOff.input.split.splitter,
+              _state.oneOff.input.strip.before
+            ),
+            _state.oneOff.regex.pairs
+          ),
           _state.oneOff.input.split.doSplit,
           _state.oneOff.input.split.splitter,
           _state.oneOff.input.strip.before
         )
-      })
+      });
+      return next({
+        type: oneOffActions.SET_SCREEN,
+        payload: 'matches'
+      });
+
+    case oneOffActions.SET_OUTPUT:
+      // console.groupEnd();
+      dispatch({
+        type: mainAppActions.SET_OUTPUT,
+        payload: trimAndImplode(
+          regexEngines.replace(
+            explodeAndTrim(
+              _state.oneOff.input.raw,
+              _state.oneOff.input.split.doSplit,
+              _state.oneOff.input.split.splitter,
+              _state.oneOff.input.strip.before
+            ),
+            _state.oneOff.regex.pairs
+          ),
+          _state.oneOff.input.split.doSplit,
+          _state.oneOff.input.split.splitter,
+          _state.oneOff.input.strip.before
+        )
+      });
+      return next({
+        type: oneOffActions.SET_SCREEN,
+        payload: 'output'
+      });
 
     case regexPairActions.SET_AS_DEFAULT:
-      console.groupEnd();
+      // console.groupEnd();
       return next({
         type: oneOffActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
@@ -231,13 +267,13 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
     case regexPairActions.UPDATE_REGEX:
       tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
 
-      console.group('UPDATE_REGEX:', regexPairActions.UPDATE_REGEX)
-      console.log('regexEngines:', regexEngines)
-      console.log('tmpPair[0]:', tmpPair[0])
-      console.log('action.payload:', action.payload)
+      // console.group('UPDATE_REGEX:', regexPairActions.UPDATE_REGEX)
+      // console.log('regexEngines:', regexEngines)
+      // console.log('tmpPair[0]:', tmpPair[0])
+      // console.log('action.payload:', action.payload)
 
       if (tmpPair.length === 1) {
-        console.groupEnd();
+        // console.groupEnd();
         return next({
           ...action,
           payload: {
@@ -246,20 +282,20 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           }
         })
       } else {
-        console.groupEnd();
+        // console.groupEnd();
         return next(action);
       }
 
     case regexPairActions.UPDATE_FLAGS:
       tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
 
-      console.group('UPDATE_FLAGS:', regexPairActions.UPDATE_FLAGS)
-      console.log('regexEngines:', regexEngines)
-      console.log('tmpPair[0]:', tmpPair[0])
-      console.log('action.payload:', action.payload)
+      // console.group('UPDATE_FLAGS:', regexPairActions.UPDATE_FLAGS)
+      // console.log('regexEngines:', regexEngines)
+      // console.log('tmpPair[0]:', tmpPair[0])
+      // console.log('action.payload:', action.payload)
 
       if (tmpPair.length === 1) {
-        console.groupEnd();
+        // // console.groupEnd();
         return next({
           ...action,
           payload: {
@@ -268,24 +304,29 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           }
         })
       } else {
-        console.groupEnd();
+        // console.groupEnd();
         return next(action);
       }
 
 
     case oneOffActions.SET_SCREEN:
       const allowedScreens = ['input', 'regex', 'matches', 'output'] // eslint-disable-line
-
+      // console.group(oneOffActions.SET_SCREEN);
+      // console.log('payload:', action.payload)
       if (allowedScreens.indexOf(action.payload) >= 0) {
+        // console.log('screen is allowed')
         if (_state.oneOff.screen !== action.payload) {
-          console.groupEnd();
+          // console.log('screen has changed: "' + action.payload + '"')
+          // console.groupEnd();
+          // console.groupEnd();
           return next(action)
         } else {
-          console.groupEnd();
+          // console.groupEnd();
+          // console.groupEnd();
           return false
         }
       } else {
-        console.groupEnd();
+        // console.groupEnd();
         throw Error('Cannot set "' + action.payload + '" as OneOff screen')
       }
 

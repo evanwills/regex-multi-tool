@@ -279,8 +279,8 @@ export const padStr = (input, len, char, centre) => {
   const _input = input.toString()
   const _iLen = _input.length
 
-  console.log('len:', len)
-  console.log('_iLen:', _iLen)
+  // console.log('len:', len)
+  // console.log('_iLen:', _iLen)
 
   for (let a = _iLen; a < len; a += 2) {
     strR += _char
@@ -366,8 +366,8 @@ export const makeSingle = (input) => {
       : output.substring(0, l - 1)
   }
 
-  console.log('output:', output)
-  console.groupEnd()
+  // console.log('output:', output)
+  // console.groupEnd()
 
   return output
 }

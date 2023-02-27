@@ -50,10 +50,10 @@ export const multiRegexReplace = (input, findReplace, flags) => {
     const pair = findReplace[a]
 
     if (typeof pair.find !== 'string' || (typeof pair.replace !== 'string' && !isFunction(pair.replace))) {
-      console.group('findreplace[' + a + ']')
-      console.log('pair:', pair)
+      // group('findreplace[' + a + ']')
+      // log('pair:', pair)
       console.error('multiRegexReplace() expects pair to be a valid find/replace object. It is missing either a "find" or "replace" property')
-      console.groupEnd()
+      // groupEnd()
     }
 
     let _regex = null
@@ -64,13 +64,13 @@ export const multiRegexReplace = (input, findReplace, flags) => {
     try {
       _regex = new RegExp(pair.find, tmpFlags)
     } catch (e) {
-      console.group('findreplace[' + a + ']')
-      console.log('pair:', pair)
-      console.log('pair.find:', pair.find)
-      console.log('tmpFlags:', tmpFlags)
-      console.log('_regex:', _regex)
+      // group('findreplace[' + a + ']')
+      // pair:', pair)
+      // log('pair.find:', pair.find)
+      // log('tmpFlags:', tmpFlags)
+      // log('_regex:', _regex)
       console.error('multiRegexReplace() expects findReplace[' + a + '].find to contain a valid regular expression. It had the following error: "' + e.message + '"')
-      console.groupEnd()
+      // groupEnd()
     }
     // console.group('findreplace[' + a + ']')
     // console.log('pair:', pair)
@@ -126,11 +126,11 @@ export const multiLitRegexReplace = (input, findReplace) => {
         findReplace[a].replace
       )
     } catch (e) {
-      console.group('findreplace[' + a + ']')
-      console.log('findreplace[' + a + '].find:', findReplace[a].find)
-      console.log('findreplace[' + a + '].replace:', findReplace[a].replace)
+      // group('findreplace[' + a + ']')
+      // log('findreplace[' + a + '].find:', findReplace[a].find)
+      // log('findreplace[' + a + '].replace:', findReplace[a].replace)
       console.error('multiLitRegexReplace() expects findReplace[' + a + '].find to contain a valid regular expression. It had the following error: "' + e.message + '"')
-      console.groupEnd()
+      // groupEnd()
     }
   }
   return _output

@@ -47,8 +47,8 @@ export const userSettingsMW = store => next => action => {
       if (validColour(action.payload)) {
         return next(action)
       } else {
-        console.log('action.type:', action.type)
-        console.log('userSettingsActions:', userSettingsActions)
+        // console.log('action.type:', action.type)
+        // console.log('userSettingsActions:', userSettingsActions)
         console.error(action.type + 'FAILED: invalid colour value', action.payload)
       }
   }

@@ -189,7 +189,7 @@ const tsfBrandRefresh = (input, extraInputs, GETvars) => {
 
   let output = input;
 
-  console.log('extraInputs.convertMode():', extraInputs.convertMode())
+  // console.log('extraInputs.convertMode():', extraInputs.convertMode())
 
   switch (extraInputs.convertMode()) {
     case 'hex':
@@ -198,7 +198,7 @@ const tsfBrandRefresh = (input, extraInputs, GETvars) => {
       }
       break;
 
-    case 'html':
+      // case 'html':
 
     default:
       for (let a = 0; a < colourData.length; a += 1) {

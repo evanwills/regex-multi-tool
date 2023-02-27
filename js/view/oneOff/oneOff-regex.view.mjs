@@ -450,8 +450,8 @@ export const regexPair = (props) => {
 }
 
 export const oneOffRegexView = (props, eventHandlers) => {
-  console.log('props', props)
-  console.log('eventHandlers', eventHandlers)
+  // console.log('props', props)
+  // console.log('eventHandlers', eventHandlers)
   const _isOpen = props.settingsOpen
   return html`
   <!-- START: oneOffRegexView() -->

@@ -2,6 +2,46 @@
 import { regexEngines as engines } from '../regexEngine-init.mjs'
 
 
+/**
+ * Get regexes to use on intput strings
+ *
+ * Function to pass to Array.Map for current list of regex-pairs
+ *
+ * @param {object} regex RegexPair object
+ * @returns {object}
+ */
+const getUsableRegexes = (regex) => {
+  const output = {
+    ok: (regex.regex.error === '' && regex.flags.error === ''),
+    regexp: null,
+    replace: '',
+    error: ''
+  }
+
+  if (output.ok === true) {
+    output.regexp = new RegExp(regex.regex.pattern, regex.flags.flags);
+    output.replace = regex.replace;
+  } else {
+    let sep = '';
+    if (regex.regex.error !== '') {
+      output.error = regex.regex.error;
+      sep = ' & ';
+    }
+    if (regex.flags.error !== '') {
+      output.error = sep + regex.flags.error;
+    }
+  }
+
+  return output;
+}
+
+const replaceReduce = (output, regex) => {
+  return (regex.ok === true)
+    ? output.replace(regex.regexp, regex.replace)
+    : output;
+}
+
+
 function VanillaJS () {
   this.cleanError = (error) => {
     return error.message.replace(/^SyntaxError: /i, '');
@@ -107,20 +147,26 @@ function VanillaJS () {
    * @returns {array} modified version user input
    */
   this.match = function (input, regexes) {
-    return currentEngine.match(input, regexes)
+    return [];
   }
 
   /**
    * Run find & replace on supplied input using the supplied regexes
    *
-   * @param {array} input user supplied content (expects an array of
+   * @param {string[]} input user supplied content (expects an array of
    *               strings)
    * @param {array} regexes array of regex pairs and their config
    *
-   * @returns {string} modified version user input
+   * @returns {string[]} modified version user input
    */
   this.replace = function (input, regexes) {
-    return currentEngine.replace(input, regexes)
+    // group('VanillaJS().replace()')
+
+    const regExps = regexes.map(getUsableRegexes);
+    // console.log('input:', input);
+    // console.log('output:', input.map(str => regExps.reduce(replaceReduce, str)))
+    // console.groupEnd();
+    return input.map(str => regExps.reduce(replaceReduce, str))
   }
 }
 

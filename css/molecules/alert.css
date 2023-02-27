@@ -6,4 +6,16 @@
   font-weight: bold;
   margin: 1rem;
   padding: 2rem;
+  border-radius: 4rem;
+}
+.alert--note {
+  border: 0.1rem solid var(--danger);
+  box-shadow: 0 0 2rem rgba(255, 0, 0, 0.8), inset 0 0 0.5rem rgba(100, 0, 0, 0.8);
+  padding-left: 8.8rem;
+  /* text-align: justify; */
+  text-indent: -6.8rem;
+}
+.alert--note::before {
+  content: 'Note: ';
+  text-transform: uppercase;
 }

@@ -200,18 +200,18 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
     // console.log('after:', after)
     return '\n *' + after.replace(/\t/g, '  ')
   }
-  console.group('getMakeKssComment()')
-  console.log('componentName:', componentName)
-  console.log('samplePath:', samplePath)
-  console.log('componentType:', componentType)
-  console.log('html:', html)
-  console.log('_kssCommentStart:', _kssCommentStart)
-  console.log('_kssCommentEnd:', _kssCommentEnd)
-  console.log('pathClean:', pathClean)
-  console.log('_kssReplace:', _kssReplace)
+  // console.group('getMakeKssComment()')
+  // console.log('componentName:', componentName)
+  // console.log('samplePath:', samplePath)
+  // console.log('componentType:', componentType)
+  // console.log('html:', html)
+  // console.log('_kssCommentStart:', _kssCommentStart)
+  // console.log('_kssCommentEnd:', _kssCommentEnd)
+  // console.log('pathClean:', pathClean)
+  // console.log('_kssReplace:', _kssReplace)
 
   if (html === '') {
-    console.groupEnd()
+    // console.groupEnd()
     return _kssCommentStart + '*' + _kssCommentEnd
   } else {
     const findReplace = {
@@ -228,8 +228,8 @@ const getMakeKssComment = (kssCommStart, kssCommEnd, kssCompName) => (componentN
         replace: _kssCommentEnd
       }
     }
-    console.log('findReplace:', findReplace)
-    console.groupEnd()
+    // console.log('findReplace:', findReplace)
+    // console.groupEnd()
 
     return multiLitRegexReplace(html, findReplace, 'ig')
   }
@@ -1401,9 +1401,9 @@ const securePayURL = (input, extraInputs, GETvars) => {
     if (_exclude.indexOf(key) === -1) {
       // const _key = _map[key]
       output[key] = value
-      console.log('key:', key)
+      // console.log('key:', key)
       // console.log('_key:', _key)
-      console.log('value:', value)
+      // console.log('value:', value)
     }
   }
   output.timestamp = output.timestamp.replace(
@@ -1417,8 +1417,8 @@ const securePayURL = (input, extraInputs, GETvars) => {
     }
   }
 
-  console.log('output:', output)
-  console.log('tmp:', tmp)
+  // console.log('output:', output)
+  // console.log('tmp:', tmp)
   return JSON.stringify(output).replace(/(?<=\{|,)/g, '\n  ').replace(/":/g, ': ').replace('}', '\n}')
 }
 
@@ -1538,10 +1538,10 @@ const newDbAndUser = (input, extraInputs, GETvars) => {
   const staffDir = extraInputs.staffDir()
   let output = ''
 
-  console.log('dbName:', dbName)
-  console.log('userName:', userName)
-  console.log('userPassword:', userPassword)
-  console.log('staffDir:', staffDir)
+  // console.log('dbName:', dbName)
+  // console.log('userName:', userName)
+  // console.log('userPassword:', userPassword)
+  // console.log('staffDir:', staffDir)
 
   if (userPassword !== extraInputs.userPassword()) {
     output += '-- DB user\'s password has been truncated to 20 characters\n' +
@@ -1709,7 +1709,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const addPassArSessions = (input, extraInputs, GETvars) => {
-  console.group('addPassArSessions()')
+  // console.group('addPassArSessions()')
 
   const getData = (row, index, type = 'string') => {
     const field = typeof row[index] === 'string'
@@ -2022,7 +2022,7 @@ const convert2SqlInsert = (input, extraInputs, GETvars) => {
     )
 
     type = col[2].toLowerCase().trim()
-    console.log('type:', type)
+    // console.log('type:', type)
     if (type === 'tinyint(1)') {
       _types.push('BOOL')
     } else if (type.includes('int')) {

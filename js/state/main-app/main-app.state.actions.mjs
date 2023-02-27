@@ -64,7 +64,7 @@ export const getAutoDispatchMainAppEvent = (_dispatch) => {
         break
     }
 
-    console.log('dispatching type:', _type)
+    // console.log('dispatching type:', _type)
     _dispatch({ type: _type })
   }
 }

@@ -168,7 +168,7 @@ const transformSchoolsJSON = (input, extraInputs, GETvars) => {
       }
     }
 
-    console.log('json:', json)
+    // console.log('json:', json)
     return 'var Campuses = ' + noQuotes(json)
   } else {
     console.error('No mode specified.')
@@ -231,9 +231,9 @@ const makeURLok = (url) => {
  * @returns {string} modified version user input
  */
 const imageGalleryHTML = (input, extraInputs, GETvars) => {
-  console.log('input:', input)
+  // console.log('input:', input)
   const images = input.trim().split('\n')
-  console.log('images:', images)
+  // console.log('images:', images)
 
   let gallery = ''
   let modals = ''

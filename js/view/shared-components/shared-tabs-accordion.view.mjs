@@ -11,7 +11,16 @@ import { isStr, isBoolTrue } from '../../utilities/validation.mjs'
  * @returns
  */
 const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
-  const label = (isStr(props.label)) ? props.label : ucFirst(props.id)
+  // console.group('tabNavItem()')
+
+  const label = (isStr(props.label))
+    ? props.label
+    : ucFirst(props.id);
+
+  // console.log('activeID:', activeID);
+  // console.log('props.id:', props.id);
+  // console.log('isActive:', (props.id === activeID));
+  // console.groupEnd()
   return html`
     <!-- START: tabNavItem() -->
       <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}${isBoolTrue(isAccordion) ? ' tab-nav--accordion' : ''}" @click=${eventHandler} accesskey="${props.id.substring(0, 1)}">${label}</a>
@@ -20,7 +29,15 @@ const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
 }
 
 const tabBlockInner = (groupID, activeID, block, tabEvent) => {
+  // console.group('tabBlockInner()')
+
   const isActive = (block.id === activeID)
+
+  // console.log('activeID:', activeID);
+  // console.log('block.id:', block.id);
+  // console.log('isActive:', (block.id === activeID));
+  // console.groupEnd()
+
   return html`
   <section id="${block.id}" class="tab-block tab-block--${(isActive) ? '' : 'in'}active">
     <h3 class="tab-block__h">${tabNavItem(groupID, activeID, block, tabEvent, true)}</h3>
@@ -40,6 +57,10 @@ const tabBlockInner = (groupID, activeID, block, tabEvent) => {
  * @returns
  */
 export const tabBlock = (groupID, activeID, blocks, tabEvent, isMobileAccordion) => {
+  // console.group('tabBlock()')
+  // console.log('activeID:', activeID);
+  // console.groupEnd()
+
   return html`
     <!-- START: tabBlock() -->
     <section class="tab-wrapper ${isBoolTrue(isMobileAccordion) ? 'tab-wrapper--mobile' : 'tab-wrapper--tab'}">

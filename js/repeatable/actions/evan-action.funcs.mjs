@@ -1103,7 +1103,7 @@ const loadingSpinnerGenerator = (input, extraInputs, GETvars) => {
   let opacity = []
   let output = '<?xml version="1.0" encoding="UTF-8"?>\n<svg id="wating-spinner" width="' + side + 'mm" height="' + side + 'mm" version="1.1" viewBox="0 0 ' + side + ' ' + side + '" xmlns="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n\t<g id="spinner" stroke="none" fill="#106">'
 
-  console.group('loadingSpinnerGenerator()')
+  // console.group('loadingSpinnerGenerator()')
 
   for (let a = 0; a < dotCount; a += 1) {
     const dotOpacity = round(((1 * a) / dotCountSub), 3)
@@ -1293,7 +1293,7 @@ const quickSQL = (input, extraInputs, GETvars) => {
   const sql = 'SELECT `first_name` AS `firstName`, `last_name` AS `lastName`, `email` FROM `basic_user` WHERE `first_name` LIKE "%:STR1%" :AND_OR `last_name` LIKE "%:STR2%" ORDER BY `first_name`, `last_name` LIMIT 0, 20;\n'
 
   const parts = userStr.split(' ')
-  console.log('parts:', parts)
+  // console.log('parts:', parts)
   const firstName = parts[0]
 
   let lastName = ''
@@ -1506,12 +1506,12 @@ doStuff.register({
  */
 const php2js = (input, extraInputs, GETvars) => {
   const regex = /id: ##/g
-  console.group('php2js()')
-  console.log('extraInputs.index()', extraInputs.index())
+  // console.group('php2js()')
+  // console.log('extraInputs.index()', extraInputs.index())
   let index = extraInputs.index()
   const constName = snakeToCamelCase(extraInputs.name(), 1)
-  console.log('extraInputs.name():', extraInputs.name())
-  console.log('constName:', constName)
+  // console.log('extraInputs.name():', extraInputs.name())
+  // console.log('constName:', constName)
   let output = input.trim()
   output = output.replace(/\s*(?:\[|array\()/g, '\n  {')
   output = output.replace(/\s*(?:\]|\))/g, '\n  }')
@@ -1528,7 +1528,7 @@ const php2js = (input, extraInputs, GETvars) => {
 
   output = output.replace(/\s+id: [0-9]+,(\s+id: [0-9]+,)/gs, '$1')
 
-  console.groupEnd()
+  // console.groupEnd()
   return '\nexport const ' + constName + ' = [' + output + '\n]\n\n'
 }
 
@@ -1749,7 +1749,7 @@ const constToProp = (input, extraInputs, GETvars) => {
     )
   }
 
-  console.log()
+  // console.log()
   return output
 }
 
@@ -1801,7 +1801,7 @@ const cssCustomProps = (input, extraInputs, GETvars) => {
   let oldHost = '\n    :host {'
 
   for (const match of matches) {
-    console.log('match:', match)
+    // console.log('match:', match)
     const prop = match[1].replace(/^-(?:-wc)?/, '')
     const val = (typeof match[2] === 'string')
       ? match[2]
@@ -2316,9 +2316,9 @@ const extractUnitTestData = (input, extraInputs, GETvars) => {
   let outer = []
 
   while ((outer = regex1.exec(input)) !== null) {
-    console.log('outer[1]:', outer[1])
+    // console.log('outer[1]:', outer[1])
     const bits = outer[1].match(regex2)
-    console.log('bits:', bits)
+    // console.log('bits:', bits)
   }
 
   return input
@@ -3319,12 +3319,12 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   let andClause = '';
 
   for (let a = 0, b = 0, c = fields.length; a < c; a += 1) {
-    console.group('field[' + a + ']');
-    console.log('fields[' + a +']:', fields[a]);
-    console.log('fields[' + a +'].subType:', fields[a].subType);
-    console.log('fields[' + a +'].col:', fields[a].col);
-    console.log('fields[' + a +'].subType === "updatedBy":', fields[a].subType === 'updatedBy');
-    console.groupEnd();
+    // console.group('field[' + a + ']');
+    // console.log('fields[' + a +']:', fields[a]);
+    // console.log('fields[' + a +'].subType:', fields[a].subType);
+    // console.log('fields[' + a +'].col:', fields[a].col);
+    // console.log('fields[' + a +'].subType === "updatedBy":', fields[a].subType === 'updatedBy');
+    // console.groupEnd();
     switch (fields[a].subType) {
       case 'id':
         id = fields[a];
@@ -3429,7 +3429,7 @@ const stProcCUD = (fields, tableName, thingName, procName) => {
   inParams = inParams.replace(commaRegex, ' ')
   setVals = setVals.replace(commaRegex, ' ')
 
-  console.log('updatedBy:', updatedBy)
+  // console.log('updatedBy:', updatedBy)
 
   return `
 -- START: \`add_${procName}\`
@@ -3635,10 +3635,10 @@ const storedProcParams = (input, extraInputs, GETvars) => {
   let _x = 0
   let isLockable = false;
   let isSortable = false;
-  console.log('_tableName:', _tableName)
-  console.log('_thingName:', _thingName)
-  console.log('stripperRegex:', stripperRegex)
-  console.log('_prefix:', _prefix)
+  // console.log('_tableName:', _tableName)
+  // console.log('_thingName:', _thingName)
+  // console.log('stripperRegex:', stripperRegex)
+  // console.log('_prefix:', _prefix)
 
   let storedProc = ''
 
@@ -3699,17 +3699,17 @@ const storedProcParams = (input, extraInputs, GETvars) => {
     _cols.push(_field)
   }
 
-  console.log('_cols:', _cols)
+  // console.log('_cols:', _cols)
 
   // maxIn += 2
   maxCol += 2
   // const maxColIn = maxCol + 1
   maxParam += 2
 
-  console.log('maxIn:', maxIn)
-  console.log('maxCol:', maxCol)
+  // console.log('maxIn:', maxIn)
+  // console.log('maxCol:', maxCol)
   // console.log('maxColIn:', maxColIn)
-  console.log('maxParam:', maxParam)
+  // console.log('maxParam:', maxParam)
 
   for (let a = 0; a < _cols.length; a += 1) {
     _cols[a].maxCol = maxCol;
