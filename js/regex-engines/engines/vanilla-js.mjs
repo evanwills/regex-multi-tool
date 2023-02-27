@@ -3,6 +3,28 @@ import { regexEngines as engines } from '../regexEngine-init.mjs'
 
 
 function VanillaJS () {
+  this.cleanError = (error) => {
+    return error.message.replace(/^SyntaxError: /i, '');
+  }
+
+
+  /**
+   * Test if the supplied regex pattern and flags are valid for the
+   * this engine
+   *
+   * @param {array} regex Single regexPair object
+   *
+   * @return {string} If regex contains an error, error message is
+   *               returned. Otherwise empty string is returned.
+   */
+  this.validate = function (pattern, flags) {
+    try {
+      const tmp = new RegExp(pattern, flags)
+    } catch (error) {
+      return this.cleanError(error)
+    }
+    return ''
+  }
 
 
   /**
@@ -28,7 +50,7 @@ function VanillaJS () {
     try {
       tmp = new RegExp(regexPair.regex.pattern, regexPair.flags.flags)
     } catch (error) {
-      return error.message
+      return this.cleanError(error)
     }
     return ''
   }
@@ -57,7 +79,7 @@ function VanillaJS () {
     try {
       tmp = new RegExp(regexPair.regex.pattern, regexPair.flags.flags)
     } catch (error) {
-      return error.message
+      return this.cleanError(error)
     }
     return ''
   }
@@ -103,10 +125,10 @@ function VanillaJS () {
 }
 
 engines.register({
-  id: 'vanillaJS',
+  id: 'VanillaJS',
   name: 'Vanilla JS RegExp',
   description: 'Built in Browser ECMA Script RegExp functionality',
-  engine: VanillaJS,
+  engine: new VanillaJS(),
   flags: {
     allow: true,
     default: 'ig'

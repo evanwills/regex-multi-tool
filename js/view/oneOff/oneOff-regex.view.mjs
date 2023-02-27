@@ -352,7 +352,7 @@ export const regexPair = (props) => {
                        @keyup=${props.events.pairValue}
                        @change=${props.events.pairValue} />`}
         ${(isNonEmptyStr(props.flags.error))
-          ? html`<p class="r-pair__error r-pair__flags-error" id="${props.id}-flags-error">${props.flags.error}</p>`
+          ? html`<p class="r-pair__error r-pair__error--flags" id="${props.id}-flags-error">${props.flags.error}</p>`
           : ''}
         <label for="${props.id}-flags" class="r-pair__label r-pair__label--flags">Flags</label>
         <input id="${props.id}-flags" aria-describedby="${props.id}-flags-error" class="r-pair__input r-pair__field--flags" value="${props.flags.flags}" @keyup=${props.events.pairValue} placeholder="i" />

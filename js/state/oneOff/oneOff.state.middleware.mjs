@@ -1,6 +1,7 @@
 import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID, convertEscaped } from '../../utilities/sanitise.mjs'
 import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
+import { regexEngines } from '../../regex-engines/regexEngine-init.mjs'
 
 // ==============================================
 // START: Utility functions
@@ -39,6 +40,8 @@ const getNewPairAndPos = (pairs, id) => {
     pos: -1
   }
 }
+
+
 
 /**
  * Explode string and (if required) trim each string in the array
@@ -165,6 +168,8 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
     return next(action)
   }
 
+  let tmpPair = [];
+
   switch (action.type) {
     case mainAppActions.MODIFY:
       // pass current `oneOff` state to regex engine
@@ -178,16 +183,19 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       dispatch({
         type: oneOffActions.SET_MATCHES
       })
+      console.groupEnd();
       break
 
     case mainAppActions.RESET:
       dispatch({
         type: oneOffActions.RESET
       })
+      console.groupEnd();
       break
 
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
+      console.groupEnd();
       return next({
         type: action.type,
         payload: getNewPairAndPos(
@@ -198,6 +206,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
     case oneOffActions.SET_MATCHES:
     case oneOffActions.SET_OUTPUT:
+      console.groupEnd();
       return next({
         type: action.type,
         payload: explodeAndTrim(
@@ -209,6 +218,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case regexPairActions.SET_AS_DEFAULT:
+      console.groupEnd();
       return next({
         type: oneOffActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
@@ -217,26 +227,48 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           _state.oneOff.defaults
         )
       })
+
     case regexPairActions.UPDATE_REGEX:
-      const tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
+      tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
+
+      console.group('UPDATE_REGEX:', regexPairActions.UPDATE_REGEX)
+      console.log('regexEngines:', regexEngines)
+      console.log('tmpPair[0]:', tmpPair[0])
+      console.log('action.payload:', action.payload)
 
       if (tmpPair.length === 1) {
-        let errorMsg = '';
-        console.log('tmpPair:', tmpPair);
-        try {
-          const tmpRegex = new RegExp(action.payload.value, tmpPair[0].flags.flags)
-        } catch(error) {
-          errorMsg = `${error}`;
-        }
-        console.log('errorMsg:', errorMsg);
+        console.groupEnd();
         return next({
           ...action,
           payload: {
             ...action.payload,
-            error: errorMsg.replace(/^SyntaxError: /i, '')
+            error: regexEngines.validate(action.payload.value, '')
           }
         })
       } else {
+        console.groupEnd();
+        return next(action);
+      }
+
+    case regexPairActions.UPDATE_FLAGS:
+      tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id);
+
+      console.group('UPDATE_FLAGS:', regexPairActions.UPDATE_FLAGS)
+      console.log('regexEngines:', regexEngines)
+      console.log('tmpPair[0]:', tmpPair[0])
+      console.log('action.payload:', action.payload)
+
+      if (tmpPair.length === 1) {
+        console.groupEnd();
+        return next({
+          ...action,
+          payload: {
+            ...action.payload,
+            error: regexEngines.validate('', action.payload.value)
+          }
+        })
+      } else {
+        console.groupEnd();
         return next(action);
       }
 
@@ -246,11 +278,14 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
 
       if (allowedScreens.indexOf(action.payload) >= 0) {
         if (_state.oneOff.screen !== action.payload) {
+          console.groupEnd();
           return next(action)
         } else {
+          console.groupEnd();
           return false
         }
       } else {
+        console.groupEnd();
         throw Error('Cannot set "' + action.payload + '" as OneOff screen')
       }
 

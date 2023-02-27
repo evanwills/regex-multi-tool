@@ -7,6 +7,8 @@
  * @url https://github.com/evanwills/regex-multi-tool
  */
 
+import { isBoolTrue, invalidString, isFunction } from '../utilities/validation.mjs'
+
 
 import { url } from '../url.mjs'
 
@@ -94,6 +96,7 @@ function OneOff (url, remote, docs, api) {
   const updateRegistry = function (config) {
     let tmp = false
     const errorMsg = 'OneOff.register() expects config to contain '
+    console.group('updateRegistry()')
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // START: Validating fields
@@ -102,12 +105,17 @@ function OneOff (url, remote, docs, api) {
       // This action has been set to IGNORE
       if (noIgnore !== config.action) {
         // The user has not overridden the IGNORE directive via the URL
+        console.log('The user has not overridden the IGNORE directive via the URL')
+        console.groupEnd();
         return false
       }
     }
 
     tmp = invalidString('id', config)
     if (tmp !== false) {
+      console.error(errorMsg + 'an "id" property that is a non-empty string. ' +
+      tmp + ' given.')
+      console.groupEnd();
       throw Error(
         errorMsg + 'an "id" property that is a non-empty string. ' +
         tmp + ' given.'
@@ -116,6 +124,11 @@ function OneOff (url, remote, docs, api) {
 
     tmp = invalidString('name', config)
     if (tmp !== false) {
+      console.log(
+        errorMsg + 'a "name" property that is a non-empty string. ' +
+        tmp + ' given.'
+      )
+      console.groupEnd();
       throw Error(
         errorMsg + 'a "name" property that is a non-empty string. ' +
         tmp + ' given.'
@@ -133,6 +146,7 @@ function OneOff (url, remote, docs, api) {
           'All remote Regex Engines are blocked from this host. ' +
           'Engine: "' + config.name + '" will not be available'
         )
+        console.groupEnd();
         return false
       } else if (isHTTPS === true) {
         console.warn(
@@ -145,6 +159,9 @@ function OneOff (url, remote, docs, api) {
 
     // This is a local action so it MUST have an action function
     if (typeof config.engine !== 'object') {
+      console.log('config:', config)
+      console.log('config.engine:', config.engine)
+      console.groupEnd();
       throw Error(
         errorMsg + 'an "engine" property that is a plain javascript ' +
         'function. ' + tmp + ' given.'
@@ -182,6 +199,15 @@ function OneOff (url, remote, docs, api) {
     if (config.delimiters.allow) {
 
     }
+
+    registry = [...registry, config];
+
+    if (registry.length === 1) {
+      // currentEngineID = registry[0].engine
+      currentEngine = registry[0].engine
+    }
+    console.log('registry:', registry)
+    console.groupEnd();
   }
 
   /**
@@ -278,11 +304,19 @@ function OneOff (url, remote, docs, api) {
   this.register = function (config) {
     let registerOk = false
 
+    console.group('RegeEngine.setEngine()')
+    console.log('config:', config)
+    console.groupEnd();
     try {
       registerOk = updateRegistry(config)
     } catch (error) {
       console.error('OneOff.register() expects config to contain ' + error)
+      console.groupEnd();
       return false
+    }
+
+    if (registry.length === 1) {
+
     }
 
     return registerOk
@@ -320,6 +354,14 @@ function OneOff (url, remote, docs, api) {
       }
     }
     return ''
+  }
+
+  this.setEngine = function(engine) {
+    console.group('RegeEngine.setEngine()')
+    console.log('engine:', engine)
+    console.log('this:', this)
+    console.log('registry:', registry)
+    console.groupEnd()
   }
 
   /**
@@ -363,8 +405,15 @@ function OneOff (url, remote, docs, api) {
    *
    * @return {object}
    */
-  this.validate = function (regex) {
-    return currentEngine.validate(regex)
+  this.validate = function (pattern, flags) {
+    if (currentEngine === null) {
+      console.group('OneOff.validate()')
+      console.log('OneOff.this:', this)
+      console.log('OneOff.getCurrentEngineID():', this.getCurrentEngineID())
+      console.groupEnd()
+      return '';
+    }
+    return currentEngine.validate(pattern, flags)
   }
 
   /**

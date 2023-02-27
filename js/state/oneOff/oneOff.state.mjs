@@ -31,7 +31,7 @@ const oneOffState = {
     pairs: [defaultPair],
     focusedID: defaultPair.id,
     chain: true,
-    engine: 'vanillaJS',
+    engine: 'VanillaJS',
     defaults: {
       flags: 'ig',
       delims: {
