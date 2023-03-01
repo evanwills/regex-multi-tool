@@ -394,4 +394,202 @@ doStuff.register({
 })
 
 //  END:  Brand colour variables to MD table
+
+// ====================================================================
+// START: Test file type
+
+/**
+ * Test if file type is valid
+ *
+ * created by: Evan Wills
+ * created: 2023-02-28
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const testFileType = (input, extraInputs, GETvars) => {
+  const types = [
+    { type: 'image/png', ok: true },
+    { type: 'image/jpeg', ok: true },
+    { type: 'image/webp', ok: true },
+    { type: 'application/pdf', ok: true },
+    { type: 'application/msword', ok: true },
+    { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', ok: true },
+    { type: 'audio/aac', ok: false },
+    { type: 'application/x-abiword', ok: false },
+    { type: 'video/x-msvideo', ok: false },
+    { type: 'image/avif', ok: false },
+    { type: '', ok: false },
+    { type: 'OOOO', ok: false },
+    { type: 'text/csv', ok: false },
+    { type: false, ok: false },
+    { type: { type: 'image/webp' }, ok: false },
+    { type: 'application/epub+zip', ok: false },
+    { type: 'image/gif', ok: false },
+    { type: 'text/javascript', ok: false },
+    { type: 'application/json', ok: false },
+    { type: 'text/html', ok: false },
+    { type: 'text/plain', ok: false },
+    { type: 'audio/webm', ok: false },
+    { type: 'application/vnd.ms-excel', ok: false },
+    { type: 'application/xml', ok: false },
+    { type: 'text/xml', ok: false },
+    { type: 'application/x-7z-compressed', ok: false }
+  ]
+
+  const isValidFileType = (fileType) => {
+    const allwedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    const tmpType = (typeof fileType.type === 'string')
+      ? fileType.type.trim()
+      : ''
+
+    console.group('isValidFileType()')
+    console.log(`fileType: "${fileType.type}"`);
+    console.log(`tmpType: "${tmpType}"`);
+    const OK = (tmpType !== '' && allwedTypes.indexOf(tmpType) > -1)
+
+    if (OK === true) {
+      console.info('isValid:', OK)
+    } else {
+      console.warn('isValid:', OK)
+    }
+    console.groupEnd();
+
+    return (tmpType !== '' && OK === true);
+  }
+
+  types.map(fType => isValidFileType(fType))
+}
+
+doStuff.register({
+  id: 'testFileType',
+  name: 'Test if file type is valid',
+  func: testFileType,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  group: 'tsf',
+  ignore: true
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Test file type
+
+// ====================================================================
+// START: branch name
+
+/**
+ * Get branch name for current sprint
+ *
+ * created by: Evan Wills
+ * created: 2023-02-28
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const getBranchName = (input, extraInputs, GETvars) => {
+  const sprint = extraInputs.sprint()
+  const id = extraInputs.id()
+  let title = extraInputs.title()
+  // const sprint = 4
+  // const id = 94719
+  // let title = 'MSF | Address allows save when state is Select from List'
+  title = title.replace(/^[^|]+\|/, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/ig, '-')
+
+  const _now = new Date()
+  let year = _now.getFullYear()
+  const month = _now.getMonth() + 1
+  let q = 3
+
+  if (month > 3) {
+    if (month > 6) {
+      year += 1
+      if (month > 9) {
+        q = 2
+      } else {
+        q = 1
+      }
+      year += 1
+    } else {
+      q = 4
+    }
+  }
+
+  year = year.toString().replace(/^[0-9]{2}/, '')
+
+  return 'family/feature/FY' + year + '.Q' + q + '/Sprint-' + sprint + '/' + id + '-' + title;
+
+}
+
+doStuff.register({
+  id: 'getBranchName',
+  name: 'Get branch name for current sprint',
+  func: getBranchName,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'sprint',
+    label: 'Sprint number',
+    min: 1,
+    max: 7,
+    step: 1,
+    default: 0,
+    type: 'number'
+  }, {
+    id: 'id',
+    label: 'Ticket ID',
+    min: 1,
+    max: 100000,
+    step: 1,
+    default: 0,
+    type: 'number'
+  }, {
+    id: 'title',
+    label: 'Ticket title',
+    type: 'text',
+    description: '',
+    pattern: '',
+    default: ''
+  }],
+  // group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  branch name
 // ====================================================================

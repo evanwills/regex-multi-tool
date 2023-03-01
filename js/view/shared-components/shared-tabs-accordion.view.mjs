@@ -15,7 +15,11 @@ const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
 
   const label = (isStr(props.label))
     ? props.label
-    : ucFirst(props.id);
+    : ucFirst(props.id)
+
+  const aKey = (typeof props.aKey === 'string')
+    ? props.aKey
+    : props.id.substring(0, 1)
 
   // console.log('activeID:', activeID);
   // console.log('props.id:', props.id);
@@ -23,7 +27,7 @@ const tabNavItem = (groupID, activeID, props, eventHandler, isAccordion) => {
   // console.groupEnd()
   return html`
     <!-- START: tabNavItem() -->
-      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}${isBoolTrue(isAccordion) ? ' tab-nav--accordion' : ''}" @click=${eventHandler} accesskey="${props.id.substring(0, 1)}">${label}</a>
+      <a href="#${props.id}" class="tab-nav__btn${(props.id === activeID) ? ' tab-nav__btn--active' : ''}${isBoolTrue(isAccordion) ? ' tab-nav--accordion' : ''}" @click=${eventHandler} accesskey="${aKey}">${label}</a>
     <!--  END:  tabNavItem() -->
   `
 }

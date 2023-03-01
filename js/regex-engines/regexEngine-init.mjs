@@ -11,6 +11,7 @@ import { isBoolTrue, invalidString, isFunction } from '../utilities/validation.m
 
 
 import { url } from '../url.mjs'
+import { convertEscaped } from '../utilities/sanitise.mjs'
 
 // ======================================================
 // START: constructor functions
@@ -217,7 +218,7 @@ function OneOff (url, remote, docs, api) {
    *
    * @returns {object}
    */
-  function filterNonProps (config) {
+  const filterNonProps = (config) => {
     const output = {}
     const okKeys = [
       'id', 'engine', 'remote', 'name', 'description',
@@ -276,6 +277,23 @@ function OneOff (url, remote, docs, api) {
       return output
     }
     return false
+  }
+
+  /**
+   * Convert escape character sequences to actual character
+   *
+   * @param {RegexPair} pair RegexPair to be modified
+   *
+   * @returns {RegexPair}
+   */
+  const convertEscapedReplace = (pair) => {
+    if (pair.transformEscaped === true) {
+      const output = { ...pair }
+      output.replace = convertEscaped(output.replace);
+      return output
+    } else {
+      return pair
+    }
   }
 
   //  END:  private method declaration
@@ -426,7 +444,7 @@ function OneOff (url, remote, docs, api) {
    * @returns {array} modified version user input
    */
   this.match = function (input, regexes) {
-    return currentEngine.match(input, regexes)
+    return currentEngine.match(input, regexes.map(convertEscapedReplace))
   }
 
   /**
@@ -440,7 +458,7 @@ function OneOff (url, remote, docs, api) {
    */
   this.replace = function (input, regexes) {
     console.log('RegexEngine().replace()')
-    return currentEngine.replace(input, regexes)
+    return currentEngine.replace(input, regexes.map(convertEscapedReplace))
   }
 
   this.getDocsURL = function () {

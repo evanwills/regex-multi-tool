@@ -98,11 +98,15 @@ const escapeChars = [
  *                   normal characters
  */
 export const convertEscaped = (input) => {
+  console.group('convertEscaped()')
+  console.log(input)
   let output = input
   for (let a = 0; a < escapeChars.length; a += 1) {
-    output = output.replace(escapeChars[a].find, escapeChars.replace)
+    output = output.replace(escapeChars[a].find, escapeChars[a].replace)
   }
   // return escapeChars.reduce((tmp, pair) => tmp.replace(pair[0], pair[1]), input)
+  console.log(output);
+  console.groupEnd();
   return output
 }
 
