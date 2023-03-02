@@ -741,7 +741,11 @@ export const regexToggleEngineSettings = (state = false, action = { type: 'defau
 
 
 export const regexSetMatchesReducer = (state = [], action = { type: 'default' }) => {
-  if (action.type === oneOffActions.SET_MATCHES) {
+  console.group('regexSetMatchesReducer()')
+  console.log('state:', state)
+  console.log('action:', action)
+  console.groupEnd()
+  if (action.type === oneOffActions.SET_MATCHES_INNER) {
     return action.payload
   } else {
     return state

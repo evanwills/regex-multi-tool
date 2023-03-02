@@ -1,7 +1,6 @@
 
 import { regexEngines as engines } from '../regexEngine-init.mjs'
 
-
 /**
  * Get regexes to use on intput strings
  *
@@ -46,7 +45,6 @@ function VanillaJS () {
   this.cleanError = (error) => {
     return error.message.replace(/^SyntaxError: /i, '');
   }
-
 
   /**
    * Test if the supplied regex pattern and flags are valid for the
@@ -147,6 +145,10 @@ function VanillaJS () {
    * @returns {array} modified version user input
    */
   this.match = function (input, regexes) {
+    console.group('VanillaJS.match()')
+    console.log('input:', input);
+    console.log('regexes:', regexes)
+    console.groupEnd()
     return [];
   }
 

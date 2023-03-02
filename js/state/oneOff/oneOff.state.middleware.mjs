@@ -208,20 +208,15 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
     case oneOffActions.SET_MATCHES:
       // console.groupEnd();
       dispatch({
-        type: action.type,
-        payload: trimAndImplode(
-          regexEngines.match(
-            explodeAndTrim(
-              _state.oneOff.input.raw,
-              _state.oneOff.input.split.doSplit,
-              _state.oneOff.input.split.splitter,
-              _state.oneOff.input.strip.before
-            ),
-            _state.oneOff.regex.pairs
+        type: oneOffActions.SET_MATCHES_INNER,
+        payload: regexEngines.match(
+          explodeAndTrim(
+            _state.oneOff.input.raw,
+            _state.oneOff.input.split.doSplit,
+            _state.oneOff.input.split.splitter,
+            _state.oneOff.input.strip.before
           ),
-          _state.oneOff.input.split.doSplit,
-          _state.oneOff.input.split.splitter,
-          _state.oneOff.input.strip.before
+          _state.oneOff.regex.pairs
         )
       });
       return next({
@@ -230,9 +225,13 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       });
 
     case oneOffActions.SET_OUTPUT:
+      // console.group('oneOffMW: oneOffActions.SET_OUTPUT')
+      // console.log('_state.oneOff.input.raw:', _state.oneOff.input.raw)
+      // console.log('_state.oneOff.regex.pairs:', _state.oneOff.regex.pairs)
+      // console.groupEnd()
       // console.groupEnd();
       dispatch({
-        type: mainAppActions.SET_OUTPUT,
+        type: oneOffActions.SET_OUTPUT,
         payload: trimAndImplode(
           regexEngines.replace(
             explodeAndTrim(
