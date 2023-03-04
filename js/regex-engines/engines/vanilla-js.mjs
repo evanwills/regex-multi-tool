@@ -18,32 +18,124 @@ const getUsableRegexes = (regex) => {
   }
 
   if (output.ok === true) {
-    output.regexp = new RegExp(regex.regex.pattern, regex.flags.flags);
-    output.replace = regex.replace;
+    output.regexp = new RegExp(regex.regex.pattern, regex.flags.flags)
+    output.replace = regex.replace
   } else {
-    let sep = '';
+    let sep = ''
     if (regex.regex.error !== '') {
-      output.error = regex.regex.error;
-      sep = ' & ';
+      output.error = regex.regex.error
+      sep = ' & '
     }
     if (regex.flags.error !== '') {
-      output.error = sep + regex.flags.error;
+      output.error = sep + regex.flags.error
     }
   }
 
-  return output;
+  return output
 }
 
 const replaceReduce = (output, regex) => {
   return (regex.ok === true)
     ? output.replace(regex.regexp, regex.replace)
-    : output;
+    : output
 }
 
+/**
+ * Apply a single regular expression to a single sample string
+ *
+ * @param {string}      input string to match against
+ * @param {RegexPair[]} regex RegexPair info
+ *
+ * @returns {Object}
+ */
+const matchSingle = (input, regex) => {
+  const output = {
+    output: input.replace(
+      regex.regexp,
+      regex.replace
+    ),
+    matches: []
+  }
+  let tmp = []
+
+  while ((tmp = regex.regexp.exec(input)) !== null) {
+    const groups = (typeof tmp.groups !== 'undefined')
+      ? tmp.groups
+      : null
+
+    // remove groups from the main list of captured sub-patterns
+    const tmpMatches = tmp.filter((value, index) => (index !== 'groups'))
+      .map((value, index) => {
+        return {
+          index: index,
+          key: '',
+          str: value
+        }
+      })
+
+    if (groups !== null) {
+      /**
+       * Index of the last matched group sub-pattern
+       *
+       * @var {number}
+       */
+      let c = 0
+      for (const key in groups) {
+        /**
+         * Index of the sub-pattern this group (named sub-pattern)
+         * matches
+         *
+         * @var {number}
+         */
+        const b = tmp.indexOf(groups[key], c)
+
+        // If the index and string from the group pattern matches
+        // the index and group string of the sub-pattern, then use
+        // the group's key
+        if (typeof tmpMatches[b] !== 'undefined' &&
+            tmpMatches[b].index === b &&
+            tmpMatches[b].str === tmp.groups[key]
+        ) {
+          tmpMatches[b].key = key
+        }
+
+        // Bump the starting index so we don't reuse a previously
+        // used index.
+        c = b + 1
+      }
+    }
+
+    output.matches.push(tmpMatches)
+  }
+
+  return output
+}
+
+/**
+ * process all regexes against a single input string.
+ *
+ * @param {string} input text to apply regexes to.
+ * @param {RegexPair[]} List of regexes
+ *
+ * @returns {Array} list of match data for every regex applied to
+ *                  input
+ */
+const matchAll = (input, regexes) => {
+  const output = []
+  let str = input
+
+  for (let a = 0; a < regexes.length; a += 1) {
+    const tmp = matchSingle(str, regexes[a])
+    str = tmp.output
+    output.push(tmp)
+  }
+
+  return output
+}
 
 function VanillaJS () {
   this.cleanError = (error) => {
-    return error.message.replace(/^SyntaxError: /i, '');
+    return error.message.replace(/^SyntaxError: /i, '')
   }
 
   /**
@@ -57,13 +149,12 @@ function VanillaJS () {
    */
   this.validate = function (pattern, flags) {
     try {
-      const tmp = new RegExp(pattern, flags)
+      const tmp = new RegExp(pattern, flags) // eslint-disable-line no-unused-vars
     } catch (error) {
       return this.cleanError(error)
     }
     return ''
   }
-
 
   /**
    * Test what the supplied regex is valid for the this engine
@@ -86,13 +177,13 @@ function VanillaJS () {
     //   // }
     // }
     try {
-      tmp = new RegExp(regexPair.regex.pattern, regexPair.flags.flags)
+      const tmp = new RegExp(regexPair.regex.pattern, '') // eslint-disable-line no-unused-vars
     } catch (error) {
       return this.cleanError(error)
     }
+
     return ''
   }
-
 
   /**
    * Test what the supplied regex is valid for the this engine
@@ -115,13 +206,12 @@ function VanillaJS () {
     //   // }
     // }
     try {
-      tmp = new RegExp(regexPair.regex.pattern, regexPair.flags.flags)
+      const tmp = new RegExp('', regexPair.flags.flags) // eslint-disable-line no-unused-vars
     } catch (error) {
       return this.cleanError(error)
     }
     return ''
   }
-
 
   /**
    * Test what the supplied regex is valid for the this engine
@@ -138,18 +228,22 @@ function VanillaJS () {
   /**
    * Test what the supplied regexes match from the supplied input
    *
-   * @param {array} input user supplied content (expects an array of
-   *               strings)
-   * @param {array} regexes array of regex pairs and their config
+   * @param {string[]} inputs  user supplied content (expects an
+   *                           array of strings)
+   * @param {array}    regexes array of regex pairs and their config
    *
    * @returns {array} modified version user input
    */
-  this.match = function (input, regexes) {
+  this.match = function (inputs, regexes) {
+    const regExps = regexes.map(getUsableRegexes)
+
     console.group('VanillaJS.match()')
-    console.log('input:', input);
-    console.log('regexes:', regexes)
+    // console.log('inputs:', inputs)
+    // console.log('regexes:', regexes)
+    // console.log('regExps:', regExps)
+    console.log('matches:', inputs.map(input => matchAll(input, regExps)))
     console.groupEnd()
-    return [];
+    return inputs.map(input => matchAll(input, regExps))
   }
 
   /**
@@ -164,7 +258,7 @@ function VanillaJS () {
   this.replace = function (input, regexes) {
     // group('VanillaJS().replace()')
 
-    const regExps = regexes.map(getUsableRegexes);
+    const regExps = regexes.map(getUsableRegexes)
     // console.log('input:', input);
     // console.log('output:', input.map(str => regExps.reduce(replaceReduce, str)))
     // console.groupEnd();

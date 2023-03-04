@@ -89,7 +89,7 @@ export const oneOffUI = (props) => {
   return html`
   <!-- START: oneOffUI() -->
   <h2 class="tool-heading">One-Off regex test</h2>
-  <p class="alert alert--note">Regex Multi Tool's <em>OneOff</em> mode is not yet working for "TEST".</p>
+  <p class="alert alert--note"><em>TEST</em> is not working Yet. <span style="font-size: 1.5rem">(But you can see the matches in the console)</span></p>
   <div class="oneOff">
     ${tabBlock(
       'oneOff',

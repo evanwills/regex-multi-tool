@@ -9,7 +9,6 @@
 
 import { isBoolTrue, invalidString, isFunction } from '../utilities/validation.mjs'
 
-
 import { url } from '../url.mjs'
 import { convertEscaped } from '../utilities/sanitise.mjs'
 
@@ -201,7 +200,7 @@ function OneOff (url, remote, docs, api) {
 
     // }
 
-    registry = [...registry, config];
+    registry = [...registry, config]
 
     if (registry.length === 1) {
       // currentEngineID = registry[0].engine
@@ -289,7 +288,7 @@ function OneOff (url, remote, docs, api) {
   const convertEscapedReplace = (pair) => {
     if (pair.transformEscaped === true) {
       const output = { ...pair }
-      output.replace = convertEscaped(output.replace);
+      output.replace = convertEscaped(output.replace)
       return output
     } else {
       return pair
@@ -299,7 +298,6 @@ function OneOff (url, remote, docs, api) {
   //  END:  private method declaration
   // ============================================
   // START: public method declaration
-
 
   /**
    * Register an action, making it available for use and creating
@@ -334,7 +332,7 @@ function OneOff (url, remote, docs, api) {
     }
 
     if (registry.length === 1 && currentEngine !== null) {
-      currentEngine = config.engine;
+      currentEngine = config.engine
     }
 
     return registerOk
@@ -374,7 +372,7 @@ function OneOff (url, remote, docs, api) {
     return ''
   }
 
-  this.setEngine = function(engine) {
+  this.setEngine = function (engine) {
     // console.group('RegeEngine.setEngine()')
     // console.log('engine:', engine)
     // console.log('this:', this)
@@ -415,7 +413,6 @@ function OneOff (url, remote, docs, api) {
     return registry.map(action => getEngineMetaBasic(action))
   }
 
-
   /**
    * Test what the supplied regex is valid for the current engine
    *
@@ -429,7 +426,7 @@ function OneOff (url, remote, docs, api) {
       // console.og('OneOff.this:', this)
       console.log('OneOff.getCurrentEngineID():', this.getCurrentEngineID())
       console.groupEnd()
-      return '';
+      return ''
     }
     return currentEngine.validate(pattern, flags)
   }
@@ -469,7 +466,6 @@ function OneOff (url, remote, docs, api) {
     return apiURL
   }
 }
-
 
 //  END:  constructor function
 // ======================================================
