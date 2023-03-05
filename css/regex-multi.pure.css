@@ -6,6 +6,7 @@
 @import 'organisms/header.css';
 @import 'organisms/footer.css';
 @import 'organisms/regex-pair.css';
+@import 'organisms/regex-match.css';
 @import 'organisms/settings-block.css';
 @import 'organisms/repeatable-description.css';
 @import 'organisms/repeatable-extraInputs.css';

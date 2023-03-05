@@ -1,0 +1,100 @@
+.match-code {
+  border: 0.1rem dotted #ccc;
+  display: block;
+  font-family: var(--code-text);
+  margin: 2rem 1rem 0.5rem 1rem;
+  padding: 0.3rem;
+  position: relative;
+  white-space: pre-wrap;
+}
+.match-code::before {
+  display: block;
+  font-family: var(--head-text);
+  font-weight: bold;
+  left: 0;
+  position: absolute;
+  top: -1.5rem;
+}
+
+.match-result__sample__str {
+  background-color: rgba(0, 0, 30, 0.9);
+}
+.match-result__sample__str::before {
+  content: 'Input:';
+}
+.match-result__sample__str--long::after {
+  bottom: 0.3rem;
+  content: '... (truncated)';
+  position: absolute;
+  font-style: italic;
+  right: 0.3rem;
+}
+
+.match-captured__regex {
+  background-color: rgba(0, 30, 0, 0.9);
+}
+.match-captured__regex::before {
+  content: 'Pattern:';
+}
+
+.sub-patterns__list {
+  margin: 0.5rem 0 1rem;
+  padding: 0 0 0 1.5rem;
+}
+
+.sub-patterns__item {
+  padding: 0.25rem 0;
+}
+.sub-patterns__key {
+  display: inline-block;
+  font-family: var(--code-text);
+  /* font-weight: bold; */
+  letter-spacing: -.05rem;
+  margin-right: 0.5rem;
+  min-width: 7.2rem;
+  opacity: 0.8;
+  position: relative;
+  text-align: right;
+}
+.sub-patterns__key > span {
+  background-color: #2d2b2b;
+  z-index: 100;
+}
+.sub-patterns__key > span::before {
+  content: "['";
+}
+.sub-patterns__key > span::after {
+  content: "']";
+}
+.sub-patterns__key::before {
+  content: '';
+  position: absolute;
+  border-top: 0.1rem dashed #555;
+  top: 45%;
+  left: 0.25rem;
+  right: 0;
+  z-index: -1;
+}
+
+.sub-patterns__captured-empty {
+  color: var(--warning);
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.4;
+  text-transform: uppercase;
+}
+.sub-patterns__captured-empty::before {
+  content: '[';
+  padding-right: 0.2rem;
+}
+.sub-patterns__captured-empty::after {
+  content: ']';
+  padding-left: 0.2rem;
+}
+.match-captured_count {
+  margin: 1rem 1rem 0.5rem;
+}
+.sub-patterns__ratio {
+  margin: 1rem 0 0.5rem;
+  font-style: italic;
+}

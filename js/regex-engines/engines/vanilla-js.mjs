@@ -48,64 +48,74 @@ const replaceReduce = (output, regex) => {
  *
  * @returns {Object}
  */
-const matchSingle = (input, regex) => {
+const matchSingle = (input, regex, regexIndex) => {
   const output = {
-    output: input.replace(
-      regex.regexp,
-      regex.replace
-    ),
-    matches: []
+    regexIndex: regexIndex,
+    output: '',
+    matches: [],
+    hasError: !regex.ok
   }
-  let tmp = []
 
-  while ((tmp = regex.regexp.exec(input)) !== null) {
-    const groups = (typeof tmp.groups !== 'undefined')
-      ? tmp.groups
-      : null
+  if (regex.ok === true) {
+    let tmp = []
 
-    // remove groups from the main list of captured sub-patterns
-    const tmpMatches = tmp.filter((value, index) => (index !== 'groups'))
-      .map((value, index) => {
-        return {
-          index: index,
-          key: '',
-          str: value
-        }
-      })
+    output.output = input.replace(regex.regexp, regex.replace)
 
-    if (groups !== null) {
-      /**
-       * Index of the last matched group sub-pattern
-       *
-       * @var {number}
-       */
-      let c = 0
-      for (const key in groups) {
+    // console.group('matchSingle()')
+    // console.log('regex:', regex)
+    // console.groupEnd()
+
+    while ((tmp = regex.regexp.exec(input)) !== null) {
+      const groups = (typeof tmp.groups !== 'undefined')
+        ? tmp.groups
+        : null
+
+      // remove groups from the main list of captured sub-patterns
+      const tmpMatches = tmp.filter((value, index) => (index !== 'groups'))
+        .map((value, index) => {
+          return {
+            index: index,
+            key: '',
+            str: value
+          }
+        })
+
+      tmpMatches[0].key = '__WHOLE__'
+
+      if (groups !== null) {
         /**
-         * Index of the sub-pattern this group (named sub-pattern)
-         * matches
+         * Index of the last matched group sub-pattern
          *
          * @var {number}
          */
-        const b = tmp.indexOf(groups[key], c)
+        let c = 0
+        for (const key in groups) {
+          /**
+           * Index of the sub-pattern this group (named sub-pattern)
+           * matches
+           *
+           * @var {number}
+           */
+          const b = tmp.indexOf(groups[key], c)
 
-        // If the index and string from the group pattern matches
-        // the index and group string of the sub-pattern, then use
-        // the group's key
-        if (typeof tmpMatches[b] !== 'undefined' &&
-            tmpMatches[b].index === b &&
-            tmpMatches[b].str === tmp.groups[key]
-        ) {
-          tmpMatches[b].key = key
+          // If the index and string from the group pattern matches
+          // the index and group string of the sub-pattern, then use
+          // the group's key
+          if (typeof tmpMatches[b] !== 'undefined' &&
+              tmpMatches[b].index === b &&
+              tmpMatches[b].str === tmp.groups[key]
+          ) {
+            tmpMatches[b].key = key
+          }
+
+          // Bump the starting index so we don't reuse a previously
+          // used index.
+          c = b + 1
         }
-
-        // Bump the starting index so we don't reuse a previously
-        // used index.
-        c = b + 1
       }
-    }
 
-    output.matches.push(tmpMatches)
+      output.matches.push(tmpMatches)
+    }
   }
 
   return output
@@ -125,12 +135,15 @@ const matchAll = (input, regexes) => {
   let str = input
 
   for (let a = 0; a < regexes.length; a += 1) {
-    const tmp = matchSingle(str, regexes[a])
+    const tmp = matchSingle(str, regexes[a], a)
     str = tmp.output
     output.push(tmp)
   }
 
-  return output
+  return {
+    input: input,
+    matches: output
+  }
 }
 
 function VanillaJS () {
@@ -237,13 +250,16 @@ function VanillaJS () {
   this.match = function (inputs, regexes) {
     const regExps = regexes.map(getUsableRegexes)
 
-    console.group('VanillaJS.match()')
+    // console.group('VanillaJS.match()')
     // console.log('inputs:', inputs)
     // console.log('regexes:', regexes)
     // console.log('regExps:', regExps)
-    console.log('matches:', inputs.map(input => matchAll(input, regExps)))
-    console.groupEnd()
-    return inputs.map(input => matchAll(input, regExps))
+    // console.log('matches:', inputs.map(input => matchAll(input, regExps)))
+    // console.groupEnd()
+    return {
+      matches: inputs.map((input) => matchAll(input, regExps)),
+      regexes: regexes
+    }
   }
 
   /**

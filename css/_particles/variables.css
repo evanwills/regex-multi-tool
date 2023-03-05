@@ -29,6 +29,11 @@
   --hazard: rgb(231, 227, 10);
   --success: rgb(77, 201, 128);
   --warning: rgb(143, 150, 219);
+
+  --body-text: Arial, Helvetica, sans-serif;
+  --head-text: Verdana, Geneva, Tahoma, sans-serif;
+  --code-text: 'Courier New', Courier, monospace;
+
 }
 
 .ui-darkmode {

@@ -6,7 +6,6 @@ import { oneOffOutputView } from './oneOff-output.view.mjs'
 import { tabBlock } from '../shared-components/shared-tabs-accordion.view.mjs'
 
 export const oneOffUI = (props) => {
-  // console.group('oneOffUI()')
   const blocks = [
     {
       id: 'input',
@@ -21,7 +20,7 @@ export const oneOffUI = (props) => {
   ]
   let i = -1
 
-  if (props.matches.length > 0) {
+  if (typeof props.matches === 'object' && typeof props.matches.matches !== 'undefined' && Array.isArray(props.matches.matches) && props.matches.matches.length > 0) {
     blocks.push({
       id: 'matches',
       label: 'Matches',
@@ -36,10 +35,6 @@ export const oneOffUI = (props) => {
       aKey: 'o'
     })
   }
-
-  // console.log('props:', props)
-  // console.log('props.screen:', props.screen)
-  // console.log('blocks:', blocks)
 
   switch (props.screen) {
     case 'regex':
@@ -84,12 +79,12 @@ export const oneOffUI = (props) => {
       }
       blocks[0].view = oneOffInputView
   }
-  // console.log('props.screen:', props.screen)
-  // console.groupEnd();
+
+  // <p class="alert alert--note"><em>TEST</em> is not working Yet. <span style="font-size: 1.5rem">(But you can see the matches in the console)</span></p>
+
   return html`
   <!-- START: oneOffUI() -->
   <h2 class="tool-heading">One-Off regex test</h2>
-  <p class="alert alert--note"><em>TEST</em> is not working Yet. <span style="font-size: 1.5rem">(But you can see the matches in the console)</span></p>
   <div class="oneOff">
     ${tabBlock(
       'oneOff',
