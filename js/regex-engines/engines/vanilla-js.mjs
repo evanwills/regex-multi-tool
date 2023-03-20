@@ -35,6 +35,16 @@ const getUsableRegexes = (regex) => {
 }
 
 const replaceReduce = (output, regex) => {
+  console.group('replaceReduce()');
+  console.log('regex:', regex);
+  console.log('regex.ok:', regex.ok);
+  console.log('regex.ok === true:', regex.ok === true);
+  console.log('output:', output);
+  console.log(
+    'output.replace(regex.regexp, regex.replace):',
+    output.replace(regex.regexp, regex.replace)
+  );
+  console.groupEnd();
   return (regex.ok === true)
     ? output.replace(regex.regexp, regex.replace)
     : output
@@ -54,10 +64,10 @@ const matchSingle = (input, regex, regexIndex) => {
     output: '',
     matches: [],
     hasError: !regex.ok
-  }
+  };
 
   if (regex.ok === true) {
-    let tmp = []
+    let tmp = [];
 
     output.output = input.replace(regex.regexp, regex.replace)
 
@@ -65,10 +75,12 @@ const matchSingle = (input, regex, regexIndex) => {
     // console.log('regex:', regex)
     // console.groupEnd()
 
-    while ((tmp = regex.regexp.exec(input)) !== null) {
+    let safety = 999999;
+
+    while ((tmp = regex.regexp.exec(input)) !== null && safety > 0) {
       const groups = (typeof tmp.groups !== 'undefined')
         ? tmp.groups
-        : null
+        : null;
 
       // remove groups from the main list of captured sub-patterns
       const tmpMatches = tmp.filter((value, index) => (index !== 'groups'))
@@ -78,8 +90,9 @@ const matchSingle = (input, regex, regexIndex) => {
             key: '',
             str: value
           }
-        })
+        });
 
+      safety -= 1;
       tmpMatches[0].key = '__WHOLE__'
 
       if (groups !== null) {

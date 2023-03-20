@@ -50,6 +50,7 @@ export const _text = {
   id: '',
   label: '',
   type: 'text',
+  // type: 'textarea',
   description: '',
   pattern: '',
   default: ''

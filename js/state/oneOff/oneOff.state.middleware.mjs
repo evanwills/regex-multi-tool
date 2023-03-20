@@ -225,7 +225,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
     case oneOffActions.SET_OUTPUT:
       // console.groupEnd();
       dispatch({
-        type: oneOffActions.SET_OUTPUT,
+        type: oneOffActions.SET_OUTPUT_INNER,
         payload: trimAndImplode(
           regexEngines.replace(
             explodeAndTrim(

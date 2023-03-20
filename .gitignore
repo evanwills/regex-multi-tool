@@ -3,3 +3,4 @@ tmp
 ..vite-running
 js/repeatable/actions/acu.funcs.mjs
 js/repeatable/actions/expensum.funcs.mjs
+vite.config.ts

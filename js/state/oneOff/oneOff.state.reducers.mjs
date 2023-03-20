@@ -752,7 +752,7 @@ export const regexSetMatchesReducer = (state = [], action = { type: 'default' })
 }
 
 export const regexSetOutputReducer = (state = '', action = { type: 'default' }) => {
-  if (action.type === oneOffActions.SET_OUTPUT && typeof action.payload === 'string') {
+  if (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string') {
     return action.payload
   } else {
     return state
