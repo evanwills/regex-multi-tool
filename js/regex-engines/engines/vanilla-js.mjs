@@ -35,16 +35,16 @@ const getUsableRegexes = (regex) => {
 }
 
 const replaceReduce = (output, regex) => {
-  console.group('replaceReduce()');
-  console.log('regex:', regex);
-  console.log('regex.ok:', regex.ok);
-  console.log('regex.ok === true:', regex.ok === true);
-  console.log('output:', output);
-  console.log(
-    'output.replace(regex.regexp, regex.replace):',
-    output.replace(regex.regexp, regex.replace)
-  );
-  console.groupEnd();
+  // console.group('replaceReduce()');
+  // console.log('regex:', regex);
+  // console.log('regex.ok:', regex.ok);
+  // console.log('regex.ok === true:', regex.ok === true);
+  // console.log('output:', output);
+  // console.log(
+  //   'output.replace(regex.regexp, regex.replace):',
+  //   output.replace(regex.regexp, regex.replace)
+  // );
+  // console.groupEnd();
   return (regex.ok === true)
     ? output.replace(regex.regexp, regex.replace)
     : output
@@ -285,9 +285,9 @@ function VanillaJS () {
    * @returns {string[]} modified version user input
    */
   this.replace = function (input, regexes) {
-    // group('VanillaJS().replace()')
-
     const regExps = regexes.map(getUsableRegexes)
+
+    // console.group('VanillaJS().replace()')
     // console.log('input:', input);
     // console.log('output:', input.map(str => regExps.reduce(replaceReduce, str)))
     // console.groupEnd();

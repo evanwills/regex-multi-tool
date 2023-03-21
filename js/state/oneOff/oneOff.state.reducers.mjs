@@ -752,20 +752,29 @@ export const regexSetMatchesReducer = (state = [], action = { type: 'default' })
 }
 
 export const regexSetOutputReducer = (state = '', action = { type: 'default' }) => {
-  if (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string') {
-    return action.payload
-  } else {
-    return state
-  }
+  // if (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string') {
+  //   console.group('regexSetOutputReducer()')
+  //   console.log('oneOffActions.SET_OUTPUT_INNER', oneOffActions.SET_OUTPUT_INNER)
+  //   console.log('state', state)
+  //   console.log('action.type', action.type)
+  //   console.log('action.payload', action.payload)
+  //   console.log('action.type === oneOffActions.SET_OUTPUT_INNER', typeof action.payload === 'string')
+  //   console.log('typeof action.payload === "string"', typeof action.payload === 'string')
+  //   console.log('action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === "string"', action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string')
+  //   console.groupEnd()
+  // }
+  return (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string')
+    ? action.payload
+    : state;
 }
 
 export const regexSetScreenReducer = (state = '', action = { type: 'default' }) => {
-  // console.group('regexSetScreenReducer()')
-  // console.log('state:', state);
-  // console.log('action:', action);
-  // console.groupEnd();
-
   if (action.type === oneOffActions.SET_SCREEN && state !== action.payload) {
+    // console.group('regexSetScreenReducer()')
+    // console.log('state:', state);
+    // console.log('action:', action);
+    // console.groupEnd();
+
     switch (action.payload) {
       case 'output':
       case 'matches':
@@ -852,6 +861,8 @@ export const regexInputReducer = (state = defaultInput, action = { type: 'defaul
 
 export const oneOffReducer = combineReducers({
   input: regexInputReducer,
+  matches: regexSetMatchesReducer,
+  output: regexSetOutputReducer,
   regex: combineReducers({
     pairs: regexPairReducer,
     chain: regexUpdateChainReducer,
@@ -861,8 +872,6 @@ export const oneOffReducer = combineReducers({
     focusedID: regexUpdateFocusedID,
     settingsOpen: regexToggleEngineSettings
   }),
-  matches: regexSetMatchesReducer,
-  output: regexSetOutputReducer,
   screen: regexSetScreenReducer
 })
 

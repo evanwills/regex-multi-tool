@@ -223,7 +223,6 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case oneOffActions.SET_OUTPUT:
-      // console.groupEnd();
       dispatch({
         type: oneOffActions.SET_OUTPUT_INNER,
         payload: trimAndImplode(
@@ -240,11 +239,12 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           _state.oneOff.input.split.splitter,
           _state.oneOff.input.strip.before
         )
-      })
+      });
+
       return next({
         type: oneOffActions.SET_SCREEN,
         payload: 'output'
-      })
+      });
 
     case regexPairActions.SET_AS_DEFAULT:
       // console.groupEnd();

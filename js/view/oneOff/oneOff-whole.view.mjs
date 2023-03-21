@@ -20,6 +20,12 @@ export const oneOffUI = (props) => {
   ]
   let i = -1
 
+  // console.group('oneOffUI()')
+  // console.log('props:', props)
+  // console.log('props.screen:', props.output)
+  // console.log('props.output:', props.output)
+  // console.groupEnd()
+
   if (typeof props.matches === 'object' && typeof props.matches.matches !== 'undefined' && Array.isArray(props.matches.matches) && props.matches.matches.length > 0) {
     blocks.push({
       id: 'matches',

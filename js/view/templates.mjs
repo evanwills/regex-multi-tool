@@ -173,7 +173,9 @@ export const getMainAppView = (domNode, store) => {
     const newProps = {
       ...state,
       events: { ...eventHandlers },
-      output: props.output,
+      output: (isOneOff)
+        ? props.oneOff.output
+        : props.output,
       debug: props.debug
     }
     // console.group('getMainAppView()');
