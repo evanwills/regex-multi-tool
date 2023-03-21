@@ -1,36 +1,10 @@
 import { repeatActions } from './repeatable.state.actions.mjs'
 import { repeatable } from '../../repeatable/repeatable-init.mjs'
 import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
-import {
-  // isBool,
-  // isFunction,
-  // isNumber,
-  isNumeric
-  // isStr,
-  // invalidString,
-} from '../../utilities/validation.mjs'
-// import {
-//   // ucFirst
-//   // getURLobject
-// } from '../../utilities/sanitise.mjs'
+import { isNumeric } from '../../utilities/validation.mjs'
 import { urlActions } from '../url/url.state.all.mjs'
-// import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 
 let loop = 0
-
-export const modifyInput = ({ getState, dispatch }) => next => action => {
-}
-
-// const getActionMeta = (allActions, actionID) => {
-//   for (const prop in allActions) {
-//     const action = allActions[prop].filter(_action => _action.id === actionID)
-
-//     if (action.length === 1) {
-//       return action[0]
-//     }
-//   }
-//   return false
-// }
 
 export const repeatableMW = store => next => action => {
   const _state = store.getState()
@@ -108,9 +82,6 @@ export const repeatableMW = store => next => action => {
         // This needs to be a fetch request to the host server
         return next(action)
       } else {
-        // console.log('about to run action')
-        // console.log('input:', _state.input)
-        // console.log('_state.repeatable.extraInputs:', _state.repeatable.extraInputs)
         store.dispatch({
           type: mainAppActions.SET_OUTPUT,
           payload: repeatable.run(

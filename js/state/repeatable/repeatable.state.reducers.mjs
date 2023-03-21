@@ -43,7 +43,6 @@ export const defaultRepeat = {
  * @returns {object}
  */
 const sortActionsList = (actionsList) => {
-  // const _newList = []
   const groupedActions = {}
   const publicActions = []
 
@@ -204,15 +203,6 @@ const getExtraInputKeyValues = (extraInputs, get) => {
 
 const updateFields = (state, payload) => {
   const { id, key, value } = payload
-  // console.group('updateFields()')
-  // console.log('id:', id)
-  // console.log('key:', key)
-  // console.log('value:', value)
-  // console.log('state[' + key + ']:', state[key])
-  // console.log('isNumeric(state[' + key + ']):', isNumeric(state[key]))
-  // console.log('isStr(state[' + key + ']):', isStr(state[key]))
-  // console.log('state[' + key + '] !== value', state[key] !== value)
-  // console.groupEnd()
 
   switch (id) {
     case 'extraInputs':
@@ -260,9 +250,6 @@ const updateFields = (state, payload) => {
  *  @returns {object}
  */
 export const repeatableReducer = (state = defaultRepeat, action = { type: 'default' }) => {
-  // console.group('repeatableReducer()')
-  // console.log('action:', action)
-  // console.groupEnd()
   switch (action.type) {
     case repeatActions.SET_ACTION:
       return (action.payload !== false)
@@ -285,8 +272,6 @@ export const repeatableReducer = (state = defaultRepeat, action = { type: 'defau
       }
 
     case repeatActions.UPDATE_FIELD:
-      // console.log('type:', repeatActions.UPDATE_FIELD)
-      // console.log('payload:', action.payload)
       return {
         ...state,
         extraInputs: updateFields(

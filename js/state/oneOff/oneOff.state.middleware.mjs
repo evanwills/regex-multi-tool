@@ -2,6 +2,7 @@ import { regexPairActions, oneOffActions } from './oneOff.state.actions.mjs'
 import { getID, convertEscaped } from '../../utilities/sanitise.mjs'
 import { mainAppActions } from '../main-app/main-app.state.actions.mjs'
 import { regexEngines } from '../../regex-engines/regexEngine-init.mjs'
+import { repeatActions } from '../repeatable/repeatable.state.actions.mjs'
 // import { oneOffMatchesView } from '../../view/oneOff/oneOff-matches.view.mjs'
 
 // ==============================================
@@ -189,12 +190,10 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       dispatch({
         type: oneOffActions.RESET
       })
-      // console.groupEnd();
       break
 
     case regexPairActions.ADD_BEFORE:
     case regexPairActions.ADD_AFTER:
-      // console.groupEnd();
       return next({
         type: action.type,
         payload: getNewPairAndPos(
@@ -204,7 +203,6 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case oneOffActions.SET_MATCHES:
-      // console.groupEnd();
       dispatch({
         type: oneOffActions.SET_MATCHES_INNER,
         payload: regexEngines.match(
@@ -237,7 +235,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           ),
           _state.oneOff.input.split.doSplit,
           _state.oneOff.input.split.splitter,
-          _state.oneOff.input.strip.before
+          _state.oneOff.input.strip.after
         )
       });
 
@@ -247,7 +245,6 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       });
 
     case regexPairActions.SET_AS_DEFAULT:
-      // console.groupEnd();
       return next({
         type: oneOffActions.UPDATE_DEFAULTS,
         payload: getPairDefaults(
@@ -260,13 +257,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
     case regexPairActions.UPDATE_REGEX:
       tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id)
 
-      // console.group('UPDATE_REGEX:', regexPairActions.UPDATE_REGEX)
-      // console.log('regexEngines:', regexEngines)
-      // console.log('tmpPair[0]:', tmpPair[0])
-      // console.log('action.payload:', action.payload)
-
       if (tmpPair.length === 1) {
-        // console.groupEnd();
         return next({
           ...action,
           payload: {
@@ -275,20 +266,13 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           }
         })
       } else {
-        // console.groupEnd()
         return next(action)
       }
 
     case regexPairActions.UPDATE_FLAGS:
       tmpPair = _state.oneOff.regex.pairs.filter(pair => pair.id === action.payload.id)
 
-      // console.group('UPDATE_FLAGS:', regexPairActions.UPDATE_FLAGS)
-      // console.log('regexEngines:', regexEngines)
-      // console.log('tmpPair[0]:', tmpPair[0])
-      // console.log('action.payload:', action.payload)
-
       if (tmpPair.length === 1) {
-        // // console.groupEnd();
         return next({
           ...action,
           payload: {
@@ -297,28 +281,19 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           }
         })
       } else {
-        // console.groupEnd()
         return next(action)
       }
 
     case oneOffActions.SET_SCREEN:
       const allowedScreens = ['input', 'regex', 'matches', 'output'] // eslint-disable-line
-      // console.group(oneOffActions.SET_SCREEN);
-      // console.log('payload:', action.payload)
+
       if (allowedScreens.indexOf(action.payload) >= 0) {
-        // console.log('screen is allowed')
         if (_state.oneOff.screen !== action.payload) {
-          // console.log('screen has changed: "' + action.payload + '"')
-          // console.groupEnd();
-          // console.groupEnd();
           return next(action)
         } else {
-          // console.groupEnd();
-          // console.groupEnd();
           return false
         }
       } else {
-        // console.groupEnd();
         throw Error('Cannot set "' + action.payload + '" as OneOff screen')
       }
 

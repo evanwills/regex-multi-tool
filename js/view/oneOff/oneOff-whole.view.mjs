@@ -20,12 +20,6 @@ export const oneOffUI = (props) => {
   ]
   let i = -1
 
-  // console.group('oneOffUI()')
-  // console.log('props:', props)
-  // console.log('props.screen:', props.output)
-  // console.log('props.output:', props.output)
-  // console.groupEnd()
-
   if (typeof props.matches === 'object' && typeof props.matches.matches !== 'undefined' && Array.isArray(props.matches.matches) && props.matches.matches.length > 0) {
     blocks.push({
       id: 'matches',
@@ -59,14 +53,12 @@ export const oneOffUI = (props) => {
       }
 
     case 'output': // eslint-disable-line
-      // console.group('oneOffUI() - "output"');
-      // console.log('props.screen:', props.screen)
-      // console.log('typeof blocks[3]:', typeof blocks[3])
       if (typeof blocks[3] !== 'undefined' && blocks[3].id === 'output') {
         i = 3
       } else if (typeof blocks[2] !== 'undefined' && blocks[2].id === 'output') {
         i = 2
       }
+
       if (i > -1) {
         blocks[i].data = props[props.screen]
         blocks[i].view = oneOffOutputView
@@ -74,7 +66,6 @@ export const oneOffUI = (props) => {
       } else {
         props.screen = 'input'
       }
-      // console.groupEnd();
 
     default: // eslint-disable-line
       props.screen = 'input'
@@ -85,8 +76,6 @@ export const oneOffUI = (props) => {
       }
       blocks[0].view = oneOffInputView
   }
-
-  // <p class="alert alert--note"><em>TEST</em> is not working Yet. <span style="font-size: 1.5rem">(But you can see the matches in the console)</span></p>
 
   return html`
   <!-- START: oneOffUI() -->

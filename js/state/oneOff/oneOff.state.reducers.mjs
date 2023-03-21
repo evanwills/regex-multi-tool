@@ -7,22 +7,6 @@ import { getID } from '../../utilities/sanitise.mjs'
 // ==============================================
 // START: Utility functions
 
-// /**
-//  * Use up a couple of milliseconds worth of CPU time to ensure
-//  * UID is unique
-//  *
-//  * @returns {void}
-//  */
-// const slowPoke = (loops) => {
-//   const _loops = (isInt(loops) && loops > 1 && loops < 1000) ? loops : 15
-//
-//   console.groupCollapsed('slowPoke()')
-//   for (let a = 0; a < loops; a += 1) {
-//     console.log(Math.sqrt(Date.now() * Math.PI))
-//   }
-//   console.groupEnd()
-// }
-
 /**
  * Update the pos (position) & count property of each regex pair
  *
@@ -50,9 +34,6 @@ const updatePos = (pairs) => {
  * @returns {object} Shallow clone of original pair with hasError
  */
 const setHasError = (pair) => {
-  // console.group('setHasError()')
-  // console.log('pair:', pair);
-  // console.groupEnd();
   const _hasError = (pair.regex.error !== '' || pair.flags.error !== '' || pair.delims.error !== '')
 
   if (pair.hasError === _hasError) {
@@ -303,7 +284,6 @@ const updatePairEscaped = (pairs, id) => {
  *                  updated
  */
 const updatePairMultiLine = (pairs, id) => {
-  // console.log('id:', id)
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
@@ -328,7 +308,6 @@ const updatePairMultiLine = (pairs, id) => {
  *                  updated
  */
 const updatePairFullWidth = (pairs, id) => {
-  // console.log('id:', id)
   return pairs.map((pair) => {
     if (pair.id === id) {
       return {
@@ -564,8 +543,6 @@ const closePairSettings = (pairs) => {
  *                  disabled/enabled
  */
 const togglePairSettings = (pairs, id) => {
-  // console.log('id:', id)
-  // console.log('open:', open)
   return pairs.map(pair => {
     const isOpen = (pair.id === id)
       ? !pair.settingsOpen
@@ -665,8 +642,6 @@ export const regexPairReducer = (state = [defaultPair], action = { type: 'defaul
       return togglePairSettings(state, action.payload)
 
     case regexPairActions.SET_FOCUSED_ID:
-      // console.log('SET_FOCUSED_ID')
-      // console.log('action.payload:', action.payload)
       return closePairSettings(state, action.payload)
 
     default:
@@ -740,10 +715,6 @@ export const regexToggleEngineSettings = (state = false, action = { type: 'defau
 }
 
 export const regexSetMatchesReducer = (state = [], action = { type: 'default' }) => {
-  // console.group('regexSetMatchesReducer()')
-  // console.log('state:', state)
-  // console.log('action:', action)
-  // console.groupEnd()
   if (action.type === oneOffActions.SET_MATCHES_INNER) {
     return action.payload
   } else {
@@ -752,17 +723,6 @@ export const regexSetMatchesReducer = (state = [], action = { type: 'default' })
 }
 
 export const regexSetOutputReducer = (state = '', action = { type: 'default' }) => {
-  // if (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string') {
-  //   console.group('regexSetOutputReducer()')
-  //   console.log('oneOffActions.SET_OUTPUT_INNER', oneOffActions.SET_OUTPUT_INNER)
-  //   console.log('state', state)
-  //   console.log('action.type', action.type)
-  //   console.log('action.payload', action.payload)
-  //   console.log('action.type === oneOffActions.SET_OUTPUT_INNER', typeof action.payload === 'string')
-  //   console.log('typeof action.payload === "string"', typeof action.payload === 'string')
-  //   console.log('action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === "string"', action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string')
-  //   console.groupEnd()
-  // }
   return (action.type === oneOffActions.SET_OUTPUT_INNER && typeof action.payload === 'string')
     ? action.payload
     : state;
@@ -770,11 +730,6 @@ export const regexSetOutputReducer = (state = '', action = { type: 'default' }) 
 
 export const regexSetScreenReducer = (state = '', action = { type: 'default' }) => {
   if (action.type === oneOffActions.SET_SCREEN && state !== action.payload) {
-    // console.group('regexSetScreenReducer()')
-    // console.log('state:', state);
-    // console.log('action:', action);
-    // console.groupEnd();
-
     switch (action.payload) {
       case 'output':
       case 'matches':

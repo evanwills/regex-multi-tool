@@ -178,12 +178,6 @@ export const getMainAppView = (domNode, store) => {
         : props.output,
       debug: props.debug
     }
-    // console.group('getMainAppView()');
-    // console.log('state:', state);
-    // console.log('state.screen:', state.screen);
-    // console.log('newProps:', newProps);
-    // console.log('newProps.screen:', newProps.screen);
-    // console.groupEnd();
 
     if (!isOneOff) {
       newProps.href = props.url.actionHref
@@ -213,12 +207,7 @@ export const getMainAppView = (domNode, store) => {
         )}
       </div>
     `
-    // console.group('getMainAppView')
-    // console.log('props:', props)
-    // console.log('state:', state)
-    // console.log('newProps:', newProps)
-    // console.log('buttons:', buttons)
-    // console.groupEnd()
+
     render(UI, domNode)
   }
 }

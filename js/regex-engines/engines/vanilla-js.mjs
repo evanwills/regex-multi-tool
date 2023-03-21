@@ -35,16 +35,6 @@ const getUsableRegexes = (regex) => {
 }
 
 const replaceReduce = (output, regex) => {
-  // console.group('replaceReduce()');
-  // console.log('regex:', regex);
-  // console.log('regex.ok:', regex.ok);
-  // console.log('regex.ok === true:', regex.ok === true);
-  // console.log('output:', output);
-  // console.log(
-  //   'output.replace(regex.regexp, regex.replace):',
-  //   output.replace(regex.regexp, regex.replace)
-  // );
-  // console.groupEnd();
   return (regex.ok === true)
     ? output.replace(regex.regexp, regex.replace)
     : output
@@ -70,10 +60,6 @@ const matchSingle = (input, regex, regexIndex) => {
     let tmp = [];
 
     output.output = input.replace(regex.regexp, regex.replace)
-
-    // console.group('matchSingle()')
-    // console.log('regex:', regex)
-    // console.groupEnd()
 
     let safety = 999999;
 
@@ -191,17 +177,6 @@ function VanillaJS () {
    *               returned. Otherwise empty string is returned.
    */
   this.validateRegex = function (regexPair) {
-    // const output = {
-    //   ok: true,
-
-    //   // error: {
-    //   //   message: '',
-    //   //   badChar: '',
-    //   //   start: '',
-    //   //   middle: '',
-    //   //   end: ''
-    //   // }
-    // }
     try {
       const tmp = new RegExp(regexPair.regex.pattern, '') // eslint-disable-line no-unused-vars
     } catch (error) {
@@ -220,17 +195,6 @@ function VanillaJS () {
    *               returned. Otherwise empty string is returned.
    */
   this.validateFlags = function (regexPair) {
-    // const output = {
-    //   ok: true,
-
-    //   // error: {
-    //   //   message: '',
-    //   //   badChar: '',
-    //   //   start: '',
-    //   //   middle: '',
-    //   //   end: ''
-    //   // }
-    // }
     try {
       const tmp = new RegExp('', regexPair.flags.flags) // eslint-disable-line no-unused-vars
     } catch (error) {
@@ -263,12 +227,6 @@ function VanillaJS () {
   this.match = function (inputs, regexes) {
     const regExps = regexes.map(getUsableRegexes)
 
-    // console.group('VanillaJS.match()')
-    // console.log('inputs:', inputs)
-    // console.log('regexes:', regexes)
-    // console.log('regExps:', regExps)
-    // console.log('matches:', inputs.map(input => matchAll(input, regExps)))
-    // console.groupEnd()
     return {
       matches: inputs.map((input) => matchAll(input, regExps)),
       regexes: regexes
@@ -287,10 +245,6 @@ function VanillaJS () {
   this.replace = function (input, regexes) {
     const regExps = regexes.map(getUsableRegexes)
 
-    // console.group('VanillaJS().replace()')
-    // console.log('input:', input);
-    // console.log('output:', input.map(str => regExps.reduce(replaceReduce, str)))
-    // console.groupEnd();
     return input.map(str => regExps.reduce(replaceReduce, str))
   }
 }

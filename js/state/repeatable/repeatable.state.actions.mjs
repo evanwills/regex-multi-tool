@@ -37,11 +37,6 @@ export const getAutoDispatchHrefAction = (_dispatch) => {
 export const getAutoDispatchSimpleAction = (_dispatch) => {
   return function (e) {
     let _type = ''
-    // console.group('inside getAutoDispatchSimpleAction()')
-    // console.log('this:', this)
-    // console.log('this.value:', this.value)
-    // console.log('this.id:', this.id)
-    // console.groupEnd()
 
     switch (this.value) {
       case 'toggle-nav':
@@ -59,19 +54,10 @@ export const getAutoDispatchSimpleAction = (_dispatch) => {
 
 export const getAutoDispatchValueAction = (_dispatch) => {
   return function (e) {
-    // console.log('inside getAutoDispatchValueAction()')
     const meta = getMeta(this.id)
-    // let _type = ''
-
-    // console.group('getAutoDispatchValueAction()')
-    // console.log('meta:', meta)
-    // console.log('this:', this)
-    // console.log('this.checked:', this.checked)
-    // console.groupEnd()
 
     switch (meta.type) {
       case 'extraInputs':
-        // console.log('this.value:', this.value)
         _dispatch({
           type: repeatActions.UPDATE_FIELD,
           payload: {
@@ -84,7 +70,6 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         break
 
       case 'primaryInput':
-        // console.log('setting main input')
         _dispatch({
           type: mainAppActions.SET_INPUT,
           payload: this.value
@@ -92,7 +77,6 @@ export const getAutoDispatchValueAction = (_dispatch) => {
         break
 
       case 'filter':
-        // console.log('setting actions filter')
         _dispatch({
           type: repeatActions.FILTER,
           payload: this.value.toLowerCase()
@@ -112,8 +96,6 @@ export const dispatchRegisterAction = (_dispatch, repeatable, actionID) => {
     ? repeatActions.REGISTER_ALL_ACTIONS
     : repeatActions.REGISTER_SINGLE_ACTION
 
-  // console.log('repeatable:', repeatable)
-  // console.log('actionID:', actionID)
   _dispatch({
     type: _type,
     payload: repeatable
