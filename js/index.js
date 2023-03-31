@@ -111,12 +111,3 @@ if (forceUiUpdate === true) {
   const tmp = store.getState()
   forceUIupdate(tmp.userSettings)
 }
-
-
-// ========================================================
-// START: guestimate and set ideal height for input box
-
-optimiseRepeatableInputHeight();
-
-//  END:  guestimate and set ideal height for input box
-// ========================================================
