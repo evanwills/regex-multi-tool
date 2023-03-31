@@ -78,7 +78,6 @@ export const store = createStore(
       oneOff.middleware,
       repeatable.middleware
     )
-
   )
   //  && window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 )
