@@ -320,13 +320,21 @@ function Repeatable (url, _remote, docs, api) {
     // console.group('presetDefaults()')
     // console.log('extraInputs:', extraInputs)
     // console.log('getParams:', getParams)
+    // console.log('localParams:', localParams)
+    // console.log('typeof localParams:', typeof localParams)
+    // console.log('typeof localParams !== "undefined":', typeof localParams !== 'undefined')
+    // console.log('localParams !== null:', localParams !== null)
     // console.log('_local:', _local)
 
     for (let a = 0; a < extraInputs.length; a += 1) {
       if (extraInputs[a].type === 'checkbox') {
         options = extraInputs[a].options.map(option => {
+          // console.group('presetDefaults() - checkbox mapper');
           // console.log('option:', option)
+          // console.log('_local:', _local)
+          // console.log('extraInputs[a].id:', extraInputs[a].id)
           // console.log('_local[extraInputs[a].id]:', _local[extraInputs[a].id])
+          // console.groupEnd();
           return {
             ...option,
             default: getOptionDefault(
@@ -578,6 +586,10 @@ function Repeatable (url, _remote, docs, api) {
     if (!invalidString('action', getParams)) {
       const _action = getParams.action.toLowerCase()
       const firstAction = registry.filter(oneAction => (oneAction.action === _action))
+
+      // console.group('Repeatable.setFirstAction()');
+      // console.log('localParams:', localParams);
+      // console.groupEnd();
 
       if (firstAction.length === 1) {
         const tmp = presetDefaults(firstAction[0].extraInputs, getParams, localParams)

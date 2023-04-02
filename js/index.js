@@ -41,15 +41,20 @@ const unsubscribers = { // eslint-disable-line
 repeatable.verifyChained()
 
 const localRepeat = getFromLocalStorage('repeatable')
+// console.group('index.js')
+// console.log('localRepeat:', localRepeat)
+// console.log('typeof localRepeat !== "undefined":', typeof localRepeat !== 'undefined')
+// console.log('localRepeat !== null:', localRepeat !== null)
+// console.groupEnd()
 
 dispatchRegisterAction(
   store.dispatch,
   repeatable.getActionsList(),
   repeatable.setFirstAction(
     url.searchParams,
-    (localRepeat !== null)
+    (typeof localRepeat !== 'undefined' &&  localRepeat !== null)
       ? localRepeat.extraInputs
-      : null
+      : {}
   )
 )
 
