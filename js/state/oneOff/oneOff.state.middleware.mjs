@@ -203,6 +203,10 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
       })
 
     case oneOffActions.SET_MATCHES:
+      // console.group('oneOffMW() -', oneOffActions.SET_MATCHES);
+      // console.group('oneOffMW() - ' + oneOffActions.SET_MATCHES + ' (inner)');
+      // console.log('_state.oneOff.regex.pairs:', _state.oneOff.regex.pairs)
+      // console.groupEnd();
       dispatch({
         type: oneOffActions.SET_MATCHES_INNER,
         payload: regexEngines.match(
@@ -215,6 +219,7 @@ export const oneOffMW = ({ getState, dispatch }) => next => action => {
           _state.oneOff.regex.pairs
         )
       })
+      // console.groupEnd();
       return next({
         type: oneOffActions.SET_SCREEN,
         payload: 'matches'
