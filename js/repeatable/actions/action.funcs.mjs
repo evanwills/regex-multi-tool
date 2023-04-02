@@ -7,12 +7,12 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
-import { isNumber, isNonEmptyStr, isStrNum, isNumeric } from '../../utilities/validation.mjs'
+import { isInt, isNonEmptyStr, isNumber, isNumeric, isStrNum } from '../../utilities/validation.mjs'
 import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
- * "Do JS regex stuff"
+ * "Regex Multi Tool"
  *
  * Each action has two parts:
  * 1. A function declaration which is the business part. This function
@@ -2997,8 +2997,8 @@ const _decimal2hex = (values) => {
 /**
  * Convert colour values from one format to another
  *
- * created by: Firstname LastName
- * created: YYYY-MM-DD
+ * created by: Evan Wills
+ * created: 2022-04-04
  *
  * @param {string} input user supplied content (expects HTML code)
  * @param {object} _extraInputs all the values from "extra" form
@@ -3398,4 +3398,66 @@ doStuff.register({
 })
 
 //  END:  Unix timestamp
+// ====================================================================
+// START: Pixels to REMs
+
+/**
+ * Convert pixels to REMs
+ *
+ * created by: Evan Wills
+ * created: 2023-03-16
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const px2rem = (input, extraInputs, GETvars) => {
+  const basePX = (extraInputs.base() !== '')
+    ? parseInt(extraInputs.base())
+    : 16;
+
+  const toConvert = isInt(input)
+    ? parseInt(input)
+    : 0;
+
+  if (toConvert > 0) {
+    const output = Math.round((toConvert / basePX) * 1000) / 1000
+    return output + 'rem';
+  } else {
+    return '';
+  }
+}
+
+doStuff.register({
+  id: 'px2rem',
+  name: 'Pixels to REMs',
+  func: px2rem,
+  description: 'Enter the number of pixels you wish to convert to REMs into the "Input" box and click "MODIFY"',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'base',
+    label: 'Pixels in 1 rem',
+    min: 1,
+    max: 100,
+    step: 1,
+    default: 16,
+    type: 'number'
+  }],
+  // group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Pixels to REMs
 // ====================================================================

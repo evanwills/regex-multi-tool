@@ -16,6 +16,10 @@ textarea.xl {
   height: 35rem;
 }
 
+textarea.oneOff-input__input, textarea.repeat-input__input {
+  height: var(--input-height, auto);
+}
+
 .input-pair {
   display: flex;
   justify-content: space-between;

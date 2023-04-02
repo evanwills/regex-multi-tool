@@ -16,6 +16,7 @@ import { getFromLocalStorage } from './utilities/general.mjs'
 import { mainAppActions } from './state/main-app/main-app.state.actions.mjs'
 import { userSettingsActions } from './state/user-settings/user-settings.state.actions.mjs'
 import { url } from './url.mjs'
+import { optimiseInputHeight } from './utilities/height-optimiser.mjs'
 
 if ('serviceWorker' in navigator) {
   // navigator.serviceWorker.register(url.path + 'regexMulti.sw.js')
@@ -35,7 +36,8 @@ const unsubscribers = { // eslint-disable-line
   ui: store.subscribe(mainView),
   userSettings: store.subscribe(userSettingsSubscriber(store)),
   history: store.subscribe(historySubscriber(store)),
-  localStorage: store.subscribe(localStorageSubscriber(store))
+  localStorage: store.subscribe(localStorageSubscriber(store)),
+  inputResize: store.subscribe(optimiseInputHeight)
 }
 
 repeatable.verifyChained()
@@ -114,21 +116,3 @@ if (forceUiUpdate === true) {
   const tmp = store.getState()
   forceUIupdate(tmp.userSettings)
 }
-
-
-// ========================================================
-// START: guestimate and set ideal height for input box
-
-const tmpInputHeight = ((window.innerHeight / 16) - 16.5)
-
-const inputHeight = (tmpInputHeight > 28.5)
-  ? tmpInputHeight
-  : 28.5;
-
-const pageRoot = document.documentElement;
-if (typeof pageRoot !== 'undefined') {
-  pageRoot.style.setProperty('--input-height', inputHeight + 'rem')
-}
-
-//  END:  guestimate and set ideal height for input box
-// ========================================================
