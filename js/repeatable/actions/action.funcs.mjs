@@ -3420,6 +3420,111 @@ doStuff.register({
 
 //  END:  Pixels to REMs
 // ====================================================================
+// START: Element props to MD
+
+/**
+ * Convert Vue element prop docuemntation to markdown for README
+ *
+ * created by: Evan Wills
+ * created: 2023-05-22
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const elPropsToMD = (input, extraInputs, GETvars) => {
+  const regex = /(?<=^|,)[\r\n ]*\/\*\*[\r\n ]+(?<desc>\*.*?)(?:[\r\n ]+\* )+@property.*?\*\/[\r\n ]*(?<prop>[a-z0-9]+): \{(?: (?<key1>[a-z]+): (?<val1>[^,}]+))(?:, (?<key2>[a-z]+): (?<val2>[^,}]+))?(?:, (?<key3>[a-z]+): (?<val3>[^,}]+))?/isg;
+  // const _input = tmp;
+  let output = '';
+  let matches;
+
+  while ((matches = regex.exec(input)) !== null) {
+    const desc = matches.groups.desc.replace(/(?<=^|[\r\n]) *\*/g, '').replace(/(?<=[\r\n]) *\* *(?=[\r\n]+|$)/, '\n').replace(/(?<=^|[r\n]) +/g, '');
+    const prop = matches.groups.prop.trim();
+    const attr = camel2kebab(prop)
+    let type = ''
+    let required = false;
+    let _default = undefined;
+
+    for (let a = 3; a < matches.length; a += 2) {
+      const b = a + 1;
+      if (typeof matches[a] !== 'undefined') {
+        const key = matches[a].trim()
+        const val = matches[b].trim().replace(/^' *| *'$/g, '')
+
+        switch (matches[a]) {
+          case 'type':
+            type = val.toLowerCase();
+            break;
+
+          case 'required':
+            console.log('val === \'true\':', val === 'true');
+            required = (val === 'true')
+              ? '_required_'
+              : '_optional_'
+            break;
+
+          case 'default':
+            console.log('val === "\'\'":', val === "''");
+            _default = (val === "''")
+              ? ''
+              : val
+            console.log('_default:', _default);
+        }
+      }
+    }
+
+    if (typeof _default !== 'undefined') {
+      if (type === 'boolean') {
+        _default = (_default === true)
+          ? '`TRUE`'
+          : '`FALSE`';
+      } else if (type === 'number') {
+        _default = `\`${_default}\``;
+      } else if (type === 'string') {
+        _default = (_default === '')
+          ? '"" (empty)'
+          : `\`"${_default}"\``;
+      }
+    } else {
+      _default = '_no default_';
+    }
+
+    const TSV = 'Required\tType\tDefault\tVariable Name\n' +
+                required + '\t_{' + type + '}_\t' + _default + '\t`props.' + prop + '`'
+
+    output += `\n\n### \`${attr}\`\n\n${toMdTable(TSV, '\\t', '\\n', 'c')}\n${desc}\n`;
+
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'elPropsToMD',
+  name: 'Vue element props to MD',
+  func: elPropsToMD,
+  description: 'Convert Vue element prop docuemntation to markdown for README',
+  // docsURL: '',
+  extraInputs: [],
+  // group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Element props to MD
+// ====================================================================
 // START: Strip comments and excess lines
 
 const lineCount = (input) => input.split(/\n/).length
@@ -3444,11 +3549,11 @@ const lineCount = (input) => input.split(/\n/).length
  * @returns {string} modified version user input
  */
 const stripComments = (input, extraInputs, GETvars) => {
-  const reportOnly = extraInputs.report('1');
+  const reportMode = extraInputs.report();
   const tmp = input.replace(/(?:\r\n|\n|\r)/, '\n')
-  const sep = (reportOnly === true)
-    ? ''
-    : '// '
+  const sep = (reportMode > 1)
+    ? '// '
+    : ''
   const after = {}
 
   let output  = tmp.replace(/(?:^|\n)[\t ]*\/\*\*.*?\*\//isg, '') // strip multi line comments
@@ -3481,30 +3586,38 @@ const stripComments = (input, extraInputs, GETvars) => {
   const beforeH = humanNumbers(totalLines.toString())
   const len = beforeH.length
 
-  let report = (reportOnly === true)
-    ? ''
-    : `${output}\n\n// ------------------------------------------------------------\n\n`;
+  let report = '';
 
-  report +=     `${sep}Original size:                      ${beforeH} lines`
-  report +=   `\n${sep}After strip - doc block comments:   ` +
-                `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} lines (${docBlockCmnt})`
-  report +=   `\n${sep}After strip - multi-line comments:  ` +
-                `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} lines (${multiLineCmnt})`
-  report +=   `\n${sep}After strip - single line comments: ` +
-                `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} lines (${singleLineCmnt})`
-  report +=   `\n${sep}After strip - console logs:         ` +
-                `${padStrLeft(humanNumbers(after.consoles.toString()), len)} lines (${consoleLogs})`
-  report +=   `\n${sep}After strip - blank lines:          ` +
-                `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} lines (${blankLines})`
-  report += `\n\n${sep}Comments:                           ` +
-                `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} lines ` +
-                `(${(Math.round((1 - (after.singleLineCmnts / totalLines)) * 10000) / 100)}%)`;
-  report +=   `\n${sep}Blank lines:                        ` +
-                `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} lines ` +
-                `(${(Math.round((((after.singleLineCmnts - after.blankLines) / totalLines)) * 10000) / 100)}%)`;
-  report +=   `\n${sep}Comments & blank lines:             ` +
-                `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} lines ` +
-                `(${(Math.round((1 - (after.blankLines / totalLines)) * 10000) / 100)}%)`
+  if (reportMode > 1) {
+    report = output;
+  }
+
+  if (reportMode == 2) {
+    report += '\n\n// ------------------------------------------------------------\n\n';
+  }
+
+  if (reportMode < 3) {
+    report +=     `${sep}Original size:                      ${beforeH} lines`
+    report +=   `\n${sep}After strip - doc block comments:   ` +
+                  `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} lines (${docBlockCmnt})`
+    report +=   `\n${sep}After strip - multi-line comments:  ` +
+                  `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} lines (${multiLineCmnt})`
+    report +=   `\n${sep}After strip - single line comments: ` +
+                  `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} lines (${singleLineCmnt})`
+    report +=   `\n${sep}After strip - console logs:         ` +
+                  `${padStrLeft(humanNumbers(after.consoles.toString()), len)} lines (${consoleLogs})`
+    report +=   `\n${sep}After strip - blank lines:          ` +
+                  `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} lines (${blankLines})`
+    report += `\n\n${sep}Comments:                           ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} lines ` +
+                  `(${(Math.round((1 - (after.singleLineCmnts / totalLines)) * 10000) / 100)}%)`;
+    report +=   `\n${sep}Blank lines:                        ` +
+                  `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} lines ` +
+                  `(${(Math.round((((after.singleLineCmnts - after.blankLines) / totalLines)) * 10000) / 100)}%)`;
+    report +=   `\n${sep}Comments & blank lines:             ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} lines ` +
+                  `(${(Math.round((1 - (after.blankLines / totalLines)) * 10000) / 100)}%)`
+  }
 
   return report;
 }
@@ -3513,19 +3626,32 @@ doStuff.register({
   id: 'stripComments',
   name: 'Strip JS and/or PHP comments and excess lines from a file',
   func: stripComments,
-  description: '<p>Reports on:</p><ul><li>Original line count</li><li>Line count after cleanup</li><li>Number of lines removed</li><li>Percentage of lines removed</li></ul>',
+  description: '<p>Reports on:</p><ul><li>Original line count</li>' +
+               '<li>Line count after cleanup</li>' +
+               '<li>Number of lines removed</li>' +
+               '<li>Percentage of lines removed</li></ul>',
   // docsURL: '',
   extraInputs: [{
     id: 'report',
-    label: 'Report only',
+    label: 'Output mode',
     options: [
       {
         default: true,
         label: 'Only show report (not cleaned code)',
-        value: '1'
+        value: 1
+      },
+      {
+        default: false,
+        label: 'Show both cleaned code AND report',
+        value: 2
+      },
+      {
+        default: false,
+        label: 'Only show cleaned code (not report)',
+        value: 3
       },
     ],
-    type: 'checkbox'
+    type: 'radio'
   }],
   // group: 'evan',
   ignore: false
