@@ -3572,8 +3572,6 @@ const stripComments = (input, extraInputs, GETvars) => {
                   replace(/\n+/ig, '\n'); // strip multiple blank lines
   after.blankLines = lineCount(output)
 
-  const middle = output.split(/\n/).length
-
   const totalLines = tmp.split(/\n/).length
   const docBlockCmnt = tmp.split(/\/\*\*.*?\*\//s).length
   const multiLineCmnt = tmp.split(/\/\*.*?\*\//s).length - docBlockCmnt
@@ -3599,23 +3597,38 @@ const stripComments = (input, extraInputs, GETvars) => {
   if (reportMode < 3) {
     report +=     `${sep}Original size:                      ${beforeH} lines`
     report +=   `\n${sep}After strip - doc block comments:   ` +
-                  `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} lines (${docBlockCmnt})`
+                  `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} ` +
+                  `lines (${docBlockCmnt})`
+
     report +=   `\n${sep}After strip - multi-line comments:  ` +
-                  `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} lines (${multiLineCmnt})`
+                  `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} ` +
+                  `lines (${multiLineCmnt})`
+
     report +=   `\n${sep}After strip - single line comments: ` +
-                  `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} lines (${singleLineCmnt})`
+                  `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} ` +
+                  `lines (${singleLineCmnt})`
+
     report +=   `\n${sep}After strip - console logs:         ` +
-                  `${padStrLeft(humanNumbers(after.consoles.toString()), len)} lines (${consoleLogs})`
+                  `${padStrLeft(humanNumbers(after.consoles.toString()), len)} ` +
+                  `lines (${consoleLogs})`
+
     report +=   `\n${sep}After strip - blank lines:          ` +
-                  `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} lines (${blankLines})`
+                  `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} ` +
+                  `lines (${blankLines})`
+
     report += `\n\n${sep}Comments:                           ` +
-                  `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} lines ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} ` +
+                  `lines ` +
                   `(${(Math.round((1 - (after.singleLineCmnts / totalLines)) * 10000) / 100)}%)`;
+
     report +=   `\n${sep}Blank lines:                        ` +
-                  `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} lines ` +
+                  `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} ` +
+                  `lines ` +
                   `(${(Math.round((((after.singleLineCmnts - after.blankLines) / totalLines)) * 10000) / 100)}%)`;
+
     report +=   `\n${sep}Comments & blank lines:             ` +
-                  `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} lines ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} ` +
+                  `lines ` +
                   `(${(Math.round((1 - (after.blankLines / totalLines)) * 10000) / 100)}%)`
   }
 
