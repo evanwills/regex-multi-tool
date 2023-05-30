@@ -61,7 +61,7 @@ export const _select = {
   id: '',
   label: '',
   options: [
-    { value: '', label: '', default: true }
+    { value: '', label: '', default: true },
   ],
   type: 'select'
 }
@@ -74,7 +74,7 @@ export const _checkbox = {
       default: true,
       label: '',
       value: ''
-    }
+    },
   ],
   type: 'checkbox'
 }
@@ -87,7 +87,7 @@ export const _radio = {
       default: true,
       label: '',
       value: ''
-    }
+    },
   ],
   type: 'radio'
 }

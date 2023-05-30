@@ -8,7 +8,8 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
 import { isInt, isNonEmptyStr, isNumber, isNumeric, isStrNum } from '../../utilities/validation.mjs'
-import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.mjs'
+import { padStr, getBool2str, decodeEncodeURI, humanNumbers, padStrLeft } from '../../utilities/sanitise.mjs'
+import { toMdTable } from '../../utilities/general.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -2194,80 +2195,23 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const tsv2Markdown = (input, _extraInputs, _GETvars) => {
-  const delimChars = {
-    '\\n': '\n',
-    '\\t': '\t',
-    '\\r': '\r'
-  }
   const lengths = []
-  const colDelim = (typeof delimChars[_extraInputs.column()] === 'string')
-    ? delimChars[_extraInputs.column()]
-    : _extraInputs.column()
-  const rowDelim = (typeof delimChars[_extraInputs.row()] === 'string')
-    ? delimChars[_extraInputs.row()]
-    : _extraInputs.row()
   // const colDelim = '\t'
   // const rowDelim = '\n'
-  let tmp = input.trim()
-  let output = ''
-  let sep = ''
-  const centre = _extraInputs.options('centre')
-  const confluence = _extraInputs.options('confluence')
-  const toBoolStr = getBool2str(_extraInputs.convertBool())
-  // const centre = false
-  // const confluence = false
-  // const toBoolStr = false
+  // let tmp = input.trim()
+  // let output = ''
+  // let sep = ''
+  // const centre =
+  // const confluence =
 
-  tmp = input.split(rowDelim)
-
-  for (let a = 0; a < tmp.length; a += 1) {
-    tmp[a] = tmp[a].trim()
-
-    if (tmp[a] === '') {
-      tmp.pop()
-    } else {
-      tmp[a] = tmp[a].split(colDelim)
-
-      for (let b = 0; b < tmp[a].length; b += 1) {
-        tmp[a][b] = tmp[a][b].trim()
-
-        const len = tmp[a][b].length
-        if (typeof lengths[b] === 'undefined' || len > lengths[b]) {
-          lengths[b] = len
-        }
-      }
-    }
-  }
-
-  const c = tmp[0].length
-
-  const headPipe = (confluence) ? '||' : ' |'
-  const lengthMod = (confluence) ? 1 : 0
-
-  for (let a = 0; a < c; a += 1) {
-    output += headPipe + padStr(tmp[0][a], lengths[a], ' ', true)
-    sep += '|' + padStr('', lengths[a] + lengthMod, '-')
-  }
-
-  output += headPipe + '\n'
-  if (confluence === false) {
-    output += sep + '|\n'
-  }
-
-  for (let a = 1; a < tmp.length; a += 1) {
-    for (let b = 0; b < c; b += 1) {
-      // make sure we at least have an empty string for this cell
-      tmp[a][b] = (isStrNum(tmp[a][b]))
-        ? tmp[a][b]
-        : ''
-
-      const _centre = (b > 0) ? centre : false
-      output += '|' + padStr(toBoolStr(tmp[a][b]), lengths[b] + lengthMod, ' ', _centre)
-    }
-    output += '|\n'
-  }
-
-  return output
+  return toMdTable(
+    input,
+    _extraInputs.column(),
+    _extraInputs.row(),
+    (_extraInputs.options('centre') === true) ? 'c' : 'r',
+    _extraInputs.convertBool(),
+    _extraInputs.options('confluence')
+  );
 }
 
 doStuff.register({
@@ -3217,7 +3161,7 @@ const hexToIntInner = (input) => {
     : parseInt(input);
 }
 const hexToInt = (input) => {
-  const tmp = input.split('')
+  const tmp = input.toLowerCase().split('')
 
   const a = hexToIntInner(tmp[0]) * 16
   const b = (typeof tmp[1] === 'string')
@@ -3289,7 +3233,7 @@ const intToHex = (input) => {
  * @returns {string} modified version user input
  */
 const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
-  const regex = /^^(?:(?:rgba?\(\s*)?([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:(?:,\s*|\s+)(1|0?.[0-9]{1,5}))?(?:\s*\))|#(?:([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?|([a-f0-9])([a-f0-9])([a-f0-9])))$/i
+  const regex = /^(?:(?:rgba?\(\s*)?([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:(?:,\s*|\s+)([0-9.]{1,6}%|1|0?.[0-9]{1,5}))?(?:\s*\))|#(?:([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?|([a-f0-9])([a-f0-9])([a-f0-9])))$/i
 
   // const dummy = '#ed0c00\nrgb(204, 204, 204)\n#abc\nrgba(123,46,89,0.5)'
   // const through = dummy.trim().split('\n')
@@ -3314,11 +3258,19 @@ const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
     if (tmp !== null) {
       if (typeof tmp[1] === 'string') {
         mode = 'rgb'
+        console.group('colourSyntaxConverter')
+        console.log('RGB')
+
         r = parseInt(tmp[1])
         g = parseInt(tmp[2])
         b = parseInt(tmp[3])
         if (typeof tmp[4] === 'string') {
-          a = parseFloat(tmp[4])
+          if (tmp[4].match(/^[0-9.]+%$/)) {
+            a = parseFloat(tmp[4].replace(/%$/, '')) / 100
+          } else {
+            a = parseFloat(tmp[4])
+          }
+
           a = (a > 1)
             ? 1
             : (a < 0)
@@ -3326,14 +3278,21 @@ const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
               : Math.round(a * 255)
         }
 
-        console.log('RGB')
+        console.groupEnd();
       } else if (typeof tmp[5] === 'string') {
         mode = 'hex'
         r = hexToInt(tmp[5])
         g = hexToInt(tmp[6])
         b = hexToInt(tmp[7])
+
         if (typeof tmp[8] === 'string') {
-          a = tmp[8]
+          console.group('colourSyntaxConverter')
+          console.log('tmp[8]:', tmp[8])
+          console.log('hexToInt(tmp[8]):', hexToInt(tmp[8]))
+          console.log('(hexToInt(tmp[8]) / 255):', (hexToInt(tmp[8]) / 255))
+          console.log('Math.round(hexToInt(tmp[8]) / 255):', Math.round((hexToInt(tmp[8]) / 255) * 1000) / 1000)
+          console.groupEnd();
+          a = Math.round((hexToInt(tmp[8]) / 255) * 1000) / 1000
         }
       } else if (typeof tmp[9] === 'string') {
         mode = 'hex'
@@ -3460,4 +3419,120 @@ doStuff.register({
 })
 
 //  END:  Pixels to REMs
+// ====================================================================
+// START: Strip comments and excess lines
+
+const lineCount = (input) => input.split(/\n/).length
+
+/**
+ * Strip JS and/or PHP comments and excess lines from a file
+ *
+ * created by: Evan Wills
+ * created: 2023-05-30
+ *
+ * @param {string} input       user supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} GETvars     all the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const stripComments = (input, extraInputs, GETvars) => {
+  const reportOnly = extraInputs.report('1');
+  const tmp = input.replace(/(?:\r\n|\n|\r)/, '\n')
+  const sep = (reportOnly === true)
+    ? ''
+    : '// '
+  const after = {}
+
+  let output  = tmp.replace(/(?:^|\n)[\t ]*\/\*\*.*?\*\//isg, '') // strip multi line comments
+  after.docBlocks = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*\/\*.*?\*\//isg, '') // strip multi line comments
+  after.multiLineCmnts = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*\/\/.*(?=[\r\n])/ig, ''); // strip single line comments
+  after.singleLineCmnts = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*console\.(?:log|group(?:End)?|warn|info)\(.*?\)(?=;|[\r\n]|$)/isg, '')
+  after.consoles = lineCount(output)
+
+  output = output.replace(/[\t ]+(?=\n)/ig, ''). // strip trailing white space
+                  replace(/\n+/ig, '\n'); // strip multiple blank lines
+  after.blankLines = lineCount(output)
+
+  const middle = output.split(/\n/).length
+
+  const totalLines = tmp.split(/\n/).length
+  const docBlockCmnt = tmp.split(/\/\*\*.*?\*\//s).length
+  const multiLineCmnt = tmp.split(/\/\*.*?\*\//s).length - docBlockCmnt
+  const singleLineCmnt = tmp.split(/\/\/.*(?=[\r\n])/).length
+  const consoleLogs = tmp.split(/console\.(?:log|group|warn|info)/i).length
+  const blankLines = tmp.split(/(?<=^|\n)[\t ]*(?=\n|$)/).length
+
+ // strip multi line comments
+
+  const beforeH = humanNumbers(totalLines.toString())
+  const len = beforeH.length
+
+  let report = (reportOnly === true)
+    ? ''
+    : `${output}\n\n// ------------------------------------------------------------\n\n`;
+
+  report +=     `${sep}Original size:                      ${beforeH} lines`
+  report +=   `\n${sep}After strip - doc block comments:   ` +
+                `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} lines (${docBlockCmnt})`
+  report +=   `\n${sep}After strip - multi-line comments:  ` +
+                `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} lines (${multiLineCmnt})`
+  report +=   `\n${sep}After strip - single line comments: ` +
+                `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} lines (${singleLineCmnt})`
+  report +=   `\n${sep}After strip - console logs:         ` +
+                `${padStrLeft(humanNumbers(after.consoles.toString()), len)} lines (${consoleLogs})`
+  report +=   `\n${sep}After strip - blank lines:          ` +
+                `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} lines (${blankLines})`
+  report += `\n\n${sep}Comments:                           ` +
+                `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} lines ` +
+                `(${(Math.round((1 - (after.singleLineCmnts / totalLines)) * 10000) / 100)}%)`;
+  report +=   `\n${sep}Blank lines:                        ` +
+                `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} lines ` +
+                `(${(Math.round((((after.singleLineCmnts - after.blankLines) / totalLines)) * 10000) / 100)}%)`;
+  report +=   `\n${sep}Comments & blank lines:             ` +
+                `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} lines ` +
+                `(${(Math.round((1 - (after.blankLines / totalLines)) * 10000) / 100)}%)`
+
+  return report;
+}
+
+doStuff.register({
+  id: 'stripComments',
+  name: 'Strip JS and/or PHP comments and excess lines from a file',
+  func: stripComments,
+  description: '<p>Reports on:</p><ul><li>Original line count</li><li>Line count after cleanup</li><li>Number of lines removed</li><li>Percentage of lines removed</li></ul>',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'report',
+    label: 'Report only',
+    options: [
+      {
+        default: true,
+        label: 'Only show report (not cleaned code)',
+        value: '1'
+      },
+    ],
+    type: 'checkbox'
+  }],
+  // group: 'evan',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Strip comments and excess lines
 // ====================================================================

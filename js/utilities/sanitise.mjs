@@ -346,8 +346,12 @@ export const snakeToCamelCase = (input, start = 0) => {
     : ''
 }
 
-export const camel2human = (input) => {
-  return input.replace(/(?<=[a-z0-9])(?=[A-Z])/g, ' ')
+export const camel2human = (input, sep = ' ') => {
+  return input.replace(/(?<=[a-z0-9])(?=[A-Z])/g, sep)
+}
+
+export const camel2kebab = (input, sep = '-') => {
+  return input.replace(/(?<=[a-z0-9])(?=[A-Z])/g, sep).toLowerCase()
 }
 
 /**
@@ -493,4 +497,45 @@ export const decodeEncodeURI = (input, decode) => {
     output = output.replace(new RegExp(findReplace[a][find], 'g'), findReplace[a][replace])
   }
   return output
+}
+
+export const strRev = (input) => {
+  console.group('strRev()')
+  console.log('input:', input);
+  console.log('typeof input:', typeof input);
+  console.log('typeof input === "string":', typeof input === 'string');
+  const tmp = input.split('');
+  let output = '';
+
+  for (let a = (tmp.length - 1); a >= 0; a -= 1) {
+    output += tmp[a];
+  }
+
+  console.groupEnd();
+  return output;
+}
+
+export const humanNumbers = (input) => {
+  const _input = input.toString()
+  console.group('humanNumbers()')
+  console.log('input:', input);
+  console.log('typeof input:', typeof input);
+  console.log('typeof input === "string":', typeof input === 'string');
+
+  const whole = _input.split('.', 1).toString();
+  const frac = (_input.includes('.'))
+    ? _input.split('.', 2)[1].toString()
+    : '';
+
+  let tmp = strRev(whole)
+
+  tmp = strRev(tmp.replace(/([0-9]{3})(?=[0-9])/g, '$1,'))
+
+  console.log('whole:', whole);
+  console.log('frac:', frac);
+  console.log('tmp:', tmp);
+  console.groupEnd();
+  return (frac !== '')
+    ? `${tmp}.${frac}`
+    : tmp;
 }
