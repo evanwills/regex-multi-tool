@@ -8,7 +8,7 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
 import { isInt, isNonEmptyStr, isNumber, isNumeric, isStrNum } from '../../utilities/validation.mjs'
-import { padStr, getBool2str, decodeEncodeURI, humanNumbers, padStrLeft } from '../../utilities/sanitise.mjs'
+import { camel2human, camel2kebab, decodeEncodeURI, getBool2str, humanNumbers, padStr, padStrLeft } from '../../utilities/sanitise.mjs'
 import { toMdTable } from '../../utilities/general.mjs'
 
 /**
