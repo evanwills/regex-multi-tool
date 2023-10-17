@@ -10,20 +10,20 @@
  * created by: Firstname LastName
  * created: YYYY-MM-DD
  *
- * @param {string} input       user supplied content
+ * @param {string} input       User supplied content
  *                             (expects text HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} extraInputs All the values from "extra" form
  *                             fields specified when registering
  *                             the ation
- * @param {object} GETvars     all the GET variables from the URL as
+ * @param {object} _GETvars    All the GET variables from the URL as
  *                             key/value pairs
- *                             NOTE: numeric strings are converted
+ *                             NOTE: Numeric strings are converted
  *                                   to numbers and "true" & "false"
  *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const myFunction = (input, extraInputs, GETvars) => {
+const myFunction = (input, extraInputs, _GETvars) => {
 }
 
 doStuff.register({
@@ -33,7 +33,7 @@ doStuff.register({
   description: '',
   // docsURL: '',
   extraInputs: [],
-  // group: 'evan',
+  // group: '',
   ignore: false
   // inputLabel: '',
   // remote: false,
@@ -61,7 +61,7 @@ export const _select = {
   id: '',
   label: '',
   options: [
-    { value: '', label: '', default: true }
+    { value: '', label: '', default: true },
   ],
   type: 'select'
 }
@@ -74,7 +74,7 @@ export const _checkbox = {
       default: true,
       label: '',
       value: ''
-    }
+    },
   ],
   type: 'checkbox'
 }
@@ -87,7 +87,7 @@ export const _radio = {
       default: true,
       label: '',
       value: ''
-    }
+    },
   ],
   type: 'radio'
 }

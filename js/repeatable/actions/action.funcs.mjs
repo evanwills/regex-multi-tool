@@ -8,7 +8,8 @@ import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
 import { isInt, isNonEmptyStr, isNumber, isNumeric, isStrNum } from '../../utilities/validation.mjs'
-import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.mjs'
+import { camel2human, camel2kebab, decodeEncodeURI, getBool2str, humanNumbers, padStr, padStrLeft, ucFirst } from '../../utilities/sanitise.mjs'
+import { toMdTable } from '../../utilities/general.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -36,35 +37,38 @@ import { padStr, getBool2str, decodeEncodeURI } from '../../utilities/sanitise.m
  * created by: Evan Wills
  * created: 2019-03-22
  *
- * @param {string} input user supplied content
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted to
+ *                                   numbers and "true" & "false" are
+ *                                   converted to booleans
  *
  * @returns {string} modified version user input
  */
-const exposeChickens = (input, _extraInputs, _GETvars) => {
+const exposeChickens = (input, extraInputs, _GETvars) => {
   // console.group('exposeChickens()')
   // console.log('input:', input)
-  // console.log('_extraInputs:', _extraInputs)
-  // console.log('_extraInputs.year():', _extraInputs.year())
-  // console.log('_extraInputs.gender():', _extraInputs.gender())
-  // console.log('_extraInputs.mood("unsure"):', _extraInputs.mood('unsure'))
-  // console.log('_extraInputs.mood("angry"):', _extraInputs.mood('angry'))
-  // console.log('_extraInputs.mood("excited"):', _extraInputs.mood('excited'))
+  // console.log('extraInputs:', extraInputs)
+  // console.log('extraInputs.year():', extraInputs.year())
+  // console.log('extraInputs.gender():', extraInputs.gender())
+  // console.log('extraInputs.mood("unsure"):', extraInputs.mood('unsure'))
+  // console.log('extraInputs.mood("angry"):', extraInputs.mood('angry'))
+  // console.log('extraInputs.mood("excited"):', extraInputs.mood('excited'))
   // console.log('_GETvars:', _GETvars)
   // console.groupEnd()
 
-  const _unsure = (_extraInputs.mood('unsure')) ? ' I think' : ''
-  const _angry = _extraInputs.mood('angry')
-  const _excited = _extraInputs.mood('excited')
+  const _unsure = (extraInputs.mood('unsure')) ? ' I think' : ''
+  const _angry = extraInputs.mood('angry')
+  const _excited = extraInputs.mood('excited')
   // We retrieve the value of _gender by calling the function that
   // matches the ID (or name) of the input field
-  const _gender = _extraInputs.gender()
-  const _year = _extraInputs.year()
+  const _gender = extraInputs.gender()
+  const _year = extraInputs.year()
 
   let _boc = 'BOC! BOC!!'
   let _chicken = 'chicken'
@@ -112,9 +116,8 @@ const exposeChickens = (input, _extraInputs, _GETvars) => {
 doStuff.register({
   id: 'doChicken',
   description: 'Change all vowels into chickens',
-  // docURL: 'docs/expose-chickens.html',
   docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/expose-chickens',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'year',
       label: 'Year chicken was hatched',
@@ -155,16 +158,35 @@ doStuff.register({
 // ====================================================================
 // START: heading to accordion
 
-const makeAccordion = (input, _extraInputs, _GETvars) => {
-  const heading = _extraInputs.heading()
-  const multi = _extraInputs.multiCollpase('multi')
-  const parent = _extraInputs.parent()
+/**
+ * Convert content to Bootstrap accordion blocks
+ *
+ * created by: Evan Wills
+ * created: 2021-03-19
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const makeAccordion = (input, extraInputs, _GETvars) => {
+  const heading = extraInputs.heading()
+  const multi = extraInputs.multiCollpase('multi')
+  const parent = extraInputs.parent()
   // var content = ''
   // var tmp = ''
   const regexHead = new RegExp('\\s*<h' + heading + '[^>]*>\\s*([\\s\\S]*?)\\s*</h' + heading + '>\\s*([\\s\\S]*?)\\s*(?=<h' + heading + '[^>]*>|$)', 'ig')
   let expand = true
   // var clean = new RegExp('(?:<div[^>]*>\\s*){2}<h2[^>]*>\\s*<a[^>]*>\\s*([\\s\\S]*?)\\s*<span[^>]*>[\\s\\S]*?</div>\\s*<div class="panel-body">\\s*([\\s\\S]*?)(?:\\s*</div>){3}', 'ig')
-  const expandMode = _extraInputs.expandMode()
+  const expandMode = extraInputs.expandMode()
   let defaultExpand = false
 
   if (expandMode === 'closeAll') {
@@ -199,7 +221,8 @@ const makeAccordion = (input, _extraInputs, _GETvars) => {
    * wrapAccordion() wraps all the accordion items in the accordion
    * wrapper (with apporpriate attributes set)
    *
-   * @param {string} input whole accordion block to be wrapped in HTML for a accordion (panel) group
+   * @param {string} input whole accordion block to be wrapped in
+   *                       HTML for a accordion (panel) group
    *
    * @returns {string} Full bootstrap compliant accordion
    */
@@ -222,11 +245,14 @@ const makeAccordion = (input, _extraInputs, _GETvars) => {
    *       the 'panel-group' wrapper must be applied after all the
    *       accordion blocks are generated.
    *
-   * @param {string} match All the characters matched by the regular expression
-   * @param {string} headingTxt Heading text for the accordion block
+   * @param {string} match        All the characters matched by the
+   *                              regular expression
+   * @param {string} headingTxt   Heading text for the accordion block
    * @param {string} accodionBody Body of the accordion block
-   * @param {number} offset number where abouts in the whole string the match started
-   * @param {string} whole the original string the match was found in
+   * @param {number} offset       number where abouts in the whole
+   *                              string the match started
+   * @param {string} whole        the original string the match was
+   *                              found in
    *
    * @returns {string} marked up accordion block
    */
@@ -283,19 +309,15 @@ const makeAccordion = (input, _extraInputs, _GETvars) => {
     ))
   }
 
-  switch (_extraInputs.mode()) {
+  switch (extraInputs.mode()) {
     case 'headings':
-      return headingFunc(input)
-      // return ''
-      // break
+      return headingFunc(input);
 
     case 'dl':
-      return dlFunc(input)
-      // break
+      return dlFunc(input);
 
     case 'clean':
-      return ''
-      // break
+      return '';
   }
 }
 
@@ -303,7 +325,7 @@ doStuff.register({
   id: 'heading2accordion',
   description: 'Convert content to an accordion using specific headings as the separator for the accordion',
   // docsURL: '',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'mode',
       label: 'Convert mode',
@@ -378,7 +400,7 @@ doStuff.register({
     }
   ],
   func: makeAccordion,
-  // ignore: true,
+  ignore: true,
   name: 'Convert content to Bootstrap accordion blocks'
 })
 
@@ -386,7 +408,26 @@ doStuff.register({
 // ====================================================================
 // START: Syntax highlighting for JS
 
-function jsSyntaxHighlight (input, _extraInputs, _GETvars) {
+/**
+ * Syntax highlighting for JS
+ *
+ * created by: Evan Wills
+ * created: 2021-03-19
+ *
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+function jsSyntaxHighlight (input, extraInputs, _GETvars) {
   const findReplace = [
     { // 0 function name
       find: '([a-z0-9_]+(?:\\[(?:\'.*?\'|[a-z0-9_.])\\]|\\.[a-z0-9_]+)*)(?=\\s*\\()',
@@ -448,18 +489,21 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2019-08-22
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function incrementH (input, _extraInputs, _GETvars) {
-  const mode = Number.parseInt(_extraInputs.mode())
+function incrementH (input, extraInputs, _GETvars) {
+  const mode = Number.parseInt(extraInputs.mode())
   const replace = function (matches, close, level) {
     let h = '<'
     let newLevel = (Number.parseInt(level) + mode)
@@ -481,7 +525,7 @@ doStuff.register({
   name: 'Decrement or Increment HTML heading',
   description: 'Fix heading levels when Migrating HTML from one system to another',
   // docURL: '',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'mode',
       label: 'Decrement/Increment heading importance',
@@ -501,7 +545,7 @@ doStuff.register({
   ]
 })
 
-//  END:  Syntax highlighting for JS
+//  END:  Fix heading levels when Migrating HTML from one system to another
 // ==================================================================
 // START: Match unfinished payment IDs to confirmed payments.
 
@@ -512,17 +556,20 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2019-08-28
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function matchPaymentIDs (input, _extraInputs, _GETvars) {
+function matchPaymentIDs (input, extraInputs, _GETvars) {
   /**
    * splitPaymentID() takes a list of payment IDs as provided by
    * Finance and extracts the payment ID as listed in Form Build
@@ -574,7 +621,7 @@ function matchPaymentIDs (input, _extraInputs, _GETvars) {
     return (str !== '') ? accum + sep + str : accum
   }
 
-  const paymentIDs = splitNclean(_extraInputs.paymentIDs())
+  const paymentIDs = splitNclean(extraInputs.paymentIDs())
 
   return paymentIDs.map(grep).filter(str => str !== '').reduce(implode, '')
 }
@@ -584,10 +631,9 @@ doStuff.register({
   func: matchPaymentIDs,
   ignore: true,
   name: 'Match unfinished payment IDs to confirmed payments.',
-  // docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/match_unfinished_payment_ids_to_confirmed_payments.',
   docURL: 'docs/match-unfinished-payment.html',
   inputLabel: 'Copied "Unfinished" payments listing',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'paymentIDs',
       label: 'Transaction Reference IDs (from finance)',
@@ -607,18 +653,21 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2019-08-28
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function urlDecodeEncode (input, _extraInputs, _GETvars) {
-  return decodeEncodeURI(input, !(_extraInputs.mode() === 'encode'))
+function urlDecodeEncode (input, extraInputs, _GETvars) {
+  return decodeEncodeURI(input, !(extraInputs.mode() === 'encode'))
 }
 
 doStuff.register({
@@ -627,10 +676,9 @@ doStuff.register({
   func: urlDecodeEncode,
   ignore: false,
   name: 'URI decode (or encode)',
-  // docURL: 'https://courses.acu.edu.au/do-js-regex-stuff/docs/match_unfinished_payment_ids_to_confirmed_payments.',
-  // docURL: 'docs/match-unfinished-payment.html',
+  // docURL: ''
   inputLabel: 'action',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'mode',
       label: 'Mode',
@@ -652,263 +700,33 @@ doStuff.register({
 
 //  END:  Match unfinished payment IDs to confirmed payments.
 // ====================================================================
-// START: Staff Access Card URL
-
-function staffAccessCard (input, _extraInputs, _GETvars) {
-  const baseURL = 'https://forms.acu.edu.au/public/staff_access_card'
-  const altURL = 'https://forms.acu.edu.au/public/staff_access_card_validation_test'
-  const raw = window.btoa('?email=' + _extraInputs.email() + '&gender=' + _extraInputs.gender())
-  let data = ''
-
-  for (let a = (raw.length - 1); a >= 0; a -= 1) {
-    data += raw[a]
-  }
-
-  return baseURL + '?data=' + window.btoa(data) + '\n\n\n' + altURL + '?data=' + window.btoa(data)
-}
-
-doStuff.register({
-  id: 'staffAccessCard',
-  func: staffAccessCard,
-  description: 'Generate a staff access card URL with email and gender bound in',
-  // docsURL: '',
-  _extraInputs: [
-    {
-      id: 'email',
-      label: 'Email address',
-      type: 'email'
-    },
-    {
-      id: 'gender',
-      label: 'Gender',
-      options: [
-        {
-          label: 'Male',
-          value: 'm'
-        },
-        {
-          label: 'Female',
-          value: 'f'
-        }
-      ],
-      type: 'radio'
-    }
-  ],
-  ignore: true,
-  name: 'Staff Access Card URL'
-})
-
-//  END:  Staff Access Card URL
-// ====================================================================
-// START: Fix CEG unit modal URLs
-
-/**
- * fixCEGunitURLs() Fix CEG unit modal URLs
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function fixCEGunitURLs (input, _extraInputs, _GETvars) {
-  let output = input
-  const regex = [
-    {
-      find: /https:\/\/(?:enrolment-guides|handbook)\.acu\.edu\.au\/(?:handbooks\/handbook_)?[0-9]{4}\/unit_display(?=\?unit=)/ig,
-      replace: './?a=2318995'
-    },
-    {
-      find: /&nbsp;/ig,
-      replace: ' '
-    },
-    {
-      find: /&amp;(?=SQ_DESIGN_NAME=modal)/ig,
-      replace: '&'
-    }
-  ]
-
-  for (let a = 0; a < regex.length; a += 1) {
-    output = output.replace(regex[a].find, regex[a].replace)
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'fixCEGunitURLs',
-  func: fixCEGunitURLs,
-  description: 'Fix CEG unit modal URLs',
-  // docsURL: '',
-  _extraInputs: [],
-  ignore: true,
-  name: 'Fix CEG unit URLs'
-})
-
-//  END:  Fix CEG unit modal URLs
-// ====================================================================
-// START: fixPoliciesAnchorLinks
-
-/**
- * Make sure invalid anchors and ToC are converted to valid links and
- * anchors
- *
- * created by: Evan Wills
- * created: 2020-08-04
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-function fixPoliciesAnchorLinksV1 (input, _extraInputs, _GETvars) {
-  let output = input
-  const labelsAndIDs = []
-
-  /**
-   * Make a sure string only contains alpha-numeric characters,
-   * hyphens & underscores
-   *
-   * @param {string} subID string to be used as the Sub-ID for a link
-   *
-   * @returns {string}
-   */
-  const makeIdSafeSub = (subID) => {
-    if (typeof subID === 'undefined') {
-      return ''
-    }
-
-    subID = subID.replace(/^[^a-z0-9]+|[^a-z0-9]+$/ig, '')
-
-    return subID.replace(/[^a-z0-9_\\-]+/ig, '-')
-  }
-
-  /**
-   * Make ID safe as HTML ID
-   *
-   * @param {string} id           ID string to be cleaned
-   * @param {number} headingLevel
-   *
-   * @returns {string}
-   */
-  const makeIdSafe = (id, subID) => {
-    let output = id.trim()
-
-    output = output.replace(/[^a-z0-9]+/ig, '-')
-    output = 'a' + makeIdSafeSub(subID) + '__' + output.toLowerCase()
-
-    return output
-  }
-
-  /**
-   * Find all the headings in a policy and create new IDs for them
-   *
-   * @param {string} whole   Whole matched pattern
-   * @param {string} level   Heading level
-   * @param {string} id      ID for heading
-   * @param {string} num     Hierarchical number of heading
-   * @param {string} heading Heading text
-   *
-   * @returns {string}
-   */
-  const updateHeadings = (whole, level, id, num, heading) => {
-    const _id = makeIdSafe(heading, id)
-
-    if (labelsAndIDs.indexOf(_id) === -1) {
-      labelsAndIDs.push(_id)
-    }
-
-    return '<a id="' + _id + '" name="' + _id + '" class="sticky-safe-anchor">&nbsp;</a><h' + level + '>' + num + heading
-  }
-
-  /**
-   * Update the links in the Table of Contents
-   *
-   * @param {string} whole      Whole matched pattern
-   * @param {string} attribute1 First attribute name
-   * @param {string} hash1      First attribute hash character
-   * @param {string} value1     First attribute value
-   * @param {string} attribute2 Second attribute name
-   * @param {string} hash2      Second attribute hash character
-   * @param {string} value2     Second attribute value
-   * @param {string} linkText   Link text
-   *
-   * @returns {string}
-   */
-  const updateLinks = (whole, attribute1, hash1, value1, attribute2, hash2, value2, linkText) => {
-    if (hash1 === '#' || hash2 === '#') {
-      if (value1 !== 'top' && value2 !== 'top') {
-        const subID = (hash1 === '#') ? value1 : value2
-        const _id = makeIdSafe(linkText, subID)
-
-        if (labelsAndIDs.indexOf(_id) >= 0) {
-          return '<a href="#' + _id + '">' + linkText
-        }
-      }
-    }
-    return whole
-  }
-
-  output = output.replace(
-    /'<h([1-5])(?: id="([^"]+)")>((?:[0-9]+\.?)+\s*)(.*?)\s*(?=<\/h\1>)/ig,
-    updateHeadings
-  )
-  output = output.replace(
-    /<a(?:\s+(title|href)="(#?)([^"]+)")(?:\s+(title|href)="(#?)([^"]+)")?>([^<]+)(?=<\/a>)/ig,
-    updateLinks
-  )
-
-  return output
-}
-
-doStuff.register({
-  id: 'fixPoliciesAnchorLinksV1',
-  func: fixPoliciesAnchorLinksV1,
-  description: '',
-  // docsURL: '',
-  _extraInputs: [],
-  ignore: true,
-  name: 'Fix policy anchor links'
-})
-
-//  END: fixPoliciesAnchorLinksV1
-// ====================================================================
 // START: Strip inline styles from table elements
 
 /**
- *
+ * Strip inline styles from table elements
  *
  * created by: Evan Wills
  * created: 2020-04-09
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-function stripTableStyles (input, _extraInputs, _GETvars) {
+function stripTableStyles (input, extraInputs, _GETvars) {
   const tableInner = (whole) => {
     return whole.replace(/\sstyle="[^"]+"/igs, '')
   }
 
-  if (_extraInputs.whichStyle() === 'table') {
+  if (extraInputs.whichStyle() === 'table') {
     return input.replace(/<(?:table|t(?:[hdr]|head|body|foot))[^>]+>/igs, tableInner)
   } else {
     return tableInner(input)
@@ -919,8 +737,7 @@ doStuff.register({
   id: 'stripTableStyles',
   func: stripTableStyles,
   description: 'Remove style attributes (inline styles) from HTML',
-  // docsURL: '',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'whichStyle',
       label: 'Which style blocks to delete',
@@ -937,10 +754,110 @@ doStuff.register({
 
 //  END:  Strip inline styles from table elements
 // ====================================================================
+// START: KSS comment block
+
+const prefixHTMLline = (input) => {
+  return input.replace(/(^|[\r\n])+(?=[\t ]*<)/ig, '$1 *')
+}
+
+/**
+ * Generate a KSS comment block (or make HTML code safe to use in a
+ * KSS comment block
+ *
+ * created by: Evan Wills
+ * created: 2020-09-04
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const kssCommentBlock = (input, extraInputs, _GETvars) => {
+  // console.log("extraInputs.wholeComment('true'):", extraInputs.wholeComment('true'))
+
+  if (extraInputs.wholeComment('true')) {
+    return makeKssComment(
+      extraInputs.componentName(),
+      extraInputs.samplePath(),
+      extraInputs.type(),
+      prefixHTMLline(input)
+    )
+  } else {
+    return prefixHTMLline(input)
+  }
+}
+
+doStuff.register({
+  id: 'kssCommentBlock',
+  func: kssCommentBlock,
+  description: 'Generate a KSS comment block (or make HTML code safe to use in a KSS comment block',
+  extraInputs: [{
+    id: 'wholeComment',
+    label: 'Build whole KSS comment',
+    type: 'checkbox',
+    options: [
+      { value: 'true', label: 'Yes! Build whole comment', default: true }
+    ]
+  }, {
+    id: 'componentName',
+    label: 'Component name',
+    default: '',
+    type: 'text'
+  }, {
+    id: 'samplePath',
+    label: 'Path to Sample HTML',
+    default: '',
+    type: 'text'
+  }, {
+    id: 'type',
+    label: 'Component type',
+    type: 'select',
+    options: [
+      { value: 'Partilces', label: 'Partilces' },
+      { value: 'Atoms', label: 'Atoms' },
+      { value: 'Molecules', label: 'Molecules', default: true },
+      { value: 'Organisms', label: 'Organisms' },
+      { value: 'Templates', label: 'Templates' },
+      { value: 'Pages', label: 'Pages' }
+    ]
+  }],
+  // group: '',
+  ignore: false,
+  name: 'KSS comment block'
+})
+
+// ====================================================================
 // START: Base64
 
+/**
+ * Encode/Decode Base64 string
+ *
+ * created by: Evan Wills
+ * created: 2021-03-19
+ *
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
 function base64 (input, _extraInputs, _GETvars) {
-  if (_extraInputs.mode() === 'true') {
+  if (extraInputs.mode() === 'true') {
     console.log('Base64 encoding')
     return window.btoa(input)
   } else {
@@ -953,10 +870,10 @@ doStuff.register({
   id: 'Base64',
   description: 'Encode/Decode Base64 string',
   func: base64,
-  // group: 'it',
+  // group: '',
   // ignore: true,
   name: 'Base64 encode/decode',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'mode',
       label: 'Encode/Decode mode',
@@ -986,13 +903,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2020-04-09
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -1017,195 +937,13 @@ doStuff.register({
   func: commaSepThousand,
   description: '',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false,
   name: 'Comma separated thousands'
 })
 
 //  END: Comma separated thousands
-// ====================================================================
-// START: Format handbook policy
-
-/**
- * Action description goes here
- *
- * created by: Evan Wills
- * created: 2020-04-09
- *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
- *
- * @returns {string} modified version user input
- */
-const formatHandbookPolicy = (input, _extraInputs, _GETvars) => {
-  // let currentHeading = 0
-  let depth = 0
-  // let openSections = 0
-  // let closeSections = 0
-  let output = input
-  // const knownIDs = []
-
-  /**
-   * Convert heading text to a human readable ID attribute
-   *
-   * @param {string} input
-   *
-   * @returns {string} HTML 4.0 safe full id attribute string
-   */
-  // function makeID (_input) {
-  //   let _output = _input.trim()
-  //   let tmp = ''
-  //   let a = 0
-
-  //   // clean up heading text to make it ID safe (and human readable)
-  //   _output = _output.toLowerCase()
-  //   _output = _output.replace(/[^a-z0-9_-]+/g, '-') // strip undesirable chars
-  //   _output = _output.replace(/-+_+-+/g, '_') // strip bad join combos
-  //   _output = _output.replace(/_+-+_+/g, '-') // strip bad join combos
-
-  //   // Handle duplicate IDs
-  //   tmp = _output
-  //   while (knownIDs.indexOf(tmp) > -1) {
-  //     tmp = _output + '__' + a // possible unique ID
-  //     a += 1
-  //   }
-
-  //   // Make sure we have a unique ID
-  //   _output = (tmp !== _output) ? tmp : _output
-
-  //   // Add the unique ID to the list of all IDs on the page
-  //   knownIDs.push(_output)
-
-  //   // send a complete ID attribute back
-  //   return ' id="' + _output + '"'
-  // }
-
-  /**
-   * Prefix SECTION tags to H tags
-   *
-   * @param {string} whole
-   * @param {string} hNum
-   * @param {string} headingText
-   *
-   * @returns {string}
-   */
-  // const wrapSection = (whole, hNum, headingText) => {
-  //   let id = makeID(headingText)
-  //   let sectionTags = ''
-
-  //   if (hNum > currentHeading) {
-  //     // Deeper level heading
-  //     hNum = currentHeading
-  //     openSections = hNum - currentHeading // In a well structured document this will always be 1
-  //     depth += openSections
-
-  //     for (let a = 0; a < depth; a += 1) {
-  //       sectionTags = '<section' + id + '>' + sectionTags
-  //       id = ''
-  //     }
-  //   } else if (hNum < currentHeading) {
-  //     // Shallower level heading
-  //     hNum = currentHeading
-  //     closeSections = currentHeading - hNum // In a well structured document this will always be 1
-  //     depth -= closeSections
-
-  //     for (let a = 0; a < depth; a += 1) {
-  //       sectionTags += '</section>'
-  //     }
-  //     sectionTags += '<section' + id + '>'
-  //   } else {
-  //     // Same level heading
-  //     sectionTags = '</section><section' + id + '>'
-  //   }
-  //   return sectionTags + whole
-  // }
-
-  function listClasses (whole, close, tag, attrs) {
-    const isOpen = close !== '/'
-    const listClasses = {
-      1: 'list-alpha',
-      2: 'list-roman',
-      3: 'list-decimal',
-      4: 'list-alpha',
-      5: 'list-roman',
-      6: 'list-decimal',
-      7: 'list-alpha',
-      8: 'list-roman',
-      9: 'list-decimal'
-    }
-
-    // console.group('listClasses()')
-    // console.log('whole:', whole)
-    // console.log('close:', close)
-    // console.log('tag:', tag)
-    // console.log('attrs:', attrs)
-
-    if (tag === 'li') {
-      // strip styles from list items.
-      // console.log('List item')
-      // console.groupEnd()
-      return '<' + close + tag + attrs.replace(/\s+style="[^"]*"/ig, '') + '>'
-    } else {
-      // console.log('Ordered list')
-      // console.log('depth:', depth)
-      // console.log('isOpen:', isOpen)
-      depth = (isOpen) ? depth + 1 : depth - 1
-      // console.log('depth:', depth)
-    }
-    // console.log('typeof listClasses[' + depth + ']:', typeof listClasses[depth])
-
-    if (isOpen && typeof listClasses[depth] === 'string') {
-      console.groupEnd()
-      return '<' + close + tag + ' class="' + listClasses[depth] + '"' + attrs.replace(/\s+(?:class|style|type)="[^"]*"/ig, '') + '>'
-    } else {
-      console.groupEnd()
-      return whole
-    }
-  }
-
-  // if (_extraInputs.mods('sections') === true) {
-  //   output = output.replace(/<h([1-6])[^>]*>(.*?)<\/h$1>/ig, wrapSection)
-  // }
-
-  if (_extraInputs.mods('lists') === true) {
-    output = output.replace(/<(\/?)(ol|li)([^>]*)>/ig, listClasses)
-  }
-
-  if (_extraInputs.mods('outerWrap') === true && !output.match('policy-document--ph')) {
-    output = '<div class="policy-document policy-document--ph">\n\n' + output + '\n\n</div>'
-  }
-
-  return output
-}
-
-doStuff.register({
-  id: 'formatHandbookPolicy',
-  func: formatHandbookPolicy,
-  description: '',
-  // docsURL: '',
-  _extraInputs: [
-    {
-      id: 'mods',
-      label: 'Modification options',
-      type: 'checkbox',
-      options: [
-        { value: 'lists', label: 'Set classes on OL tags', default: true },
-        { value: 'outerWrap', label: 'Wrap the whole content in policy document class', default: true }
-        // { value: 'sections', label: 'Wrap headings in sections' }
-      ]
-    }],
-  // group: 'cim',
-  ignore: true,
-  name: 'Format handbook policy'
-})
-
-//  END:  Format handbook policy
 // ====================================================================
 // START: HTML Enchode special chars
 
@@ -1215,13 +953,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2020-04-09
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects text HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the ation
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2183,91 +1924,37 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-08-05
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const tsv2Markdown = (input, _extraInputs, _GETvars) => {
-  const delimChars = {
-    '\\n': '\n',
-    '\\t': '\t',
-    '\\r': '\r'
-  }
+const tsv2Markdown = (input, extraInputs, _GETvars) => {
   const lengths = []
-  const colDelim = (typeof delimChars[_extraInputs.column()] === 'string')
-    ? delimChars[_extraInputs.column()]
-    : _extraInputs.column()
-  const rowDelim = (typeof delimChars[_extraInputs.row()] === 'string')
-    ? delimChars[_extraInputs.row()]
-    : _extraInputs.row()
   // const colDelim = '\t'
   // const rowDelim = '\n'
-  let tmp = input.trim()
-  let output = ''
-  let sep = ''
-  const centre = _extraInputs.options('centre')
-  const confluence = _extraInputs.options('confluence')
-  const toBoolStr = getBool2str(_extraInputs.convertBool())
-  // const centre = false
-  // const confluence = false
-  // const toBoolStr = false
+  // let tmp = input.trim()
+  // let output = ''
+  // let sep = ''
+  // const centre =
+  // const confluence =
 
-  tmp = input.split(rowDelim)
-
-  for (let a = 0; a < tmp.length; a += 1) {
-    tmp[a] = tmp[a].trim()
-
-    if (tmp[a] === '') {
-      tmp.pop()
-    } else {
-      tmp[a] = tmp[a].split(colDelim)
-
-      for (let b = 0; b < tmp[a].length; b += 1) {
-        tmp[a][b] = tmp[a][b].trim()
-
-        const len = tmp[a][b].length
-        if (typeof lengths[b] === 'undefined' || len > lengths[b]) {
-          lengths[b] = len
-        }
-      }
-    }
-  }
-
-  const c = tmp[0].length
-
-  const headPipe = (confluence) ? '||' : ' |'
-  const lengthMod = (confluence) ? 1 : 0
-
-  for (let a = 0; a < c; a += 1) {
-    output += headPipe + padStr(tmp[0][a], lengths[a], ' ', true)
-    sep += '|' + padStr('', lengths[a] + lengthMod, '-')
-  }
-
-  output += headPipe + '\n'
-  if (confluence === false) {
-    output += sep + '|\n'
-  }
-
-  for (let a = 1; a < tmp.length; a += 1) {
-    for (let b = 0; b < c; b += 1) {
-      // make sure we at least have an empty string for this cell
-      tmp[a][b] = (isStrNum(tmp[a][b]))
-        ? tmp[a][b]
-        : ''
-
-      const _centre = (b > 0) ? centre : false
-      output += '|' + padStr(toBoolStr(tmp[a][b]), lengths[b] + lengthMod, ' ', _centre)
-    }
-    output += '|\n'
-  }
-
-  return output
+  return toMdTable(
+    input,
+    extraInputs.column(),
+    extraInputs.row(),
+    (extraInputs.options('centre') === true) ? 'c' : 'r',
+    extraInputs.convertBool(),
+    extraInputs.options('confluence')
+  );
 }
 
 doStuff.register({
@@ -2324,13 +2011,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-08-05
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2383,7 +2073,7 @@ doStuff.register({
   func: markdown2tsv,
   description: 'Convert Markdown formatted table to TSV data that can be pasted directly into Excel.<br />(Also works for terminal/CLI SQL query results)',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false,
   // inputLabel: '',
@@ -2438,13 +2128,16 @@ const encodeMap = (input) => {
  * created by: Evan Wills
  * created: 2021-06-30
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2469,8 +2162,8 @@ doStuff.register({
   func: degoogle,
   description: '',
   // docsURL: '',
-  _extraInputs: [],
-  // group: 'evan',
+  extraInputs: [],
+  // group: '',
   ignore: false,
   // inputLabel: '',
   name: 'De-Google URL'
@@ -2488,13 +2181,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-10-28
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2507,7 +2203,7 @@ doStuff.register({
   func: stripLines,
   description: 'Strip lines breaks from text so it can be used in CSV/TSV',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false,
   // inputLabel: '',
@@ -2529,13 +2225,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-11-23
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2572,7 +2271,7 @@ doStuff.register({
   func: posix2pcre,
   description: 'Convert a PCRE regular expression to POSIX and vice versa',
   // docsURL: '',
-  _extraInputs: [
+  extraInputs: [
     // {
     //   id: 'direction',
     //   label: 'Conversion direction',
@@ -2601,27 +2300,30 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-11-24
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input       User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const truncateText = (input, _extraInputs, _GETvars) => {
-  const count = (isNumber(_extraInputs.count()))
-    ? _extraInputs.count()
+const truncateText = (input, extraInputs, _GETvars) => {
+  const count = (isNumber(extraInputs.count()))
+    ? extraInputs.count()
     : 250
 
-  const mode1 = (isNonEmptyStr(_extraInputs.mode1()))
-    ? _extraInputs.mode1()
+  const mode1 = (isNonEmptyStr(extraInputs.mode1()))
+    ? extraInputs.mode1()
     : 'char'
 
-  const mode2 = (isNonEmptyStr(_extraInputs.mode2()))
-    ? _extraInputs.mode2()
+  const mode2 = (isNonEmptyStr(extraInputs.mode2()))
+    ? extraInputs.mode2()
     : 'sentence'
 
   // Convert multiple consecutive white-space characters into a
@@ -2673,7 +2375,7 @@ doStuff.register({
   func: truncateText,
   description: 'Truncate text by character count then trim incomplete tail',
   // docsURL: '',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'mode1',
       label: 'Truncation by',
@@ -2722,13 +2424,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2021-12-03
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -2853,7 +2558,7 @@ doStuff.register({
   func: convert2kwds,
   description: 'Makes sure that all the characters in the text are normal English characters, Build a list of comma separated words from the input text, strip out words that are duplicated, that are less than 3 characters or are common english language words.',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false
   // inputLabel: '',
@@ -3000,32 +2705,35 @@ const _decimal2hex = (values) => {
  * created by: Evan Wills
  * created: 2022-04-04
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} _input      User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const acuFrontEndHelper = (input, _extraInputs, _GETvars) => {
-  const _colour = decodeURI(_extraInputs.colour())
+const colourConverter = (_input, extraInputs, _GETvars) => {
+  const _colour = decodeURI(extraInputs.colour())
   let _sep = ''
 
   console.group('colourConverter()')
-  console.log('_extraInputs.colour():', _extraInputs.colour())
-  console.log('_extraInputs.pixels():', _extraInputs.pixels())
+  console.log('extraInputs.colour():', extraInputs.colour())
+  console.log('extraInputs.pixels():', extraInputs.pixels())
   if (_colour !== '') {
     console.group('colourConverter() (colour')
     const _rgbRegex = /rgba?\(\s*([0-9]+),\s*([0-9]+),\s*([0-9]+)(?:,\s*([.0-9]+))?\s*\)/i
     const _hexRegex = /#?([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})([0-9a-f]{1,2})?/i
     let _rgb = true
-    let _tmp = _extraInputs.colour().trim().match(_rgbRegex)
+    let _tmp = extraInputs.colour().trim().match(_rgbRegex)
 
     if (_tmp === null) {
-      _tmp = _extraInputs.colour().trim().match(_hexRegex)
+      _tmp = extraInputs.colour().trim().match(_hexRegex)
       _rgb = false
     }
     console.log('_tmp:', _tmp)
@@ -3082,7 +2790,7 @@ const acuFrontEndHelper = (input, _extraInputs, _GETvars) => {
 
       console.groupEnd()
       console.groupEnd()
-      return 'Original: ' + _extraInputs.colour() + '\n\n' +
+      return 'Original: ' + extraInputs.colour() + '\n\n' +
              '          HEX: #' + _hexValues.r + _hexValues.g + _hexValues.b + _he + '\n' +
              '  HEX (Alpha): #' + _hexValues.r + _hexValues.g + _hexValues.b + _hexValues.a + _a + ';\n\n' +
              '          RGB:  rgb(' + _values.r + ', ' + _values.g + ', ' + _values.b + ');\n' +
@@ -3091,17 +2799,20 @@ const acuFrontEndHelper = (input, _extraInputs, _GETvars) => {
     }
     console.groupEnd()
   } else {
-    console.group('colourConverter() (px)')
-    console.log('_extraInputs.pixels():', _extraInputs.pixels())
-    console.log('_extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', _extraInputs.pixels())
-    const _px = _extraInputs.pixels().replace(/[^-0-9.]+/g, '')
-    console.log('isNumeric(' + _px + '):', isNumeric(_px))
+    // console.group('colourConverter() (px)')
+    // console.log('extraInputs.pixels():', extraInputs.pixels())
+    // console.log('extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', extraInputs.pixels())
+    
+    const _px = extraInputs.pixels().replace(/[^-0-9.]+/g, '')
+    
+    // console.log('isNumeric(' + _px + '):', isNumeric(_px))
+    
     if (isNumeric(_px)) {
       let _output = '\n                 REMs: ' + _px / 16 + 'rem'
 
-      console.log('_px / 16:', _px / 16)
+      // console.log('_px / 16:', _px / 16)
       const _matchVars = _pxVars.filter(item => item.px == _px)
-      console.log('_matchVars:', _matchVars)
+      // console.log('_matchVars:', _matchVars)
       _sep = ' $'
       if (_matchVars.length > 0) {
         _output += '\n\nMedia query variables:'
@@ -3109,24 +2820,25 @@ const acuFrontEndHelper = (input, _extraInputs, _GETvars) => {
           _output += _sep + _matchVars[0].v[a]
           _sep = '\n                       $'
         }
-        console.groupEnd()
+        // console.groupEnd()
       }
       return _output
     }
-    console.groupEnd()
+    // console.groupEnd()
   }
-  console.groupEnd()
+  
+  // console.groupEnd()
   return ''
 }
 
 doStuff.register({
-  id: 'acuFrontEndHelper',
-  name: 'ACU front end helper',
-  func: acuFrontEndHelper,
+  id: 'colourConverter',
+  name: 'Colour type converter',
+  func: colourConverter,
   description: 'Convert colour values to other colour formats (and find SASS variable) or convert pixel value to REMs (and find SASS variable)<br /><br />To check colours, enter a colour value into the "Colour value" field & click the "MODIFY" button (bottom left of window)<br /><br />To check pixel values, enter a pixel value into the "Pixel value" field and click MODIFY. Pixel value will be converted to REMS and (if possible) a sass variable will also be shown',
   inputLabel: 'Output',
   // docsURL: '',
-  _extraInputs: [
+  extraInputs: [
     {
       id: 'colour',
       label: 'Colour value',
@@ -3140,7 +2852,7 @@ doStuff.register({
       description: 'Convert pixel value to REMs'
     }
   ],
-  group: 'it',
+  group: '',
   ignore: false
   // inputLabel: '',
   // remote: false,
@@ -3160,13 +2872,16 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2022-06-11
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
@@ -3198,7 +2913,7 @@ doStuff.register({
   func: unixTimestamp,
   description: 'Get current timestamp or Timestamp for specified ISO 8601 date<br /><br /><strong>NOTE:</strong> Multiple date/time strings can be parsed (separated by new line)',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false
   // inputLabel: '',
@@ -3217,7 +2932,7 @@ const hexToIntInner = (input) => {
     : parseInt(input);
 }
 const hexToInt = (input) => {
-  const tmp = input.split('')
+  const tmp = input.toLowerCase().split('')
 
   const a = hexToIntInner(tmp[0]) * 16
   const b = (typeof tmp[1] === 'string')
@@ -3278,18 +2993,21 @@ const intToHex = (input) => {
  * created by: Evan Wills
  * created: 2022-06-14
  *
- * @param {string} input user supplied content (expects HTML code)
- * @param {object} _extraInputs all the values from "extra" form
- *               fields specified when registering the ation
- * @param {object} _GETvars all the GET variables from the URL as
- *               key/value pairs
- *               NOTE: numeric strings are converted to numbers and
- *                     "true" & "false" are converted to booleans
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
  *
  * @returns {string} modified version user input
  */
 const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
-  const regex = /^^(?:(?:rgba?\(\s*)?([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:(?:,\s*|\s+)(1|0?.[0-9]{1,5}))?(?:\s*\))|#(?:([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?|([a-f0-9])([a-f0-9])([a-f0-9])))$/i
+  const regex = /^(?:(?:rgba?\(\s*)?([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:,\s*|\s+)([0-9]{1,3})(?:(?:,\s*|\s+)([0-9.]{1,6}%|1|0?.[0-9]{1,5}))?(?:\s*\))|#(?:([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?|([a-f0-9])([a-f0-9])([a-f0-9])))$/i
 
   // const dummy = '#ed0c00\nrgb(204, 204, 204)\n#abc\nrgba(123,46,89,0.5)'
   // const through = dummy.trim().split('\n')
@@ -3318,7 +3036,12 @@ const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
         g = parseInt(tmp[2])
         b = parseInt(tmp[3])
         if (typeof tmp[4] === 'string') {
-          a = parseFloat(tmp[4])
+          if (tmp[4].match(/^[0-9.]+%$/)) {
+            a = parseFloat(tmp[4].replace(/%$/, '')) / 100
+          } else {
+            a = parseFloat(tmp[4])
+          }
+
           a = (a > 1)
             ? 1
             : (a < 0)
@@ -3332,8 +3055,9 @@ const colourSyntaxConverter = (input, __extraInputs, __GETvars) => {
         r = hexToInt(tmp[5])
         g = hexToInt(tmp[6])
         b = hexToInt(tmp[7])
+
         if (typeof tmp[8] === 'string') {
-          a = tmp[8]
+          a = Math.round((hexToInt(tmp[8]) / 255) * 1000) / 1000
         }
       } else if (typeof tmp[9] === 'string') {
         mode = 'hex'
@@ -3389,7 +3113,7 @@ doStuff.register({
   func: colourSyntaxConverter,
   description: 'Convert colour values from one syntax to another',
   // docsURL: '',
-  _extraInputs: [],
+  extraInputs: [],
   // group: '',
   ignore: false
   // inputLabel: '',
@@ -3407,20 +3131,20 @@ doStuff.register({
  * created by: Evan Wills
  * created: 2023-03-16
  *
- * @param {string} input       user supplied content
+ * @param {string} input       User supplied content
  *                             (expects text HTML code)
- * @param {object} extraInputs all the values from "extra" form
+ * @param {object} extraInputs All the values from "extra" form
  *                             fields specified when registering
- *                             the ation
- * @param {object} GETvars     all the GET variables from the URL as
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
  *                             key/value pairs
- *                             NOTE: numeric strings are converted
+ *                             NOTE: Numeric strings are converted
  *                                   to numbers and "true" & "false"
  *                                   are converted to booleans
  *
  * @returns {string} modified version user input
  */
-const px2rem = (input, extraInputs, GETvars) => {
+const px2rem = (input, extraInputs, _GETvars) => {
   const basePX = (extraInputs.base() !== '')
     ? parseInt(extraInputs.base())
     : 16;
@@ -3452,6 +3176,925 @@ doStuff.register({
     default: 16,
     type: 'number'
   }],
+  ignore: false
+})
+
+//  END:  Pixels to REMs
+// ====================================================================
+// START: Element props to MD
+
+/**
+ * Convert Vue element prop docuemntation to markdown for README
+ *
+ * created by: Evan Wills
+ * created: 2023-05-22
+ *
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const elPropsToMD = (input, _extraInputs, _GETvars) => {
+  const regex = /(?<=^|,)[\r\n ]*\/\*\*[\r\n ]+(?<desc>\*.*?)(?:[\r\n ]+\* )+@property.*?\*\/[\r\n ]*(?<prop>[a-z0-9]+): \{(?: (?<key1>[a-z]+): (?<val1>[^,}]+))(?:, (?<key2>[a-z]+): (?<val2>[^,}]+))?(?:, (?<key3>[a-z]+): (?<val3>[^,}]+))?/isg;
+  // const _input = tmp;
+  let output = '';
+  let matches;
+
+  while ((matches = regex.exec(input)) !== null) {
+    const desc = matches.groups.desc.replace(/(?<=^|[\r\n]) *\*/g, '').replace(/(?<=[\r\n]) *\* *(?=[\r\n]+|$)/, '\n').replace(/(?<=^|[r\n]) +/g, '');
+    const prop = matches.groups.prop.trim();
+    const attr = camel2kebab(prop)
+    let type = ''
+    let required = false;
+    let _default = undefined;
+
+    for (let a = 3; a < matches.length; a += 2) {
+      const b = a + 1;
+      if (typeof matches[a] !== 'undefined') {
+        const key = matches[a].trim()
+        const val = matches[b].trim().replace(/^' *| *'$/g, '')
+
+        switch (matches[a]) {
+          case 'type':
+            type = val.toLowerCase();
+            break;
+
+          case 'required':
+            console.log('val === \'true\':', val === 'true');
+            required = (val === 'true')
+              ? '_required_'
+              : '_optional_'
+            break;
+
+          case 'default':
+            console.log('val === "\'\'":', val === "''");
+            _default = (val === "''")
+              ? ''
+              : val
+            console.log('_default:', _default);
+        }
+      }
+    }
+
+    if (typeof _default !== 'undefined') {
+      if (type === 'boolean') {
+        _default = (_default === true)
+          ? '`TRUE`'
+          : '`FALSE`';
+      } else if (type === 'number') {
+        _default = `\`${_default}\``;
+      } else if (type === 'string') {
+        _default = (_default === '')
+          ? '"" (empty)'
+          : `\`"${_default}"\``;
+      }
+    } else {
+      _default = '_no default_';
+    }
+
+    const TSV = 'Required\tType\tDefault\tVariable Name\n' +
+                required + '\t_{' + type + '}_\t' + _default + '\t`props.' + prop + '`'
+
+    output += `\n\n### \`${attr}\`\n\n${toMdTable(TSV, '\\t', '\\n', 'c')}\n${desc}\n`;
+
+  }
+
+  return output
+}
+
+doStuff.register({
+  id: 'elPropsToMD',
+  name: 'Vue element props to MD',
+  func: elPropsToMD,
+  description: 'Convert Vue element prop docuemntation to markdown for README',
+  extraInputs: [],
+  ignore: false
+})
+
+//  END:  Element props to MD
+// ====================================================================
+// START: Strip comments and excess lines
+
+const lineCount = (input) => input.split(/\n/).length
+
+/**
+ * Strip JS and/or PHP comments and excess lines from a file
+ *
+ * created by: Evan Wills
+ * created: 2023-05-30
+ *
+ * @param {string} input       User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const stripComments = (input, extraInputs, _GETvars) => {
+  const reportMode = extraInputs.report();
+  const tmp = input.replace(/(?:\r\n|\n|\r)/, '\n')
+  const sep = (reportMode > 1)
+    ? '// '
+    : ''
+  const after = {}
+
+  let output  = tmp.replace(/(?:^|\n)[\t ]*\/\*\*.*?\*\//isg, '') // strip multi line comments
+  after.docBlocks = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*\/\*.*?\*\//isg, '') // strip multi line comments
+  after.multiLineCmnts = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*\/\/.*(?=[\r\n])/ig, ''); // strip single line comments
+  after.singleLineCmnts = lineCount(output)
+
+  output = output.replace(/(?:^|\n)[\t ]*console\.(?:log|group(?:End)?|warn|info)\(.*?\)(?=;|[\r\n]|$)/isg, '')
+  after.consoles = lineCount(output)
+
+  output = output.replace(/[\t ]+(?=\n)/ig, ''). // strip trailing white space
+                  replace(/\n+/ig, '\n'); // strip multiple blank lines
+  after.blankLines = lineCount(output)
+
+  const totalLines = tmp.split(/\n/).length
+  const docBlockCmnt = tmp.split(/\/\*\*.*?\*\//s).length
+  const multiLineCmnt = tmp.split(/\/\*.*?\*\//s).length - docBlockCmnt
+  const singleLineCmnt = tmp.split(/\/\/.*(?=[\r\n])/).length
+  const consoleLogs = tmp.split(/console\.(?:log|group|warn|info)/i).length
+  const blankLines = tmp.split(/(?<=^|\n)[\t ]*(?=\n|$)/).length
+
+ // strip multi line comments
+
+  const beforeH = humanNumbers(totalLines.toString())
+  const len = beforeH.length
+
+  let report = '';
+
+  if (reportMode > 1) {
+    report = output;
+  }
+
+  if (reportMode == 2) {
+    report += '\n\n// ------------------------------------------------------------\n\n';
+  }
+
+  if (reportMode < 3) {
+    report +=     `${sep}Original size:                      ${beforeH} lines`
+    report +=   `\n${sep}After strip - doc block comments:   ` +
+                  `${padStrLeft(humanNumbers(after.docBlocks.toString()), len)} ` +
+                  `lines (${docBlockCmnt})`
+
+    report +=   `\n${sep}After strip - multi-line comments:  ` +
+                  `${padStrLeft(humanNumbers(after.multiLineCmnts.toString()), len)} ` +
+                  `lines (${multiLineCmnt})`
+
+    report +=   `\n${sep}After strip - single line comments: ` +
+                  `${padStrLeft(humanNumbers(after.singleLineCmnts.toString()), len)} ` +
+                  `lines (${singleLineCmnt})`
+
+    report +=   `\n${sep}After strip - console logs:         ` +
+                  `${padStrLeft(humanNumbers(after.consoles.toString()), len)} ` +
+                  `lines (${consoleLogs})`
+
+    report +=   `\n${sep}After strip - blank lines:          ` +
+                  `${padStrLeft(humanNumbers(after.blankLines.toString()), len)} ` +
+                  `lines (${blankLines})`
+
+    report += `\n\n${sep}Comments:                           ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.singleLineCmnts).toString()), len)} ` +
+                  `lines ` +
+                  `(${(Math.round((1 - (after.singleLineCmnts / totalLines)) * 10000) / 100)}%)`;
+
+    report +=   `\n${sep}Blank lines:                        ` +
+                  `${padStrLeft(humanNumbers((after.singleLineCmnts - after.blankLines).toString()), len)} ` +
+                  `lines ` +
+                  `(${(Math.round((((after.singleLineCmnts - after.blankLines) / totalLines)) * 10000) / 100)}%)`;
+
+    report +=   `\n${sep}Comments & blank lines:             ` +
+                  `${padStrLeft(humanNumbers((totalLines - after.blankLines).toString()), len)} ` +
+                  `lines ` +
+                  `(${(Math.round((1 - (after.blankLines / totalLines)) * 10000) / 100)}%)`
+  }
+
+  return report;
+}
+
+doStuff.register({
+  id: 'stripComments',
+  name: 'Strip JS and/or PHP comments and excess lines from a file',
+  func: stripComments,
+  description: '<p>Reports on:</p><ul><li>Original line count</li>' +
+               '<li>Line count after cleanup</li>' +
+               '<li>Number of lines removed</li>' +
+               '<li>Percentage of lines removed</li></ul>',
+  extraInputs: [{
+    id: 'report',
+    label: 'Output mode',
+    options: [
+      {
+        default: true,
+        label: 'Only show report (not cleaned code)',
+        value: 1
+      },
+      {
+        default: false,
+        label: 'Show both cleaned code AND report',
+        value: 2
+      },
+      {
+        default: false,
+        label: 'Only show cleaned code (not report)',
+        value: 3
+      },
+    ],
+    type: 'radio'
+  }],
+  ignore: false
+})
+
+//  END:  Strip comments and excess lines
+// ====================================================================
+// START: Github MD to Azure DevOps MD
+
+/**
+ * Strip bad chars from headings
+ *
+ * @param {string} whole
+ * @param {string} level
+ * @param {string} head
+ *
+ * @returns {string}
+ */
+const cleanHeading = (_whole, level, head) => {
+  const output = head.replace(/\&/g, 'and').
+                      replace(/[^a-z _-]+/ig, ' ').
+                      replace(/[\t ]+/g, ' ');
+
+  return `${level}${output}`;
+}
+
+/**
+ * Convert Github markdown style code to Azure DevOps markdown style markdown code
+ *
+ * created by: Evan Wills
+ * created: 2023-08-07
+ *
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+export const githubMd2AzureMd = (input, _extraInputs, _GETvars) => {
+  const noH1 = /^[\r\n ]*# [^\r\n]+[\r\n]+/
+  const codeReg = /[\r\n ]+`{3}[a-z]{2,5}(?:[\r\n]+.*?)+[\r\n ]+```[\r\n ]+/igm
+  const hReg = /(?<=[\r\n])#(#+ )([^\r\n]+)(?=[\r\n])/g;
+  const lineReg = /(?<=[^\r\n])[\r\n]( *(?:> +)?)?(?=["_`'a-z0-9(<\[]+|\*[^ ]|\*[^ ])/g;
+  const brRegBefore = /<br ?\/?> *[\r\n]+( +)/g;
+  const brRegAfter = /\[\[BR:( +)\]\]/g;
+  const codeBlocks = {};
+  const keys = [];
+
+  let output = input;
+  let match = null;
+  let a = 0;
+
+  // Strip out the code blocks
+  while ((match = codeReg.exec(output)) !== null) {
+    const key = `[[CODE_BLOCK_${a}]]`;
+    keys.push(key)
+    codeBlocks[key] = match[0];
+    output = output.replace(match[0], key);
+    a += 1;
+  }
+
+  // Do the main cleaning.
+  output = output.replace(noH1, '')
+              .replace(hReg, cleanHeading)
+              .replace(brRegBefore, '[[BR:$1]]')
+              .replace(lineReg, ' ')
+              .replace(brRegAfter, '\n$1')
+              .replace(/[\t ]+(?=[\r\n])/g, '');
+
+  // re-add the stripped code blocks.
+  for (let a = 0; a < keys.length; a += 1) {
+    output = output.replace(keys[a], codeBlocks[keys[a]]);
+  }
+
+  return output;
+}
+
+doStuff.register({
+  id: 'githubMd2AzureMd',
+  name: 'Github MD to Azure DevOps MD',
+  func: githubMd2AzureMd,
+  description: 'Convert Github markdown style code to Azure DevOps markdown style markdown code',
+  extraInputs: [],
+  ignore: false
+})
+
+//  END:  Github MD to Azure DevOps MD
+// ====================================================================
+// START: Base64 decode within compressed JS
+
+/**
+ * Convert Base64 encoded data within a JavaScript file to it's
+ * original content
+ *
+ * created by: Evan Wills
+ * created: 2023-08-21
+ *
+ * @param {string} input        User supplied content
+ *                              (expects HTML code)
+ * @param {object} _extraInputs All the values from "extra" form
+ *                              fields specified when registering
+ *                              the action
+ * @param {object} _GETvars     All the GET variables from the URL as
+ *                              key/value pairs
+ *                              NOTE: Numeric strings are converted
+ *                                    to numbers and "true" & "false"
+ *                                    are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+export const base64decodeInJS = (input, _extraInputs, _GETvars) => {
+  const regex = /(?<=;base64,)((?:[^\r\n\/=]+[\/[\r\n]+)*[^\r\n\/=]+=*)(?=\\n)/igsm
+
+  return input.replace(regex, (_whole, data) => window.atob(data));
+}
+
+doStuff.register({
+  id: 'base64decodeInJS',
+  name: 'Base64 decode within compressed JS',
+  func: base64decodeInJS,
+  description: 'Convert Base64 encoded data within a JavaScript file to it\'s original content',
+  extraInputs: [],
+  ignore: false
+})
+
+//  END:  Base64 decode within compressed JS
+// ====================================================================
+// START: Vue 3 upgrade transforms
+
+const vue3imports = '\n/* eslint vue/multi-word-component-names: off */\n' +
+                    'import {\n  // computed,\n  ' +
+                    '// defineEmits,\n  // defineProps,\n  // defineSlots,\n  ' +
+                    '// onBeforeMount,\n  // onMounted,\n  // onUpdated,\n  ' +
+                    '// ref,\n  // useSlots,\n  // useStore,\n} from \'vue\';\n\n';
+
+const listThisVars = (type, varlist) => {
+  const sep = '\n// -------\n';
+  return `${sep}// -- ${type}: --\n//      ${varlist.join(', ')}${sep}`;
+};
+
+const extractThisVars = (code) => {
+  const regex = /\n\/\/\ -------\n\/\/ -- [^:]+: --\n\/\/ {6}([^\r\n]+)\n\/\/\ -------\n/i
+  const output = {
+    code: code,
+    vars: '',
+  };
+  let matches = [];
+
+  if ((matches = code.match(regex)) !== null) {
+    output.vars = matches[1];
+    output.code = code.replace(matches[0], '\n');
+  }
+
+  return output;
+}
+
+const fixVars = (vars) => {
+  console.group('fixProps()');
+  console.log('vars:', vars);
+  if (vars !== '') {
+    let _vars = vars.split(', ');
+    _vars = _vars.join('|');
+    console.log('_vars:', _vars);
+    const regex = new RegExp(`this\.(${_vars})`, 'ig');
+    console.log('regex:', regex);
+
+    console.groupEnd();
+    return (input) => input.replace(regex, '$1.value');
+  }
+
+  console.groupEnd();
+  return (input) => input;
+}
+
+const fixProps = (props) => {
+  console.group('fixProps()');
+  console.log('props:', props);
+  if (props !== '') {
+    let _props = props.split(', ');
+    _props = _props.join('|');
+    console.log('_props:', _props);
+    const regex = new RegExp(`this\.(${_props})`, 'ig');
+    console.log('regex:', regex);
+    console.groupEnd();
+    return (input) => input.replace(regex, 'props.$1');
+  }
+  console.groupEnd();
+
+  return (input) => input;
+}
+
+const getCleaner = (props, vars) => {
+  const _props = fixProps(props);
+  const _vars = fixVars(vars);
+
+  return (input) => {
+    const output = _props(_vars(input));
+
+    return output.replace(/this\./g, '');
+  }
+}
+
+/**
+ * Transform emit listing code for Vue 2 component to Vue 3 compatible code
+ *
+ * @param {string} input Vue 2 component code for emitted events
+ *
+ * @returns {string} Vue 3 compatible code for emitted events
+ */
+const upgradeVue3emit = (input) => {
+  const output = input.replace(/^[^\[+]+(\[[^\]]*\]).*$/ism, '$1');
+  return `const emit = defineEmits(${output});`;
+};
+
+/**
+ * Transform props code for Vue 2 component to Vue 3 compatible props
+ *
+ * @param {string} input Vue 2 component code for props
+ *
+ * @returns {string} Vue 3 compatible code for props
+ */
+const upgradeVue3props = (input) => {
+  let output = input.trim();
+
+  output = output.replace(/^[^\{]*(?=\{)/ism, '');
+  output = output.replace(/,$/s, '');
+  output = output.replace(/ {4}/g, '  ');
+  output = output.replace(/ +(?=\}$)/, '');
+
+  const propList = [];
+  let matches;
+  const regex = /(?<=^|[\r\n]) +([_a-z0-9]+): [^,]+,/ig;
+  let a = 0;
+
+  while ((matches = regex.exec(output)) !== null) {
+    a += 1;
+    console.log('matches:', matches);
+    if (propList.indexOf(matches[1]) === -1) {
+      propList.push(matches[1]);
+    }
+
+    if (a > 100) {
+      break;
+    }
+  }
+
+  return `const props = defineProps(${output});\n` +
+    listThisVars('Props', propList);
+};
+
+/**
+ * Rewrite emit calls for Vue 3
+ *
+ * @param {string} input  Vue 2 component code
+ * @param {number} spaces The number of leading spaces to be removed
+ *
+ * @returns {string} Vue 3 compatible code
+ */
+const methodPrepInner = (input, spaces = 4) => {
+  let output = input.trim().replace(/\},$/, '');
+
+  output += '\r\n/**';
+  output = output.replace(/^(?:computed|methods): \{[\r\n]+/i, '');
+  output = output.replace(/},$/i, '');
+
+  switch (spaces) {
+    case 2:
+      output = output.replace(/(?<=^|[\r\n])  /g, '');
+      break;
+    case 6:
+      output = output.replace(/(?<=^|[\r\n])      /g, '');
+      break;
+    default: // 4
+      console.log('spaces:', spaces);
+      console.log('stripping four spaces:');
+      output = output.replace(/(?<=^|[\r\n])    /g, '');
+      break;
+  }
+
+  return output.replace(/this\.\$emit/g, 'emit');
+};
+
+/**
+ * Transform method code from Vue 2 to Vue 3 compatible code.
+ *
+ * @param {string}   input    Vue 2 component code
+ * @param {function} callback Callback function to transform to Vue
+ *                            3 code
+ * @param {number}   spaces   The number of leading spaces to be
+ *
+ * @returns {string} Vue 3 compatible code
+ */
+const medthodPrep = (input, callback, spaces = 4) => {
+  let output = methodPrepInner(`${input}\n\n  updated()`, spaces);
+
+  return output.replace(
+    /(\/\*\*.*?\*\/)?[\r\n\t ]*([_a-z0-9]+(?=\())(\([^)]*\))(.*?\},)/igsm,
+    callback,
+  );
+}
+
+/**
+ * Transform individual computed property methods to Vue 3 format
+ *
+ * @param {string} _whole      Whole string match.
+ * @param {string} docBlock    DocBlock for computed property
+ * @param {string} methodName  Name of computed property
+ * @param {string} methodProps Parameters/arguments for computed
+ *                             property (usually empty)
+ * @param {string} methodBody  Computed property method contents
+ *
+ * @returns {string} Vue 3 compatible code for computed properties.
+ */
+const upgradeVue3computed = (_whole, docBlock, methodName, methodProps, methodBody) => {
+  const _methBod = methodBody.trim().replace(/,$/, '');
+  const _docBlock = (typeof docBlock === 'string')
+    ? `${docBlock}\n`
+    : '';
+
+  return `\n${_docBlock}const ${methodName} = computed(${methodProps} => ${_methBod});\n`;
+};
+
+/**
+ * Transform individual local method methods to Vue 3 format
+ *
+ * @param {string} _whole      Whole string match.
+ * @param {string} docBlock    DocBlock for local method
+ * @param {string} methodName  Name of local method
+ * @param {string} methodProps Parameters/arguments for local method
+ * @param {string} methodBody  Local method method contents
+ *
+ * @returns {string} Vue 3 compatible code for local method.
+ */
+const upgradeVue3methods = (_whole, docBlock, methodName, methodProps, methodBody) => {
+  const _methBod = methodBody.trim().replace(/,$/, '');
+  const _docBlock = (typeof docBlock === 'string')
+    ? `${docBlock}\n`
+    : '';
+
+  return `\n${_docBlock}const ${methodName.trim()} = ${methodProps.trim()} => ${_methBod.trim()};\n`;
+};
+
+/**
+ * Transform lifecycle method code for Vue 2 component to Vue 3
+ * compatible code
+ *
+ * @param {string} input Vue 2 component code for lifecycle method
+ *
+ * @returns {string} Vue 3 compatible code for lifecycle method
+ */
+const upgradeVue3lifecycle = (input) => {
+  const lifeMeth = (_whole, methodName, methodBody) => {
+    return `on${ucFirst(methodName)}(() => ${methodBody.trim().replace(/,$/, '};')});`;
+  }
+  let output = methodPrepInner(`${input}\n\n`, 2);
+
+  return output.replace(
+    /(?<=[ \r\n])(?:setup|created)(?=\s*\(\s*\))/i,
+    'beforeMount',
+  ).replace(
+    /(?<=^|[\r\n]) *(before(?:Mount|Update|Unmount)|mounted|updated|setup|created|unmounted|activated|deactivated)\(\) (\{.*?\}),(?=[\r\n ]+)/igsm,
+    lifeMeth,
+  ).replace(/\};[\r\n]+\/\*\*$/, '');
+};
+
+/**
+ * Transform local state code for Vue 2 component to Vue 3
+ * compatible code
+ *
+ * @param {string} input Vue 2 component code for local state
+ *
+ * @returns {string} Vue 3 compatible code for local state
+ */
+const updateVue3LocalState = (input) => {
+  const output = input.replace(
+    /^.*?data\(\) \{[\r\n ]+return \{(.*?)[\r\n ]*\};[\r\n\t ]*\},/igsm,
+    '$1',
+  ).replace(
+    /(?<=^|[\r\n])      /g,
+    ''
+  );
+  const localStateVars = [];
+
+  const localState = (_whole, docBlock, varName, value) => {
+    if (localStateVars.indexOf(varName) === -1) {
+      localStateVars.push(varName);
+    }
+
+    const _docBlock = (typeof docBlock === 'string')
+      ? `${docBlock}\n`
+      : '';
+    return `\n${_docBlock}const ${varName} = ref(${value});`;
+  }
+
+  return output.replace(/(\/\*.*?\*\/)?[\r\n\t ]+([_a-z0-9]+): ([^,]+),/ismg, localState) + `\n${listThisVars('Local state vars', localStateVars)}`;
+}
+
+const updateVue3auto = (input) => {
+  const regex = /(?<=[\r\n\t ])(emits|props|data|computed|methods|before(?:Mount|Update|Unmount)|mounted|updated|setup|created|unmounted|activated|deactivated)[\r\n\t ]*:?[\r\n\t ]*(?:\[|\{|\([\r\n\t ]*\)[\r\n\t ]*\{)(.*?)(?=[\]}],?[\r\n\t ]*(?:<\/script>|emits|props|data|computed|methods|before(?:Mount|Update|Unmount)|mounted|updated|setup|created|unmounted|activated|deactivated|[a-z]+[\r\n\t ]*\())/igs
+  const oldLife = ['created', 'setup'];
+  const normalLife = ['beforeMount', 'beforeUpdate', 'beforeUnmount', 'mounted', 'updated', 'unmounted', 'activated', 'deactivated'];
+
+  const bits = {
+    emits: '',
+    props: '',
+    data: '',
+    computed: '',
+    methods: '',
+    lifeCycle: '',
+  };
+  let matches = [];
+  let output = '';
+  let tmp = '';
+  let start = '\n// --------------------------------------------------\n';
+  const end = start;
+  const imports = [];
+  let cleanup = () => (input) => input
+  const known = {
+    'props': '',
+    'state': '',
+  };
+
+  while ((matches = regex.exec(input)) !== null) {
+    console.group('updateVue3auto() matches');
+    console.log('matches:', matches);
+    console.log('matches[1]:', matches[1]);
+    console.log('matches[2]:', matches[2]);
+
+    if (oldLife.indexOf(matches[1]) > -1) {
+      bits.lifeCycle += `\n  beforeMount() {\n    ${matches[2]}\n  },\n`;
+
+      if (imports.indexOf('onBeforeMount') < 0) {
+        imports.push('onBeforeMount');
+      }
+    } else if (normalLife.indexOf(matches[1]) > -1) {
+      tmp = `on${ucFirst(matches[1])}`;
+      bits.lifeCycle += `\n  ${matches[1]}() {\n    ${matches[2]}\n  },\n`;
+
+      if (imports.indexOf(tmp) < 0) {
+        imports.push(tmp);
+      }
+    } else if (typeof bits[matches[1]] === 'string') {
+      bits[matches[1]] = matches[2];
+
+      if (matches[1] === 'data' && imports.indexOf('ref') < 0) {
+        imports.push('ref');
+      } else if ('emits', 'props') {
+        tmp = `define${ucFirst(matches[1])}`;
+
+        if (imports.indexOf(tmp) < 0) {
+          imports.push(tmp);
+        }
+      }
+    }
+    console.groupEnd();
+  }
+
+  if (bits.computed.includes('mapGetters') || bits.methods.includes('mapActions')) {
+    imports.push('useStore');
+  }
+  if (bits.computed.includes('$slots')
+    || bits.methods.includes('$slots')
+    || bits.lifeCycle.includes('$slots')
+  ) {
+    imports.push('useSots');
+  }
+
+  if (imports.length > 0) {
+    output = '\nimport {';
+    for (let a = 0; a < imports.length; a += 1) {
+      output += `\n  ${imports[a]},`;
+    }
+    output += '\n} from \'vue\';\n';
+  }
+
+  if (bits.emits !== '') {
+    output += start;
+    output += '// START: Event emitters\n\n';
+    output += `const emit = defineEmits([\n${bits.emits},\n]);\n\n`;
+    output += '//  END:  Event emitters';
+    output += end;
+
+    start = '\n';
+  }
+
+  if (bits.props !== '') {
+    tmp = extractThisVars(upgradeVue3props(bits.props));
+    known.props = tmp.vars;
+    output += start;
+    output += '// START: Component properties\n\n';
+    output += tmp.code;
+    output += '\n\n//  END  Component properties';
+    output += end;
+    start = '\n';
+  }
+
+  if (bits.data !== '') {
+    tmp = extractThisVars(updateVue3LocalState(bits.data));
+    known.state = tmp.vars;
+    output += start;
+    output += '// START: Local state\n\n';
+    output += tmp.code;
+    output += '\n\n//  END:  Local state';
+    output += end;
+    start = '\n';
+  }
+
+  cleanup = getCleaner(known.props, known.state);
+
+  if (bits.computed !== '') {
+    output += start;
+    output += '// START: Local state\n\n';
+    output += cleanup(medthodPrep(bits.computed, upgradeVue3computed));
+    output += '\n\n//  END:  Local state';
+    output += end;
+    start = '\n';
+  }
+
+  if (bits.methods !== '') {
+    output += start;
+    output += '// START: Local state\n\n';
+    output += cleanup(medthodPrep(bits.methods, upgradeVue3methods));
+    output += '\n\n//  END:  Local state';
+    output += end;
+    start = '\n';
+  }
+
+  if (bits.lifeCycle !== '') {
+    output += start;
+    output += '// START: Local state\n\n';
+    output += cleanup(upgradeVue3lifecycle(bits.lifeCycle));
+    output += '\n\n//  END:  Local state';
+    output += end;
+    start = '\n';
+  }
+
+  return output;
+}
+
+/**
+ * Vue 3 upgrade transforms
+ *
+ * created by: Evan Wills
+ * created: 2023-10-12
+ *
+ * @param {string} input       User supplied content
+ *                             (expects HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the action
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const upgradeToVue3 = (input, extraInputs, _GETvars) => {
+  let output = '';
+  let type = '';
+  const sep = '\n// --------------------------------------------------\n';
+  const cleanup = getCleaner(extraInputs.props(), extraInputs.vars());
+  let prefix = '';
+
+  switch (extraInputs.what()) {
+    case 'auto':
+      output = updateVue3auto(input);
+      break;
+
+    case 'emit':
+      output = upgradeVue3emit(input);
+      type = 'Emitted events';
+      prefix = vue3imports;
+      break;
+
+    case 'computed':
+      output = cleanup(medthodPrep(
+        input,
+        upgradeVue3computed,
+      ));
+      type = 'Computed properties';
+      break;
+
+    case 'lifecycle':
+      type = 'Lifecycle methods';
+      output = cleanup(upgradeVue3lifecycle(input));
+      break;
+
+    case 'props':
+      type = 'Properties/attributes';
+      output = upgradeVue3props(input);
+      break;
+
+    case 'methods':
+      type = 'Local methods';
+      output = cleanup(medthodPrep(
+        input,
+        upgradeVue3methods,
+      ));
+      break;
+
+    case 'state':
+      type = 'Local state';
+      output = updateVue3LocalState(input);
+      break;
+  }
+
+  return `${prefix}${sep}// START: ${type}\n\n${output.trim()}\n\n//  END:  ${type}${sep}`;
+}
+
+doStuff.register({
+  id: 'upgradeToVue3',
+  name: 'Vue 3 upgrade transforms',
+  func: upgradeToVue3,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'what',
+    label: 'What is being upgraded',
+    options: [
+      {
+        default: true,
+        label: 'Auto',
+        value: 'auto'
+      },
+      {
+        label: 'Emitters',
+        value: 'emit'
+      },
+      {
+        label: 'Props',
+        value: 'props'
+      },
+      {
+        label: 'Local state',
+        value: 'state'
+      },
+      {
+        label: 'Computed props',
+        value: 'computed'
+      },
+      {
+        label: 'Methods',
+        value: 'methods'
+      },
+      {
+        label: 'Lifecycle methods',
+        value: 'lifecycle'
+      },
+    ],
+    type: 'radio'
+  }, {
+    id: 'props',
+    label: 'Known props',
+    type: 'text',
+    // type: 'textarea',
+    description: '',
+    pattern: '',
+    default: ''
+  }, {
+    id: 'vars',
+    label: 'Local state vars',
+    type: 'text',
+    // type: 'textarea',
+    description: '',
+    pattern: '',
+    default: ''
+  }],
   // group: 'evan',
   ignore: false
   // inputLabel: '',
@@ -3459,5 +4102,5 @@ doStuff.register({
   // rawGet: false,
 })
 
-//  END:  Pixels to REMs
+//  END:  Vue 3 upgrade transforms
 // ====================================================================

@@ -1,6 +1,7 @@
 /* jslint browser: true */
 /* global fetch */
 
+import { strPad } from '../utilities/general.mjs'
 import { isIterable, isFunction } from '../utilities/validation.mjs'
 
 /**
@@ -239,4 +240,34 @@ export const getRemoteActionFunc = (config, url) => {
 
   // END remote func
   // ----------------------------------------
+}
+
+
+export const num2TimeStr = (num, decimalPlaces = 3) => {
+  const rem = num % 1;
+  let whole = Math.floor(num);
+  const units = [];
+
+  while (whole > 0) {
+    const tmp = whole / 60;
+    const left = whole % 60;
+    const fl = Math.floor(whole / 60);
+
+    units.push(whole % 60);
+
+    whole = Math.floor(whole / 60);
+  }
+
+  while (units.length < 3) {
+    units.push(0);
+  }
+
+  let sep = '';
+  let output = '';
+  for (let a = units.length - 1; a >= 0; a -= 1) {
+    output += sep + strPad(units[a], 2, '0', 'l');
+    sep = ':';
+  }
+
+  return `${output}.${Math.round(rem * Math.pow(10, decimalPlaces))}`;
 }
