@@ -7,8 +7,23 @@
 import { multiLitRegexReplace } from '../repeatable-utils.mjs'
 import { repeatable as doStuff } from '../repeatable-init.mjs'
 // import { isStr } from '../../utilities/validation.mjs'
-import { isInt, isNonEmptyStr, isNumber, isNumeric, isStrNum } from '../../utilities/validation.mjs'
-import { camel2human, camel2kebab, decodeEncodeURI, getBool2str, humanNumbers, padStr, padStrLeft, ucFirst } from '../../utilities/sanitise.mjs'
+import {
+  isInt,
+  isNonEmptyStr,
+  isNumber,
+  isNumeric,
+  // isStrNum,
+} from '../../utilities/validation.mjs'
+import {
+  camel2human,
+  camel2kebab,
+  decodeEncodeURI,
+  // getBool2str,
+  humanNumbers,
+  // padStr,
+  padStrLeft,
+  ucFirst,
+} from '../../utilities/sanitise.mjs'
 import { toMdTable } from '../../utilities/general.mjs'
 
 /**
@@ -2802,11 +2817,11 @@ const colourConverter = (_input, extraInputs, _GETvars) => {
     // console.group('colourConverter() (px)')
     // console.log('extraInputs.pixels():', extraInputs.pixels())
     // console.log('extraInputs.pixels().replace(/[^-0-9.]+/g, ""):', extraInputs.pixels())
-    
+
     const _px = extraInputs.pixels().replace(/[^-0-9.]+/g, '')
-    
+
     // console.log('isNumeric(' + _px + '):', isNumeric(_px))
-    
+
     if (isNumeric(_px)) {
       let _output = '\n                 REMs: ' + _px / 16 + 'rem'
 
@@ -2826,7 +2841,7 @@ const colourConverter = (_input, extraInputs, _GETvars) => {
     }
     // console.groupEnd()
   }
-  
+
   // console.groupEnd()
   return ''
 }
