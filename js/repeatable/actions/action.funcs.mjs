@@ -4119,3 +4119,69 @@ doStuff.register({
 
 //  END:  Vue 3 upgrade transforms
 // ====================================================================
+// START: Remove console log calls
+
+/**
+ * Remove console log calls from javascript code
+ *
+ *
+ *
+ * created by: Evan Wills
+ * created: 2024-04-05
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const stripConsole = (input, _extraInputs, _GETvars) => {
+  const consoleRegex = /([\r\n] *\/\/ eslint-disable-next-line(?: no-console)?)?(?:[\r\n] *console\.(?:log|group|warn|info|error)(?:\(( *\/\/ eslint-disable-line(?: no-console)?)?))([^;]+;)( *\/\/ eslint-disable-line(?: no-console)?)?(?=[\r\n])/isg;
+  const processConsole = (whole, nextLn, multiLn, _args, lnEnd) => {
+    return (isNonEmptyStr(nextLn) || isNonEmptyStr(multiLn) || isNonEmptyStr(lnEnd))
+      ? whole
+      : '';
+  };
+
+  const trimTrailing = (input) => input.replace(/ +(?=[\r\n])/g, '');
+
+  // Before we start the real work, trim trailing white space from
+  // each line
+  let output = trimTrailing(input.replace(/ +(?=[\r\n])/g, ''));
+
+  // Get rid of console logs
+  output = trimTrailing(output.replace(consoleRegex, processConsole));
+
+  // Remove excess new lines
+  output = trimTrailing(output.replace(/(?<=[\r\n]{2})[\r\n]+/g, ''));
+
+  // Remove excess new lines from start and end of curly braces
+  return trimTrailing(output.replace(/(\{[\r\n] *)[\r\n]+|[\r\n]+?(?=[\r\n] *\})/g, '$1'));
+}
+
+doStuff.register({
+  id: 'stripConsole',
+  name: 'Remove console log calls',
+  func: stripConsole,
+  description: '<p>Find and remove unwanted console logs.</p>' +
+    '<blockquote><p><strong>Note:</strong> <code>console</code> ' +
+    'calls with eslint exclusions will not be removed</p></blockquote>' +
+    '<p><code>(?<=[\\r\\n]) +console\\.(log|group)[^;\\r\\n]+;</code></p>',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Remove console log calls
+// ====================================================================
