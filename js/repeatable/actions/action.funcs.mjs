@@ -4143,7 +4143,7 @@ doStuff.register({
  * @returns {string} modified version user input
  */
 const stripConsole = (input, _extraInputs, _GETvars) => {
-  const consoleRegex = /([\r\n] *\/\/ eslint-disable-next-line(?: no-console)?)?(?:[\r\n] *console\.(?:log|group|warn|info|error)(?:\(( *\/\/ eslint-disable-line(?: no-console)?)?))([^;]+;)( *\/\/ eslint-disable-line(?: no-console)?)?(?=[\r\n])/isg;
+  const consoleRegex = /([\r\n] *\/\/ eslint-disable-next-line(?: no-console)?)?(?:[\r\n] *console\.(?:log|group(?:End)?|warn|info|error)(?:\(( *\/\/ eslint-disable-line(?: no-console)?)?))([^;]+;)( *\/\/ eslint-disable-line(?: no-console)?)?(?=[\r\n])/isg;
   const processConsole = (whole, nextLn, multiLn, _args, lnEnd) => {
     return (isNonEmptyStr(nextLn) || isNonEmptyStr(multiLn) || isNonEmptyStr(lnEnd))
       ? whole
