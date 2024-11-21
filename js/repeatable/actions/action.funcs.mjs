@@ -3573,8 +3573,10 @@ doStuff.register({
 const vue3imports = '\n/* eslint vue/multi-word-component-names: off */\n' +
                     'import {\n  // computed,\n  ' +
                     '// defineEmits,\n  // defineProps,\n  // defineSlots,\n  ' +
+                    '// getCurrentInstance,\n  ' +
                     '// onBeforeMount,\n  // onMounted,\n  // onUpdated,\n  ' +
-                    '// ref,\n  // useSlots,\n  // useStore,\n} from \'vue\';\n\n';
+                    '// ref,\n  // useSlots,\n  // watch\n} from \'vue\';\n' +
+                    '// import { useStore } from \'vuex\';\n';
 
 const listThisVars = (type, varlist) => {
   const sep = '\n// -------\n';
@@ -3651,8 +3653,13 @@ const getCleaner = (props, vars) => {
  * @returns {string} Vue 3 compatible code for emitted events
  */
 const upgradeVue3emit = (input) => {
+  const pre = (input.trim() === '')
+    ? '// '
+    : '';
   const output = input.replace(/^[^\[+]+(\[[^\]]*\]).*$/ism, '$1');
-  return `const emit = defineEmits(${output});`;
+  return '// const store = useStore();\n'
+    + `${pre}const emit = defineEmits(${output});\n`
+    + '// const instance = getCurrentInstance(); // instance.proxy.$forceUpdate();';
 };
 
 /**
@@ -3733,14 +3740,26 @@ const methodPrepInner = (input, spaces = 4) => {
  *
  * @returns {string} Vue 3 compatible code
  */
-const medthodPrep = (input, callback, spaces = 4) => {
-  let output = methodPrepInner(`${input}\n\n  updated()`, spaces);
+const medthodPrep = (input, callback, spaces = 4, computed = false) => {
+  const regex = /(\/\*\*.*?\*\/)?[\r\n\t ]*([_a-z0-9]+(?=\())(\([^)]*\))(.*?\},)/igsm;
+  let output = methodPrepInner(`${input}`, spaces);
+  const computedVars = [];
 
-  return output.replace(
-    /(\/\*\*.*?\*\/)?[\r\n\t ]*([_a-z0-9]+(?=\())(\([^)]*\))(.*?\},)/igsm,
-    callback,
-  );
-}
+  output = output.replace(regex, callback);
+
+  if (computed !== true) {
+    return output;
+  }
+
+  const cReg = /(?<=[\r\n]const )([a-z0-9]+)(?= = computed\()/ig
+  let matches = [];
+
+  while ((matches = cReg.exec(output)) !== null) {
+    computedVars.push(matches[1]);
+  }
+
+  return output = `${output}\n${listThisVars('Computed vars', computedVars)}`;
+};
 
 /**
  * Transform individual computed property methods to Vue 3 format
@@ -3760,7 +3779,7 @@ const upgradeVue3computed = (_whole, docBlock, methodName, methodProps, methodBo
     ? `${docBlock}\n`
     : '';
 
-  return `\n${_docBlock}const ${methodName} = computed(${methodProps} => ${_methBod});\n`;
+  return `${_docBlock}const ${methodName} = computed(${methodProps} => ${_methBod});`;
 };
 
 /**
@@ -3918,9 +3937,12 @@ const updateVue3auto = (input) => {
 
   if (bits.emits !== '') {
     output += start;
-    output += '// START: Event emitters\n\n';
-    output += `const emit = defineEmits([\n${bits.emits},\n]);\n\n`;
-    output += '//  END:  Event emitters';
+    output += '// START: Vue 3 utilities\n\n';
+    output += `// const store = useStore();\n`;
+    output += `const emit = defineEmits([\n${bits.emits},\n]);\n`;
+    output += `// const instance = getCurrentInstance([\n${bits.emits},\n]);`
+    output += '// instance.proxy.$forceUpdate();\n\n';
+    output += '//  END:  Vue 3 utilities';
     output += end;
 
     start = '\n';
@@ -4013,7 +4035,7 @@ const upgradeToVue3 = (input, extraInputs, _GETvars) => {
 
     case 'emit':
       output = upgradeVue3emit(input);
-      type = 'Emitted events';
+      type = 'Vue 3 utilities';
       prefix = vue3imports;
       break;
 
@@ -4021,6 +4043,8 @@ const upgradeToVue3 = (input, extraInputs, _GETvars) => {
       output = cleanup(medthodPrep(
         input,
         upgradeVue3computed,
+        4,
+        true
       ));
       type = 'Computed properties';
       break;
@@ -4184,4 +4208,382 @@ doStuff.register({
 })
 
 //  END:  Remove console log calls
+// ==================================================================
+// START: File path transform
+
+/**
+ * File path transform - Convert a windows style file system path to
+ * what everyone else uses (Web, Linux, Mac, Unix) or the reverse.
+ *
+ * created by: Evan Wills
+ * created: 2021-06-04
+ * updated: 2024-11-22
+ *
+ * @param {string} input user supplied content (expects HTML code)
+ * @param {object} extraInputs all the values from "extra" form
+ *               fields specified when registering the ation
+ * @param {object} GETvars all the GET variables from the URL as
+ *               key/value pairs
+ *               NOTE: numeric strings are converted to numbers and
+ *                     "true" & "false" are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const filePathTransform = (input, extraInputs, GETvars) => {
+  const path = extraInputs.path()
+  if (extraInputs.dir() === 'unix-2-win') {
+    return path.replace(/\//g, '\\').replace(/[^a-z0-9.-_]+/g, '')
+  }
+
+  return path.replace(
+    /^([A-Z]):\\/i,
+    (_matches, drive) => `\/${drive.toLowerCase()}\/`,
+  ).replace(/\\/g, '/');
+}
+
+doStuff.register({
+  id: 'filePathTransform',
+  func: filePathTransform,
+  description: 'Convert a windows style file system path to what '
+    + 'everyone else uses (Web, Linux, Mac, Unix) or the reverse.',
+  extraInputs: [{
+    id: 'path',
+    label: 'Path',
+    placeholder: 'file path e.g. C:\\Users\\dummyuser\\Documents\\my-file.txt',
+    type: 'text',
+    default: ''
+  }, {
+    id: 'dir',
+    label: 'Convert direction',
+    options: [
+      {
+        default: true,
+        label: 'Windows to Unix',
+        value: 'win-to-unix'
+      },
+      {
+        default: false,
+        label: 'Unix to Windows',
+        value: 'unix-2-win'
+      },
+    ],
+    type: 'radio'
+  }],
+  ignore: false,
+  name: 'File path transform (Windows, Web/Linux/Unix/Mac)'
+})
+
+//  END:  File path transform
+// ====================================================================
+// START: Find merge PRs by author
+
+/**
+ * Find merge PRs by author
+ *
+ * created by: Evan Wills
+ * created: 2024-10-28
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const filterGitLog = (input, extraInputs, _GETvars) => {
+  const userStr = extraInputs.userStr().toLocaleLowerCase().trim();
+  const msgMatch = extraInputs.messageMatch().toLocaleLowerCase().trim();
+  const msgExclude = extraInputs.messageExclude().toLocaleLowerCase().trim();
+  const mergeFilter = parseInt(extraInputs.mergeFilter());
+  const commits = input.split(/(?<=^|[\r\n])(commit [a-f0-9]{40}.*?)(?=[\r\n]+commit [a-f0-9]{40}|\s*$)/igs);
+
+  const regex = /^commit ([a-f0-9]{40})[\r\n ]+(?:Merge: ([^\r\n]+)[\r\n ]+)?Author: ([^\r\n]+)[\r\n ]+Date: +([^\r\n]+)[\r\n ]+(.*)$/igs
+  const data = [];
+  let output = '';
+  let commitList = [];
+  let sep = '';
+
+  for (const commit of commits) {
+    const _commit = commit.trim();
+    if (_commit !== '') {
+      let tmp = null;
+
+      while ((tmp = regex.exec(_commit)) !== null) {
+        const bits = {
+          commit: tmp[1],
+          merge: (typeof tmp[2] === 'string')
+            ? tmp[2]
+            : false,
+          author: tmp[3].toLocaleLowerCase(),
+          rawDate: tmp[4],
+          date: new Date(tmp[4]),
+          message: tmp[5].trim(),
+        };
+
+        const normalisedMsg = bits.message.toLocaleLowerCase();
+
+        if ((mergeFilter === 1 && bits.merge === false) || (mergeFilter === 2 && bits.merge !== false)
+          || (userStr !== '' && bits.author.toLocaleLowerCase().includes(userStr) === false)
+          || (msgMatch !== '' && normalisedMsg.includes(msgMatch) === false)
+          || (msgExclude !== '' && normalisedMsg.includes(msgExclude) === true)
+        ) {
+          continue;
+        }
+
+        data.push(bits);
+        commitList.push(bits.commit);
+        output += sep + `COMMIT: ${bits.commit}\nAUTHOR: ${bits.author}\n  DATE: ${bits.date.toISOString()}\n\n    ${bits.message}`;
+        output += `\n\ngit revert -m 1 ${bits.commit}; # date: ${bits.date.toISOString().replace(/T/, ' ')}`
+        output += `\ngit diff --name-only ${bits.commit}~ ${bits.commit}`;
+
+        sep = '\n\n-----------------------------------------\n\n';
+      }
+    }
+  }
+
+  if (commitList.length > 0) {
+    output += sep + 'Commit IDs\n';
+
+    for (const guid of commitList) {
+      output += `\n${guid}`;
+    }
+  }
+
+  console.log('data:', data);
+  console.groupEnd();
+  return output;
+}
+
+doStuff.register({
+  id: 'filterGitLog',
+  name: 'Filter git log',
+  func: filterGitLog,
+  description: 'NOTE: All matches are case insensitive',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'userStr',
+    label: 'Match commit by user string',
+    type: 'text',
+    // type: 'textarea',
+    description: '',
+    pattern: '',
+    default: 'evan.wills'
+  },
+  {
+    id: 'messageMatch',
+    label: 'Match commit by message sub-string',
+    type: 'text',
+    // type: 'textarea',
+    description: '',
+    pattern: '',
+    default: 'Merged PR'
+  },
+  {
+    id: 'messageExclude',
+    label: 'Exclude commit by message sub-string',
+    type: 'text',
+    // type: 'textarea',
+    description: '',
+    pattern: '',
+    default: 'Revert'
+  },{
+    id: 'mergeFilter',
+    label: 'Filter by merge',
+    options: [
+      {
+        default: true,
+        label: 'Any (do not filter on merge commit)',
+        value: '0'
+      },
+      {
+        default: false,
+        label: 'Only include merge commits',
+        value: '1'
+      },
+      {
+        default: false,
+        label: 'Exclude all merge commits',
+        value: '2'
+      },
+    ],
+    type: 'radio'
+  }],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+})
+
+//  END:  Find merge PRs by author
+// ====================================================================
+// START: Split HTML by heading
+
+/**
+ * Split HTML by heading
+ *
+ * created by: Evan Wills
+ * created: 2024-11-05
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const splitHtmlByH = (input, extraInputs, _GETvars) => {
+  // const _input = input;
+  const _input = '<h3>Activate your SIM online</h3>\n<h4>Step 1:</h4>\n<p>Watch the Optus Donate Your Data&trade; activation video.</p>\n<p><a href=\"link/to/video\">Watch video</a></p>\n<h4>Step 2: </h4>\n<p><span>Visit the Optus Donate Your Data&trade; website to activate your SIM card.</span></p>\n<p><a href=\"link/to/sim/activation/form\">Activate SIM</a></p>\n<p><span>If you need any help, please contact Optus on 1300 132 208 or visit your local Optus store. Make sure to tell them that you&rsquo;re a Donate Your Data&trade; recipient.</span></p>';
+
+  const extractParaLink = (linkInput) => {
+    console.group('extractParaLink()');
+    const regex = /(?:\\[rn]|\s)*(?:<p>(?:<span>)?)?<a([^>]+)>(.*?)<\/a>(?:(?:<\/span>)?<\/p>)?(?:\\[rn]|\s)*/is;
+    const hrefRegex = /^.*?href=(\\?["'])(.*?)\1.*$/i;
+    const link = linkInput.match(regex);
+    console.log('regex:', regex);
+    console.log('hrefRegex:', hrefRegex);
+    console.log('linkInput:', linkInput);
+    console.log('link:', link);
+    const output = {
+      body: linkInput,
+      hasLink: false,
+      link: {
+        href: '',
+        text: '',
+      },
+    }
+    if (link !== null) {
+      output.body = linkInput.replace(link[0], '').replace(/\\[rnt]/g, '[[LINK_GOES_HERE]]').trim();
+      output.hasLink = true;
+      output.link.href = link[1].replace(hrefRegex, '$2');
+      output.link.text = link[2];
+    }
+
+    output.body = splitByHeading(output.body);
+
+    console.log('output:', output);
+    console.groupEnd();
+    return output;
+  };
+
+  const setLink = (body, hLevel = 0, heading = '', hasLink = false, linkURL = '', linkText = '') => ({
+    body: body,
+    hasLink,
+    heading,
+    hLevel,
+    link: {
+      href: linkURL,
+      text: linkText,
+    },
+  });
+
+  const splitByHeading = (blockInput) => {
+    const regex = /<(h([1-6]))>(.*?)<\/\1>(.*?)(?=<\1|$)/igs;
+    const hasH = /<h[1-6[^>]*>/i;
+
+    console.group('splitByHeading()');
+    console.log('blockInput:', blockInput);
+    console.log('regex:', regex);
+    console.log('hasH:', hasH);
+
+    if (hasH.test(blockInput) === false) {
+      console.log('No headings here');
+      console.groupEnd();
+      return [setLink(blockInput)];
+    }
+
+    const output = [];
+    let matches = null;
+
+    // eslint-disable-next-line no-cond-assign
+    while ((matches = regex.exec(blockInput)) !== null) {
+      console.log('matches:', matches);
+      console.log('setLink(matches[4], matches[2], matches[3]):', setLink(matches[4], matches[2], matches[3]));
+
+      output.push(setLink(splitByHeading(matches[4]), matches[2], matches[3]));
+    }
+
+    console.log('output:', output);
+    console.groupEnd();
+
+    return output;
+  }
+
+  const recursivlyExtractParalink = (item) => {
+    console.group('recursivlyExtractParalink()');
+    console.log('item:', item);
+    if (typeof item.body === 'string') {
+      console.log('extractParaLink(item.body):', extractParaLink(item.body));
+      console.groupEnd();
+      return {
+        ...item,
+        ...extractParaLink(item.body),
+      };
+    }
+
+    for (let a = 0; a < item.body.length; a += 1) {
+      item[a].body = recursivlyExtractParalink(item[a].body);
+      console.log(`item[${a}]:`, item[a].body);
+    }
+
+    console.log('item:', item);
+    console.groupEnd();
+    return item;
+  }
+
+  let output = splitByHeading(_input);
+  console.log('extraInputs:', extraInputs);
+  console.log('extraInputs.getLink():', extraInputs.getLink());
+
+  if (extraInputs.getLink() == 1) {
+    output = recursivlyExtractParalink(output);
+  }
+
+  return JSON.stringify(output);
+};
+
+doStuff.register({
+  id: 'splitHtmlByH',
+  name: 'Split HTML by heading',
+  func: splitHtmlByH,
+  description: '',
+  // docsURL: '',
+  extraInputs: [{
+    id: 'getLink',
+    label: 'Get first link',
+    options: [
+      {
+        default: true,
+        label: 'No',
+        value: '0'
+      },
+      {
+        default: false,
+        label: 'Yes',
+        value: '1'
+      },
+    ],
+    type: 'radio'
+  }],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  Action name
 // ====================================================================

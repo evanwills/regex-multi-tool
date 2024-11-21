@@ -24,7 +24,7 @@
  * @returns {string} modified version user input
  */
 const myFunction = (input, extraInputs, _GETvars) => {
-}
+};
 
 doStuff.register({
   id: '',
@@ -38,7 +38,7 @@ doStuff.register({
   // inputLabel: '',
   // remote: false,
   // rawGet: false,
-})
+});
 
 //  END:  Action name
 // ====================================================================
@@ -54,7 +54,7 @@ export const _text = {
   description: '',
   pattern: '',
   default: ''
-}
+};
 
 export const _select = {
   description: '',
@@ -64,7 +64,7 @@ export const _select = {
     { value: '', label: '', default: true },
   ],
   type: 'select'
-}
+};
 
 export const _checkbox = {
   id: '',
@@ -77,7 +77,7 @@ export const _checkbox = {
     },
   ],
   type: 'checkbox'
-}
+};
 
 export const _radio = {
   id: '',
@@ -90,7 +90,7 @@ export const _radio = {
     },
   ],
   type: 'radio'
-}
+};
 
 export const _number = {
   id: '',
@@ -100,7 +100,7 @@ export const _number = {
   step: 1,
   default: 0,
   type: 'number'
-}
+};
 
 //  END:  extraInputs field type templates
 // ----------------------------------------------

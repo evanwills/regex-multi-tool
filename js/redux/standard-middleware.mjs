@@ -26,7 +26,7 @@ export const crashReporter = store => next => action => {
     console.error('Caught an exception!', err)
     console.info('action: ', action)
     console.info('state: ', store.getState())
-    throw err
+    // throw err
   }
 }
 

@@ -125,17 +125,22 @@ export const multiLitRegexReplace = (input, findReplace) => {
       _output = _output.replace(
         findReplace[a].find,
         findReplace[a].replace
-      )
+      );
     } catch (e) {
       // group('findreplace[' + a + ']')
       // log('findreplace[' + a + '].find:', findReplace[a].find)
       // log('findreplace[' + a + '].replace:', findReplace[a].replace)
-      console.error('multiLitRegexReplace() expects findReplace[' + a + '].find to contain a valid regular expression. It had the following error: "' + e.message + '"')
+      console.error(
+        'multiLitRegexReplace() expects findReplace[' + a +
+        '].find to contain a valid regular expression. ' +
+        'It had the following error: "' + e.message + '"'
+      );
       // groupEnd()
     }
   }
-  return _output
-}
+
+  return _output;
+};
 
 /**
  * Convert object into string to be used as the POST values to be
