@@ -4585,5 +4585,82 @@ doStuff.register({
   // rawGet: false,
 });
 
-//  END:  Action name
+//  END:  Split HTML by heading
+// ====================================================================
+// START: Get a unique ID
+
+/**
+ * Get a unique ID  to use in dummy/mock data
+ *
+ * created by: Evan Wills
+ * created: 2025-10-27
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const getUniqueID = (input, extraInputs, _GETvars) => {
+  const asGUID = extraInputs.type('1');
+  const defLen = (asGUID === true)
+    ? 32
+    : 10;
+
+  const len = (asGUID === false && typeof extraInputs.len() === 'number' && extraInputs.len() > 0)
+    ? extraInputs.len()
+    : defLen;
+
+  if (asGUID === false) {
+    return nanoid(len);
+  }
+
+  const idGetter = customAlphabet('1234567890abcdef', len);
+  return idGetter().replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
+};
+
+doStuff.register({
+  id: 'getUniqueID',
+  name: 'Get a unique ID',
+  func: getUniqueID,
+  description: 'Get a unique ID  to use as dummy/mock data',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'len',
+      label: 'Character Count',
+      min: 1,
+      max: 64,
+      step: 1,
+      default: 10,
+      type: 'number'
+    },
+    {
+      id: 'type',
+      label: 'Type',
+      options: [
+        {
+          default: false,
+          label: 'As GUID (32 chars)',
+          value: '1'
+        },
+      ],
+      type: 'checkbox'
+    },
+  ],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  Get a unique ID
 // ====================================================================
