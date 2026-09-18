@@ -24,7 +24,7 @@ import {
   padStrLeft,
   ucFirst,
 } from '../../utilities/sanitise.mjs'
-import { toMdTable } from '../../utilities/general.mjs'
+import { toMdTable, getLocalISOdate } from '../../utilities/general.mjs'
 
 /**
  * action-functions.js contains all the possible actions available to
@@ -4168,6 +4168,7 @@ doStuff.register({
  */
 const stripConsole = (input, _extraInputs, _GETvars) => {
   const consoleRegex = /([\r\n] *\/\/ eslint-disable-next-line(?: no-console)?)?(?:[\r\n] *console\.(?:log|group(?:End)?|warn|info|error)(?:\(( *\/\/ eslint-disable-line(?: no-console)?)?))([^;]+;)( *\/\/ eslint-disable-line(?: no-console)?)?(?=[\r\n])/isg;
+  const cLogRegex = /[\r\n ]+_cLog(?:\.value)?\.(?:getName|group(?:Name)?|after|before|error|info|only|resetID|warn)\(.*?\);/isg
   const processConsole = (whole, nextLn, multiLn, _args, lnEnd) => {
     return (isNonEmptyStr(nextLn) || isNonEmptyStr(multiLn) || isNonEmptyStr(lnEnd))
       ? whole
@@ -4181,7 +4182,7 @@ const stripConsole = (input, _extraInputs, _GETvars) => {
   let output = trimTrailing(input.replace(/ +(?=[\r\n])/g, ''));
 
   // Get rid of console logs
-  output = trimTrailing(output.replace(consoleRegex, processConsole));
+  output = trimTrailing(output.replaceAll(consoleRegex, processConsole)).replaceAll(cLogRegex, '');
 
   // Remove excess new lines
   output = trimTrailing(output.replace(/(?<=[\r\n]{2})[\r\n]+/g, ''));
@@ -4197,7 +4198,13 @@ doStuff.register({
   description: '<p>Find and remove unwanted console logs.</p>' +
     '<blockquote><p><strong>Note:</strong> <code>console</code> ' +
     'calls with eslint exclusions will not be removed</p></blockquote>' +
-    '<p><code>(?<=[\\r\\n]) +console\\.(log|group)[^;\\r\\n]+;</code></p>',
+    '<p><code>' +
+    '(?<=[\\r\\n]) +(?:console\\.(?:log|group)[^;\\r\\n]+|[\\r\\n ]+_cLog(?:\\.value)?\\.(?:getName|group(?:Name)?|after|before|error|info|only|resetID|warn)\\(.*?\\);(?:[\\r\\n]|$)?' +
+    '</code><br /><code>' +
+    '[\\r\\n ]+_cLog(?:\\.value)?\\.(?:getName|group(?:Name)?|after|before|error|info|only|resetID|warn)\\(.*?\\);' +
+    '</code><br /><code>' +
+    '(?<=[\\r\\n]) +console\\.(?:log|group)[^;\\r\\n]+;(?:[\\r\\n]|$)?'
+    + '</code><br /></p>',
   // docsURL: '',
   extraInputs: [],
   // group: '',
@@ -4587,6 +4594,445 @@ doStuff.register({
 
 //  END:  Split HTML by heading
 // ====================================================================
+// START: TSV rows to TSV columns
+
+/**
+ * Switch TSV columns to rows and rows to columns
+ *
+ * created by: Evan Wills
+ * created: 2024-07-09
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const tsvRows2Cols = (input, extraInputs, _GETvars) => {
+  const tmp = input.trim().split('\n');
+  const inter = []
+  let max = 0;
+  for (let a = 0; a < tmp.length; a += 1) {
+    tmp[a] = tmp[a].split('\t');
+    if (tmp[a].length > max) {
+      max = tmp[a].length;
+    }
+  }
+  for (let a = 0; a < tmp.length; a += 1) {
+    if (tmp[a].length < max) {
+      for (let b = 0, c = (max - tmp[a].length);  b < c; b += 1) {
+        tmp[a].push('');
+      }
+    }
+  }
+
+  for (let a = 0; a < max; a += 1) {
+    for (let b = 0; b < tmp.length; b += 1) {
+      if (!Array.isArray(inter[a])) {
+        inter[a] = [];
+      }
+      inter[a].push(tmp[b][a]);
+    }
+  }
+
+  for (let a = 0; a < inter.length; a += 1) {
+    inter[a] = inter[a].join('\t');
+  }
+
+  return inter.join('\n');
+}
+
+doStuff.register({
+  id: 'tsvRows2Cols',
+  name: 'TSV/Table rows to TSV columns',
+  func: tsvRows2Cols,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  TSV rows to TSV columns
+// ====================================================================
+// START: Reset bad git merge
+
+/**
+ * Reset bad git merge
+ *
+ * created by: Evan Wills
+ * created: 2025-03-07
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const resetBadMerge = (input, extraInputs, _GETvars) => {
+  const regex = /(?<=^|[\r\n])        (?:([a-z ]+): +)?([^\r\n]+)(?=[r\n]|$)/ig;
+  const tracked = [];
+  const untacked = [];
+  let matched;
+  let output = '#!/bin/sh\n';
+
+  while ((matched = regex.exec(input)) !== null) {
+    if (typeof matched[1] !== 'undefined') {
+      tracked.push(matched[2])
+    } else {
+      untacked.push(matched[2]);
+    }
+  }
+
+  const esc = (str) => str.replace(/ /g, '\\ ');
+  const render = (cmd, file) => `\n${cmd} ${esc(file)};`;
+
+  for (const file of tracked) {
+    output += render('git checkout', file);
+  }
+
+  output += '\n';
+
+  for (const file of untacked) {
+    const rm = file.endsWith('/')
+      ? 'rm -r'
+      : 'rm';
+    output += render(rm, file);
+  }
+
+  return `${output}\n\ngit status;`;
+};
+
+doStuff.register({
+  id: 'resetBadMerge',
+  name: 'Reset bad git merge',
+  func: resetBadMerge,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  Reset bad git merge
+
+// ====================================================================
+// START: JSDoc typedef to Typescript type definition
+
+/**
+ * Convert JSDoc typedef doc blocks to TypeScript type definitions
+ *
+ * created by: Evan Wills
+ * created: 2025-05-15
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const jsdoc2tsTypeDef = (input, extraInputs, _GETvars) => {
+  const _input = `/**
+ * A function that is called every time an event is dispatched and
+ * does an action if the event is of a type it cares about.
+ *
+ * @typedef Watcher
+ * @type {Function}
+ *
+ * @param {string} evenName Name of the event being dispatched
+ * @param {
+ *          AllCompleteEventData|
+ *          CompleteEventData|
+ *          InvalidEventData|
+ *          ProcesscountEventData|
+ *          ProcessingEventData|
+ *          ToobigEventData|
+ *          ToomanyEventData
+ * } data Data associated with the event
+ *
+ * @returns {any|void}
+ */`;
+
+  const makeOneLine = (str) => str.replace(/(?<=[a-z0-9,.|]+) *[\r\n] *\* +/ig, ' ').trim().replace(/^\*|\*$/, ' ').trim();
+
+  const processObjProp = (prop) => {
+    const _bits = /\{([a-z_0-9|?]+)\}[\t ]+([a-z_0-9|]+)(?:[\t ]+(.*))?/igs.exec(prop);
+
+    return (_bits !== null)
+      ? {
+        type: _bits[1],
+        name: _bits[2],
+        desc: (typeof _bits[3] === 'string')
+          ? makeOneLine(_bits[3])
+          : null
+      }
+      : null;
+  };
+
+  const processProps = (_whole, at, prop) => {
+    const bits = processObjProp(prop);
+
+    if (bits === null) {
+      return '';
+    }
+
+    const docBlock = (bits.desc !== null)
+      ? `\n\n  \/**`
+        + `\n   * ${at} ${bits.desc}`
+        + `\n   */`
+      : '';
+
+    return `${docBlock}\n  ${bits.name}: ${bits.type},`;
+  };
+
+  const processObj = (props) => {
+    const _props = (isNonEmptyStr(props))
+      ? props.replace(
+          /(?:[\r\n\t ]\*[\t ])?(@[a-z]+)(.*?)(?=[\r\n][\t ]+\*(?:[\t ]+@[a-z]+|\/)|$)/igs,
+          processProps
+        )
+      : '';
+    return (_props !== '')
+      ? `{\n  ${_props.trimStart().replace(/[\r\n]+/g, '\n')}\n};`
+      : '';
+  };
+
+  const getBitsObj = (bits = []) => {
+    const output = {};
+    const keys = ['type', 'name', 'desc'];
+
+    for (let a = 0; a < keys.length; a += 1) {
+      let tmp = (typeof bits[a] === 'string')
+        ? bits[a]
+        : '';
+      if (keys[a] === 'type') {
+        tmp = makeOneLine(tmp);
+      }
+      output[keys[a]] = tmp;
+    }
+
+    return output;
+  };
+
+  const processFunc = (args) => {
+    const regex = /(?:\s*\* )?@(param|returns?) \{([^}]+)\}(?:[\t ]+([a-z0-9_]+)[\t ]+)?(.*?)?(?=\* @(?:param|returns?)|$)/igs;
+    const bits = {
+      args: [],
+      return: getBitsObj(),
+    }
+    let match;
+
+    while ((match = regex.exec(args)) !== null) {
+      const _bits = getBitsObj(match.slice(2));
+
+      if (match[1].substring(0, 6).toLowerCase() === 'return') {
+        bits.return = _bits;
+      } else {
+        bits.args.push(_bits)
+      }
+    }
+
+    let output = '(';
+    let sep = '';
+    for (const {name, type} of bits.args) {
+      output += `${sep}${name} : ${type}`;
+      sep = ', ';
+    }
+
+    return `${output}) => ${bits.return.type};`;
+  };
+
+  const processDocBlockInner = (whole, description, typeDefWhole, typeDef, type, props) => {
+    const desc = (typeof description === 'string')
+      ? `\n * ${makeOneLine(description)}\n *`
+      : '';
+    let output = `/**${desc}\n *${props}*/\nexport type ${typeDef} = `;
+
+    switch (type.toLowerCase()) {
+      case 'function':
+        output += processFunc(props);
+        break;
+      case 'object':
+        output += processObj(props);
+        break;
+
+      default:
+        output += `${type};`;
+    }
+
+    return output;
+  };
+
+  const processDocBlock = (_whole, docBlock) => docBlock.replace(
+    /^(.*?)((?:\s+\* )*@typedef ([a-z0-9_]+)\s+\* @type \{([a-z]+)\})(?:\s+\*)*(.*)$/is,
+    processDocBlockInner,
+  );
+
+  return input.replace(
+    /\/\*\*\s+\* (.*?)\*\//isg,
+    processDocBlock,
+  );
+};
+
+doStuff.register({
+  id: 'jsdoc2tsTypeDef',
+  name: 'JSDoc typedef to Typescript type definition',
+  func: jsdoc2tsTypeDef,
+  description: 'Convert JSDoc typedef doc blocks to TypeScript type definitions',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  JSDoc typedef to Typescript type definition
+// ====================================================================
+// START: Compare file between branches
+
+/**
+ * Convert output of `git diff --name-only [branch name]` to
+ * `git diff [branch name] [file path]` for easy comparing of individual
+ * files across branches
+ *
+ * created by: Evan Wills
+ * created: 2025-07-31
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const compareBranchFile = (input, extraInputs, _GETvars) => input
+  .trim()
+  .split('\n')
+  .map((item) => item.trim())
+  .filter((item) => item !== '')
+  .map(
+    (item) => `git diff ${extraInputs.branch()} ${item.replace(extraInputs.pathPrefix(), '')};`
+  ).join('\n')
+  .replace(/^/, `git diff --name-only ${extraInputs.branch()}\n\n`);
+
+doStuff.register({
+  id: 'compareBranchFile',
+  name: 'Git compare file between branches',
+  func: compareBranchFile,
+  description: 'Convert output of `git diff --name-only [branch name]` '
+  + 'to `git diff [branch name] [file path]` for easy comparing of '
+  + 'individual files across branches',
+  // docsURL: '',
+  extraInputs: [
+    {
+      id: 'branch',
+      label: 'Branch name',
+      type: 'text',
+      // type: 'textarea',
+      description: '',
+      pattern: '',
+      default: ''
+    }, {
+      id: 'pathPrefix',
+      label: 'File path prefix to remove',
+      type: 'text',
+      // type: 'textarea',
+      description: 'When you run `git diff --name-only [branch-name]` '
+        + 'you get the full path of the files from the repo root.',
+      pattern: '',
+      default: ''
+    }
+  ]
+});
+
+//  END:  Compare file between branches
+// ====================================================================
+// START: Tailwind cleanup
+
+/**
+ * Clean up tailwind white space
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const cleanTailwind = (input, extraInputs, _GETvars) => {
+  const steps = [
+    { find: /(?<=[^ ]) (?=[^ ])/g, replace: '\n      ' },
+    { find: /(?<=@layer)[\r\n]+ {5}( components|base)[\r\n]+ +(?=\{)/g, replace: '$1 ' },
+    { find: /(?<=[a-z0-9])[\r\n]+ +(?=\{)/ig, replace: ' ' },
+    { find: /(?<=[\r\n]) +(?=@apply)/ig, replace: '    ' },
+    { find: / +(?=\{)/ig, replace: ' ' },
+    { find: /[\r\n ]*(?=\})/ig, replace: '\n  ' },
+    { find: /[\r\n ]+\}[\r\n ]*$/, replace: '\n}\n' },
+  ];
+
+  return multiLitRegexReplace(input, steps);
+};
+
+doStuff.register({
+  id: 'cleanTailwind',
+  name: 'Tailwind cleanup',
+  func: cleanTailwind,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  Tailwind cleanup
+
 // START: Get a unique ID
 
 /**
@@ -4663,4 +5109,112 @@ doStuff.register({
 });
 
 //  END:  Get a unique ID
+
+// ====================================================================
+// START: URL Encode string
+
+/**
+ * URL Encode string (using encodeURIComponent())
+ *
+ * created by: Evan Wills
+ * created: 2025-11-27
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const urlEncode = (input, extraInputs, _GETvars) => encodeURIComponent(input);
+
+doStuff.register({
+  id: 'urlEncode',
+  name: 'URL Encode string',
+  func: urlEncode,
+  description: '',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  URL Encode string
+
+// ====================================================================
+// START: Git log to TSV
+
+/**
+ * Take the output of `git log` and convert it to TSV format for easy
+ * analysis in Excel or similar tools.
+ *
+ * created by: Firstname LastName
+ * created: YYYY-MM-DD
+ *
+ * @param {string} input       User supplied content
+ *                             (expects text HTML code)
+ * @param {object} extraInputs All the values from "extra" form
+ *                             fields specified when registering
+ *                             the ation
+ * @param {object} _GETvars    All the GET variables from the URL as
+ *                             key/value pairs
+ *                             NOTE: Numeric strings are converted
+ *                                   to numbers and "true" & "false"
+ *                                   are converted to booleans
+ *
+ * @returns {string} modified version user input
+ */
+const gitLogToTSV = (input, extraInputs, _GETvars) => {
+  const regex1 = /(?<=^|[\r\n])commit ([a-f\d]{40})(.*?)(?=commit|$)/igs;
+  const regex2 = /(?:Merge: ([^\r\n]+)[\r\n ]+)?Author: ([^\r\n]+)[\r\n ]+Date: +([^\r\n]+)[\r\n ]+(.*)/is;
+
+  let output = 'Commit\tMerge\tAuthor\tDate\tMessage';
+  let match;
+
+  while ((match = regex1.exec(input)) !== null) {
+    const commit = match[1];
+    const tmp = match[2].trim();
+
+    const match2 = regex2.exec(tmp);
+    if (match2 === null) {
+      continue;
+    }
+
+    const merge = (typeof match2[1] === 'string')
+      ? match2[1]
+      : '';
+    const author = match2[2];
+    const date = getLocalISOdate(new Date(match2[3]));
+    const message = match2[4].trim().replace(/\s+/g, ' ');
+    output += `\n${commit}\t${merge}\t${author}\t${date}\t${message}`;
+  }
+
+  return output;
+};
+
+doStuff.register({
+  id: 'gitLogToTSV',
+  name: 'Git log to TSV',
+  func: gitLogToTSV,
+  description: 'Take the output of `git log` and convert it to TSV '
+    + 'format for easy analysis in Excel or similar tools.',
+  // docsURL: '',
+  extraInputs: [],
+  // group: '',
+  ignore: false
+  // inputLabel: '',
+  // remote: false,
+  // rawGet: false,
+});
+
+//  END:  Git log to TSV
 // ====================================================================
