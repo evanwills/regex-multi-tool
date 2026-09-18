@@ -202,3 +202,31 @@ export const round = (input, places) => {
  * @returns {string}
  */
 export const consGrp = (func, group = '') => ((group !== '') ? `${group}.${func}()` : `${func}()`);
+
+/**
+ * Convert a number to a two-digit string, padding with leading zeros if necessary.
+ *
+ * @param {number} input
+ * @returns {string}
+ */
+export const twoDigit = (input) => input.toString().substring(0, 2).padStart(2, '0');
+
+/**
+ * Get the local ISO date string for a given Date object.
+ *
+ * @param {Date}    date     Date value to be converted to full
+ *                           ISO8601 formated string.
+ * @param {boolean} dateOnly Whether to return only the date portion
+ *                           (true) or include the time (false).
+ * @returns {string} Local ISO date string, including the time
+ *                   portion and timezone offset.
+ */
+export const getLocalISOdate = (date, dateOnly = false) => {
+  const time = (dateOnly === true)
+    ? ''
+    : ` ${twoDigit(date.getHours())}:${twoDigit(date.getMinutes())}:${twoDigit(date.getSeconds())}`;
+
+  return (date instanceof Date)
+    ? `${date.getFullYear()}-${twoDigit(date.getMonth() + 1)}-${twoDigit(date.getDate())}${time}`
+    : '';
+};
