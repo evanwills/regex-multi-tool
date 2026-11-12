@@ -85,7 +85,7 @@ const hiddenPos = (pos) => html`<span class="sr-only">number ${pos}</span>`
  *
  * @returns {lit-html} render function
  */
-const moveTo = (id, count, pos, _change, tabIndex) => {
+const moveTo = (id, count, pos, _change) => {
   const _id = id + '-moveTo'
   const options = []
 
@@ -106,7 +106,7 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
     <!-- START: moveTo() -->
     <span class="r-pair__move-to__wrap"><!--
       --><label for="${_id}" class="r-pair__move-to__label">Move ${hiddenPos(pos)} to</label><!--
-      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change} tabindex="${getTabI(tabIndex)}">
+      --><select id="${_id}" class="r-pair__move-to__field" data-id="${id}" @change=${_change}>
         ${options.map(option => (option.current)
           ? html`<option value="" ?selected=${option.current} title="current position (${option.pos})">&ndash;</option>`
           : html`<option value="${option.value}" ?selected=${option.current} title="Move ${option.dir} to position ${option.pos}">${option.pos}</option>`
@@ -138,13 +138,13 @@ const moveTo = (id, count, pos, _change, tabIndex) => {
  *
  * @returns {lit-html} render function
  */
-const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
+const disableBtn = (id, count, isDisabled, pos, _click) => {
   const _mode = (isDisabled) ? 'Enable' : 'Disable'
 
   return (count > 1)
     ? html`
       <!-- START: disableBtn() -->
-      <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair" tabindex="${getTabI(tabIndex)}">
+      <button value="${id}-disable" class="rnd-btn rnd-btn--${_mode.toLocaleLowerCase()}" @click=${_click} title="${_mode} this regex pair">
         ${_mode} ${hiddenPos(pos)}
       </button>
       <!--  END:  disableBtn() -->`
@@ -170,11 +170,11 @@ const disableBtn = (id, count, isDisabled, pos, _click, tabIndex) => {
  *
  * @returns {lit-html} render function
  */
-const deleteBtn = (id, count, pos, _click, tabIndex) => {
+const deleteBtn = (id, count, pos, _click) => {
   return (count > 1)
     ? html`
       <!-- START: deleteBtn() -->
-      <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair" tabindex="${getTabI(tabIndex)}">
+      <button value="${id}-delete" class="rnd-btn rnd-btn--danger rnd-btn--delete" @click=${_click} title="Delete this regex pair">
         Delete ${hiddenPos(pos)}
       </button>
       <!-- START: deleteBtn() -->`
@@ -205,7 +205,7 @@ const deleteBtn = (id, count, pos, _click, tabIndex) => {
  *
  * @returns {lit-html} render function
  */
-const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
+const movePair = (id, count, pos, _dir, clickHandler) => {
   let _newPos = -1
 
   if (typeof _dir !== 'string' || (_dir !== 'up' && _dir !== 'down')) {
@@ -230,7 +230,7 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
 
   return html`
       <!-- START: movePair() -->
-    <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}" tabindex="${getTabI(tabIndex)}">
+    <button value="${id}-move-${_dir}" class="rnd-btn rnd-btn--move rnd-btn--move--${_dir}" @click=${clickHandler} title="Move regex pair ${_dir} to position ${_newPos}">
       Move ${pos} ${_dir}
     </button>
     <!--  END:  movePair() -->`
@@ -244,12 +244,30 @@ const movePair = (id, count, pos, _dir, clickHandler, tabIndex) => {
  * @param {string}   suffix       Suffix for the ID & class
  * @param {boolean}  isChecked    Whether or not the checkbox is checked
  * @param {function} eventHandler Event handler function
+ * @param {string}   title        Title attribute for the checkbox
  * @returns
  */
-const checkboxField = (id, label, classSuffix, isChecked, eventHandler, tabIndex) => {
+const checkboxField = (
+  id,
+  label,
+  classSuffix,
+  isChecked,
+  eventHandler,
+  title = '',
+) => {
   const _id = id + '-' + classSuffix
 
-  return checkboxBtn(_id, label, _id, isChecked, eventHandler, tabIndex)
+  return checkboxBtn(
+    _id,
+    label,
+    _id,
+    isChecked,
+    eventHandler,
+    0,
+    '',
+    false,
+    title,
+  );
 }
 
 /**
@@ -262,14 +280,14 @@ const checkboxField = (id, label, classSuffix, isChecked, eventHandler, tabIndex
  *
  * @returns {lit-html}
  */
-const addPair = (id, pos, _dir, clickHandler, tabIndex) => {
+const addPair = (id, pos, _dir, clickHandler) => {
   if (_dir !== 'before' && _dir !== 'after') {
     throw Error('addPair() expects third param _dir to be either "before" or "after"')
   }
 
   return html`
     <!-- START: addPair() -->
-    <button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}" tabindex="${getTabI(tabIndex)}">
+    <button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add rnd-btn--add--${_dir}" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
       Add pair ${_dir} ${pos}
     </button>
     <!--  END:  addPair() -->`
@@ -324,8 +342,6 @@ const addPair = (id, pos, _dir, clickHandler, tabIndex) => {
  */
 export const regexPair = (props) => {
   const _pos = hiddenPos(props.pos)
-
-  const tabIndex = (props.settingsOpen) ? 0 : -1
 
   return html`
   <!-- START: regexPair() -->
@@ -391,57 +407,55 @@ export const regexPair = (props) => {
           : ''}
       </main>
 
+      <!--
       ${openCloseBtn(props.id, 'Open', 'this Regex Pair', props.settingsOpen, props.events.simplePair, 0, 'xs')}
+      -->
 
-      <footer class="r-pair__footer settings settings--${(props.settingsOpen) ? 'opened' : 'closed'}">
+      <footer class="r-pair__footer settings">
+        <ul class="r-pair__sibling-ctrl list-clean">
+          <li class="r-pair__sibling-ctrl__before">
+            ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair)}<!--
+            -->${addPair(props.id, props.count, 'before', props.events.simplePair)}
+          </li>
+          <li class="r-pair__sibling-ctrl__this">
+            ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair)}<!--
+            --><button value="${props.id}-reset" class="rnd-btn rnd-btn--danger rnd-btn--reset" @click=${props.events.simplePair} title="Reset this regex pair">Reset ${_pos}</button><!--
+            -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair)}<!--
+            --><button value="${props.id}-setDefault" class="rnd-btn rnd-btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs">Make default</button><!--
+            -->${moveTo(props.id, props.count, props.pos, props.events.pairValue)}
+          </li>
+          <li class="r-pair__sibling-ctrl__after">
+            ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair)}<!--
+            -->${addPair(props.id, props.count, 'after', props.events.simplePair)}
+          </li>
+        </ul>
+
         <ul class="r-pair__control list-clean">
             ${checkboxField(
               props.id,
-              'Multi-line input',
+              'Multi-line',
               'multiLine',
               props.multiLine,
               props.events.simplePair,
-              tabIndex
+              'Multi-line input',
             )}
             ${checkboxField(
               props.id,
-              'Full width input',
+              'Full width',
               'fullWidth',
               props.fullWidth,
               props.events.simplePair,
-              tabIndex
+              'Full width input',
             )}
             ${checkboxField(
               props.id,
-              'Transform escaped characters in replacement',
+              'Transform escaped',
               'whiteSpace',
               props.transformEscaped,
               props.events.simplePair,
-              tabIndex
+              'Transform escaped characters in replacement',
             )}
         </ul>
-
-        <ul class="r-pair__sibling-ctrl list-clean">
-          <li class="r-pair__sibling-ctrl__before">
-            ${movePair(props.id, props.count, props.pos, 'up', props.events.simplePair,
-                tabIndex)}<!--
-            -->${addPair(props.id, props.count, 'before', props.events.simplePair,
-                tabIndex)}
-          </li>
-          <li class="r-pair__sibling-ctrl__this">
-            ${deleteBtn(props.id, props.count, props.pos, props.events.simplePair, tabIndex)}<!--
-            --><button value="${props.id}-reset" class="rnd-btn rnd-btn--danger rnd-btn--reset" @click=${props.events.simplePair} title="Reset this regex pair" tabindex="${tabIndex}">Reset ${_pos}</button><!--
-            -->${disableBtn(props.id, props.count, props.isDisabled, props.pos, props.events.simplePair, tabIndex)}<!--
-            --><button value="${props.id}-setDefault" class="rnd-btn rnd-btn--set-default" @click=${props.events.simplePair} title="Use this regex pair's confguration as default for new regex pairs" tabindex="${tabIndex}">Make default</button><!--
-            -->${moveTo(props.id, props.count, props.pos, props.events.pairValue, tabIndex)}
-          </li>
-          <li class="r-pair__sibling-ctrl__after">
-            ${movePair(props.id, props.count, props.pos, 'down', props.events.simplePair, tabIndex)}<!--
-            -->${addPair(props.id, props.count, 'after', props.events.simplePair, tabIndex)}
-          </li>
-        </ul>
-
-        ${openCloseBtn(props.id, 'Close', 'this Regex Pair', props.settingsOpen, props.events.simplePair, tabIndex, 'xs')}
       </footer>
     </article>
   </li>
