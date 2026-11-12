@@ -1,4 +1,5 @@
 import { html } from '../../lit-html/lit-html.mjs'
+import { ifDefined } from '../../lit-html/directives/if-defined.mjs'
 import {
   // isBool,
   isBoolTrue,
@@ -26,17 +27,20 @@ import {
  *
  * @returns {html}
  */
-export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge, isRadio) => {
+export const checkboxBtn = (id, label, value, isChecked, eventHandler, tabIndex, badge, isRadio, title = '') => {
   const _isRadio = isBoolTrue(isRadio)
   const _id = id + '-' + makeAttributeSafe(value.toString())
   const _name = (_isRadio) ? id : _id
   const _type = (_isRadio) ? 'radio' : 'checkbox'
+  const _title = (isNonEmptyStr(title) === true)
+    ? title
+    : undefined;
 
   return html`
   <!-- START: checkboxBtn() -->
   <li>
     <input type="${_type}" id="${_id}" name="${_name}" value="${value}" class="cb-btn__input" ?checked=${(isChecked)} @change=${eventHandler} tabindex="${getTabI(tabIndex)}" />
-    <label for="${_id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}">${label}</label>
+    <label for="${_id}" class="cb-btn__label cb-btn__label--badge${isNonEmptyStr(badge) ? ' cb-btn__label--' + badge : ''}" title="${ifDefined(_title)}">${label}</label>
   </li>
   <!--  END:  checkboxBtn() -->
   `
