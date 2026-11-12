@@ -1,16 +1,21 @@
 
 .settings {
-  background-color: var(--over-colour);
-  bottom: 0;
-  box-shadow: 0 0 1.5rem var(--over-colour);
   left: 0;
-  padding: 0.5rem;
-  position: absolute;
-  right: 0;
-  transition: transform var(--ease) var(--timing);
-  transform-origin: 2% 90%;
+  opacity: 0.075;
+  scale: 0.66667;
+  transition: opacity var(--ease) var(--timing), scale var(--ease) var(--timing);
+  transform-origin: top left;
   width: 100%;
   z-index: 100;
+}
+.settings:hover, .settings:focus-within {
+  opacity: 1;
+  scale: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings {
+    transition: none;
+  }
 }
 
 .settings__wrap {
