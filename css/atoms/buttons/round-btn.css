@@ -79,9 +79,15 @@
   background-color: var(--success);
 }
 .rnd-btn--add::after {
-  content: "+";
+  content: "\02A39";
   left: 50%;
+  bottom: -1.3rem;
 }
+.rnd-btn--add--after::after {
+  transform: translate(-50%, -50%) rotate(180deg);
+  bottom: -1.7rem;
+}
+
 .rnd-btn--settings {
   border: var(--line-weight-hvy) solid var(--txt-colour);
   background-color: var(--bg-colour);
