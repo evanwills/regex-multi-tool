@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 52.917 52.917" xmlns="http://www.w3.org/2000/svg">
+	<style type="text/css">
+		:root {
+			--stroke-colour: #000;
+			--bg-colour: #000;
+			--bg-opacity: 0;
+		}
+		path {
+			fill:none;
+			stroke-linecap:round;
+			stroke-linejoin:round;
+			stroke-miterlimit:10;
+			stroke-width:5.3607;
+			stroke:var(--stroke-colour);
+		}
+		circle {
+			opacity:var(--bg-opacity);
+			stroke:none;
+			fill:var(--bg-colour);
+		}
+	</style>
+	<g>
+		<circle cx="26.376" cy="26.376" r="26.376" />
+		<path d="m8.1486 15.881 18.231-10.554 18.374 10.546" />
+		<path d="m13.232 34.378 26.46-0.0031" />
+		<path d="m26.446 21.15 0.01204 26.483" />
+	</g>
+</svg>

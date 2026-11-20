@@ -77,15 +77,11 @@
 }
 .rnd-btn--add {
   background-color: var(--success);
+  padding: 0.25rem;
+  text-indent: 0;
 }
-.rnd-btn--add::after {
-  content: "\02A39";
-  left: 50%;
-  bottom: -1.3rem;
-}
-.rnd-btn--add--after::after {
-  transform: translate(-50%, -50%) rotate(180deg);
-  bottom: -1.7rem;
+.rnd-btn--add--after img {
+  transform: rotate(180deg);
 }
 
 .rnd-btn--settings {

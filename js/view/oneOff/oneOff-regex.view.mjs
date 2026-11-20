@@ -1,13 +1,13 @@
-import { html } from '../../lit-html/lit-html.mjs'
-import { repeat } from '../../lit-html/directives/repeat.mjs'
+import { html } from '../../lit-html/lit-html.mjs';
+import { repeat } from '../../lit-html/directives/repeat.mjs';
 import {
   isBool,
   isStr,
   isNonEmptyStr
-} from '../../utilities/validation.mjs'
-import { getID, getTabI } from '../../utilities/sanitise.mjs'
-import { openCloseBtn } from '../shared-components/shared-openClose-btn.view.mjs'
-import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs'
+} from '../../utilities/validation.mjs';
+import { getID, getTabI } from '../../utilities/sanitise.mjs';
+import { openCloseBtn } from '../shared-components/shared-openClose-btn.view.mjs';
+import { checkboxBtn } from '../shared-components/shared-checkbox-btn.view.mjs';
 
 // ============================================
 // START: non-view functions
@@ -288,7 +288,7 @@ const addPair = (id, pos, _dir, clickHandler) => {
   return html`
     <!-- START: addPair() -->
     <button value="${id}-add-${_dir}" class="rnd-btn rnd-btn--add rnd-btn--add--${_dir}" @click=${clickHandler} title="Add regex pair ${_dir} ${pos}">
-      Add pair ${_dir} ${pos}
+      <img src="/img/add-up.icon.svg" alt=""/>
     </button>
     <!--  END:  addPair() -->`
 }
