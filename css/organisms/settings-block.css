@@ -1,7 +1,7 @@
 
 .settings {
   left: 0;
-  opacity: 0.075;
+  opacity: 0.5;
   scale: 0.66667;
   transition: opacity var(--ease) var(--timing), scale var(--ease) var(--timing);
   transform-origin: top left;
